@@ -7,9 +7,12 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.type.ResolvedType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.simple.ob.JSON;
+import com.fasterxml.jackson.simple.ob.JSONObjectException;
 
 /**
- * Convenience wrapper around {@link JSON} that implements {@link ObjectCodec}
+ * Convenience wrapper around {@link JSON} that implements {@link ObjectCodec}.
+ * Note that implementation is not complete, due to natural limitations of
+ * {@link JSON} and "simple" object binding.
  */
 public class JSONAsObjectCodec
     extends ObjectCodec
@@ -42,47 +45,53 @@ public class JSONAsObjectCodec
     /**********************************************************************
      */
     
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T readValue(JsonParser jp, Class<T> valueType)
-            throws IOException, JsonProcessingException {
-        // TODO Auto-generated method stub
-        return null;
+            throws IOException, JsonProcessingException
+    {
+        Object ob = _json.fromJSON(jp);
+        _checkResultType(valueType, ob);
+        return (T) ob;
     }
-
+    
     @Override
     public <T> T readValue(JsonParser jp, TypeReference<?> valueTypeRef)
-            throws IOException, JsonProcessingException {
-        // TODO Auto-generated method stub
-        return null;
+            throws IOException, JsonProcessingException
+    {
+        throw _noTypeReference();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T readValue(JsonParser jp, ResolvedType valueType)
             throws IOException, JsonProcessingException {
-        // TODO Auto-generated method stub
-        return null;
+        return (T) readValue(jp, valueType.getRawClass());
     }
 
     @Override
     public <T> Iterator<T> readValues(JsonParser jp, Class<T> valueType)
             throws IOException, JsonProcessingException {
-        // TODO Auto-generated method stub
-        return null;
+        // May be able to support in future but...
+        throw new JSONObjectException("Simple JSON does not support 'readValues()' methods");
     }
 
     @Override
     public <T> Iterator<T> readValues(JsonParser jp,
-            TypeReference<?> valueTypeRef) throws IOException,
-            JsonProcessingException {
-        // TODO Auto-generated method stub
-        return null;
+        TypeReference<?> valueTypeRef) throws IOException, JsonProcessingException
+    {
+        throw _noTypeReference();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> Iterator<T> readValues(JsonParser jp, ResolvedType valueType)
             throws IOException, JsonProcessingException {
-        // TODO Auto-generated method stub
-        return null;
+        return (Iterator<T>) readValues(jp, valueType.getRawClass());
+    }
+    
+    protected JSONObjectException _noTypeReference() {
+        return new JSONObjectException("Simple JSON does not support use of TypeReference");
     }
 
     /*
@@ -95,14 +104,7 @@ public class JSONAsObjectCodec
     public void writeValue(JsonGenerator jgen, Object value)
             throws IOException, JsonProcessingException
     {
-        // Let's handle trivial case first, to simplify further processing
-        if (value == null) {
-            jgen.writeNull();
-            return;
-        }
-        Class<?> rawType = value.getClass();
-
-        // TODO Auto-generated method stub
+        _json.writeJSON(value, jgen);
     }
     /*
     /**********************************************************************
@@ -127,7 +129,8 @@ public class JSONAsObjectCodec
     }
 
     @Override
-    public void writeTree(JsonGenerator jg, TreeNode tree) throws IOException, JsonProcessingException
+    public void writeTree(JsonGenerator jg, TreeNode tree)
+        throws IOException, JsonProcessingException
     {
         _checkTreeCodec().writeTree(jg, tree);
     }
@@ -143,12 +146,20 @@ public class JSONAsObjectCodec
     {
         /* Without TokenBuffer from jackson-databind, need to actually
          * create an intermediate textual representation. Fine,
-         * we should be able to do that.
+         * we should be able to do that. Bigger question is whether
+         * actual read works but...
          */
-        
-        
-//        return _checkTreeCodec().treeToValue(n, valueType);
-        return null;
+        try {
+            String json = _json.asJSONString(n);
+            JsonParser jp = _jsonFactory.createParser(json);
+            T result = readValue(jp, valueType);
+            jp.close();
+            return result;
+        } catch (JsonProcessingException e) { // to support [JACKSON-758]
+            throw e;
+        } catch (IOException e) { // shouldn't really happen, but is declared as possibility so:
+            throw JSONObjectException.fromUnexpectedIOE(e);
+        }
     }
     
     /*
@@ -175,5 +186,16 @@ public class JSONAsObjectCodec
             throw new IllegalStateException("No TreeCodec has been configured: can not use tree operations");
         }
         return c;
+    }
+
+    protected void _checkResultType(Class<?> valueType, Object ob)
+        throws JSONObjectException
+    {
+        if (ob != null) {
+            if (!valueType.isAssignableFrom(ob.getClass())) {
+                throw new JSONObjectException("Simple JSON can only bind given JSON as "
+                        +ob.getClass().getName()+", not as "+valueType.getName());
+            }
+        }
     }
 }

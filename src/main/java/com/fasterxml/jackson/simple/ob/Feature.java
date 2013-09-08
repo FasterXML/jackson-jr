@@ -36,6 +36,30 @@ public enum Feature
     /* Write-related features
     /**********************************************************************
      */
+
+    /**
+     * Feature that can be enabled to use "pretty-printing", basic indentation
+     * to make resulting JSON easier to read by humans by adding white space
+     * such as line feeds and indentation.
+     *<p>
+     * Default setting is <code>false</code> so that no pretty-printing is done
+     * (unless explicitly constructed with a pretty printer object)
+     */
+    PRETTY_PRINT_OUTPUT(false),
+    
+    /**
+     * Feature that determines whether <code>JsonGenerator.flush()</code> is
+     * called after <code>writeJSON()</code> method <b>that takes JsonGenerator
+     * as an argument</b> completes (that is, does NOT affect methods
+     * that use other destinations).
+     * This usually makes sense; but there are cases where flushing
+     * should not be forced: for example when underlying stream is
+     * compressing and flush() causes compression state to be flushed
+     * (which occurs with some compression codecs).
+     *<p>
+     * Feature is enabled by default.
+     */
+    FLUSH_AFTER_WRITE_VALUE(true),
     
     ;
 

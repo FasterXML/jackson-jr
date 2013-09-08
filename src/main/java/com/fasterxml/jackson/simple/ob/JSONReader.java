@@ -1,5 +1,8 @@
 package com.fasterxml.jackson.simple.ob;
 
+import java.io.IOException;
+import java.util.*;
+
 import com.fasterxml.jackson.core.*;
 
 /**
@@ -77,10 +80,28 @@ public class JSONReader
     
     /*
     /**********************************************************************
-    /* Public serialization methods
+    /* Public deserialization methods
     /**********************************************************************
      */
 
+    public Object readValue() throws IOException, JsonProcessingException
+    {
+        // !!! TODO
+        return null;
+    }
+
+    public Map<String,Object> readMap() throws IOException, JsonProcessingException
+    {
+        // !!! TODO
+        return null;
+    }
+
+    public List<Object> readList() throws IOException, JsonProcessingException
+    {
+        // !!! TODO
+        return null;
+    }
+    
     /*
     /**********************************************************************
     /* Internal methods

@@ -29,6 +29,8 @@ public enum SimpleType
     
     CHARACTER_SEQUENCE,
 
+    BYTE_ARRAY,
+    
     // // // Numbers
     
     NUMBER_BYTE,

@@ -1,5 +1,7 @@
 package com.fasterxml.jackson.simple.ob;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.simple.ob.impl.TypeDetector;
 
@@ -86,6 +88,11 @@ public class JSONWriter
     /**********************************************************************
      */
 
+    public void writeValue(Object value) throws IOException, JsonProcessingException
+    {
+        // !!! TODO
+    }
+    
     /*
     /**********************************************************************
     /* Internal methods
