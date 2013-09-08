@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fasterxml.jackson.core.TreeNode;
+
 /**
  * Helper object used for efficient detection of type information
  * relevant to our conversion needs.
@@ -137,6 +139,9 @@ public class TypeDetector
                 // and if not, consider "only" a collection
             }
             return SimpleType.COLLECTION;
+        }
+        if (TreeNode.class.isAssignableFrom(raw)) {
+            return SimpleType.TREE_NODE;
         }
         if (CharSequence.class.isAssignableFrom(raw)) {
             return SimpleType.CHARACTER_SEQUENCE;

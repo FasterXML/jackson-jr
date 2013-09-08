@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.Instantiatable;
 import com.fasterxml.jackson.simple.ob.impl.JSONAsObjectCodec;
+import com.fasterxml.jackson.simple.ob.impl.TypeDetector;
 
 /**
  * Main entry point for functionality.
@@ -75,8 +76,7 @@ public class JSON
             JsonFactory jsonF, TreeCodec trees)
     {
         this(features, jsonF, trees,
-                new JSONReader(DEFAULT_FEATURES),
-                new JSONWriter(DEFAULT_FEATURES),
+                null, null, // reader, writer
                 null);
     }
     
@@ -88,11 +88,19 @@ public class JSON
         _features = features;
         _jsonFactory = jsonF;
         _treeCodec = trees;
-        _reader = r;
-        _writer = w;
+        _reader = (r == null) ? _defaultReader(features) : r;
+        _writer = (w == null) ? _defaultWriter(features, trees) : w;
         _prettyPrinter = pp;
     }
 
+    protected JSONReader _defaultReader(int features) {
+        return new JSONReader(features);
+    }
+
+    protected JSONWriter _defaultWriter(int features, TreeCodec tc) {
+        return new JSONWriter(features, TypeDetector.rootDetector(), tc);
+    }
+    
     /*
     /**********************************************************************
     /* Adapting

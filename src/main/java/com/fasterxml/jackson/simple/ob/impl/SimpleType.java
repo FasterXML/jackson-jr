@@ -27,6 +27,11 @@ public enum SimpleType
      * Arrays of non-primitive types
      */
     OBJECT_ARRAY,
+
+    /**
+     * An implementation of {@link com.fasterxml.jackson.core.TreeNode}
+     */
+    TREE_NODE,
     
     // // // String(-like) types
 

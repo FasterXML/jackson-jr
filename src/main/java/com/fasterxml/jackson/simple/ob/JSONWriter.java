@@ -35,6 +35,8 @@ public class JSONWriter
      */
     protected final TypeDetector _typeDetector;
 
+    protected final TreeCodec _treeCodec;
+    
     /*
     /**********************************************************************
     /* Instance config
@@ -50,21 +52,14 @@ public class JSONWriter
      */
 
     /**
-     * Constructor used for creating the default blueprint instance.
-     */
-    protected JSONWriter(int features)
-    {
-        this(features, TypeDetector.rootDetector());
-    }
-
-    /**
      * Constructor used for creating differently configured blueprint
      * instances
      */
-    protected JSONWriter(int features, TypeDetector td)
+    protected JSONWriter(int features, TypeDetector td, TreeCodec tc)
     {
         _features = features;
         _typeDetector = td;
+        _treeCodec = tc;
         _generator = null;
     }
 
@@ -75,7 +70,46 @@ public class JSONWriter
     {
         _features = base._features;
         _typeDetector = base._typeDetector.perOperationInstance();
+        _treeCodec = base._treeCodec;
         _generator = jgen;
+    }
+
+    /*
+    /**********************************************************************
+    /* Mutant factories for blueprint
+    /**********************************************************************
+     */
+
+    public final JSONWriter withFeatures(int features) {
+        if (_features == features) {
+            return this;
+        }
+        return _with(features, _typeDetector, _treeCodec);
+    }
+
+    public final JSONWriter with(TypeDetector td) {
+        if (_typeDetector == td) {
+            return this;
+        }
+        return _with(_features, td, _treeCodec);
+    }
+
+    public final JSONWriter with(TreeCodec tc) {
+        if (_treeCodec == tc) {
+            return this;
+        }
+        return _with(_features, _typeDetector, tc);
+    }
+    
+    /**
+     * Overridable method
+     */
+    protected JSONWriter _with(int features, TypeDetector td, TreeCodec tc)
+    {
+        if (getClass() != JSONWriter.class) { // sanity check
+            throw new IllegalStateException("Sub-classes MUST override _with(...)");
+        }
+        return new JSONWriter(features, td, tc);
     }
     
     /*
@@ -178,7 +212,9 @@ public class JSONWriter
         case OBJECT_ARRAY:
             writeObjectArrayValue((Object[]) value);
             return;
-            
+        case TREE_NODE:
+            writeTreeNodeValue((TreeNode) value);
+            return;
         case OTHER:
             writeUnknownValue(value);
             return;
@@ -212,9 +248,6 @@ public class JSONWriter
             return;
         case BYTE_ARRAY:
             writeBinaryField(fieldName, (byte[]) value);
-            return;
-        case INT_ARRAY:
-            writeIntArrayField(fieldName, (int[]) value);
             return;
 
             // Number types:
@@ -270,7 +303,13 @@ public class JSONWriter
         case OBJECT_ARRAY:
             writeObjectArrayField(fieldName, (Object[]) value);
             return;
-            
+        case INT_ARRAY:
+            writeIntArrayField(fieldName, (int[]) value);
+            return;
+        case TREE_NODE:
+            writeTreeNodeField(fieldName, (TreeNode) value);
+            return;
+
         case OTHER:
             writeUnknownField(fieldName, value);
             return;
@@ -359,7 +398,7 @@ public class JSONWriter
         _generator.writeFieldName(fieldName);
         writeObjectArrayValue(v);
     }
-    
+
     protected void writeIntArrayValue(int[] v) throws IOException, JsonProcessingException {
         _generator.writeStartArray();
         for (int i = 0, len = v.length; i < len; ++i) {
@@ -372,6 +411,19 @@ public class JSONWriter
     {
         _generator.writeFieldName(fieldName);
         writeIntArrayValue(v);
+    }
+
+    protected void writeTreeNodeValue(TreeNode v) throws IOException, JsonProcessingException {
+        if (_treeCodec == null) {
+            throw new JSONObjectException("No TreeCodec configured: can not serializer TreeNode values");
+        }
+        _treeCodec.writeTree(_generator, v);
+    }
+
+    protected void writeTreeNodeField(String fieldName, TreeNode v) throws IOException, JsonProcessingException
+    {
+        _generator.writeFieldName(fieldName);
+        writeTreeNodeValue(v);
     }
     
     /*
