@@ -47,7 +47,7 @@ public class JSONWriter
     
     /*
     /**********************************************************************
-    /* Blueprint construction, configuration
+    /* Blueprint construction
     /**********************************************************************
      */
 
@@ -100,9 +100,10 @@ public class JSONWriter
         }
         return _with(_features, _typeDetector, tc);
     }
-    
+
     /**
-     * Overridable method
+     * Overridable method that all mutant factories call if a new instance
+     * is to be constructed
      */
     protected JSONWriter _with(int features, TypeDetector td, TreeCodec tc)
     {

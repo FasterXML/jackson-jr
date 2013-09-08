@@ -35,7 +35,7 @@ public class JSONReader
     
     /*
     /**********************************************************************
-    /* Blueprint construction, configuration
+    /* Blueprint construction
     /**********************************************************************
      */
 
@@ -61,12 +61,39 @@ public class JSONReader
     }
     */
 
+    /**
+     * Constructor used for per-operation (non-blueprint) instance.
+     */
     protected JSONReader(JSONReader base, JsonParser jp)
     {
         _features = base._features;
         _parser = jp;
     }
+
+    /*
+    /**********************************************************************
+    /* Mutant factories for blueprint
+    /**********************************************************************
+     */
+    public final JSONReader withFeatures(int features) {
+        if (_features == features) {
+            return this;
+        }
+        return _with(features);
+    }
     
+    /**
+     * Overridable method that all mutant factories call if a new instance
+     * is to be constructed
+     */
+    protected JSONReader _with(int features)
+    {
+        if (getClass() != JSONReader.class) { // sanity check
+            throw new IllegalStateException("Sub-classes MUST override _with(...)");
+        }
+        return new JSONReader(features);
+    }
+
     /*
     /**********************************************************************
     /* New instance creation
@@ -77,10 +104,10 @@ public class JSONReader
     {
         return new JSONReader(this, jp);
     }
-    
+
     /*
     /**********************************************************************
-    /* Public deserialization methods
+    /* Public entry points for reading Simple objects from JSON
     /**********************************************************************
      */
 
@@ -101,6 +128,12 @@ public class JSONReader
         // !!! TODO
         return null;
     }
+
+    /*
+    /**********************************************************************
+    /* Internal parse methods
+    /**********************************************************************
+     */
     
     /*
     /**********************************************************************
