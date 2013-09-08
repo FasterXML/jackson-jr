@@ -489,6 +489,7 @@ public class JSON
     protected JsonParser _config(JsonParser jp)
     {
         // nothing to do, yet
+        return jp;
     }
 
     protected void _close(Closeable cl) {
