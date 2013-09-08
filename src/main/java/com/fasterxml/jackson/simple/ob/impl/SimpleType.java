@@ -23,14 +23,23 @@ public enum SimpleType
      */
     COLLECTION,
 
+    /**
+     * Arrays of non-primitive types
+     */
+    OBJECT_ARRAY,
+    
     // // // String(-like) types
 
     STRING,
     
     CHARACTER_SEQUENCE,
+    
+    CHAR_ARRAY,
 
     BYTE_ARRAY,
-    
+
+    INT_ARRAY,
+
     // // // Numbers
     
     NUMBER_BYTE,
@@ -49,14 +58,18 @@ public enum SimpleType
 
     NUMBER_BIG_DECIMAL,
 
+    NUMBER_OTHER,
+    
     // // // Other scalar types
     
     BOOLEAN,
 
     CHAR,
-    
+
     DATE,
-    
+
+    ENUM,
+
     // // // Iterate-able types
 
     /**
