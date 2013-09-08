@@ -29,7 +29,8 @@ has no other dependencies.
 
   <properties>
     <osgi.export>
-com.fasterxml.jackson.simple.ob
+com.fasterxml.jackson.simple.ob,
+com.fasterxml.jackson.simple.ob.impl
     </osgi.export>
     <osgi.import>
 com.fasterxml.jackson.core,
