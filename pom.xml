@@ -33,8 +33,6 @@ com.fasterxml.jackson.simple.ob
     </osgi.export>
     <osgi.import>
 com.fasterxml.jackson.core,
-com.fasterxml.jackson.core.base,
-com.fasterxml.jackson.core.format,
 com.fasterxml.jackson.core.json,
 com.fasterxml.jackson.core.io,
 com.fasterxml.jackson.core.util,

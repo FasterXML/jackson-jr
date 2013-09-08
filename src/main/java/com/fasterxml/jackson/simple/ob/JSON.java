@@ -43,6 +43,10 @@ public class JSON
      * read and write {@link TreeNode} instances that codec supports.
      */
     protected final TreeCodec _treeCodec;
+
+    protected final JSONReader _reader;
+
+    protected final JSONWriter _writer;
     
     /*
     /**********************************************************************
@@ -65,9 +69,20 @@ public class JSON
     protected JSON(int features,
             JsonFactory jsonF, TreeCodec trees)
     {
+        this(features, jsonF, trees,
+                new JSONReader(DEFAULT_FEATURES),
+                new JSONWriter(DEFAULT_FEATURES));
+    }
+    
+    protected JSON(int features,
+            JsonFactory jsonF, TreeCodec trees,
+            JSONReader r, JSONWriter w)
+    {
         _features = features;
         _jsonFactory = jsonF;
         _treeCodec = trees;
+        _reader = r;
+        _writer = w;
     }
     
     /*
@@ -100,9 +115,25 @@ public class JSON
         if (c == _treeCodec) {
             return this;
         }
-        return new JSON(_features, _jsonFactory, c);
+        return new JSON(_features, _jsonFactory, c, _reader, _writer);
     }
 
+    public JSON with(JSONReader r)
+    {
+        if (r == _reader) {
+            return this;
+        }
+        return new JSON(_features, _jsonFactory, _treeCodec, r, _writer);
+    }
+
+    public JSON with(JSONWriter w)
+    {
+        if (w == _writer) {
+            return this;
+        }
+        return new JSON(_features, _jsonFactory, _treeCodec, _reader, w);
+    }
+    
     public JSON with(Feature feature, boolean state)
     {
         int f = _features;
@@ -136,7 +167,7 @@ public class JSON
         if (_features == f) {
             return this;
         }
-        return new JSON(f, _jsonFactory, _treeCodec);
+        return new JSON(f, _jsonFactory, _treeCodec, _reader, _writer);
     }
     
     protected final JSON _with(JSON base,
@@ -146,7 +177,7 @@ public class JSON
                 && (_treeCodec == trees)) {
             return this;
         }
-        return new JSON(base._features, jsonF, trees);
+        return new JSON(base._features, jsonF, trees, _reader, _writer);
     }
     
     /*
