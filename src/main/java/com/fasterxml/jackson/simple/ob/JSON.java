@@ -1,11 +1,10 @@
 package com.fasterxml.jackson.simple.ob;
 
-import java.io.IOException;
-import java.util.Iterator;
+import java.io.*;
+import java.util.*;
 
 import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.core.type.ResolvedType;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.simple.ob.impl.JSONAsObjectCodec;
 
 /**
  * Main entry point for functionality.
@@ -13,7 +12,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
  * Note that instances are fully immutable, and thereby thread-safe.
  */
 public class JSON
-    extends ObjectCodec
+    implements Versioned
 {
     /**
      * Singleton instance with standard, default configuration.
@@ -83,6 +82,20 @@ public class JSON
         _treeCodec = trees;
         _reader = r;
         _writer = w;
+    }
+
+    /*
+    /**********************************************************************
+    /* Adapting
+    /**********************************************************************
+     */
+
+    /**
+     * Convenience method for constructing an adapter that uses this
+     * instance as a {@link ObjectCodec}
+     */
+    public ObjectCodec asCodec() {
+        return new JSONAsObjectCodec(this);
     }
     
     /*
@@ -182,157 +195,84 @@ public class JSON
     
     /*
     /**********************************************************************
-    /* ObjectCodec: Object reads
-    /**********************************************************************
-     */
-    
-    @Override
-    public <T> T readValue(JsonParser jp, Class<T> valueType)
-            throws IOException, JsonProcessingException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T> T readValue(JsonParser jp, TypeReference<?> valueTypeRef)
-            throws IOException, JsonProcessingException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T> T readValue(JsonParser jp, ResolvedType valueType)
-            throws IOException, JsonProcessingException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T> Iterator<T> readValues(JsonParser jp, Class<T> valueType)
-            throws IOException, JsonProcessingException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T> Iterator<T> readValues(JsonParser jp,
-            TypeReference<?> valueTypeRef) throws IOException,
-            JsonProcessingException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T> Iterator<T> readValues(JsonParser jp, ResolvedType valueType)
-            throws IOException, JsonProcessingException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-    /**********************************************************************
-    /* ObjectCodec: Object writes
+    /* Simple accessors
     /**********************************************************************
      */
 
-    @Override
-    public void writeValue(JsonGenerator jgen, Object value)
-            throws IOException, JsonProcessingException
-    {
-        // Let's handle trivial case first, to simplify further processing
-        if (value == null) {
-            jgen.writeNull();
-            return;
-        }
-        Class<?> rawType = value.getClass();
-
-        // TODO Auto-generated method stub
-    }
-    
-    /*
-    /**********************************************************************
-    /* ObjectCodec: Tree
-    /**********************************************************************
-     */
-
-    @Override
-    public TreeNode createObjectNode() {
-        return _checkTreeCodec().createObjectNode();
+    public TreeCodec getTreeCodec() {
+        return _treeCodec;
     }
 
-    @Override
-    public TreeNode createArrayNode() {
-        return _checkTreeCodec().createArrayNode();
-    }
-
-    @Override
-    public <T extends TreeNode> T readTree(JsonParser jp) throws IOException, JsonProcessingException
-    {
-        return _checkTreeCodec().readTree(jp);
-    }
-
-    @Override
-    public void writeTree(JsonGenerator jg, TreeNode tree) throws IOException, JsonProcessingException
-    {
-        _checkTreeCodec().writeTree(jg, tree);
-    }
-    
-    @Override
-    public JsonParser treeAsTokens(TreeNode n) {
-        return _checkTreeCodec().treeAsTokens(n);
-    }
-
-    @Override
-    public <T> T treeToValue(TreeNode n, Class<T> valueType)
-        throws JsonProcessingException
-    {
-        /* Without TokenBuffer from jackson-databind, need to actually
-         * create an intermediate textual representation. Fine,
-         * we should be able to do that.
-         */
-        
-        
-//        return _checkTreeCodec().treeToValue(n, valueType);
-        return null;
-    }
-    
-    /*
-    /**********************************************************************
-    /* ObjectCodec: other
-    /**********************************************************************
-     */
-
-    /**
-     * Use of this method is discouraged, because it can be used to potentially
-     * cause thread-safety problems if modifications are made during operation;
-     * the reason for inclusion is that it is part of {@link ObjectCodec} API
-     * that we implement.
-     * Use it <b>ONLY IF YOU KNOW WHAT YOU ARE DOING</b>.
-     */
-    @Deprecated
-    @Override
     public JsonFactory getJsonFactory() {
         return _jsonFactory;
     }
     
     /*
     /**********************************************************************
-    /* Extended API
+    /* API: writing JSON
     /**********************************************************************
      */
 
+    public String asJSONString() throws IOException, JSONObjectException
+    {
+        // !!! TODO
+        return null;
+    }
+
+    public byte[] asJSONBytes() throws IOException, JSONObjectException
+    {
+        // !!! TODO
+        return null;
+    }
+
+    public void writeJSON(Object value, JsonGenerator jgen) throws IOException, JSONObjectException
+    {
+        // !!! TODO
+    }
+
+    public void writeJSON(Object value, OutputStream out) throws IOException, JSONObjectException
+    {
+        // !!! TODO
+    }
+
+    public void writeJSON(Object value, Reader r) throws IOException, JSONObjectException
+    {
+        // !!! TODO
+    }
+
+    public void writeJSON(Object value, File f) throws IOException, JSONObjectException
+    {
+        // !!! TODO
+    }
+    
+    /*
+    /**********************************************************************
+    /* API: reading JSON
+    /**********************************************************************
+     */
+
+    public List<Object> listFromJSON(String json) throws IOException, JSONObjectException
+    {
+        // !!! TODO
+        return null;
+    }
+    
+    public Map<String,Object> mapFromJSON(String json) throws IOException, JSONObjectException
+    {
+        // !!! TODO
+        return null;
+    }
+
+    public Object fromJSON(String json) throws IOException, JSONObjectException
+    {
+        // !!! TODO
+        return null;
+    }
+    
     /*
     /**********************************************************************
     /* Internal methods
     /**********************************************************************
      */
 
-    protected TreeCodec _checkTreeCodec()
-    {
-        TreeCodec c = _treeCodec;
-        if (c == null) {
-            throw new IllegalStateException("No TreeCodec has been configured: can not use tree operations");
-        }
-        return c;
-    }
 }
