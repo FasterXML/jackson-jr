@@ -335,6 +335,32 @@ public class JSON
         return result;
     }
 
+    public Object[] arrayFromJSON(Object source) throws IOException, JSONObjectException
+    {
+        JsonParser jp;
+        Object[] result;
+        if (source instanceof JsonParser) {
+            // note: no call to _config(), should come pre-configured
+            jp = _initForReading((JsonParser) source);
+            result = _reader(jp).readArray();
+        } else {
+            jp = _parser(source);
+            boolean closed = false;
+            try {
+                _initForReading(_config(jp));
+                result = _reader(jp).readArray();
+                closed = true;
+            } finally {
+                if (!closed) {
+                    _close(jp);
+                }
+            }
+        }
+        // Need to consume the token too
+        jp.clearCurrentToken();
+        return result;
+    }
+    
     public Map<String,Object> mapFromJSON(Object source) throws IOException, JSONObjectException
     {
         JsonParser jp;
@@ -361,6 +387,24 @@ public class JSON
         return result;
     }
 
+    /**
+     * Read method that will take given JSON Source (of one of supported types),
+     * read contents and map it to one of simple mappings ({@link java.util.Map}
+     * for JSON Objects, {@link java.util.List} for JSON Arrays, {@link java.lang.String}
+     * for JSON Strings, null for JSON null, {@link java.lang.Boolean} for JSON booleans
+     * and {@link java.lang.Number} for JSON numbers.
+     *<p>
+     * Supported source types include:
+     *<ul>
+     * <li>{@link java.io.InputStream}</li>
+     * <li>{@link java.io.Reader}</li>
+     * <li>{@link java.io.File}</li>
+     * <li>{@link java.net.URL}</li>
+     * <li>{@link java.lang.String}</li>
+     * <li><code>byte[]</code></li>
+     * <li><code>char[]</code></li>
+     *</ul>
+     */
     public Object fromJSON(Object source) throws IOException, JSONObjectException
     {
         JsonParser jp;

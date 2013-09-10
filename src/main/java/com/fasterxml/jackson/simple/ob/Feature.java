@@ -13,14 +13,31 @@ public enum Feature
 
     /**
      * When reading JSON Numbers, should {@link java.math.BigDecimal} be used
-     * for floating-point numbers or {@link java.lang.Double}?
-     * is used.
+     * for floating-point numbers; or should {@link java.lang.Double} be used.
+     * Trade-off is between accuracy -- only {@link java.math.BigDecimal} is
+     * guaranteed to store the EXACT decimal value parsed -- and performance
+     * ({@link java.lang.Double} is typically faster to parser).
      *<p>
      * Default setting is <code>false</code>, meaning that {@link java.lang.Double}
      * is used.
      */
     USE_BIG_DECIMAL_FOR_FLOATS(false),
 
+    /**
+     * This feature can be enabled to reduce memory usage for use cases where
+     * resulting container objects ({@link java.util.Map}s and {@link java.util.Collection}s)
+     * do not need to mutable (that is, their contents can not changed).
+     * If set, reader is allowed to construct immutable (read-only)
+     * container objects; and specifically empty {@link java.util.Map}s and
+     * {@link java.util.Collection}s can be used to reduce number of
+     * objects allocated. In addition, sizes of non-empty containers can
+     * be trimmed to exact size.
+     *<p>
+     * Defaul setting is <code>false</code>, meaning that reader will have to
+     * construct mutable container instance when reading.
+     */
+    READ_ONLY(false),
+    
     /**
      * When encountering duplicate keys for JSON Objects, should an exception
      * be thrown or not? If exception is not thrown, <b>the last</b> instance
@@ -70,9 +87,12 @@ public enum Feature
      */
 
     private final boolean _defaultState;
+
+    private final int _mask;
     
     private Feature(boolean defaultState) {
         _defaultState = defaultState;
+        _mask = (1 << ordinal());
     }
 
     public static int defaults()
@@ -88,5 +108,9 @@ public enum Feature
     
     public boolean enabledByDefault() { return _defaultState; }
 
-    public int mask() { return (1 << ordinal()); }
+    public int mask() { return _mask; }
+
+    public boolean isEnabled(int flags) {
+        return (flags & _mask) != 0;
+    }
 }
