@@ -26,6 +26,8 @@ public class JSONReader
      */
 
     protected final int _features;
+    
+    protected final boolean _cfgReadOnly;
 
     /*
     /**********************************************************************
@@ -49,6 +51,7 @@ public class JSONReader
 //        this(features);
         _features = features;
         _parser = null;
+        _cfgReadOnly = Feature.READ_ONLY.isEnabled(features);
     }
 
     /**
@@ -69,6 +72,7 @@ public class JSONReader
     protected JSONReader(JSONReader base, JsonParser jp)
     {
         _features = base._features;
+        _cfgReadOnly = base._cfgReadOnly;
         _parser = jp;
     }
 
@@ -181,9 +185,15 @@ public class JSONReader
     protected Object _readFromObject() throws IOException, JsonProcessingException
     {
         final JsonParser p = _parser;
-        JsonToken t;
-        final Map<Object,Object> result = new LinkedHashMap<Object,Object>();
+
+        // First, a minor optimization for empty Maps
+
+        JsonToken t = p.nextValue();
+        if (t == JsonToken.END_OBJECT) {
+            return emptyMap();
+        }
         
+        final Map<Object,Object> result = new LinkedHashMap<Object,Object>();
         while ((t = p.nextValue()) != null && t != JsonToken.END_OBJECT) {
             Object key = fromKey(p.getCurrentName());
             Object value = _readFromAny();
@@ -285,8 +295,19 @@ public class JSONReader
         return null;
     }
 
-    public List<?> emptyList() { return null; }
-    public Map<String,Object> emptyMap() { return null; }
+    public List<Object> emptyList() { 
+        if (_cfgReadOnly) {
+            return Collections.emptyList();
+        }
+        return new ArrayList<Object>(0);
+    }
+
+    public Map<Object,Object> emptyMap() {
+        if (_cfgReadOnly) {
+            return Collections.emptyMap();
+        }
+        return new LinkedHashMap<Object,Object>();
+    }
     public Object[] emptyArray() { // always safe to return empty array
         return EMPTY_ARRAY;
     }
