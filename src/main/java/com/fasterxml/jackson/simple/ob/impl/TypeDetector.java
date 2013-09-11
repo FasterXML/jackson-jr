@@ -30,7 +30,7 @@ public class TypeDetector
     protected Class<?> _prevClass;
 
     protected SimpleType _prevType;
-    
+
     protected TypeDetector(ConcurrentHashMap<ClassKey, SimpleType> types) {
         _knownTypes = types;
     }

@@ -24,6 +24,15 @@ public enum Feature
     USE_BIG_DECIMAL_FOR_FLOATS(false),
 
     /**
+     * When reading JSON Arrays, should matching Java value be of type
+     * <code>Object[]</code> (true) or {@link java.util.List} (false)?
+     *<p>
+     * Default setting is <code>false</code>, meaning that JSON Arrays
+     * are bound to {@link java.util.List}s.
+     */
+    READ_JSON_ARRAYS_AS_JAVA_ARRAYS(false),
+
+    /**
      * This feature can be enabled to reduce memory usage for use cases where
      * resulting container objects ({@link java.util.Map}s and {@link java.util.Collection}s)
      * do not need to mutable (that is, their contents can not changed).
@@ -33,10 +42,21 @@ public enum Feature
      * objects allocated. In addition, sizes of non-empty containers can
      * be trimmed to exact size.
      *<p>
-     * Defaul setting is <code>false</code>, meaning that reader will have to
+     * Default setting is <code>false</code>, meaning that reader will have to
      * construct mutable container instance when reading.
      */
     READ_ONLY(false),
+
+    /**
+     * This feature can be used to indicate that the reader should preserve
+     * order of the properties same as what input document has.
+     * Note that it is up to {@link com.fasterxml.jackson.simple.ob.impl.MapBuilder}
+     * to support this feature; custom implementations may ignore the setting.
+     *<p>
+     * Default setting is <code>true</code>, meaning that reader is expected to try to
+     * preserve ordering of fields read.
+     */
+    PRESERVE_FIELD_ORDERING(true),
     
     /**
      * When encountering duplicate keys for JSON Objects, should an exception

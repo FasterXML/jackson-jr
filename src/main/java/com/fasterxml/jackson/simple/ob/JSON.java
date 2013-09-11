@@ -8,8 +8,7 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.Instantiatable;
-import com.fasterxml.jackson.simple.ob.impl.JSONAsObjectCodec;
-import com.fasterxml.jackson.simple.ob.impl.TypeDetector;
+import com.fasterxml.jackson.simple.ob.impl.*;
 
 /**
  * Main entry point for functionality.
@@ -47,9 +46,17 @@ public class JSON
      * read and write {@link TreeNode} instances that codec supports.
      */
     protected final TreeCodec _treeCodec;
-
+    
+    /**
+     * Blueprint instance of the reader to use for reading JSON as simple
+     * Objects.
+     */
     protected final JSONReader _reader;
 
+    /**
+     * Blueprint isntance of the writer to use for writing JSON given
+     * simple Objects.
+     */
     protected final JSONWriter _writer;
     
     /*
@@ -94,7 +101,7 @@ public class JSON
     }
 
     protected JSONReader _defaultReader(int features) {
-        return new JSONReader(features);
+        return new JSONReader(features, ListBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
 
     protected JSONWriter _defaultWriter(int features, TreeCodec tc) {
@@ -125,7 +132,7 @@ public class JSON
     public Version version() {
         return PackageVersion.VERSION;
     }
-
+    
     /*
     /**********************************************************************
     /* Mutant factories
@@ -137,45 +144,93 @@ public class JSON
         if (f == _jsonFactory) {
             return this;
         }
-        return new JSON(_features, f, _treeCodec);
+        return _with(_features, f, _treeCodec, _reader, _writer, _prettyPrinter);
     }
 
+    /**
+     * Mutant factory for constructing an instance with specified {@link TreeCodec},
+     * and returning new instance (or, if there would be no change, this instance).
+     */
     public JSON with(TreeCodec c)
     {
         if (c == _treeCodec) {
             return this;
         }
-        return new JSON(_features, _jsonFactory, c,
-                _reader, _writer, _prettyPrinter);
+        return _with(_features, _jsonFactory, c,
+                _reader, _writer.with(c), _prettyPrinter);
     }
 
+    /**
+     * Mutant factory for constructing an instance with specified {@link JSONReader},
+     * and returning new instance (or, if there would be no change, this instance).
+     */
     public JSON with(JSONReader r)
     {
         if (r == _reader) {
             return this;
         }
-        return new JSON(_features, _jsonFactory, _treeCodec,
+        return _with(_features, _jsonFactory, _treeCodec,
                 r, _writer, _prettyPrinter);
     }
 
+    /**
+     * Mutant factory for constructing an instance with specified {@link JSONWriter},
+     * and returning new instance (or, if there would be no change, this instance).
+     */
     public JSON with(JSONWriter w)
     {
         if (w == _writer) {
             return this;
         }
-        return new JSON(_features, _jsonFactory, _treeCodec,
+        return _with( _features, _jsonFactory, _treeCodec,
                 _reader, w, _prettyPrinter);
     }
 
+    /**
+     * Mutant factory for constructing an instance with specified {@link PrettyPrinter},
+     * and returning new instance (or, if there would be no change, this instance).
+     */
     public JSON with(PrettyPrinter pp)
     {
         if (_prettyPrinter == pp) {
             return this;
         }
-        return new JSON(_features, _jsonFactory, _treeCodec,
+        return _with(_features, _jsonFactory, _treeCodec,
                 _reader, _writer, pp);
     }
+
+    /**
+     * Mutant factory for constructing an instance with specified {@link MapBuilder},
+     * and returning new instance (or, if there would be no change, this instance).
+     */
+    public JSON with(MapBuilder b) {
+        JSONReader r = _reader.with(b);
+        if (r == _reader) {
+            return this;
+        }
+        return _with(_features, _jsonFactory, _treeCodec,
+                r, _writer, _prettyPrinter);
+    }
+
+    /**
+     * Mutant factory for constructing an instance with specified {@link ListBuilder},
+     * and returning new instance (or, if there would be no change, this instance).
+     */
+    public JSON with(ListBuilder b) {
+        JSONReader r = _reader.with(b);
+        if (r == _reader) {
+            return this;
+        }
+        return _with(_features, _jsonFactory, _treeCodec,
+                r, _writer, _prettyPrinter);
+    }
     
+    /**
+     * Mutant factory for constructing an instance with specified feature
+     * enabled or disabled (depending on <code>state</codec>), and returning
+     * an instance with that setting; this may either be this instance (if feature
+     * already had specified state), or a newly constructed instance.
+     */
     public JSON with(Feature feature, boolean state)
     {
         int f = _features;
@@ -187,6 +242,10 @@ public class JSON
         return _with(f);
     }
     
+    /**
+     * Mutant factory for constructing an instance with specified features
+     * enabled.
+     */
     public JSON with(Feature ... features)
     {
         int flags = _features;
@@ -196,6 +255,10 @@ public class JSON
         return _with(flags);
     }
 
+    /**
+     * Mutant factory for constructing an instance with specified features
+     * disabled.
+     */
     public JSON without(Feature ... features)
     {
         int flags = _features;
@@ -205,23 +268,34 @@ public class JSON
         return _with(flags);
     }
 
-    protected final JSON _with(int f) {
-        if (_features == f) {
+    /**
+     * Internal mutant factory method used for constructing
+     */
+    protected final JSON _with(int features)
+    {
+        if (_features == features) {
             return this;
         }
-        return new JSON(f, _jsonFactory, _treeCodec,
-                _reader, _writer, _prettyPrinter);
+        return _with(features, _jsonFactory, _treeCodec,
+                _reader.withFeatures(features), _writer.withFeatures(features),
+                _prettyPrinter);
     }
     
-    protected final JSON _with(JSON base,
-            JsonFactory jsonF, TreeCodec trees)
+    /*
+    /**********************************************************************
+    /* Methods sub-classes must override
+    /**********************************************************************
+     */
+    
+    protected final JSON _with(int features,
+            JsonFactory jsonF, TreeCodec trees,
+            JSONReader reader, JSONWriter writer,
+            PrettyPrinter pp)
     {
-        if ((_jsonFactory == jsonF)
-                && (_treeCodec == trees)) {
-            return this;
+        if (getClass() != JSON.class) {
+            throw new IllegalStateException("Sub-classes MUST override _with(...)");
         }
-        return new JSON(base._features, jsonF, trees,
-                _reader, _writer, _prettyPrinter);
+        return new JSON(_features, jsonF, trees, reader, writer, pp);
     }
     
     /*
@@ -281,7 +355,7 @@ public class JSON
     public void writeJSON(Object value, JsonGenerator jgen) throws IOException, JSONObjectException
     {
         // NOTE: no call to _config(); assumed to be fully configured
-        _writer(jgen).writeValue(value);
+        _writerForOperation(jgen).writeValue(value);
         if (isEnabled(Feature.FLUSH_AFTER_WRITE_VALUE)) {
             jgen.flush();
         }
@@ -316,13 +390,13 @@ public class JSON
         if (source instanceof JsonParser) {
             // note: no call to _config(), should come pre-configured
             jp = _initForReading((JsonParser) source);
-            result = _reader(jp).readList();
+            result = _readerForOperation(jp).readList();
         } else {
             jp = _parser(source);
             boolean closed = false;
             try {
                 _initForReading(_config(jp));
-                result = _reader(jp).readList();
+                result = _readerForOperation(jp).readList();
                 closed = true;
             } finally {
                 if (!closed) {
@@ -342,13 +416,13 @@ public class JSON
         if (source instanceof JsonParser) {
             // note: no call to _config(), should come pre-configured
             jp = _initForReading((JsonParser) source);
-            result = _reader(jp).readArray();
+            result = _readerForOperation(jp).readArray();
         } else {
             jp = _parser(source);
             boolean closed = false;
             try {
                 _initForReading(_config(jp));
-                result = _reader(jp).readArray();
+                result = _readerForOperation(jp).readArray();
                 closed = true;
             } finally {
                 if (!closed) {
@@ -361,20 +435,20 @@ public class JSON
         return result;
     }
     
-    public Map<String,Object> mapFromJSON(Object source) throws IOException, JSONObjectException
+    public Map<Object,Object> mapFromJSON(Object source) throws IOException, JSONObjectException
     {
         JsonParser jp;
-        Map<String,Object> result;
+        Map<Object,Object> result;
         if (source instanceof JsonParser) {
             // note: no call to _config(), should come pre-configured
             jp = _initForReading((JsonParser) source);
-            result = _reader(jp).readMap();
+            result = _readerForOperation(jp).readMap();
         } else {
             jp = _parser(source);
             boolean closed = false;
             try {
                 _initForReading(_config(jp));
-                result = _reader(jp).readMap();
+                result = _readerForOperation(jp).readMap();
                 closed = true;
             } finally {
                 if (!closed) {
@@ -411,13 +485,13 @@ public class JSON
         Object result;
         if (source instanceof JsonParser) {
             jp = _initForReading((JsonParser) source);
-            result = _reader(jp).readValue();
+            result = _readerForOperation(jp).readValue();
         } else {
             jp = _parser(source);
             boolean closed = false;
             try {
                 _initForReading(_config(jp));
-                result = _reader(jp).readValue();
+                result = _readerForOperation(jp).readValue();
                 closed = true;
             } finally {
                 if (!closed) {
@@ -441,7 +515,7 @@ public class JSON
         boolean closed = false;
         try {
             _config(jgen);
-            _writer(jgen).writeValue(value);
+            _writerForOperation(jgen).writeValue(value);
             closed = true;
             jgen.close();
         } finally {
@@ -454,8 +528,8 @@ public class JSON
         }
     }
 
-    protected JSONWriter _writer(JsonGenerator jgen) {
-        return _writer.newWriter(jgen);
+    protected JSONWriter _writerForOperation(JsonGenerator jgen) {
+        return _writer.perOperationInstance(jgen);
     }
 
     /*
@@ -464,8 +538,8 @@ public class JSON
     /**********************************************************************
      */
     
-    protected JSONReader _reader(JsonParser jp) {
-        return _reader.newReader(jp);
+    protected JSONReader _readerForOperation(JsonParser jp) {
+        return _reader.perOperationInstance(jp);
     }
 
     protected JsonParser _parser(Object source) throws IOException, JSONObjectException

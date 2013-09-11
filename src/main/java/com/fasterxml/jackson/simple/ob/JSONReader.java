@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.simple.ob.impl.ListBuilder;
+import com.fasterxml.jackson.simple.ob.impl.MapBuilder;
 
 /**
  * Object that handles construction of simple Objects from JSON.
@@ -13,12 +15,10 @@ import com.fasterxml.jackson.core.*;
  * using mutant factory methods). This blueprint object
  * acts as a factory, and is never used for direct writing;
  * instead, per-call instance is created by calling
- * {@link #newReader}.
+ * {@link #perOperationInstance}.
  */
 public class JSONReader
 {
-    protected final static Object[] EMPTY_ARRAY = new Object[0];
-    
     /*
     /**********************************************************************
     /* Blueprint config
@@ -26,17 +26,26 @@ public class JSONReader
      */
 
     protected final int _features;
-    
-    protected final boolean _cfgReadOnly;
 
+    /**
+     * Handler that takes care of constructing {@link java.util.Map}s as needed
+     */
+    protected final MapBuilder _mapBuilder;
+
+    /**
+     * Handler that takes care of constructing {@link java.util.Map}s as needed
+     */
+    protected final ListBuilder _listBuilder;
+    
     /*
     /**********************************************************************
-    /* Instance config
+    /* Instance config, state
     /**********************************************************************
      */
 
     protected final JsonParser _parser;
 
+    
     /*
     /**********************************************************************
     /* Blueprint construction
@@ -46,12 +55,12 @@ public class JSONReader
     /**
      * Constructor used for creating the default blueprint instance.
      */
-    protected JSONReader(int features)
+    protected JSONReader(int features, ListBuilder lb, MapBuilder mb)
     {
-//        this(features);
         _features = features;
         _parser = null;
-        _cfgReadOnly = Feature.READ_ONLY.isEnabled(features);
+        _listBuilder = lb;
+        _mapBuilder = mb;
     }
 
     /**
@@ -59,9 +68,10 @@ public class JSONReader
      * instances
      */
     /*
-    protected JSONReader(int features)
+    protected JSONReader(int features, ContainerBuilder containerBuilder)
     {
         _features = features;
+        _containerBuilder = containerBuilder;
         _parser = null;
     }
     */
@@ -71,8 +81,10 @@ public class JSONReader
      */
     protected JSONReader(JSONReader base, JsonParser jp)
     {
-        _features = base._features;
-        _cfgReadOnly = base._cfgReadOnly;
+        int features = base._features;
+        _features = features;
+        _listBuilder = base._listBuilder.newBuilder(features);
+        _mapBuilder = base._mapBuilder.newBuilder(features);
         _parser = jp;
     }
 
@@ -82,23 +94,34 @@ public class JSONReader
     /**********************************************************************
      */
 
-    public final JSONReader withFeatures(int features) {
+    public final JSONReader withFeatures(int features)
+    {
         if (_features == features) {
             return this;
         }
-        return _with(features);
+        return _with(features, _listBuilder, _mapBuilder);
+    }
+
+    public final JSONReader with(MapBuilder mb) {
+        if (_mapBuilder == mb) return this;
+        return _with(_features, _listBuilder, mb);
+    }
+
+    public final JSONReader with(ListBuilder lb) {
+        if (_listBuilder == lb) return this;
+        return _with(_features, lb, _mapBuilder);
     }
     
     /**
      * Overridable method that all mutant factories call if a new instance
      * is to be constructed
      */
-    protected JSONReader _with(int features)
+    protected JSONReader _with(int features, ListBuilder lb, MapBuilder mb)
     {
         if (getClass() != JSONReader.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override _with(...)");
         }
-        return new JSONReader(features);
+        return new JSONReader(features, lb, mb);
     }
 
     /*
@@ -107,8 +130,11 @@ public class JSONReader
     /**********************************************************************
      */
 
-    public JSONReader newReader(JsonParser jp)
+    public JSONReader perOperationInstance(JsonParser jp)
     {
+        if (getClass() != JSONReader.class) { // sanity check
+            throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
+        }
         return new JSONReader(this, jp);
     }
 
@@ -123,10 +149,14 @@ public class JSONReader
         return _readFromAny();
     }
     
-    public Map<String,Object> readMap() throws IOException, JsonProcessingException
+    @SuppressWarnings("unchecked")
+    public Map<Object,Object> readMap() throws IOException, JsonProcessingException
     {
-        // !!! TODO
-        return null;
+        if (_parser.getCurrentToken() != JsonToken.START_OBJECT) {
+            throw JSONObjectException.from(_parser,
+                    "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+_parser.getCurrentToken());
+        }
+        return (Map<Object,Object>) _readFromObject();
     }
 
     public List<Object> readList() throws IOException, JsonProcessingException
@@ -187,31 +217,51 @@ public class JSONReader
         final JsonParser p = _parser;
 
         // First, a minor optimization for empty Maps
+        if (p.nextValue() == JsonToken.END_OBJECT) {
+            return _mapBuilder.emptyMap();
+        }
+        // and another for singletons...
+        Object key = fromKey(p.getCurrentName());
+        Object value = _readFromAny();
 
-        JsonToken t = p.nextValue();
-        if (t == JsonToken.END_OBJECT) {
-            return emptyMap();
+        if (p.nextValue() == JsonToken.END_OBJECT) {
+            return _mapBuilder.singletonMap(key, value);
         }
-        
-        final Map<Object,Object> result = new LinkedHashMap<Object,Object>();
-        while ((t = p.nextValue()) != null && t != JsonToken.END_OBJECT) {
-            Object key = fromKey(p.getCurrentName());
-            Object value = _readFromAny();
-            result.put(key, value);
+
+        // but then it's loop-de-loop
+        MapBuilder b = _mapBuilder.start();
+        while (true) {
+            b = b.put(key, value);
+            JsonToken t;
+            if ((t = p.nextValue()) == JsonToken.END_OBJECT || t == null) {
+                return b.build();
+            }
+            key = fromKey(p.getCurrentName());
+            value = _readFromAny();
         }
-        return result;
     }
 
     protected Object _readFromArray() throws IOException, JsonProcessingException
     {
         final JsonParser p = _parser;
-        JsonToken t;
-        final List<Object> result = new ArrayList<Object>();
-        
-        while ((t = p.nextToken()) != null && t != JsonToken.END_ARRAY) {
-            result.add(_readFromAny());
+        // First two special cases; empty, single-element
+        if (p.nextToken() == JsonToken.END_ARRAY) {
+            return _listBuilder.emptyList();
         }
-        return result;
+        Object value = _readFromAny();
+        if (p.nextToken() == JsonToken.END_ARRAY) {
+            return _listBuilder.singletonList(value);
+        }
+        // otherwise, loop
+        ListBuilder b = _listBuilder.start();
+        while (true) {
+            b = b.add(value);
+            JsonToken t;
+            if (((t = p.nextToken()) == JsonToken.END_ARRAY) || t == null) {
+                return b.build();
+            }
+            value = _readFromAny();
+        }
     }
 
     protected Object _readFromInteger() throws IOException, JsonProcessingException
@@ -290,28 +340,11 @@ public class JSONReader
     public Object nullForRootValue() { return null; }
 
     public List<?> nullForRootList() { return null; }
-    public Map<String,Object> nullForRootMap() { return null; }
+    public Map<Object,Object> nullForRootMap() { return null; }
     public Object[] nullForRootArray() {
         return null;
     }
 
-    public List<Object> emptyList() { 
-        if (_cfgReadOnly) {
-            return Collections.emptyList();
-        }
-        return new ArrayList<Object>(0);
-    }
-
-    public Map<Object,Object> emptyMap() {
-        if (_cfgReadOnly) {
-            return Collections.emptyMap();
-        }
-        return new LinkedHashMap<Object,Object>();
-    }
-    public Object[] emptyArray() { // always safe to return empty array
-        return EMPTY_ARRAY;
-    }
-    
     /*
     /**********************************************************************
     /* Internal methods, other

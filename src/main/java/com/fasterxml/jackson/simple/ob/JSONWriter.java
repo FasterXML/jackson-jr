@@ -18,7 +18,7 @@ import com.fasterxml.jackson.simple.ob.impl.TypeDetector;
  * using mutant factory methods). This blueprint object
  * acts as a factory, and is never used for direct writing;
  * instead, per-call instance is created by calling
- * {@link #newWriter}.
+ * {@link #perOperationInstance}.
  */
 public class JSONWriter
 {
@@ -119,8 +119,11 @@ public class JSONWriter
     /**********************************************************************
      */
 
-    public JSONWriter newWriter(JsonGenerator jg)
+    public JSONWriter perOperationInstance(JsonGenerator jg)
     {
+        if (getClass() != JSONWriter.class) { // sanity check
+            throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
+        }
         return new JSONWriter(this, jg);
     }
     
