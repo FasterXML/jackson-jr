@@ -16,8 +16,16 @@ import com.fasterxml.jackson.simple.ob.JSON.Feature;
  */
 public abstract class ListBuilder
 {
+    protected final static Object[] EMPTY_ARRAY = new Object[0];
+    
     protected final int _features;
 
+    /*
+    /**********************************************************************
+    /* Construction
+    /**********************************************************************
+     */
+    
     protected ListBuilder(int features) {
         _features = features;
     }
@@ -36,16 +44,47 @@ public abstract class ListBuilder
         return newBuilder(_features);
     }
 
+    /*
+    /**********************************************************************
+    /* Simple accessors
+    /**********************************************************************
+     */
+    
     public final boolean isEnabled(Feature f) {
         return f.isEnabled(_features);
     }
+
+    /*
+    /**********************************************************************
+    /* Actual building
+    /**********************************************************************
+     */
     
     public abstract ListBuilder start();
 
     public abstract ListBuilder add(Object value);
 
-    public abstract List<Object> build();
+    /**
+     * The usual build method to use for constructing {@link List}
+     */
+    public abstract List<Object> buildList();
 
+    /**
+     * Alternative build method used when desired result type is
+     * <code>Object[]</code>
+     */
+    public Object[] buildArray() {
+        // sub-optimal, but defined for convenience
+        List<Object> l = buildList();
+        return l.toArray(new Object[l.size()]);
+    }
+
+    /*
+    /**********************************************************************
+    /* More specialized build methods
+    /**********************************************************************
+     */
+    
     /**
      * Specialized method that is called when an empty list needs to
      * be constructed; this may be a new list, or an immutable shared
@@ -53,11 +92,21 @@ public abstract class ListBuilder
      *<p>
      * Default implementation simply calls:
      *<pre>
-     *  start().build();
+     *  start().buildList();
      *</pre>
      */
     public List<Object> emptyList() {
-        return start().build();
+        return start().buildList();
+    }
+
+    /**
+     * Specialized method that is called when an empty <code>Object[]</code> needs to
+     * be returned.
+     *<p>
+     * Default implementation simply returns a shared empty array instance.
+     */
+    public Object[] emptyArray() {
+        return EMPTY_ARRAY;
     }
 
     /**
@@ -67,12 +116,34 @@ public abstract class ListBuilder
      *<p>
      * Default implementation simply calls:
      *<pre>
-     *  start().add(value).build();
+     *  start().add(value).buildList();
      *</pre>
      */
     public List<Object> singletonList(Object value) {
-        return start().add(value).build();
+        return start().add(value).buildList();
     }
+
+    /**
+     * Specialized method that is called when an empty list needs to
+     * be constructed; this may be a new list, or an immutable shared
+     * List, depending on implementation.
+     *<p>
+     * Default implementation simply returns equivalent of:
+     *<pre>
+     *   new Object[] { value }
+     *</pre>
+     */
+    public Object[] singletonArray(Object value) {
+        Object[] result = new Object[1];
+        result[0] = value;
+        return result;
+    }
+    
+    /*
+    /**********************************************************************
+    /* Default implementations
+    /**********************************************************************
+     */
     
     /**
      * Default {@link ListBuilder} implementation, which uses {@link ArrayList}
@@ -115,12 +186,22 @@ public abstract class ListBuilder
         }
         
         @Override
-        public List<Object> build() {
+        public List<Object> buildList() {
             List<Object> result = _current;
             _current = null;
             return result;
         }
 
+        @Override
+        public Object[] buildArray() {
+            List<Object> l = _current;
+            _current = null;
+            final int len = l.size();
+            Object[] result = new Object[len];
+            l.toArray(result);
+            return result;
+        }
+        
         @Override
         public ListBuilder add(Object value) {
             _current.add(value);

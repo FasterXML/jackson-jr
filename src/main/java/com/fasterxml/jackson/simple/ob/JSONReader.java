@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.simple.ob.JSON.Feature;
 import com.fasterxml.jackson.simple.ob.impl.ListBuilder;
 import com.fasterxml.jackson.simple.ob.impl.MapBuilder;
 
@@ -27,6 +28,8 @@ public class JSONReader
 
     protected final int _features;
 
+    protected final boolean _arraysAsLists;
+    
     /**
      * Handler that takes care of constructing {@link java.util.Map}s as needed
      */
@@ -58,6 +61,7 @@ public class JSONReader
     protected JSONReader(int features, ListBuilder lb, MapBuilder mb)
     {
         _features = features;
+        _arraysAsLists = Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(features);
         _parser = null;
         _listBuilder = lb;
         _mapBuilder = mb;
@@ -72,6 +76,7 @@ public class JSONReader
         _features = features;
         _listBuilder = base._listBuilder.newBuilder(features);
         _mapBuilder = base._mapBuilder.newBuilder(features);
+        _arraysAsLists = base._arraysAsLists;
         _parser = jp;
     }
 
@@ -153,16 +158,16 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_parser.getCurrentToken());
         }
-        return (List<Object>) _readFromObject();
+        return (List<Object>) _readFromArray(true);
     }
 
     public Object[] readArray() throws IOException, JsonProcessingException
     {
         if (_parser.getCurrentToken() != JsonToken.START_ARRAY) {
             throw JSONObjectException.from(_parser,
-                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_parser.getCurrentToken());
+                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_parser.getCurrentToken());
         }
-        return (Object[]) _readFromObject();
+        return (Object[]) _readFromArray(false);
     }
 
     /*
@@ -180,7 +185,7 @@ public class JSONReader
         case START_OBJECT:
             return _readFromObject();
         case START_ARRAY:
-            return _readFromArray();
+            return _readFromArray(_arraysAsLists);
         case VALUE_STRING:
             return fromString(_parser.getText());
         case VALUE_NUMBER_INT:
@@ -230,23 +235,27 @@ public class JSONReader
         return b.build();
     }
 
-    protected Object _readFromArray() throws IOException, JsonProcessingException
+    /**
+     * @param asList Whether to bind into a {@link java.util.List} (true), or
+     *    <code>Object[]</code> (false)
+     */
+    protected Object _readFromArray(boolean asList) throws IOException, JsonProcessingException
     {
         final JsonParser p = _parser;
         // First two special cases; empty, single-element
         if (p.nextToken() == JsonToken.END_ARRAY) {
-            return _listBuilder.emptyList();
+            return asList ? _listBuilder.emptyList() : _listBuilder.emptyArray();
         }
         Object value = _readFromAny();
         if (p.nextToken() == JsonToken.END_ARRAY) {
-            return _listBuilder.singletonList(value);
+            return asList ?  _listBuilder.singletonList(value) : _listBuilder.singletonList(value);
         }
         // otherwise, loop
         ListBuilder b = _listBuilder.start().add(value);
         do {
             b = b.add(_readFromAny());
         } while (p.nextToken() != JsonToken.END_ARRAY);
-        return b.build();
+        return asList ? b.buildList() : b.buildArray();
     }
 
     protected Object _readFromInteger() throws IOException, JsonProcessingException
