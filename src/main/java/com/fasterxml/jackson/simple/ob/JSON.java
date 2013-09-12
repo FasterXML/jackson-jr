@@ -94,6 +94,16 @@ public class JSON
         */
 
        /**
+        * Feature that defines what to do with {@link java.util.Map} entries and Java Bean
+        * properties that have null as value: if enabled, they will be written out normally;
+        * if disabled, such entries and properties will be ignored.
+        *<p>
+        * Default setting is <code>false</code> so that any null-valued properties
+        * are ignored during serialization.
+        */
+       WRITE_NULL_PROPERTIES(false),
+       
+       /**
         * Feature that can be enabled to use "pretty-printing", basic indentation
         * to make resulting JSON easier to read by humans by adding white space
         * such as line feeds and indentation.
@@ -145,11 +155,14 @@ public class JSON
            return flags;
        }
        
-       public boolean enabledByDefault() { return _defaultState; }
+       public final boolean enabledByDefault() { return _defaultState; }
 
-       public int mask() { return _mask; }
+       public final int mask() { return _mask; }
 
-       public boolean isEnabled(int flags) {
+       public final boolean isDisabled(int flags) {
+           return (flags & _mask) == 0;
+       }
+       public final boolean isEnabled(int flags) {
            return (flags & _mask) != 0;
        }
    }

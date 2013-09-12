@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.simple.ob.JSON.Feature;
 import com.fasterxml.jackson.simple.ob.impl.SimpleType;
 import com.fasterxml.jackson.simple.ob.impl.TypeDetector;
 
@@ -229,7 +230,9 @@ public class JSONWriter
     public void writeField(String fieldName, Object value) throws IOException, JsonProcessingException
     {
         if (value == null) {
-            writeNullField(fieldName);
+            if (Feature.WRITE_NULL_PROPERTIES.isEnabled(_features)) {
+                writeNullField(fieldName);
+            }
             return;
         }
 
@@ -528,7 +531,9 @@ public class JSONWriter
     }
 
     protected void writeNullField(String fieldName) throws IOException, JsonProcessingException {
-        _generator.writeNullField(fieldName);
+        if (Feature.WRITE_NULL_PROPERTIES.isEnabled(_features)) {
+            _generator.writeNullField(fieldName);
+        }
     }
 
     protected void writeDateValue(Date v) throws IOException, JsonProcessingException {
