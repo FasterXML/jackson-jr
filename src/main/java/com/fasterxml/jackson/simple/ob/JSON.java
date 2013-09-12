@@ -445,7 +445,7 @@ public class JSON
         return _treeCodec;
     }
 
-    public JsonFactory getJsonFactory() {
+    public JsonFactory getStreamingFactory() {
         return _jsonFactory;
     }
 

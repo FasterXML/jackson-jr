@@ -24,7 +24,7 @@ public class JSONAsObjectCodec
     protected final TreeCodec _treeCodec;
     
     public JSONAsObjectCodec(JSON json) {
-        this(json, json.getJsonFactory());
+        this(json, json.getStreamingFactory());
     }
 
     public JSONAsObjectCodec(JSON json, JsonFactory jf)
@@ -169,10 +169,16 @@ public class JSONAsObjectCodec
      */
 
     @Override
-    public JsonFactory getJsonFactory() {
+    public JsonFactory getFactory() {
         return _jsonFactory;
     }
 
+    @Deprecated
+    @Override
+    public JsonFactory getJsonFactory() {
+        return _jsonFactory;
+    }
+    
     /*
     /**********************************************************************
     /* Internal methods
