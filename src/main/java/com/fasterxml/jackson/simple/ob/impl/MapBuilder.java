@@ -16,6 +16,12 @@ import com.fasterxml.jackson.simple.ob.Feature;
  */
 public abstract class MapBuilder
 {
+    protected final int _features;
+
+    protected MapBuilder(int features) {
+        _features = features;
+    }
+    
     /**
      * Factory method for getting a blueprint instance of the default
      * {@link MapBuilder} implementation.
@@ -23,8 +29,16 @@ public abstract class MapBuilder
     public static MapBuilder defaultImpl() {
         return new Default(0);
     }
-    
+
     public abstract MapBuilder newBuilder(int features);
+
+    public MapBuilder newBuilder() {
+        return newBuilder(_features);
+    }
+
+    public final boolean isEnabled(Feature f) {
+        return f.isEnabled(_features);
+    }
 
     public abstract MapBuilder start();
 
@@ -77,15 +91,10 @@ public abstract class MapBuilder
      */
     public static class Default extends MapBuilder
     {
-        protected final boolean _readOnly;
-
-        protected final boolean _ordered;
-
         protected Map<Object,Object> _current;
         
         protected Default(int features) {
-            _readOnly = Feature.READ_ONLY.isEnabled(features);
-            _ordered = Feature.PRESERVE_FIELD_ORDERING.isEnabled(features);
+            super(features);
         }
         
         @Override
@@ -95,6 +104,10 @@ public abstract class MapBuilder
 
         @Override
         public MapBuilder start() {
+            // If this builder is "busy", create a new one...
+            if (_current != null) {
+                return newBuilder().start();
+            }
             _current = _map(12);
             return this;
         }
@@ -114,14 +127,15 @@ public abstract class MapBuilder
         
         @Override
         public Map<Object,Object> emptyMap() {
-            if (_readOnly) {
+            if (isEnabled(Feature.READ_ONLY)) {
                 return Collections.emptyMap();
             }
             return _map(4);
         }
 
         private final HashMap<Object,Object> _map(int initialSize) {
-            return _ordered ? new LinkedHashMap<Object,Object>(initialSize)
+            return isEnabled(Feature.PRESERVE_FIELD_ORDERING)
+                    ? new LinkedHashMap<Object,Object>(initialSize)
                     : new HashMap<Object,Object>(initialSize);
         }
     }

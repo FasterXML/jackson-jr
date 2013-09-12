@@ -18,6 +18,9 @@ import com.fasterxml.jackson.simple.ob.impl.*;
 public class JSON
     implements Versioned
 {
+    // Important: has to come before 'std' instance, since it refers to it
+    private final static int DEFAULT_FEATURES = Feature.defaults();
+
     /**
      * Singleton instance with standard, default configuration.
      * May be used with direct references like:
@@ -26,8 +29,6 @@ public class JSON
      *</pre>
      */
     public final static JSON std = new JSON();
-
-    private final static int DEFAULT_FEATURES = Feature.defaults();
     
     /*
     /**********************************************************************
@@ -74,7 +75,7 @@ public class JSON
     /* Basic construction
     /**********************************************************************
      */
-    
+
     public JSON() {
         this(DEFAULT_FEATURES, new JsonFactory(), null);
     }
@@ -295,7 +296,7 @@ public class JSON
         if (getClass() != JSON.class) {
             throw new IllegalStateException("Sub-classes MUST override _with(...)");
         }
-        return new JSON(_features, jsonF, trees, reader, writer, pp);
+        return new JSON(features, jsonF, trees, reader, writer, pp);
     }
     
     /*
@@ -606,7 +607,7 @@ public class JSON
                 pp = (PrettyPrinter) ((Instantiatable<?>) pp).createInstance();
             }
             jgen.setPrettyPrinter(pp);
-        } else if (this.isEnabled(Feature.PRETTY_PRINT_OUTPUT)) {
+        } else if (isEnabled(Feature.PRETTY_PRINT_OUTPUT)) {
             jgen.useDefaultPrettyPrinter();
         }
         return jgen;

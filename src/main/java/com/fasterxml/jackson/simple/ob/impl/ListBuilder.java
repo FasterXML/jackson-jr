@@ -16,6 +16,12 @@ import com.fasterxml.jackson.simple.ob.Feature;
  */
 public abstract class ListBuilder
 {
+    protected final int _features;
+
+    protected ListBuilder(int features) {
+        _features = features;
+    }
+
     /**
      * Factory method for getting a blueprint instance of the default
      * {@link ListBuilder} implementation.
@@ -23,15 +29,23 @@ public abstract class ListBuilder
     public static ListBuilder defaultImpl() {
         return new Default(0);
     }
-    
+
     public abstract ListBuilder newBuilder(int features);
 
+    public ListBuilder newBuilder() {
+        return newBuilder(_features);
+    }
+
+    public final boolean isEnabled(Feature f) {
+        return f.isEnabled(_features);
+    }
+    
     public abstract ListBuilder start();
 
     public abstract ListBuilder add(Object value);
 
     public abstract List<Object> build();
-    
+
     /**
      * Specialized method that is called when an empty list needs to
      * be constructed; this may be a new list, or an immutable shared
@@ -59,28 +73,43 @@ public abstract class ListBuilder
     public List<Object> singletonList(Object value) {
         return start().add(value).build();
     }
-
+    
     /**
      * Default {@link ListBuilder} implementation, which uses {@link ArrayList}
      * as the type of {@link java.util.List} to build.
+     *<p>
+     * When sub-classing to use different underlying mutable {@link java.util.List}
+     * type, you need to sub-class following methods:
+     *<ul>
+     * <li>{@link #newBuilder}: factory method for constructing new builder instance
+     *  </li>
+     * <li>{@link #_list}: factory method for constructing {@link java.util.List} to build
+     *  </li>
+     *</ul>
+     *<p>
+     * If constructing builders that use different approaches (like, say, produce
+     * immutable Guava Lists), you may need to override more methods; or perhaps
+     * just extend basic {@link ListBuilder}.
      */
     public static class Default extends ListBuilder
     {
-        protected final boolean _readOnly;
-
         protected List<Object> _current;
         
         protected Default(int features) {
-            _readOnly = Feature.READ_ONLY.isEnabled(features);
+            super(features);
         }
         
         @Override
         public ListBuilder newBuilder(int features) {
             return new Default(features);
         }
-
+        
         @Override
         public ListBuilder start() {
+            // If this builder is "busy", create a new one...
+            if (_current != null) {
+                return newBuilder().start();
+            }
             _current = _list(12);
             return this;
         }
@@ -100,13 +129,16 @@ public abstract class ListBuilder
         
         @Override
         public List<Object> emptyList() {
-            if (_readOnly) {
+            if (isEnabled(Feature.READ_ONLY)) {
                 return Collections.emptyList();
             }
             return _list(0);
         }
 
-        private final List<Object> _list(int initialSize) {
+        /**
+         * Overridable factory method for constructing underlying List.
+         */
+        protected List<Object> _list(int initialSize) {
             return new ArrayList<Object>(initialSize);
         }
     }

@@ -53,7 +53,7 @@ public class JSONReader
      */
 
     /**
-     * Constructor used for creating the default blueprint instance.
+     * Constructor used for creating the blueprint instances.
      */
     protected JSONReader(int features, ListBuilder lb, MapBuilder mb)
     {
@@ -62,19 +62,6 @@ public class JSONReader
         _listBuilder = lb;
         _mapBuilder = mb;
     }
-
-    /**
-     * Constructor used for creating differently configured blueprint
-     * instances
-     */
-    /*
-    protected JSONReader(int features, ContainerBuilder containerBuilder)
-    {
-        _features = features;
-        _containerBuilder = containerBuilder;
-        _parser = null;
-    }
-    */
 
     /**
      * Constructor used for per-operation (non-blueprint) instance.
@@ -159,16 +146,23 @@ public class JSONReader
         return (Map<Object,Object>) _readFromObject();
     }
 
+    @SuppressWarnings("unchecked")
     public List<Object> readList() throws IOException, JsonProcessingException
     {
-        // !!! TODO
-        return null;
+        if (_parser.getCurrentToken() != JsonToken.START_ARRAY) {
+            throw JSONObjectException.from(_parser,
+                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_parser.getCurrentToken());
+        }
+        return (List<Object>) _readFromObject();
     }
 
     public Object[] readArray() throws IOException, JsonProcessingException
     {
-        // !!! TODO
-        return null;
+        if (_parser.getCurrentToken() != JsonToken.START_ARRAY) {
+            throw JSONObjectException.from(_parser,
+                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_parser.getCurrentToken());
+        }
+        return (Object[]) _readFromObject();
     }
 
     /*
@@ -229,16 +223,11 @@ public class JSONReader
         }
 
         // but then it's loop-de-loop
-        MapBuilder b = _mapBuilder.start();
-        while (true) {
-            b = b.put(key, value);
-            JsonToken t;
-            if ((t = p.nextValue()) == JsonToken.END_OBJECT || t == null) {
-                return b.build();
-            }
-            key = fromKey(p.getCurrentName());
-            value = _readFromAny();
-        }
+        MapBuilder b = _mapBuilder.start().put(key, value);
+        do {
+            b = b.put(fromKey(p.getCurrentName()), _readFromAny());
+        } while (p.nextValue() != JsonToken.END_OBJECT);
+        return b.build();
     }
 
     protected Object _readFromArray() throws IOException, JsonProcessingException
@@ -253,15 +242,11 @@ public class JSONReader
             return _listBuilder.singletonList(value);
         }
         // otherwise, loop
-        ListBuilder b = _listBuilder.start();
-        while (true) {
-            b = b.add(value);
-            JsonToken t;
-            if (((t = p.nextToken()) == JsonToken.END_ARRAY) || t == null) {
-                return b.build();
-            }
-            value = _readFromAny();
-        }
+        ListBuilder b = _listBuilder.start().add(value);
+        do {
+            b = b.add(_readFromAny());
+        } while (p.nextToken() != JsonToken.END_ARRAY);
+        return b.build();
     }
 
     protected Object _readFromInteger() throws IOException, JsonProcessingException
