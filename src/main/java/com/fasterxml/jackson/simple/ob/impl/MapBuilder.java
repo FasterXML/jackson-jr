@@ -2,7 +2,8 @@ package com.fasterxml.jackson.simple.ob.impl;
 
 import java.util.*;
 
-import com.fasterxml.jackson.simple.ob.Feature;
+import com.fasterxml.jackson.simple.ob.JSON;
+import com.fasterxml.jackson.simple.ob.JSON.Feature;
 
 /**
  * Helper class that is used for constructing {@link java.util.Map}s
@@ -36,7 +37,7 @@ public abstract class MapBuilder
         return newBuilder(_features);
     }
 
-    public final boolean isEnabled(Feature f) {
+    public final boolean isEnabled(JSON.Feature f) {
         return f.isEnabled(_features);
     }
 

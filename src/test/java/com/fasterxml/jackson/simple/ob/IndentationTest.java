@@ -17,7 +17,7 @@ public class IndentationTest extends TestBase
                 +"  \"a\" : 1,\n"
                 +"  \"b\" : 2\n"
                 +"}",
-                JSON.std.with(Feature.PRETTY_PRINT_OUTPUT).asJSONString(map));
+                JSON.std.with(JSON.Feature.PRETTY_PRINT_OUTPUT).asJSONString(map));
     }
 
 }

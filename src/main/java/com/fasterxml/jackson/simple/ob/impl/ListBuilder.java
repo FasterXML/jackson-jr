@@ -2,7 +2,7 @@ package com.fasterxml.jackson.simple.ob.impl;
 
 import java.util.*;
 
-import com.fasterxml.jackson.simple.ob.Feature;
+import com.fasterxml.jackson.simple.ob.JSON.Feature;
 
 /**
  * Helper class that is used for constructing {@link java.util.List}s

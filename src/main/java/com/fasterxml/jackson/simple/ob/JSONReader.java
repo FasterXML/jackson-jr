@@ -263,7 +263,7 @@ public class JSONReader
 
     protected Object _readFromFloat() throws IOException, JsonProcessingException
     {
-        if (!Feature.USE_BIG_DECIMAL_FOR_FLOATS.isEnabled(_features)) {
+        if (!JSON.Feature.USE_BIG_DECIMAL_FOR_FLOATS.isEnabled(_features)) {
             switch (_parser.getNumberType()) {
             case FLOAT:
                 return Float.valueOf(_parser.getFloatValue());
