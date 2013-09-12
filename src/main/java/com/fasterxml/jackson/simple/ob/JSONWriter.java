@@ -7,7 +7,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.simple.ob.JSON.Feature;
-import com.fasterxml.jackson.simple.ob.impl.SimpleType;
+import com.fasterxml.jackson.simple.ob.impl.ValueType;
 import com.fasterxml.jackson.simple.ob.impl.TypeDetector;
 
 /**
@@ -140,7 +140,7 @@ public class JSONWriter
             writeNullValue();
             return;
         }
-        SimpleType type = _typeDetector.findType(value.getClass());
+        ValueType type = _typeDetector.findType(value.getClass());
         switch (type) {
 
         // Textual types, similar:
@@ -236,7 +236,7 @@ public class JSONWriter
             return;
         }
 
-        SimpleType type = _typeDetector.findType(value.getClass());
+        ValueType type = _typeDetector.findType(value.getClass());
         switch (type) {
 
         // Textual types, similar:

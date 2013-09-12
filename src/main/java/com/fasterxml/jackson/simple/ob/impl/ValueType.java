@@ -4,7 +4,7 @@ package com.fasterxml.jackson.simple.ob.impl;
  * Set of types that we want to distinguish, mostly for purposes of
  * knowing how to write them.
  */
-public enum SimpleType
+public enum ValueType
 {
     // // // Structured types
     

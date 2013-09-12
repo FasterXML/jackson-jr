@@ -23,15 +23,15 @@ public class TypeDetector
     // TODO: can make configurable if it matters...
     protected final int MAX_ENTRIES = 1000;
     
-    protected final ConcurrentHashMap<ClassKey, SimpleType> _knownTypes;
+    protected final ConcurrentHashMap<ClassKey, ValueType> _knownTypes;
 
     protected final ClassKey _key = new ClassKey();
     
     protected Class<?> _prevClass;
 
-    protected SimpleType _prevType;
+    protected ValueType _prevType;
 
-    protected TypeDetector(ConcurrentHashMap<ClassKey, SimpleType> types) {
+    protected TypeDetector(ConcurrentHashMap<ClassKey, ValueType> types) {
         _knownTypes = types;
     }
 
@@ -40,7 +40,7 @@ public class TypeDetector
     }
     
     public final static TypeDetector rootDetector() {
-        return new TypeDetector(new ConcurrentHashMap<ClassKey, SimpleType>(50, 0.75f, 4));
+        return new TypeDetector(new ConcurrentHashMap<ClassKey, ValueType>(50, 0.75f, 4));
     }
 
     public TypeDetector perOperationInstance() {
@@ -51,14 +51,14 @@ public class TypeDetector
         return new TypeDetector(this);
     }
 
-    public final SimpleType findType(Class<?> raw)
+    public final ValueType findType(Class<?> raw)
     {
         if (raw == _prevClass) {
             return _prevType;
         }
         ClassKey k = _key;
         k.reset(raw);
-        SimpleType t = _knownTypes.get(k);
+        ValueType t = _knownTypes.get(k);
         if (t == null) {
             t = _find(raw);
         }
@@ -67,93 +67,93 @@ public class TypeDetector
         return t;
     }
 
-    protected SimpleType _find(Class<?> raw)
+    protected ValueType _find(Class<?> raw)
     {
         if (raw == String.class) {
-            return SimpleType.STRING;
+            return ValueType.STRING;
         }
         if (raw.isArray()) {
             Class<?> elemType = raw.getComponentType();
             if (elemType.isPrimitive()) {
                 if (raw == byte[].class) {
-                    return SimpleType.BYTE_ARRAY;
+                    return ValueType.BYTE_ARRAY;
                 }
                 if (raw == char[].class) {
-                    return SimpleType.CHAR_ARRAY;
+                    return ValueType.CHAR_ARRAY;
                 }
                 if (raw == int[].class) {
-                    return SimpleType.INT_ARRAY;
+                    return ValueType.INT_ARRAY;
                 }
                 // Hmmh. Could support all types but....
-                return SimpleType.OTHER;
+                return ValueType.OTHER;
             }
-            return SimpleType.OBJECT_ARRAY;
+            return ValueType.OBJECT_ARRAY;
         }
         if (raw == Boolean.class) {
-            return SimpleType.BOOLEAN;
+            return ValueType.BOOLEAN;
         }
         if (Number.class.isAssignableFrom(raw)) {
             if (raw == Integer.class) {
-                return SimpleType.NUMBER_INTEGER;
+                return ValueType.NUMBER_INTEGER;
             }
             if (raw == Long.class) {
-                return SimpleType.NUMBER_LONG;
+                return ValueType.NUMBER_LONG;
             }
             if (raw == Byte.class) {
-                return SimpleType.NUMBER_BYTE;
+                return ValueType.NUMBER_BYTE;
             }
             if (raw == Short.class) {
-                return SimpleType.NUMBER_SHORT;
+                return ValueType.NUMBER_SHORT;
             }
             if (raw == Float.class) {
-                return SimpleType.NUMBER_FLOAT;
+                return ValueType.NUMBER_FLOAT;
             }
             if (raw == Double.class) {
-                return SimpleType.NUMBER_DOUBLE;
+                return ValueType.NUMBER_DOUBLE;
             }
             if (raw == BigDecimal.class) {
-                return SimpleType.NUMBER_BIG_DECIMAL;
+                return ValueType.NUMBER_BIG_DECIMAL;
             }
             if (raw == BigInteger.class) {
-                return SimpleType.NUMBER_BIG_INTEGER;
+                return ValueType.NUMBER_BIG_INTEGER;
             }
             
             // What numeric type is this?!
-            return SimpleType.OTHER;
+            return ValueType.OTHER;
         }
         if (raw == Character.class) {
-            return SimpleType.CHAR;
+            return ValueType.CHAR;
         }
         if (raw.isEnum()) {
-            return SimpleType.ENUM;
+            return ValueType.ENUM;
         }
         if (Map.class.isAssignableFrom(raw)) {
-            return SimpleType.MAP;
+            return ValueType.MAP;
         }
         if (Collection.class.isAssignableFrom(raw)) {
             if (List.class.isAssignableFrom(raw)) {
                 // One more thing: here we assume LIST means efficient random access
                 if (RandomAccess.class.isAssignableFrom(raw)) {
-                    return SimpleType.LIST;
+                    return ValueType.LIST;
                 }
                 // and if not, consider "only" a collection
             }
-            return SimpleType.COLLECTION;
+            return ValueType.COLLECTION;
         }
         if (TreeNode.class.isAssignableFrom(raw)) {
-            return SimpleType.TREE_NODE;
+            return ValueType.TREE_NODE;
         }
         if (CharSequence.class.isAssignableFrom(raw)) {
-            return SimpleType.CHARACTER_SEQUENCE;
+            return ValueType.CHARACTER_SEQUENCE;
         }
         if (Iterable.class.isAssignableFrom(raw)) {
-            return SimpleType.ITERABLE;
+            return ValueType.ITERABLE;
         }
         if (Date.class.isAssignableFrom(raw)) {
-            return SimpleType.DATE;
+            return ValueType.DATE;
         }
         
         // Ok. I give up, no idea!
-        return SimpleType.OTHER;
+        return ValueType.OTHER;
     }
 }
