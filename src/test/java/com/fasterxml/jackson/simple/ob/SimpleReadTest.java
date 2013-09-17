@@ -37,14 +37,27 @@ public class SimpleReadTest extends TestBase
         assertTrue(ob instanceof Object[]);
         assertEquals(2, ((Object[]) ob).length);
         assertEquals(INPUT, JSON.std.asString(ob));
-}
-    
+    }
+
     public void testSimpleMap() throws Exception
     {
         final String INPUT = "{\"a\":1,\"b\":true,\"c\":3}";
         Object ob = JSON.std.from(INPUT);
         assertTrue(ob instanceof Map);
         assertEquals(3, ((Map<?,?>) ob).size());
+        // actually, verify with write...
+        assertEquals(INPUT, JSON.std.asString(ob));
+    }
+
+    public void testSimpleMixed() throws Exception
+    {
+        final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";
+        Object ob = JSON.std.from(INPUT);
+        assertTrue(ob instanceof Map);
+        assertEquals(2, ((Map<?,?>) ob).size());
+        Object list = (((Map<?,?>) ob).get("a"));
+        assertTrue(list instanceof List<?>);
+        
         // actually, verify with write...
         assertEquals(INPUT, JSON.std.asString(ob));
     }
