@@ -1,0 +1,53 @@
+package com.fasterxml.jackson.simple.ob.impl;
+
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+public class ArrayComposer<PARENT extends ComposerBase>
+    extends SequenceComposer<ArrayComposer<PARENT>>
+{
+    protected PARENT _parent;
+    
+    public ArrayComposer(PARENT parent) {
+        super(parent);
+        _parent = parent;
+    }
+
+    /*
+    /**********************************************************************
+    /* Abstract method impls
+    /**********************************************************************
+     */
+
+    @Override
+    protected ArrayComposer<PARENT> _start() throws IOException, JsonProcessingException {
+        _generator.writeStartArray();
+        return this;
+    }
+
+    @Override
+    protected void _finish() throws IOException, JsonProcessingException {
+        if (_parent != null) {
+            _generator.writeEndArray();
+            _parent = null;
+        }
+    }
+
+    /*
+    /**********************************************************************
+    /* Compose methods, structures
+    /**********************************************************************
+     */
+    
+    public PARENT end()
+        throws IOException, JsonProcessingException
+    {
+        _closeChild();
+        if (_open) {
+            _generator.writeEndArray();
+            _open = false;
+        }
+        return _parent;
+    }
+}
