@@ -18,12 +18,6 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
 
     /*
     /**********************************************************************
-    /* Life-cycle methods
-    /**********************************************************************
-     */
-
-    /*
-    /**********************************************************************
     /* Compose methods, structures
     /**********************************************************************
      */
@@ -44,7 +38,7 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
     
     /*
     /**********************************************************************
-    /* Compose methods, scalars
+    /* Compose methods, scalars, number
     /**********************************************************************
      */
 
@@ -54,6 +48,12 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
         _generator.writeNumber(value);
         return _this();
     }
+
+    /*
+    /**********************************************************************
+    /* Compose methods, scalars, textual / binary
+    /**********************************************************************
+     */
 
     public THIS add(String value)
         throws IOException, JsonProcessingException
@@ -70,6 +70,39 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
         return _this();
     }
 
+    /*
+    /**********************************************************************
+    /* Compose methods, scalars, other
+    /**********************************************************************
+     */
+
+    public THIS addNull()
+        throws IOException, JsonProcessingException
+    {
+        _generator.writeNull();
+        return _this();
+    }
+
+    public THIS add(boolean value)
+        throws IOException, JsonProcessingException
+    {
+        _generator.writeBoolean(value);
+        return _this();
+    }
+    
+    /**
+     * Method used to add Java Object ("POJO") into sequence being
+     * composed: this <b>requires</b> that the underlying {@link JsonGenerator}
+     * has a properly configure {@link com.fasterxml.jackson.core.ObjectCodec}
+     * to use for serializer object.
+     */
+    public THIS addObject(Object pojo)
+        throws IOException, JsonProcessingException
+    {
+        _generator.writeObject(pojo);
+        return _this();
+    }
+    
     /*
     /**********************************************************************
     /* Internal helper methods

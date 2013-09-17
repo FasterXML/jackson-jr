@@ -50,7 +50,7 @@ public class JSONAsObjectCodec
     public <T> T readValue(JsonParser jp, Class<T> valueType)
             throws IOException, JsonProcessingException
     {
-        Object ob = _json.fromJSON(jp);
+        Object ob = _json.from(jp);
         _checkResultType(valueType, ob);
         return (T) ob;
     }
@@ -104,7 +104,7 @@ public class JSONAsObjectCodec
     public void writeValue(JsonGenerator jgen, Object value)
             throws IOException, JsonProcessingException
     {
-        _json.writeJSON(value, jgen);
+        _json.write(value, jgen);
     }
     /*
     /**********************************************************************
@@ -150,7 +150,7 @@ public class JSONAsObjectCodec
          * actual read works but...
          */
         try {
-            String json = _json.asJSONString(n);
+            String json = _json.asString(n);
             JsonParser jp = _jsonFactory.createParser(json);
             T result = readValue(jp, valueType);
             jp.close();

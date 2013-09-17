@@ -12,10 +12,9 @@ public class NullHandlingTest extends TestBase
         map.put("a", 1);
         map.put("b", null);
         // By default we do NOT write null-valued entries:
-        assertEquals("{\"a\":1}", JSON.std.asJSONString(map));
+        assertEquals("{\"a\":1}", JSON.std.asString(map));
         // but we can disable it easily
         assertEquals("{\"a\":1,\"b\":null}",
-                JSON.std.with(JSON.Feature.WRITE_NULL_PROPERTIES).asJSONString(map));
-                
+                JSON.std.with(JSON.Feature.WRITE_NULL_PROPERTIES).asString(map));
     }
 }

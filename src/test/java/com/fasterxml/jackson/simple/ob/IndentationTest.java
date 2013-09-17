@@ -11,13 +11,13 @@ public class IndentationTest extends TestBase
         map.put("b", 2);
         
         // By default, no indentation
-        assertEquals("{\"a\":1,\"b\":2}", JSON.std.asJSONString(map));
+        assertEquals("{\"a\":1,\"b\":2}", JSON.std.asString(map));
         // but with simple change...
         assertEquals("{\n"
                 +"  \"a\" : 1,\n"
                 +"  \"b\" : 2\n"
                 +"}",
-                JSON.std.with(JSON.Feature.PRETTY_PRINT_OUTPUT).asJSONString(map));
+                JSON.std.with(JSON.Feature.PRETTY_PRINT_OUTPUT).asString(map));
     }
 
 }

@@ -468,12 +468,12 @@ public class JSON
     
     /*
     /**********************************************************************
-    /* API: writing JSON
+    /* API: writing Simple objects as JSON
     /**********************************************************************
      */
 
     @SuppressWarnings("resource")
-    public String asJSONString(Object value) throws IOException, JSONObjectException
+    public String asString(Object value) throws IOException, JSONObjectException
     {
         SegmentedStringWriter sw = new SegmentedStringWriter(_jsonFactory._getBufferRecycler());
         try {
@@ -487,7 +487,7 @@ public class JSON
     }
 
     @SuppressWarnings("resource")
-    public byte[] asJSONBytes(Object value) throws IOException, JSONObjectException
+    public byte[] asBytes(Object value) throws IOException, JSONObjectException
     {
         ByteArrayBuilder bb = new ByteArrayBuilder(_jsonFactory._getBufferRecycler());
         try {
@@ -502,38 +502,81 @@ public class JSON
         return result;
     }
 
-    public void writeJSON(Object value, JsonGenerator jgen) throws IOException, JSONObjectException
+    public void write(Object value, JsonGenerator jgen) throws IOException, JSONObjectException
     {
         // NOTE: no call to _config(); assumed to be fully configured
         _writerForOperation(jgen).writeValue(value);
-        if (isEnabled(Feature.FLUSH_AFTER_WRITE_VALUE)) {
+        if (Feature.FLUSH_AFTER_WRITE_VALUE.isEnabled(_features)) {
             jgen.flush();
         }
     }
 
-    public void writeJSON(Object value, OutputStream out)
+    public void write(Object value, OutputStream out)
         throws IOException, JSONObjectException
     {
         _writeAndClose(value, _jsonFactory.createGenerator(out));
     }
 
-    public void writeJSON(Object value, Writer w) throws IOException, JSONObjectException
+    public void write(Object value, Writer w) throws IOException, JSONObjectException
     {
         _writeAndClose(value, _jsonFactory.createGenerator(w));
     }
 
-    public void writeJSON(Object value, File f) throws IOException, JSONObjectException
+    public void write(Object value, File f) throws IOException, JSONObjectException
     {
         _writeAndClose(value, _jsonFactory.createGenerator(f, JsonEncoding.UTF8));
     }
     
     /*
     /**********************************************************************
-    /* API: reading JSON
+    /* API: writing using Composers
     /**********************************************************************
      */
 
-    public List<Object> listFromJSON(Object source) throws IOException, JSONObjectException
+    public JSONComposer<OutputStream> composeUsing(JsonGenerator gen) throws IOException, JSONObjectException
+    {
+        return JSONComposer.streamComposer(_features, gen, false);
+    }
+    
+    public JSONComposer<OutputStream> composeTo(OutputStream out) throws IOException, JSONObjectException
+    {
+        return JSONComposer.streamComposer(_features,
+                _jsonFactory.createGenerator(out), true);
+    }
+
+    public JSONComposer<OutputStream> composeTo(Writer w) throws IOException, JSONObjectException
+    {
+        return JSONComposer.streamComposer(_features,
+                _jsonFactory.createGenerator(w), true);
+    }
+
+    public JSONComposer<OutputStream> composeTo(File f) throws IOException, JSONObjectException
+    {
+        return JSONComposer.streamComposer(_features,
+                _jsonFactory.createGenerator(f, JsonEncoding.UTF8), true);
+    }
+    
+    @SuppressWarnings("resource")
+    public JSONComposer<String> composeString() throws IOException, JSONObjectException
+    {
+        SegmentedStringWriter out = new SegmentedStringWriter(_jsonFactory._getBufferRecycler());
+        return JSONComposer.stringComposer(_features, _jsonFactory.createGenerator(out), out);
+    }
+
+    @SuppressWarnings("resource")
+    public JSONComposer<byte[]> composeBytes() throws IOException, JSONObjectException
+    {
+        ByteArrayBuilder out = new ByteArrayBuilder(_jsonFactory._getBufferRecycler());
+        return JSONComposer.bytesComposer(_features, _jsonFactory.createGenerator(out), out);
+    }
+    
+    /*
+    /**********************************************************************
+    /* API: reading JSON as Simple Objects
+    /**********************************************************************
+     */
+
+    public List<Object> listFrom(Object source) throws IOException, JSONObjectException
     {
         JsonParser jp;
         List<Object> result;
@@ -559,7 +602,7 @@ public class JSON
         return result;
     }
 
-    public Object[] arrayFromJSON(Object source) throws IOException, JSONObjectException
+    public Object[] arrayFrom(Object source) throws IOException, JSONObjectException
     {
         JsonParser jp;
         Object[] result;
@@ -586,7 +629,7 @@ public class JSON
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Map<T,Object> mapFromJSON(Object source) throws IOException, JSONObjectException
+    public <T> Map<T,Object> mapFrom(Object source) throws IOException, JSONObjectException
     {
         JsonParser jp;
         Map<Object,Object> result;
@@ -630,7 +673,7 @@ public class JSON
      * <li><code>char[]</code></li>
      *</ul>
      */
-    public Object fromJSON(Object source) throws IOException, JSONObjectException
+    public Object from(Object source) throws IOException, JSONObjectException
     {
         JsonParser jp;
         Object result;

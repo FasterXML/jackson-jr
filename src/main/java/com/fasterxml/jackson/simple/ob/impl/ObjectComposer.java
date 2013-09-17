@@ -3,11 +3,12 @@ package com.fasterxml.jackson.simple.ob.impl;
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.SerializableString;
 
 public class ObjectComposer<PARENT extends ComposerBase>
     extends ComposerBase
 {
-    protected PARENT _parent;
+    protected final PARENT _parent;
     
     public ObjectComposer(PARENT parent) {
         super(parent);
@@ -27,10 +28,11 @@ public class ObjectComposer<PARENT extends ComposerBase>
     }
 
     @Override
-    protected void _finish() throws IOException, JsonProcessingException {
-        if (_parent != null) {
+    protected void _finish() throws IOException, JsonProcessingException
+    {
+        if (_open) {
+            _open = false;
             _generator.writeEndObject();
-            _parent = null;
         }
     }
     
@@ -43,13 +45,33 @@ public class ObjectComposer<PARENT extends ComposerBase>
     public ArrayComposer<ObjectComposer<PARENT>> startArrayField(String fieldName)
         throws IOException, JsonProcessingException
     {
-        return new ArrayComposer<ObjectComposer<PARENT>>(this);
+        _closeChild();
+        _generator.writeFieldName(fieldName);
+        return _startArray(this);
     }
 
+    public ArrayComposer<ObjectComposer<PARENT>> startArrayField(SerializableString fieldName)
+        throws IOException, JsonProcessingException
+    {
+        _closeChild();
+        _generator.writeFieldName(fieldName);
+        return _startArray(this);
+    }
+    
     public ObjectComposer<ObjectComposer<PARENT>> startObjectField(String fieldName)
         throws IOException, JsonProcessingException
     {
-        return new ObjectComposer<ObjectComposer<PARENT>>(this);
+        _closeChild();
+        _generator.writeFieldName(fieldName);
+        return _startObject(this);
+    }
+
+    public ObjectComposer<ObjectComposer<PARENT>> startObjectField(SerializableString fieldName)
+        throws IOException, JsonProcessingException
+    {
+        _closeChild();
+        _generator.writeFieldName(fieldName);
+        return _startObject(this);
     }
 
     public PARENT end()
@@ -57,8 +79,9 @@ public class ObjectComposer<PARENT extends ComposerBase>
     {
         _closeChild();
         if (_open) {
-            _generator.writeEndArray();
             _open = false;
+            _generator.writeEndObject();
+            _parent._childClosed();
         }
         return _parent;
     }

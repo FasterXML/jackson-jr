@@ -41,6 +41,10 @@ public abstract class ComposerBase implements Flushable
     
     protected abstract ComposerBase _start() throws IOException, JsonProcessingException;
     protected abstract void _finish() throws IOException, JsonProcessingException;
+
+    protected final void _childClosed() {
+        _child = null;
+    }
     
     /*
     /**********************************************************************

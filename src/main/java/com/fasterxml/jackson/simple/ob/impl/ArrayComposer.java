@@ -7,7 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class ArrayComposer<PARENT extends ComposerBase>
     extends SequenceComposer<ArrayComposer<PARENT>>
 {
-    protected PARENT _parent;
+    protected final PARENT _parent;
     
     public ArrayComposer(PARENT parent) {
         super(parent);
@@ -28,9 +28,9 @@ public class ArrayComposer<PARENT extends ComposerBase>
 
     @Override
     protected void _finish() throws IOException, JsonProcessingException {
-        if (_parent != null) {
+        if (_open) {
+            _open = false;
             _generator.writeEndArray();
-            _parent = null;
         }
     }
 
@@ -45,8 +45,9 @@ public class ArrayComposer<PARENT extends ComposerBase>
     {
         _closeChild();
         if (_open) {
-            _generator.writeEndArray();
             _open = false;
+            _generator.writeEndArray();
+            _parent._childClosed();
         }
         return _parent;
     }

@@ -10,7 +10,7 @@ public class SimpleWriteTest extends TestBase
         stuff.add("x");
         stuff.add(true);
         stuff.add(123);
-        assertEquals("[\"x\",true,123]", JSON.std.asJSONString(stuff));
+        assertEquals("[\"x\",true,123]", JSON.std.asString(stuff));
     }
 
     public void testSimpleMap() throws Exception
@@ -21,7 +21,7 @@ public class SimpleWriteTest extends TestBase
         stuff.put("c", "foobar");
         
         assertEquals("{\"a\":15,\"b\":true,\"c\":\"foobar\"}",
-                JSON.std.asJSONString(stuff));
+                JSON.std.asString(stuff));
     }
 
     public void testNest() throws Exception
@@ -37,6 +37,6 @@ public class SimpleWriteTest extends TestBase
         second.put("bar", new ArrayList<Object>());
 
         assertEquals("{\"first\":[123,456],\"second\":{\"foo\":\"bar\",\"bar\":[]}}",
-                JSON.std.asJSONString(stuff));
+                JSON.std.asString(stuff));
     }
 }
