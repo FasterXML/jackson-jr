@@ -87,14 +87,17 @@ Good old [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
 
 ## Get it!
 
-Most commonly this package is used via Maven; if so, dependency is:
+This package ```has not yet been officially releases``` so there are no downloadable versions.
+You can clone the project and build it locally (`mvn clean install`).
+
+In future it will be available via Maven, with dependency like:
 
 ```xml
 <dependency>
   <groupId>com.fasterxml.jackson.simple</groupId>
   <artifactId>jackson-simple-objects</artifactId>
-  <version>2.3.0-SNAPSHOT</version>
+  <version>0.5.0-SNAPSHOT</version>
 </dependency>
 ```
 
-but you can also download jars via [Central Maven repository](http://repo1.maven.org/maven2/com/fasterxml/jackson/simple/)
+and then you can also download jars via [Central Maven repository](http://repo1.maven.org/maven2/com/fasterxml/jackson/simple/).
