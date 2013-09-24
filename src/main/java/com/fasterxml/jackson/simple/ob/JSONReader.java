@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.JsonParser.NumberType;
 import com.fasterxml.jackson.simple.ob.JSON.Feature;
 import com.fasterxml.jackson.simple.ob.impl.ListBuilder;
 import com.fasterxml.jackson.simple.ob.impl.MapBuilder;
+
+import static com.fasterxml.jackson.core.JsonTokenId.*;
 
 /**
  * Object that handles construction of simple Objects from JSON.
@@ -176,27 +179,28 @@ public class JSONReader
     /**********************************************************************
      */
 
-    @SuppressWarnings("incomplete-switch")
     protected Object _readFromAny() throws IOException, JsonProcessingException
     {
-        switch (_parser.getCurrentToken()) {
-        case VALUE_NULL:
+        JsonToken t = _parser.getCurrentToken();
+        int id = (t == null) ? ID_NO_TOKEN : t.id();
+        switch (id) {
+        case ID_NULL:
             return nullForRootValue();
-        case START_OBJECT:
+        case ID_START_OBJECT:
             return _readFromObject();
-        case START_ARRAY:
+        case ID_START_ARRAY:
             return _readFromArray(_arraysAsLists);
-        case VALUE_STRING:
+        case ID_STRING:
             return fromString(_parser.getText());
-        case VALUE_NUMBER_INT:
+        case ID_NUMBER_INT:
             return _readFromInteger();
-        case VALUE_NUMBER_FLOAT:
+        case ID_NUMBER_FLOAT:
             return _readFromFloat();
-        case VALUE_TRUE:
+        case ID_TRUE:
             return fromBoolean(true);
-        case VALUE_FALSE:
+        case ID_FALSE:
             return fromBoolean(false);
-        case VALUE_EMBEDDED_OBJECT:
+        case ID_EMBEDDED_OBJECT:
             return fromEmbedded(_parser.getEmbeddedObject());
 
             // Others are error cases...
@@ -210,7 +214,7 @@ public class JSONReader
         }
         throw JSONObjectException.from(_parser, "Unexpected value token: "+_parser.getCurrentToken());
     }
-    
+
     protected Object _readFromObject() throws IOException, JsonProcessingException
     {
         final JsonParser p = _parser;
@@ -260,12 +264,12 @@ public class JSONReader
 
     protected Object _readFromInteger() throws IOException, JsonProcessingException
     {
-        switch (_parser.getNumberType()) {
-        case INT:
+        NumberType t = _parser.getNumberType();
+        if (t == NumberType.INT) {
             return Integer.valueOf(_parser.getIntValue());
-        case LONG:
+        }
+        if (t == NumberType.LONG) {
             return Long.valueOf(_parser.getLongValue());
-        default:
         }
         return _parser.getBigIntegerValue();
     }
@@ -273,12 +277,12 @@ public class JSONReader
     protected Object _readFromFloat() throws IOException, JsonProcessingException
     {
         if (!JSON.Feature.USE_BIG_DECIMAL_FOR_FLOATS.isEnabled(_features)) {
-            switch (_parser.getNumberType()) {
-            case FLOAT:
+            NumberType t = _parser.getNumberType();
+            if (t == NumberType.FLOAT) {
                 return Float.valueOf(_parser.getFloatValue());
-            case DOUBLE:
+            }
+            if (t == NumberType.DOUBLE) {
                 return Double.valueOf(_parser.getDoubleValue());
-            default:
             }
         }
         return _parser.getDecimalValue();
