@@ -7,8 +7,9 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.simple.ob.JSON.Feature;
-import com.fasterxml.jackson.simple.ob.impl.ValueType;
 import com.fasterxml.jackson.simple.ob.impl.TypeDetector;
+
+import static com.fasterxml.jackson.simple.ob.impl.TypeDetector.*;
 
 /**
  * Object that handles serialization of simple Objects into
@@ -113,7 +114,7 @@ public class JSONWriter
         }
         return new JSONWriter(features, td, tc);
     }
-    
+
     /*
     /**********************************************************************
     /* New instance creation
@@ -140,87 +141,87 @@ public class JSONWriter
             writeNullValue();
             return;
         }
-        ValueType type = _typeDetector.findType(value.getClass());
+        int type = _typeDetector.findType(value.getClass());
         switch (type) {
 
         // Textual types, similar:
 
-        case STRING:
+        case VT_STRING:
             writeStringValue((String) value);
             return;
-        case CHAR_ARRAY:
+        case VT_CHAR_ARRAY:
             writeStringValue(new String((char[]) value));
             return;
-        case CHAR:
+        case VT_CHAR:
             writeStringValue(String.valueOf(value));
             return;
-        case CHARACTER_SEQUENCE:
+        case VT_CHARACTER_SEQUENCE:
             writeStringValue(((CharSequence) value).toString());
             return;
-        case BYTE_ARRAY:
+        case VT_BYTE_ARRAY:
             writeBinaryValue((byte[]) value);
             return;
-        case INT_ARRAY:
+        case VT_INT_ARRAY:
             writeIntArrayValue((int[]) value);
             return;
 
             // Number types:
         
-        case NUMBER_BIG_DECIMAL:
+        case VT_NUMBER_BIG_DECIMAL:
             writeBigDecimalValue((BigDecimal) value);
             return;
-        case NUMBER_BIG_INTEGER:
+        case VT_NUMBER_BIG_INTEGER:
             writeBigIntegerValue((BigInteger) value);
             return;
-        case NUMBER_FLOAT: // fall through
-        case NUMBER_DOUBLE:
+        case VT_NUMBER_FLOAT: // fall through
+        case VT_NUMBER_DOUBLE:
             writeDoubleValue(((Number) value).doubleValue());
             return;
-        case NUMBER_BYTE: // fall through
-        case NUMBER_SHORT: // fall through
-        case NUMBER_INTEGER:
+        case VT_NUMBER_BYTE: // fall through
+        case VT_NUMBER_SHORT: // fall through
+        case VT_NUMBER_INTEGER:
             writeIntValue(((Number) value).intValue());
             return;
-        case NUMBER_LONG:
+        case VT_NUMBER_LONG:
             writeLongValue(((Number) value).longValue());
             return;
-        case NUMBER_OTHER:
+        case VT_NUMBER_OTHER:
             writeNumberValue((Number) value);
             return;
 
         // Scalar types:
 
-        case BOOLEAN:
+        case VT_BOOLEAN:
             writeBooleanValue(((Boolean) value).booleanValue());
             return;
-        case DATE:
+        case VT_DATE:
             writeDateValue((Date) value);
             return;
-        case ENUM:
+        case VT_ENUM:
             writeEnumValue((Enum<?>) value);
             return;
             
         // Structured types:
 
-        case COLLECTION:
+        case VT_COLLECTION:
             writeCollectionValue((Collection<?>) value);
             return;
-        case ITERABLE:
+        case VT_ITERABLE:
             writeIterableValue((Iterable<?>) value);
             return;
-        case LIST:
+        case VT_LIST:
             writeListValue((List<?>) value);
             return;
-        case MAP:
+        case VT_MAP:
             writeMapValue((Map<?,?>) value);
             return;
-        case OBJECT_ARRAY:
+        case VT_OBJECT_ARRAY:
             writeObjectArrayValue((Object[]) value);
             return;
-        case TREE_NODE:
+        case VT_TREE_NODE:
             writeTreeNodeValue((TreeNode) value);
             return;
-        case OTHER:
+        case VT_OTHER:
             writeUnknownValue(value);
             return;
         }
@@ -236,88 +237,88 @@ public class JSONWriter
             return;
         }
 
-        ValueType type = _typeDetector.findType(value.getClass());
+        int type = _typeDetector.findType(value.getClass());
         switch (type) {
 
         // Textual types, similar:
 
-        case STRING:
+        case VT_STRING:
             writeStringField(fieldName, (String) value);
             return;
-        case CHAR_ARRAY:
+        case VT_CHAR_ARRAY:
             writeStringField(fieldName, new String((char[]) value));
             return;
-        case CHAR:
+        case VT_CHAR:
             writeStringField(fieldName, String.valueOf(value));
             return;
-        case CHARACTER_SEQUENCE:
+        case VT_CHARACTER_SEQUENCE:
             writeStringField(fieldName, ((CharSequence) value).toString());
             return;
-        case BYTE_ARRAY:
+        case VT_BYTE_ARRAY:
             writeBinaryField(fieldName, (byte[]) value);
             return;
 
             // Number types:
         
-        case NUMBER_BIG_DECIMAL:
+        case VT_NUMBER_BIG_DECIMAL:
             writeBigDecimalField(fieldName, (BigDecimal) value);
             return;
-        case NUMBER_BIG_INTEGER:
+        case VT_NUMBER_BIG_INTEGER:
             writeBigIntegerField(fieldName, (BigInteger) value);
             return;
-        case NUMBER_FLOAT: // fall through
-        case NUMBER_DOUBLE:
+        case VT_NUMBER_FLOAT: // fall through
+        case VT_NUMBER_DOUBLE:
             writeDoubleField(fieldName, ((Number) value).doubleValue());
             return;
-        case NUMBER_BYTE: // fall through
-        case NUMBER_SHORT: // fall through
-        case NUMBER_INTEGER:
+        case VT_NUMBER_BYTE: // fall through
+        case VT_NUMBER_SHORT: // fall through
+        case VT_NUMBER_INTEGER:
             writeIntField(fieldName, ((Number) value).intValue());
             return;
-        case NUMBER_LONG:
+        case VT_NUMBER_LONG:
             writeLongField(fieldName, ((Number) value).longValue());
             return;
-        case NUMBER_OTHER:
+        case VT_NUMBER_OTHER:
             writeNumberField(fieldName, (Number) value);
             return;
 
         // Scalar types:
 
-        case BOOLEAN:
+        case VT_BOOLEAN:
             writeBooleanField(fieldName, ((Boolean) value).booleanValue());
             return;
-        case DATE:
+        case VT_DATE:
             writeDateField(fieldName, (Date) value);
             return;
-        case ENUM:
+        case VT_ENUM:
             writeEnumField(fieldName, (Enum<?>) value);
             return;
             
         // Structured types:
 
-        case COLLECTION:
+        case VT_COLLECTION:
             writeCollectionField(fieldName, (Collection<?>) value);
             return;
-        case ITERABLE:
+        case VT_ITERABLE:
             writeIterableField(fieldName, (Iterable<?>) value);
             return;
-        case LIST:
+        case VT_LIST:
             writeListField(fieldName, (List<?>) value);
             return;
-        case MAP:
+        case VT_MAP:
             writeMapField(fieldName, (Map<?,?>) value);
             return;
-        case OBJECT_ARRAY:
+        case VT_OBJECT_ARRAY:
             writeObjectArrayField(fieldName, (Object[]) value);
             return;
-        case INT_ARRAY:
+        case VT_INT_ARRAY:
             writeIntArrayField(fieldName, (int[]) value);
             return;
-        case TREE_NODE:
+        case VT_TREE_NODE:
             writeTreeNodeField(fieldName, (TreeNode) value);
             return;
 
-        case OTHER:
+        case VT_OTHER:
             writeUnknownField(fieldName, value);
             return;
         }
