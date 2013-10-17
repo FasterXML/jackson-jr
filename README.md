@@ -6,6 +6,12 @@ and wrapper types (`java.lang.Boolean`, `java.lang.Integer`, `java.lang.Double`)
 allowing reading of JSON as "Maps, Collections and primitive wrappers"; and writing same
 out as JSON.
 
+In addition the package contains `composer` implementation that can be used to
+construct JSON output with builder-style API, but without necessarily having
+to build an in-memory representation: instead, it can directly use `streaming-api`
+for direct output. It will be, however, also possible to build actual in-memory
+JSON `String` or `byte[]` representation, if that is preferable.
+
 Artifact itself is currently about `50 kB` in size, and only depends on
 [Jackson Streaming API](../../../jackson-core) package.
 Combined size would stay well below 300 kilobytes (streaming API is about 200kB).
