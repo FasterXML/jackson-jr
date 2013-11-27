@@ -69,7 +69,7 @@ public class JSON
        /**
         * This feature can be used to indicate that the reader should preserve
         * order of the properties same as what input document has.
-        * Note that it is up to {@link com.fasterxml.jackson.simple.ob.impl.MapBuilder}
+        * Note that it is up to {@link com.fasterxml.jackson.jr.ob.impl.MapBuilder}
         * to support this feature; custom implementations may ignore the setting.
         *<p>
         * Default setting is <code>true</code>, meaning that reader is expected to try to

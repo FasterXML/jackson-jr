@@ -13,6 +13,10 @@ import com.fasterxml.jackson.jr.ob.JSONObjectException;
  * Convenience wrapper around {@link JSON} that implements {@link ObjectCodec}.
  * Note that implementation is not complete, due to natural limitations of
  * {@link JSON} and "simple" object binding.
+ *<p>
+ * The main use case is to give minimal context for other components that
+ * expect to get a {@link ObjectCodec}, such as {@link JsonParser} and
+ * {@link JsonGenerator}.
  */
 public class JSONAsObjectCodec
     extends ObjectCodec
