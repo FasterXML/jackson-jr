@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.simple.ob.impl;
+package com.fasterxml.jackson.jr.ob.impl;
 
 /**
  * Key class, used as an efficient and accurate key

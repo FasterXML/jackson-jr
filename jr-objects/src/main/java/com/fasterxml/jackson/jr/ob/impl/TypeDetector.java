@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.simple.ob.impl;
+package com.fasterxml.jackson.jr.ob.impl;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -12,7 +12,7 @@ import com.fasterxml.jackson.core.TreeNode;
  * relevant to our conversion needs.
  *<p>
  * Note that usage pattern is such that a single "root" instance is kept
- * by each {@link com.fasterxml.jackson.simple.ob.JSON} instance; and
+ * by each {@link com.fasterxml.jackson.jr.ob.JSON} instance; and
  * an actual per-operation instance must be constructed by calling
  * {@link #perOperationInstance()}: reason for this is that instances
  * use simple caching to handle the common case of repeating types

@@ -2,6 +2,8 @@ package com.fasterxml.jackson.simple.ob;
 
 import java.util.*;
 
+import com.fasterxml.jackson.jr.ob.JSON;
+
 public class SimpleWriteTest extends TestBase
 {
     public void testSimpleList() throws Exception

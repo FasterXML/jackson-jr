@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.simple.ob.impl;
+package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -6,8 +6,8 @@ import java.util.Iterator;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.type.ResolvedType;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.simple.ob.JSON;
-import com.fasterxml.jackson.simple.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 /**
  * Convenience wrapper around {@link JSON} that implements {@link ObjectCodec}.

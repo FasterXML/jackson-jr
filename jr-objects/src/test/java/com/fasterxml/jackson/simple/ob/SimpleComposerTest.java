@@ -1,5 +1,7 @@
 package com.fasterxml.jackson.simple.ob;
 
+import com.fasterxml.jackson.jr.ob.JSON;
+
 public class SimpleComposerTest extends TestBase
 {
     public void testSimpleNonNestedObject() throws Exception

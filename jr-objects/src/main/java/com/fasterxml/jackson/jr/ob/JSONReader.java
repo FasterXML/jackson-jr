@@ -1,13 +1,13 @@
-package com.fasterxml.jackson.simple.ob;
+package com.fasterxml.jackson.jr.ob;
 
 import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
-import com.fasterxml.jackson.simple.ob.JSON.Feature;
-import com.fasterxml.jackson.simple.ob.impl.ListBuilder;
-import com.fasterxml.jackson.simple.ob.impl.MapBuilder;
+import com.fasterxml.jackson.jr.ob.JSON.Feature;
+import com.fasterxml.jackson.jr.ob.impl.ListBuilder;
+import com.fasterxml.jackson.jr.ob.impl.MapBuilder;
 
 import static com.fasterxml.jackson.core.JsonTokenId.*;
 

@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.simple.ob;
+package com.fasterxml.jackson.jr.ob;
 
 import java.io.IOException;
 
@@ -6,13 +6,13 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
-import com.fasterxml.jackson.simple.ob.JSON.Feature;
-import com.fasterxml.jackson.simple.ob.impl.SequenceComposer;
+import com.fasterxml.jackson.jr.ob.JSON.Feature;
+import com.fasterxml.jackson.jr.ob.impl.SequenceComposer;
 
 /**
  * Root-level composer object that acts as streaming "builder"
  * object, using an underlying {@link com.fasterxml.jackson.core.JsonGenerator} object.
- * This is similar to {@link com.fasterxml.jackson.simple.ob.impl.ArrayComposer}, but does not
+ * This is similar to {@link com.fasterxml.jackson.jr.ob.impl.ArrayComposer}, but does not
  * have parent composer (so no <code>end()</code> method),
  * but does implement {@link java.io.Closeable}
  * 

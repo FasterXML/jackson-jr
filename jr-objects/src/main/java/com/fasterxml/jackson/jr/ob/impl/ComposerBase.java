@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.simple.ob.impl;
+package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.Flushable;
 import java.io.IOException;

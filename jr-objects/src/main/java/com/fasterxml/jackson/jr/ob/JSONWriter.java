@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.simple.ob;
+package com.fasterxml.jackson.jr.ob;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -6,10 +6,10 @@ import java.math.BigInteger;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.simple.ob.JSON.Feature;
-import com.fasterxml.jackson.simple.ob.impl.TypeDetector;
+import com.fasterxml.jackson.jr.ob.JSON.Feature;
+import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
 
-import static com.fasterxml.jackson.simple.ob.impl.TypeDetector.*;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;
 
 /**
  * Object that handles serialization of simple Objects into

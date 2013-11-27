@@ -1,9 +1,9 @@
-package com.fasterxml.jackson.simple.ob.impl;
+package com.fasterxml.jackson.jr.ob.impl;
 
 import java.util.*;
 
-import com.fasterxml.jackson.simple.ob.JSON;
-import com.fasterxml.jackson.simple.ob.JSON.Feature;
+import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
 /**
  * Helper class that is used for constructing {@link java.util.Map}s

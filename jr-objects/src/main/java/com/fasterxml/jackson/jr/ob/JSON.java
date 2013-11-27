@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.simple.ob;
+package com.fasterxml.jackson.jr.ob;
 
 import java.io.*;
 import java.net.URL;
@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.Instantiatable;
-import com.fasterxml.jackson.simple.ob.impl.*;
+import com.fasterxml.jackson.jr.ob.impl.*;
 
 /**
  * Main entry point for functionality.
