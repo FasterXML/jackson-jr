@@ -684,7 +684,7 @@ public class JSON
      * <li><code>char[]</code></li>
      *</ul>
      */
-    public Object from(Object source) throws IOException, JSONObjectException
+    public Object anyFrom(Object source) throws IOException, JSONObjectException
     {
         JsonParser jp;
         Object result;

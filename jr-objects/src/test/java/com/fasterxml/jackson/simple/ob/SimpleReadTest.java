@@ -10,7 +10,7 @@ public class SimpleReadTest extends TestBase
     public void testSimpleList() throws Exception
     {
         final String INPUT = "[1,2,3]";
-        Object ob = JSON.std.from(INPUT);
+        Object ob = JSON.std.anyFrom(INPUT);
         // default mapping should be to List:
         assertTrue(ob instanceof List);
         assertEquals(3, ((List<?>) ob).size());
@@ -34,7 +34,7 @@ public class SimpleReadTest extends TestBase
         assertEquals(INPUT, JSON.std.asString(ob));
 
         // or by changing default mapping:
-        ob = JSON.std.with(Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS).from(INPUT);
+        ob = JSON.std.with(Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS).anyFrom(INPUT);
         assertTrue(ob instanceof Object[]);
         assertEquals(2, ((Object[]) ob).length);
         assertEquals(INPUT, JSON.std.asString(ob));
@@ -43,7 +43,7 @@ public class SimpleReadTest extends TestBase
     public void testSimpleMap() throws Exception
     {
         final String INPUT = "{\"a\":1,\"b\":true,\"c\":3}";
-        Object ob = JSON.std.from(INPUT);
+        Object ob = JSON.std.anyFrom(INPUT);
         assertTrue(ob instanceof Map);
         assertEquals(3, ((Map<?,?>) ob).size());
         // actually, verify with write...
@@ -53,7 +53,7 @@ public class SimpleReadTest extends TestBase
     public void testSimpleMixed() throws Exception
     {
         final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";
-        Object ob = JSON.std.from(INPUT);
+        Object ob = JSON.std.anyFrom(INPUT);
         assertTrue(ob instanceof Map);
         assertEquals(2, ((Map<?,?>) ob).size());
         Object list = (((Map<?,?>) ob).get("a"));

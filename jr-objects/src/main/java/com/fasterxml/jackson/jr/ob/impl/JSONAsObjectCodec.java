@@ -54,7 +54,7 @@ public class JSONAsObjectCodec
     public <T> T readValue(JsonParser jp, Class<T> valueType)
             throws IOException, JsonProcessingException
     {
-        Object ob = _json.from(jp);
+        Object ob = _json.anyFrom(jp);
         _checkResultType(valueType, ob);
         return (T) ob;
     }
