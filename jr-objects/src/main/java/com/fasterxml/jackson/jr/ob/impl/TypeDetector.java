@@ -1,7 +1,10 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -68,43 +71,49 @@ public class TypeDetector
 
     public final static int VT_STRING = 6;
     
-    public final static int VT_CHARACTER_SEQUENCE = 7;
+    /**
+     * General "misc thing that can be serialized by calling 'toString()" type,
+     * used as a fallback for things that are barely recognized.
+     */
+    public final static int VT_STRING_LIKE = 7;
+
+    public final static int VT_CHARACTER_SEQUENCE = 8;
     
-    public final static int VT_CHAR_ARRAY = 8;
+    public final static int VT_CHAR_ARRAY = 9;
 
-    public final static int VT_BYTE_ARRAY = 9;
+    public final static int VT_BYTE_ARRAY = 10;
 
-    public final static int VT_INT_ARRAY = 10;
+    public final static int VT_INT_ARRAY = 11;
 
     // // // Numbers
     
-    public final static int VT_NUMBER_BYTE = 11;
+    public final static int VT_NUMBER_BYTE = 12;
 
-    public final static int VT_NUMBER_SHORT = 12;
+    public final static int VT_NUMBER_SHORT = 13;
     
-    public final static int VT_NUMBER_INTEGER = 13;
+    public final static int VT_NUMBER_INTEGER = 14;
 
-    public final static int VT_NUMBER_LONG = 14;
+    public final static int VT_NUMBER_LONG = 15;
 
-    public final static int VT_NUMBER_FLOAT = 15;
+    public final static int VT_NUMBER_FLOAT = 16;
 
-    public final static int VT_NUMBER_DOUBLE = 16;
+    public final static int VT_NUMBER_DOUBLE = 17;
 
-    public final static int VT_NUMBER_BIG_INTEGER = 17;
+    public final static int VT_NUMBER_BIG_INTEGER = 18;
 
-    public final static int VT_NUMBER_BIG_DECIMAL = 18;
+    public final static int VT_NUMBER_BIG_DECIMAL = 19;
 
-    public final static int VT_NUMBER_OTHER = 19;
+    public final static int VT_NUMBER_OTHER = 20;
     
-    // // // Other scalar types
+    // // // Other specific scalar types
     
-    public final static int VT_BOOLEAN = 20;
+    public final static int VT_BOOLEAN = 21;
 
-    public final static int VT_CHAR = 21;
+    public final static int VT_CHAR = 22;
 
-    public final static int VT_DATE = 22;
+    public final static int VT_DATE = 23;
 
-    public final static int VT_ENUM = 23;
+    public final static int VT_ENUM = 24;
 
     // // // Iterate-able types
 
@@ -112,7 +121,7 @@ public class TypeDetector
      * Anything that implements {@link java.lang.Iterable}, but not
      * {@link java.util.Collection}.
      */
-    public final static int VT_ITERABLE = 24;
+    public final static int VT_ITERABLE = 25;
 
     /*
     /**********************************************************************
@@ -269,6 +278,14 @@ public class TypeDetector
         }
         if (CharSequence.class.isAssignableFrom(raw)) {
             return VT_CHARACTER_SEQUENCE;
+        }
+        // Misc String-like types
+        if (UUID.class.isAssignableFrom(raw)
+                || File.class.isAssignableFrom(raw)
+                || URL.class.isAssignableFrom(raw)
+                || URI.class.isAssignableFrom(raw)
+                ) {
+            return VT_STRING_LIKE;
         }
         if (Iterable.class.isAssignableFrom(raw)) {
             return VT_ITERABLE;

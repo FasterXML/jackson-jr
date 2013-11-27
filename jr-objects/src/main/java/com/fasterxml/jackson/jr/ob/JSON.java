@@ -126,6 +126,17 @@ public class JSON
         * Feature is enabled by default.
         */
        FLUSH_AFTER_WRITE_VALUE(true),
+
+       /**
+        * Feature that determines what happens when we encounter a value of
+        * unrecognized type for which we do not have handling: if enabled,
+        * will throw a {@JsonObjectException}, if disabled simply
+        * calls {@link Object#toString} and uses that JSON String as serialization.
+        *<p>
+        * Feature is disabled by default
+        * so that no exceptions are thrown.
+        */
+       FAIL_ON_UNKNOWN_TYPE_WRITE(false),
        
        ;
 

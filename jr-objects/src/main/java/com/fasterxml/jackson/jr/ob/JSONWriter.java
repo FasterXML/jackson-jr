@@ -149,6 +149,9 @@ public class JSONWriter
         case VT_STRING:
             writeStringValue((String) value);
             return;
+        case VT_STRING_LIKE:
+            writeStringValue(value.toString());
+            return;
         case VT_CHAR_ARRAY:
             writeStringValue(new String((char[]) value));
             return;
@@ -537,32 +540,43 @@ public class JSONWriter
         }
     }
 
-    protected void writeDateValue(Date v) throws IOException, JsonProcessingException {
+    protected void writeDateValue(Date v) throws IOException {
         // TODO: maybe allow serialization using timestamp?
         writeStringValue(v.toString());
     }
 
-    protected void writeDateField(String fieldName, Date v) throws IOException, JsonProcessingException {
+    protected void writeDateField(String fieldName, Date v) throws IOException {
         writeStringField(fieldName, v.toString());
     }
 
-    protected void writeEnumValue(Enum<?> v) throws IOException, JsonProcessingException {
+    protected void writeEnumValue(Enum<?> v) throws IOException {
         // TODO: maybe allow serialization using index?
         writeStringValue(v.toString());
     }
 
-    protected void writeEnumField(String fieldName, Enum<?> v) throws IOException, JsonProcessingException {
+    protected void writeEnumField(String fieldName, Enum<?> v) throws IOException {
         writeStringField(fieldName, v.toString());
     }
 
-    protected void writeUnknownValue(Object data) throws IOException, JsonProcessingException {
+    protected void writeUnknownValue(Object data) throws IOException {
+        _checkUnknown(data);
         writeStringValue(data.toString());
     }
 
-    protected void writeUnknownField(String fieldName, Object data) throws IOException, JsonProcessingException {
+    protected void writeUnknownField(String fieldName, Object data) throws IOException {
+        _checkUnknown(data);
         writeStringField(fieldName, data.toString());
     }
 
+    protected void _checkUnknown(Object value) throws IOException
+    {
+        if (Feature.FAIL_ON_UNKNOWN_TYPE_WRITE.isEnabled(_features)) {
+            throw new JSONObjectException("Unrecognized type ("+value.getClass().getName()
+                    +"), don't know how to write (disable "+Feature.FAIL_ON_UNKNOWN_TYPE_WRITE
+                    +" to avoid exception)");
+        }
+    }
+    
     /*
     /**********************************************************************
     /* Overridable concrete typed write methods; key conversions:
