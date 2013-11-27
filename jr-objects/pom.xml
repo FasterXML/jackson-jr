@@ -1,22 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>com.fasterxml.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
     <version>2.3.0-rc1-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-objects</artifactId>
-  <name>jackson-jr-objects</name>
   <packaging>bundle</packaging>
-  <description>Naive/simple/light-weight data-binding that aims to minimize size of the jar
-by only providing simplest of data-binding capabilities; but still use modular design to
-play nice with other Jackson components. Builds directly on `jackson-core` (streaming),
-has no other dependencies.
+  <description>Simple data-binding that builds directly on `jackson-core` (streaming),
+has no other dependencies, and provides additional builder-style content generator
 </description>
   <url>http://wiki.fasterxml.com/JacksonHome</url>
-
   <properties>
     <osgi.export>
 com.fasterxml.jackson.jr.ob,
@@ -29,28 +23,9 @@ com.fasterxml.jackson.core.io,
 com.fasterxml.jackson.core.util,
 com.fasterxml.jackson.core.type,
 </osgi.import>
-
-    <!-- Generate PackageVersion.java into this directory. -->
     <packageVersion.dir>com/fasterxml/jackson/jr/ob</packageVersion.dir>
     <packageVersion.package>${project.groupId}.ob</packageVersion.package>
   </properties>
-
-  <dependencies>
-    <!-- Builds on core streaming API -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${version.jackson}</version>
-    </dependency>
-
-    <!-- and for testing, JUnit is needed -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.10</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 
   <build>
     <plugins>
@@ -61,12 +36,11 @@ com.fasterxml.jackson.core.type,
         <configuration>
           <links>
             <link>http://docs.oracle.com/javase/6/docs/api/</link>
-            <link>http://fasterxml.github.com/jackson-core/javadoc/2.2.0/</link>
+            <link>http://fasterxml.github.com/jackson-core/javadoc/2.3.0/</link>
           </links>
         </configuration>
       </plugin>
       <plugin>
-        <!-- Inherited from oss-base. Generate PackageVersion.java.-->
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>replacer</artifactId>
         <executions>
