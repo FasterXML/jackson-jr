@@ -2,6 +2,7 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.SerializableString;
 
@@ -9,10 +10,13 @@ public class ObjectComposer<PARENT extends ComposerBase>
     extends ComposerBase
 {
     protected final PARENT _parent;
+
+    protected final JsonGenerator _generator;
     
-    public ObjectComposer(PARENT parent) {
-        super(parent);
+    public ObjectComposer(PARENT parent, JsonGenerator g) {
+        super();
         _parent = parent;
+        _generator = g;
     }
 
     /*
@@ -20,6 +24,13 @@ public class ObjectComposer<PARENT extends ComposerBase>
     /* Abstract method impls
     /**********************************************************************
      */
+
+    @Override
+    public void flush() throws IOException {
+        if (_generator != null) {
+            _generator.close();
+        }
+    }
 
     @Override
     protected ObjectComposer<PARENT> _start() throws IOException, JsonProcessingException {
@@ -47,7 +58,7 @@ public class ObjectComposer<PARENT extends ComposerBase>
     {
         _closeChild();
         _generator.writeFieldName(fieldName);
-        return _startArray(this);
+        return _startArray(this, _generator);
     }
 
     public ArrayComposer<ObjectComposer<PARENT>> startArrayField(SerializableString fieldName)
@@ -55,7 +66,7 @@ public class ObjectComposer<PARENT extends ComposerBase>
     {
         _closeChild();
         _generator.writeFieldName(fieldName);
-        return _startArray(this);
+        return _startArray(this, _generator);
     }
     
     public ObjectComposer<ObjectComposer<PARENT>> startObjectField(String fieldName)
@@ -63,7 +74,7 @@ public class ObjectComposer<PARENT extends ComposerBase>
     {
         _closeChild();
         _generator.writeFieldName(fieldName);
-        return _startObject(this);
+        return _startObject(this, _generator);
     }
 
     public ObjectComposer<ObjectComposer<PARENT>> startObjectField(SerializableString fieldName)
@@ -71,7 +82,7 @@ public class ObjectComposer<PARENT extends ComposerBase>
     {
         _closeChild();
         _generator.writeFieldName(fieldName);
-        return _startObject(this);
+        return _startObject(this, _generator);
     }
 
     public PARENT end()

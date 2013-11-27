@@ -5,29 +5,35 @@ import java.io.IOException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
+public class ListComposer<PARENT extends ComposerBase>
     extends ComposerBase
 {
-    protected final JsonGenerator _generator;
-    
-    public SequenceComposer(JsonGenerator g) {
+    protected final PARENT _parent;
+
+    public ListComposer(PARENT parent) {
         super();
-        _generator = g;
+        _parent = parent;
     }
 
     /*
     /**********************************************************************
-    /* Abstract methods from base class
+    /* Abstract method impls
     /**********************************************************************
      */
-    
-    /**
-     * Calls {@link JsonGenerator#flush} on underlying {@link JsonGenerator}.
-     */
+
     @Override
-    public void flush() throws IOException {
-        if (_generator != null) {
-            _generator.close();
+    public void flush()  { }
+    
+    @Override
+    protected ListComposer<PARENT> _start() {
+//        _generator.writeStartArray();
+        return this;
+    }
+
+    @Override
+    protected void _finish() {
+        if (_open) {
+            _open = false;
         }
     }
 
@@ -37,18 +43,18 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
     /**********************************************************************
      */
 
-    public ArrayComposer<THIS> startArray()
+    public ListComposer<ListComposer<PARENT>> startArray()
         throws IOException, JsonProcessingException
     {
         _closeChild();
-        return _startArray(_this(), _generator);
+        return _startList(this);
     }
 
-    public ObjectComposer<THIS> startObject()
+    public MapComposer<ListComposer<PARENT>> startObject()
         throws IOException, JsonProcessingException
     {
         _closeChild();
-        return _startObject(_this(), _generator);
+        return _startMap(this);
     }
     
     /*
@@ -57,11 +63,11 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
     /**********************************************************************
      */
 
-    public THIS add(int value)
+    public ListComposer<PARENT> add(int value)
         throws IOException, JsonProcessingException
     {
-        _generator.writeNumber(value);
-        return _this();
+//        _generator.writeNumber(value);
+        return this;
     }
 
     /*
@@ -70,19 +76,19 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
     /**********************************************************************
      */
 
-    public THIS add(String value)
+    public ListComposer<PARENT> add(String value)
         throws IOException, JsonProcessingException
     {
-        _generator.writeString(value);
-        return _this();
+//        _generator.writeString(value);
+        return this;
     }
 
-    public THIS add(CharSequence value)
+    public ListComposer<PARENT> add(CharSequence value)
         throws IOException, JsonProcessingException
     {
         String str = (value == null) ? null : value.toString();
-        _generator.writeString(str);
-        return _this();
+//        _generator.writeString(str);
+        return this;
     }
 
     /*
@@ -91,18 +97,18 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
     /**********************************************************************
      */
 
-    public THIS addNull()
+    public ListComposer<PARENT> addNull()
         throws IOException, JsonProcessingException
     {
-        _generator.writeNull();
-        return _this();
+//        _generator.writeNull();
+        return this;
     }
 
-    public THIS add(boolean value)
+    public ListComposer<PARENT> add(boolean value)
         throws IOException, JsonProcessingException
     {
-        _generator.writeBoolean(value);
-        return _this();
+//        _generator.writeBoolean(value);
+        return this;
     }
     
     /**
@@ -111,11 +117,11 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
      * has a properly configure {@link com.fasterxml.jackson.core.ObjectCodec}
      * to use for serializer object.
      */
-    public THIS addObject(Object pojo)
+    public ListComposer<PARENT> addObject(Object pojo)
         throws IOException, JsonProcessingException
     {
-        _generator.writeObject(pojo);
-        return _this();
+//        _generator.writeObject(pojo);
+        return this;
     }
     
     /*
@@ -125,16 +131,26 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
      */
 
     protected void _closeChild()
-        throws IOException, JsonProcessingException
     {
         if (_child != null) {
-            _child._finish();
+            _child._safeFinish();
             _child = null;
         }
     }
 
-    @SuppressWarnings("unchecked")
-    protected THIS _this() {
-        return (THIS) this;
+    /*
+    /**********************************************************************
+    /* Compose methods, structures
+    /**********************************************************************
+     */
+    
+    public PARENT end()
+    {
+        _closeChild();
+        if (_open) {
+            _open = false;
+            _parent._childClosed();
+        }
+        return _parent;
     }
 }

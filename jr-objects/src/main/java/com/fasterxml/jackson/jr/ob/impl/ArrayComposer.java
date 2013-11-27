@@ -2,15 +2,16 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class ArrayComposer<PARENT extends ComposerBase>
     extends SequenceComposer<ArrayComposer<PARENT>>
 {
     protected final PARENT _parent;
-    
-    public ArrayComposer(PARENT parent) {
-        super(parent);
+
+    public ArrayComposer(PARENT parent, JsonGenerator g) {
+        super(g);
         _parent = parent;
     }
 
