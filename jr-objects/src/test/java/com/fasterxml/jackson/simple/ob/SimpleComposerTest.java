@@ -1,5 +1,7 @@
 package com.fasterxml.jackson.simple.ob;
 
+import java.util.*;
+
 import com.fasterxml.jackson.jr.ob.JSON;
 
 public class SimpleComposerTest extends TestBase
@@ -78,5 +80,18 @@ public class SimpleComposerTest extends TestBase
         assertEquals("{\"a\":1,\"arr\":[1,2,3],\"ob\":{\"x\":3,\"y\":4,"
                 +"\"args\":[\"none\"]},\"last\":true}",
             new String(json, "UTF-8"));
+    }
+
+    public void testListComposer() throws Exception
+    {
+        List<Object> list = JSON.std.composeList()
+                .add(true)
+                .add("foo")
+                .add(13)
+                .startArray()
+                    .add(55)
+                .end()
+                .finish();
+        assertEquals("[true,\"foo\",13,[55]]", JSON.std.asString(list));
     }
 }

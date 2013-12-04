@@ -8,7 +8,8 @@ import com.fasterxml.jackson.core.JsonGenerator;
 /**
  * Base class for all composer implementations.
  */
-public abstract class ComposerBase implements Flushable
+public abstract class ComposerBase
+    implements Flushable
 {
     protected ComposerBase _child;
 
@@ -23,14 +24,14 @@ public abstract class ComposerBase implements Flushable
      */
     
     protected abstract ComposerBase _start() throws IOException;
-    protected abstract void _finish() throws IOException;
+    protected abstract Object _finish() throws IOException;
 
     /**
      * Helper method used to "peel away" bogus exception declaration
      */
-    protected void _safeFinish() {
+    protected Object _safeFinish() {
         try {
-            _finish();
+            return _finish();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -66,9 +67,9 @@ public abstract class ComposerBase implements Flushable
         return child._start();
     }
 
-    protected <P extends ComposerBase> ListComposer<P> _startList(P parent)
+    protected <P extends ComposerBase> CollectionComposer<P> _startCollection(P parent)
     {
-        ListComposer<P> child = new ListComposer<P>(parent);
+        CollectionComposer<P> child = new CollectionComposer<P>(parent);
         _child = child;
         return child._start();
     }

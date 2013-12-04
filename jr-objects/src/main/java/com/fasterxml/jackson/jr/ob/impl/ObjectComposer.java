@@ -39,12 +39,13 @@ public class ObjectComposer<PARENT extends ComposerBase>
     }
 
     @Override
-    protected void _finish() throws IOException, JsonProcessingException
+    protected Object _finish() throws IOException, JsonProcessingException
     {
         if (_open) {
             _open = false;
             _generator.writeEndObject();
         }
+        return null;
     }
     
     /*
@@ -116,7 +117,7 @@ public class ObjectComposer<PARENT extends ComposerBase>
         _generator.writeNullField(fieldName);
         return this;
     }
-    
+
     public ObjectComposer<PARENT> put(String fieldName, int value)
         throws IOException, JsonProcessingException
     {
@@ -124,6 +125,20 @@ public class ObjectComposer<PARENT extends ComposerBase>
         return this;
     }
 
+    public ObjectComposer<PARENT> put(String fieldName, long value)
+        throws IOException, JsonProcessingException
+    {
+        _generator.writeNumberField(fieldName, value);
+        return this;
+    }
+
+    public ObjectComposer<PARENT> put(String fieldName, double value)
+        throws IOException, JsonProcessingException
+    {
+        _generator.writeNumberField(fieldName, value);
+        return this;
+    }
+    
     public ObjectComposer<PARENT> put(String fieldName, String value)
         throws IOException, JsonProcessingException
     {
@@ -153,5 +168,4 @@ public class ObjectComposer<PARENT extends ComposerBase>
             _child = null;
         }
     }
-    
 }

@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.jr.ob;
 
 import java.io.IOException;
+import java.util.*;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -57,10 +58,20 @@ public class JSONComposer<T>
         _byteWriter = w;
         _closeGenerator = true;
     }
+
+    protected JSONComposer(int features, T result)
+    {
+        super(null);
+        _features = features;
+        _result = result;
+        _stringWriter = null;
+        _byteWriter = null;
+        _closeGenerator = false;
+    }
     
     /*
     /**********************************************************************
-    /* Extended API, factory methods
+    /* API, factory methods
     /**********************************************************************
      */
 
@@ -79,10 +90,20 @@ public class JSONComposer<T>
             JsonGenerator gen, ByteArrayBuilder w) {
         return new JSONComposer<byte[]>(features, gen, w);
     }
+
+    public static <T extends Collection<Object>> JSONComposer<T> collectionComposer(int features,
+            T coll) {
+        return new JSONComposer<T>(features, coll);
+    }
+
+    public static JSONComposer<Map<String,Object>> mapComposer(int features,
+            Map<String,Object> map) {
+        return new JSONComposer<Map<String,Object>>(features, map);
+    }
     
     /*
     /**********************************************************************
-    /* Extended API, life-cycle
+    /* API, life-cycle
     /**********************************************************************
      */
 
@@ -131,7 +152,7 @@ public class JSONComposer<T>
     }
 
     @Override
-    protected void _finish() throws IOException, JsonProcessingException {
+    protected Object _finish() throws IOException, JsonProcessingException {
         // Should never be called
         throw _illegalCall();
     }

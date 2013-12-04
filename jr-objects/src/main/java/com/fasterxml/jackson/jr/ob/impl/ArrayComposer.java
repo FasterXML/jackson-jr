@@ -28,11 +28,12 @@ public class ArrayComposer<PARENT extends ComposerBase>
     }
 
     @Override
-    protected void _finish() throws IOException, JsonProcessingException {
+    protected Object _finish() throws IOException, JsonProcessingException {
         if (_open) {
             _open = false;
             _generator.writeEndArray();
         }
+        return null;
     }
 
     /*

@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
+import java.util.*;
 
 import com.fasterxml.jackson.core.SerializableString;
 
@@ -10,10 +11,23 @@ public class MapComposer<PARENT extends ComposerBase>
     protected final PARENT _parent;
 
     protected String _fieldName;
+
+    protected Map<String,Object> _map;
     
     public MapComposer(PARENT parent) {
         super();
         _parent = parent;
+    }
+
+    public MapComposer(Map<String,Object> map) {
+        super();
+        _parent = null;
+        _map = map;
+    }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static MapComposer<?> rootComposer(Map<String,Object> map) {
+        return new MapComposer(map);
     }
 
     /*
@@ -24,18 +38,22 @@ public class MapComposer<PARENT extends ComposerBase>
 
     @Override
     public void flush() throws IOException { }
-    
+
     @Override
     protected MapComposer<PARENT> _start() {
+        if (_map == null) {
+            _map = constructMap();
+        }
         return this;
     }
     
     @Override
-    protected void _finish()
+    protected Map<String,Object> _finish()
     {
         if (_open) {
             _open = false;
         }
+        return _map;
     }
     
     /*
@@ -44,18 +62,18 @@ public class MapComposer<PARENT extends ComposerBase>
     /**********************************************************************
      */
     
-    public ListComposer<MapComposer<PARENT>> startArrayField(String fieldName)
+    public CollectionComposer<MapComposer<PARENT>> startArrayField(String fieldName)
     {
         _closeChild();
         _fieldName = fieldName;
-        return _startList(this);
+        return _startCollection(this);
     }
     
-    public ListComposer<MapComposer<PARENT>> startArrayField(SerializableString fieldName)
+    public CollectionComposer<MapComposer<PARENT>> startArrayField(SerializableString fieldName)
     {
         _closeChild();
         _fieldName = fieldName.getValue();
-        return _startList(this);
+        return _startCollection(this);
     }
     
     public MapComposer<MapComposer<PARENT>> startObjectField(String fieldName)
@@ -90,33 +108,56 @@ public class MapComposer<PARENT extends ComposerBase>
     
     public MapComposer<PARENT> put(String fieldName, boolean value)
     {
-//        _generator.writeBooleanField(fieldName, value);
+        _map.put(fieldName, value ? Boolean.TRUE : Boolean.FALSE);
         return this;
     }
     
     public MapComposer<PARENT> putNull(String fieldName)
     {
-//        _generator.writeNullField(fieldName);
+        // could maybe just omit but...
+        _map.put(fieldName, null);
         return this;
     }
     
     public MapComposer<PARENT> put(String fieldName, int value)
     {
-//        _generator.writeNumberField(fieldName, value);
+        _map.put(fieldName, value);
+        return this;
+    }
+
+    public MapComposer<PARENT> put(String fieldName, long value)
+    {
+        _map.put(fieldName, value);
+        return this;
+    }
+
+    public MapComposer<PARENT> put(String fieldName, double value)
+    {
+        _map.put(fieldName, value);
         return this;
     }
     
     public MapComposer<PARENT> put(String fieldName, String value)
     {
-//        _generator.writeStringField(fieldName, value);
+        _map.put(fieldName, value);
         return this;
     }
     
     public MapComposer<PARENT> put(String fieldName, CharSequence value)
     {
         String str = (value == null) ? null : value.toString();
-//        _generator.writeStringField(fieldName, str);
+        _map.put(fieldName, str);
         return this;
+    }
+
+    /*
+    /**********************************************************************
+    /* Overridable helper methods
+    /**********************************************************************
+     */
+    
+    protected Map<String,Object> constructMap() {
+        return new LinkedHashMap<String,Object>();
     }
     
     /*
@@ -128,7 +169,8 @@ public class MapComposer<PARENT extends ComposerBase>
     protected void _closeChild()
     {
         if (_child != null) {
-            _child._safeFinish();
+            Object value = _child._safeFinish();
+            _map.put(_fieldName, value);
             _child = null;
         }
     }

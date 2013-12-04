@@ -25,7 +25,7 @@ public abstract class ListBuilder
     /* Construction
     /**********************************************************************
      */
-    
+
     protected ListBuilder(int features) {
         _features = features;
     }

@@ -64,6 +64,20 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
         return _this();
     }
 
+    public THIS add(long value)
+        throws IOException, JsonProcessingException
+    {
+        _generator.writeNumber(value);
+        return _this();
+    }
+
+    public THIS add(double value)
+        throws IOException, JsonProcessingException
+    {
+        _generator.writeNumber(value);
+        return _this();
+    }
+    
     /*
     /**********************************************************************
     /* Compose methods, scalars, textual / binary

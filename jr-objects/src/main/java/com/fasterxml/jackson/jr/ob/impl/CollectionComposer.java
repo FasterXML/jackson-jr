@@ -1,20 +1,32 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.IOException;
+import java.util.*;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
-public class ListComposer<PARENT extends ComposerBase>
+public class CollectionComposer<PARENT extends ComposerBase>
     extends ComposerBase
 {
     protected final PARENT _parent;
 
-    public ListComposer(PARENT parent) {
+    protected Collection<Object> _collection;
+    
+    public CollectionComposer(PARENT parent) {
         super();
         _parent = parent;
     }
 
+    protected CollectionComposer(Collection<Object> coll) {
+        super();
+        _parent = null;
+        _collection = coll;
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static CollectionComposer<?> rootComposer(Collection<Object> coll) {
+        return new CollectionComposer(coll);
+    }
+    
     /*
     /**********************************************************************
     /* Abstract method impls
@@ -25,16 +37,19 @@ public class ListComposer<PARENT extends ComposerBase>
     public void flush()  { }
     
     @Override
-    protected ListComposer<PARENT> _start() {
-//        _generator.writeStartArray();
+    protected CollectionComposer<PARENT> _start() {
+        if (_collection == null) {
+            _collection = constructCollection();
+        }
         return this;
     }
 
     @Override
-    protected void _finish() {
+    protected Collection<Object> _finish() {
         if (_open) {
             _open = false;
         }
+        return _collection;
     }
 
     /*
@@ -43,15 +58,13 @@ public class ListComposer<PARENT extends ComposerBase>
     /**********************************************************************
      */
 
-    public ListComposer<ListComposer<PARENT>> startArray()
-        throws IOException, JsonProcessingException
+    public CollectionComposer<CollectionComposer<PARENT>> startArray()
     {
         _closeChild();
-        return _startList(this);
+        return _startCollection(this);
     }
 
-    public MapComposer<ListComposer<PARENT>> startObject()
-        throws IOException, JsonProcessingException
+    public MapComposer<CollectionComposer<PARENT>> startObject()
     {
         _closeChild();
         return _startMap(this);
@@ -63,31 +76,40 @@ public class ListComposer<PARENT extends ComposerBase>
     /**********************************************************************
      */
 
-    public ListComposer<PARENT> add(int value)
-        throws IOException, JsonProcessingException
+    public CollectionComposer<PARENT> add(int value)
     {
-//        _generator.writeNumber(value);
+        _collection.add(Integer.valueOf(value));
         return this;
     }
 
+    public CollectionComposer<PARENT> add(long value)
+    {
+        _collection.add(Long.valueOf(value));
+        return this;
+    }
+
+    public CollectionComposer<PARENT> add(double value)
+    {
+        _collection.add(Double.valueOf(value));
+        return this;
+    }
+    
     /*
     /**********************************************************************
     /* Compose methods, scalars, textual / binary
     /**********************************************************************
      */
 
-    public ListComposer<PARENT> add(String value)
-        throws IOException, JsonProcessingException
+    public CollectionComposer<PARENT> add(String value)
     {
-//        _generator.writeString(value);
+        _collection.add(value);
         return this;
     }
 
-    public ListComposer<PARENT> add(CharSequence value)
-        throws IOException, JsonProcessingException
+    public CollectionComposer<PARENT> add(CharSequence value)
     {
         String str = (value == null) ? null : value.toString();
-//        _generator.writeString(str);
+        _collection.add(str);
         return this;
     }
 
@@ -97,17 +119,15 @@ public class ListComposer<PARENT extends ComposerBase>
     /**********************************************************************
      */
 
-    public ListComposer<PARENT> addNull()
-        throws IOException, JsonProcessingException
+    public CollectionComposer<PARENT> addNull()
     {
-//        _generator.writeNull();
+        _collection.add(null);
         return this;
     }
 
-    public ListComposer<PARENT> add(boolean value)
-        throws IOException, JsonProcessingException
+    public CollectionComposer<PARENT> add(boolean value)
     {
-//        _generator.writeBoolean(value);
+        _collection.add(value ? Boolean.TRUE : Boolean.FALSE);
         return this;
     }
     
@@ -117,13 +137,22 @@ public class ListComposer<PARENT extends ComposerBase>
      * has a properly configure {@link com.fasterxml.jackson.core.ObjectCodec}
      * to use for serializer object.
      */
-    public ListComposer<PARENT> addObject(Object pojo)
-        throws IOException, JsonProcessingException
+    public CollectionComposer<PARENT> addObject(Object pojo)
     {
-//        _generator.writeObject(pojo);
+        _collection.add(pojo);
         return this;
     }
     
+    /*
+    /**********************************************************************
+    /* Overridable helper methods
+    /**********************************************************************
+     */
+    
+    protected Collection<Object> constructCollection() {
+        return new ArrayList<Object>();
+    }
+
     /*
     /**********************************************************************
     /* Internal helper methods
@@ -133,7 +162,8 @@ public class ListComposer<PARENT extends ComposerBase>
     protected void _closeChild()
     {
         if (_child != null) {
-            _child._safeFinish();
+            Object value = _child._safeFinish();
+            _collection.add(value);
             _child = null;
         }
     }
