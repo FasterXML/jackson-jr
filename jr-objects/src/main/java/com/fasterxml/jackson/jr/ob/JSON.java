@@ -581,21 +581,21 @@ public class JSON
         return JSONComposer.bytesComposer(_features, _jsonFactory.createGenerator(out), out);
     }
 
-    public JSONComposer<List<Object>> composeList() {
+    public CollectionComposer<?,List<Object>> composeList() {
         List<Object> list = new ArrayList<Object>();
         return composeCollection(list);
     }
 
-    public <T extends Collection<Object>> JSONComposer<T> composeCollection(T collection) {
-        return JSONComposer.collectionComposer(_features, collection);
+    public <C extends Collection<Object>> CollectionComposer<?,C> composeCollection(C collection) {
+        return new CollectionComposer<ComposerBase,C>(collection);
     }
     
-    public JSONComposer<Map<String,Object>> composeMap() {
+    public MapComposer<?> composeMap() {
         return composeMap(new LinkedHashMap<String,Object>());
     }
 
-    public JSONComposer<Map<String,Object>> composeMap(Map<String,Object> map) {
-        return JSONComposer.mapComposer(_features, map);
+    public MapComposer<?> composeMap(Map<String,Object> map) {
+        return new MapComposer<ComposerBase>(map);
     }
     
     /*

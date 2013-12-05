@@ -4,27 +4,28 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 
-public class CollectionComposer<PARENT extends ComposerBase>
+public class CollectionComposer<PARENT extends ComposerBase,
+    C extends Collection<Object>>
     extends ComposerBase
 {
     protected final PARENT _parent;
 
-    protected Collection<Object> _collection;
+    protected C _collection;
     
     public CollectionComposer(PARENT parent) {
         super();
         _parent = parent;
     }
 
-    protected CollectionComposer(Collection<Object> coll) {
+    public CollectionComposer(C coll) {
         super();
         _parent = null;
         _collection = coll;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static CollectionComposer<?> rootComposer(Collection<Object> coll) {
-        return new CollectionComposer(coll);
+    public static <T extends Collection<Object>> CollectionComposer<?,T>
+    rootComposer(T coll) {
+        return new CollectionComposer<ComposerBase,T>(coll);
     }
     
     /*
@@ -37,7 +38,7 @@ public class CollectionComposer<PARENT extends ComposerBase>
     public void flush()  { }
     
     @Override
-    protected CollectionComposer<PARENT> _start() {
+    protected CollectionComposer<PARENT,C> _start() {
         if (_collection == null) {
             _collection = constructCollection();
         }
@@ -45,7 +46,7 @@ public class CollectionComposer<PARENT extends ComposerBase>
     }
 
     @Override
-    protected Collection<Object> _finish() {
+    protected C _finish() {
         if (_open) {
             _open = false;
         }
@@ -58,16 +59,20 @@ public class CollectionComposer<PARENT extends ComposerBase>
     /**********************************************************************
      */
 
-    public CollectionComposer<CollectionComposer<PARENT>> startArray()
+    public CollectionComposer<CollectionComposer<PARENT,C>,?> startArray()
     {
         _closeChild();
         return _startCollection(this);
     }
 
-    public MapComposer<CollectionComposer<PARENT>> startObject()
+    public MapComposer<CollectionComposer<PARENT,C>> startObject()
     {
         _closeChild();
         return _startMap(this);
+    }
+
+    public C finish() {
+        return _finish();
     }
     
     /*
@@ -76,19 +81,19 @@ public class CollectionComposer<PARENT extends ComposerBase>
     /**********************************************************************
      */
 
-    public CollectionComposer<PARENT> add(int value)
+    public CollectionComposer<PARENT,C> add(int value)
     {
         _collection.add(Integer.valueOf(value));
         return this;
     }
 
-    public CollectionComposer<PARENT> add(long value)
+    public CollectionComposer<PARENT,C> add(long value)
     {
         _collection.add(Long.valueOf(value));
         return this;
     }
 
-    public CollectionComposer<PARENT> add(double value)
+    public CollectionComposer<PARENT,C> add(double value)
     {
         _collection.add(Double.valueOf(value));
         return this;
@@ -100,13 +105,13 @@ public class CollectionComposer<PARENT extends ComposerBase>
     /**********************************************************************
      */
 
-    public CollectionComposer<PARENT> add(String value)
+    public CollectionComposer<PARENT,C> add(String value)
     {
         _collection.add(value);
         return this;
     }
 
-    public CollectionComposer<PARENT> add(CharSequence value)
+    public CollectionComposer<PARENT,C> add(CharSequence value)
     {
         String str = (value == null) ? null : value.toString();
         _collection.add(str);
@@ -119,13 +124,13 @@ public class CollectionComposer<PARENT extends ComposerBase>
     /**********************************************************************
      */
 
-    public CollectionComposer<PARENT> addNull()
+    public CollectionComposer<PARENT,C> addNull()
     {
         _collection.add(null);
         return this;
     }
 
-    public CollectionComposer<PARENT> add(boolean value)
+    public CollectionComposer<PARENT,C> add(boolean value)
     {
         _collection.add(value ? Boolean.TRUE : Boolean.FALSE);
         return this;
@@ -137,7 +142,7 @@ public class CollectionComposer<PARENT extends ComposerBase>
      * has a properly configure {@link com.fasterxml.jackson.core.ObjectCodec}
      * to use for serializer object.
      */
-    public CollectionComposer<PARENT> addObject(Object pojo)
+    public CollectionComposer<PARENT,C> addObject(Object pojo)
     {
         _collection.add(pojo);
         return this;
@@ -149,8 +154,9 @@ public class CollectionComposer<PARENT extends ComposerBase>
     /**********************************************************************
      */
     
-    protected Collection<Object> constructCollection() {
-        return new ArrayList<Object>();
+    @SuppressWarnings("unchecked")
+    protected C constructCollection() {
+        return (C) new ArrayList<Object>();
     }
 
     /*

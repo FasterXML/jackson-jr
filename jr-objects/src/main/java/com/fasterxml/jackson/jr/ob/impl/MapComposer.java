@@ -62,14 +62,14 @@ public class MapComposer<PARENT extends ComposerBase>
     /**********************************************************************
      */
     
-    public CollectionComposer<MapComposer<PARENT>> startArrayField(String fieldName)
+    public CollectionComposer<MapComposer<PARENT>,?> startArrayField(String fieldName)
     {
         _closeChild();
         _fieldName = fieldName;
         return _startCollection(this);
     }
     
-    public CollectionComposer<MapComposer<PARENT>> startArrayField(SerializableString fieldName)
+    public CollectionComposer<MapComposer<PARENT>,?> startArrayField(SerializableString fieldName)
     {
         _closeChild();
         _fieldName = fieldName.getValue();
@@ -98,6 +98,10 @@ public class MapComposer<PARENT extends ComposerBase>
             _parent._childClosed();
         }
         return _parent;
+    }
+
+    public Map<String,Object> finish() {
+        return _finish();
     }
     
     /*

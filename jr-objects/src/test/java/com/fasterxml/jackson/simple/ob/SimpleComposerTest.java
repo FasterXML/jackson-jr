@@ -84,7 +84,8 @@ public class SimpleComposerTest extends TestBase
 
     public void testListComposer() throws Exception
     {
-        List<Object> list = JSON.std.composeList()
+        List<Object> list = JSON.std
+                .composeCollection(new ArrayList<Object>())
                 .add(true)
                 .add("foo")
                 .add(13)
@@ -93,5 +94,14 @@ public class SimpleComposerTest extends TestBase
                 .end()
                 .finish();
         assertEquals("[true,\"foo\",13,[55]]", JSON.std.asString(list));
+
+        list = JSON.std.composeList()
+                .add(-3)
+                .startObject()
+                    .put("a", 1)
+                    .put("b", 2)
+                .end()
+                .finish();
+        assertEquals("[-3,{\"a\",1,\"b\":2}]", JSON.std.asString(list));
     }
 }

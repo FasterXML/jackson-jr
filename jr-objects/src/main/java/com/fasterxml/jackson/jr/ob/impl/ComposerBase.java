@@ -2,6 +2,7 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.Flushable;
 import java.io.IOException;
+import java.util.Collection;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 
@@ -67,9 +68,9 @@ public abstract class ComposerBase
         return child._start();
     }
 
-    protected <P extends ComposerBase> CollectionComposer<P> _startCollection(P parent)
+    protected <P extends ComposerBase> CollectionComposer<P,?> _startCollection(P parent)
     {
-        CollectionComposer<P> child = new CollectionComposer<P>(parent);
+        CollectionComposer<P,?> child = new CollectionComposer<P,Collection<Object>>(parent);
         _child = child;
         return child._start();
     }
