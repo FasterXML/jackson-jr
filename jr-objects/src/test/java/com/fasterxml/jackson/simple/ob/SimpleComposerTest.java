@@ -102,6 +102,6 @@ public class SimpleComposerTest extends TestBase
                     .put("b", 2)
                 .end()
                 .finish();
-        assertEquals("[-3,{\"a\",1,\"b\":2}]", JSON.std.asString(list));
+        assertEquals("[-3,{\"a\":1,\"b\":2}]", JSON.std.asString(list));
     }
 }

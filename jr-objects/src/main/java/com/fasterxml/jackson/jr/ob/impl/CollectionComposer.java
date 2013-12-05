@@ -62,13 +62,17 @@ public class CollectionComposer<PARENT extends ComposerBase,
     public CollectionComposer<CollectionComposer<PARENT,C>,?> startArray()
     {
         _closeChild();
-        return _startCollection(this);
+        CollectionComposer<CollectionComposer<PARENT,C>,?> child = _startCollection(this);
+        _collection.add(child._collection);
+        return child;
     }
 
     public MapComposer<CollectionComposer<PARENT,C>> startObject()
     {
         _closeChild();
-        return _startMap(this);
+        MapComposer<CollectionComposer<PARENT,C>> child = _startMap(this);
+        _collection.add(child._map);
+        return child;
     }
 
     public C finish() {
@@ -147,7 +151,23 @@ public class CollectionComposer<PARENT extends ComposerBase,
         _collection.add(pojo);
         return this;
     }
+
+    /*
+    /**********************************************************************
+    /* Compose methods, structures
+    /**********************************************************************
+     */
     
+    public PARENT end()
+    {
+        _closeChild();
+        if (_open) {
+            _open = false;
+            _parent._childClosed();
+        }
+        return _parent;
+    }
+
     /*
     /**********************************************************************
     /* Overridable helper methods
@@ -172,21 +192,5 @@ public class CollectionComposer<PARENT extends ComposerBase,
             _collection.add(value);
             _child = null;
         }
-    }
-
-    /*
-    /**********************************************************************
-    /* Compose methods, structures
-    /**********************************************************************
-     */
-    
-    public PARENT end()
-    {
-        _closeChild();
-        if (_open) {
-            _open = false;
-            _parent._childClosed();
-        }
-        return _parent;
     }
 }

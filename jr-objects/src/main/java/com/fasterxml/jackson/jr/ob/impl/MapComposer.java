@@ -66,28 +66,26 @@ public class MapComposer<PARENT extends ComposerBase>
     {
         _closeChild();
         _fieldName = fieldName;
-        return _startCollection(this);
+        CollectionComposer<MapComposer<PARENT>,?> child = _startCollection(this);
+        _map.put(fieldName, child._collection);
+        return child;
     }
     
-    public CollectionComposer<MapComposer<PARENT>,?> startArrayField(SerializableString fieldName)
-    {
-        _closeChild();
-        _fieldName = fieldName.getValue();
-        return _startCollection(this);
+    public CollectionComposer<MapComposer<PARENT>,?> startArrayField(SerializableString fieldName) {
+        return startArrayField(fieldName.getValue());
     }
     
     public MapComposer<MapComposer<PARENT>> startObjectField(String fieldName)
     {
         _closeChild();
         _fieldName = fieldName;
-        return _startMap(this);
+        MapComposer<MapComposer<PARENT>> child = _startMap(this);
+        _map.put(fieldName, child._map);
+        return child;
     }
     
-    public MapComposer<MapComposer<PARENT>> startObjectField(SerializableString fieldName)
-    {
-        _closeChild();
-        _fieldName = fieldName.getValue();
-        return _startMap(this);
+    public MapComposer<MapComposer<PARENT>> startObjectField(SerializableString fieldName) {
+        return startObjectField(fieldName.getValue());
     }
     
     public PARENT end()
