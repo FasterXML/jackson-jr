@@ -101,7 +101,7 @@ In future it will be available via Maven, with dependency like:
 ```xml
 <dependency>
   <groupId>com.fasterxml.jackson.jr</groupId>
-  <artifactId>jackson-jr-objectss</artifactId>
+  <artifactId>jackson-jr-objects</artifactId>
   <version>2.3.0-SNAPSHOT</version>
 </dependency>
 ```
