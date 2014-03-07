@@ -86,7 +86,7 @@ public class JSON
         * {@link JSONObjectException} will be thrown if duplicates are encountered.
         */
        FAIL_ON_DUPLICATE_MAP_KEYS(true),
-       
+
        /*
        /**********************************************************************
        /* Write-related features
@@ -137,6 +137,22 @@ public class JSON
         * so that no exceptions are thrown.
         */
        FAIL_ON_UNKNOWN_TYPE_WRITE(false),
+
+       /*
+       /**********************************************************************
+       /* Other features
+       /**********************************************************************
+        */
+
+       /**
+        * Feature that determines whether access to {@link java.lang.reflect.Method}s and
+        * {@link java.lang.reflect.Constructor}s that are used with dynamically
+        * introspected Beans may be forced using
+        * {@link java.lang.reflect.AccessibleObject#setAccessible} or not.
+        *<p>
+        * Feature is enabled by default, so that access may be forced.
+        */
+       FORCE_REFLECTION_ACCESS(true),
        
        ;
 

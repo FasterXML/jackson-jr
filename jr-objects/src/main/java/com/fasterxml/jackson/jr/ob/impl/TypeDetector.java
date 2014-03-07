@@ -35,6 +35,9 @@ public class TypeDetector
      * not using enunms we try to minimize code foot print.
      * But this is ONLY done because Value Type constants are NOT part of
      * public API: if they were, size savings wouldn't make sense.
+     * 
+     * One more note: negative values are used for dynamically introspected
+     * Beans.
      */
     
     /**
