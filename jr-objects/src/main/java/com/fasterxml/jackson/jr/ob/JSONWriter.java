@@ -327,14 +327,14 @@ public class JSONWriter
         }
         throw new IllegalStateException("Unsupported type: "+type);
     }
-    
+
     /*
     /**********************************************************************
     /* Overridable concrete typed write methods, structured types
     /**********************************************************************
      */
     
-    protected void writeCollectionValue(Collection<?> v) throws IOException, JsonProcessingException
+    protected void writeCollectionValue(Collection<?> v) throws IOException
     {
         _generator.writeStartArray();
         for (Object ob : v) {
@@ -343,13 +343,13 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeCollectionField(String fieldName, Collection<?> v) throws IOException, JsonProcessingException
+    protected void writeCollectionField(String fieldName, Collection<?> v) throws IOException
     {
         _generator.writeFieldName(fieldName);
         writeCollectionValue(v);
     }
     
-    protected void writeIterableValue(Iterable<?> v) throws IOException, JsonProcessingException
+    protected void writeIterableValue(Iterable<?> v) throws IOException
     {
         _generator.writeStartArray();
         for (Object ob : v) {
@@ -358,13 +358,13 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeIterableField(String fieldName, Iterable<?> v) throws IOException, JsonProcessingException
+    protected void writeIterableField(String fieldName, Iterable<?> v) throws IOException
     {
         _generator.writeFieldName(fieldName);
         writeIterableValue(v);
     }
     
-    protected void writeListValue(List<?> v) throws IOException, JsonProcessingException
+    protected void writeListValue(List<?> v) throws IOException
     {
         _generator.writeStartArray();
         for (int i = 0, len = v.size(); i < len; ++i) {
@@ -373,13 +373,13 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeListField(String fieldName, List<?> v) throws IOException, JsonProcessingException
+    protected void writeListField(String fieldName, List<?> v) throws IOException
     {
         _generator.writeFieldName(fieldName);
         writeListValue(v);
     }
     
-    protected void writeMapValue(Map<?,?> v) throws IOException, JsonProcessingException
+    protected void writeMapValue(Map<?,?> v) throws IOException
     {
         _generator.writeStartObject();
         if (!v.isEmpty()) {
@@ -390,13 +390,13 @@ public class JSONWriter
         _generator.writeEndObject();
     }
 
-    protected void writeMapField(String fieldName, Map<?,?> v) throws IOException, JsonProcessingException
+    protected void writeMapField(String fieldName, Map<?,?> v) throws IOException
     {
         _generator.writeFieldName(fieldName);
         writeMapValue(v);
     }
 
-    protected void writeObjectArrayValue(Object[] v) throws IOException, JsonProcessingException {
+    protected void writeObjectArrayValue(Object[] v) throws IOException {
         _generator.writeStartArray();
         for (int i = 0, len = v.length; i < len; ++i) {
             writeValue(v[i]);
@@ -404,13 +404,13 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeObjectArrayField(String fieldName, Object[] v) throws IOException, JsonProcessingException
+    protected void writeObjectArrayField(String fieldName, Object[] v) throws IOException
     {
         _generator.writeFieldName(fieldName);
         writeObjectArrayValue(v);
     }
 
-    protected void writeIntArrayValue(int[] v) throws IOException, JsonProcessingException {
+    protected void writeIntArrayValue(int[] v) throws IOException {
         _generator.writeStartArray();
         for (int i = 0, len = v.length; i < len; ++i) {
             _generator.writeNumber(v[i]);
@@ -418,20 +418,20 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeIntArrayField(String fieldName, int[] v) throws IOException, JsonProcessingException
+    protected void writeIntArrayField(String fieldName, int[] v) throws IOException
     {
         _generator.writeFieldName(fieldName);
         writeIntArrayValue(v);
     }
 
-    protected void writeTreeNodeValue(TreeNode v) throws IOException, JsonProcessingException {
+    protected void writeTreeNodeValue(TreeNode v) throws IOException {
         if (_treeCodec == null) {
             throw new JSONObjectException("No TreeCodec configured: can not serializer TreeNode values");
         }
         _treeCodec.writeTree(_generator, v);
     }
 
-    protected void writeTreeNodeField(String fieldName, TreeNode v) throws IOException, JsonProcessingException
+    protected void writeTreeNodeField(String fieldName, TreeNode v) throws IOException
     {
         _generator.writeFieldName(fieldName);
         writeTreeNodeValue(v);
@@ -443,61 +443,61 @@ public class JSONWriter
     /**********************************************************************
      */
 
-    protected void writeBooleanValue(boolean v) throws IOException, JsonProcessingException {
+    protected void writeBooleanValue(boolean v) throws IOException {
         _generator.writeBoolean(v);
     }
 
-    protected void writeBooleanField(String fieldName, boolean v) throws IOException, JsonProcessingException {
+    protected void writeBooleanField(String fieldName, boolean v) throws IOException {
         _generator.writeBooleanField(fieldName, v);
     }
 
-    protected void writeIntValue(int v) throws IOException, JsonProcessingException {
+    protected void writeIntValue(int v) throws IOException {
         _generator.writeNumber(v);
     }
 
-    protected void writeIntField(String fieldName, int v) throws IOException, JsonProcessingException {
+    protected void writeIntField(String fieldName, int v) throws IOException {
         _generator.writeNumberField(fieldName, v);
     }
 
-    protected void writeLongValue(long v) throws IOException, JsonProcessingException {
+    protected void writeLongValue(long v) throws IOException {
         _generator.writeNumber(v);
     }
 
-    protected void writeBigIntegerValue(BigInteger v) throws IOException, JsonProcessingException {
+    protected void writeBigIntegerValue(BigInteger v) throws IOException {
         _generator.writeNumber(v);
     }
 
-    protected void writeBigIntegerField(String fieldName, BigInteger v) throws IOException, JsonProcessingException {
+    protected void writeBigIntegerField(String fieldName, BigInteger v) throws IOException {
         _generator.writeFieldName(fieldName);
         writeBigIntegerValue(v);
     }
     
-    protected void writeLongField(String fieldName, long v) throws IOException, JsonProcessingException {
+    protected void writeLongField(String fieldName, long v) throws IOException {
         _generator.writeNumberField(fieldName, v);
     }
     
-    protected void writeDoubleValue(double v) throws IOException, JsonProcessingException {
+    protected void writeDoubleValue(double v) throws IOException {
         _generator.writeNumber(v);
     }
 
-    protected void writeDoubleField(String fieldName, double v) throws IOException, JsonProcessingException {
+    protected void writeDoubleField(String fieldName, double v) throws IOException {
         _generator.writeNumberField(fieldName, v);
     }
 
-    protected void writeBigDecimalValue(BigDecimal v) throws IOException, JsonProcessingException {
+    protected void writeBigDecimalValue(BigDecimal v) throws IOException {
         _generator.writeNumber(v);
     }
 
-    protected void writeBigDecimalField(String fieldName, BigDecimal v) throws IOException, JsonProcessingException {
+    protected void writeBigDecimalField(String fieldName, BigDecimal v) throws IOException {
         _generator.writeNumberField(fieldName, v);
     }
 
-    protected void writeNumberValue(Number v) throws IOException, JsonProcessingException {
+    protected void writeNumberValue(Number v) throws IOException {
         // Unknown type; must use fallback method
         _generator.writeNumber(v.toString());
     }
 
-    protected void writeNumberField(String fieldName, Number v) throws IOException, JsonProcessingException {
+    protected void writeNumberField(String fieldName, Number v) throws IOException {
         _generator.writeFieldName(fieldName);
         writeNumberValue(v);
     }
@@ -508,19 +508,19 @@ public class JSONWriter
     /**********************************************************************
      */
 
-    protected void writeStringValue(String v) throws IOException, JsonProcessingException {
+    protected void writeStringValue(String v) throws IOException {
         _generator.writeString(v);
     }
 
-    protected void writeStringField(String fieldName, String v) throws IOException, JsonProcessingException {
+    protected void writeStringField(String fieldName, String v) throws IOException {
         _generator.writeStringField(fieldName, v);
     }
 
-    protected void writeBinaryValue(byte[] data) throws IOException, JsonProcessingException {
+    protected void writeBinaryValue(byte[] data) throws IOException {
         _generator.writeBinary(data);
     }
 
-    protected void writeBinaryField(String fieldName, byte[] data) throws IOException, JsonProcessingException {
+    protected void writeBinaryField(String fieldName, byte[] data) throws IOException {
         _generator.writeBinaryField(fieldName, data);
     }
 
@@ -530,11 +530,11 @@ public class JSONWriter
     /**********************************************************************
      */
 
-    protected void writeNullValue() throws IOException, JsonProcessingException {
+    protected void writeNullValue() throws IOException {
         _generator.writeNull();
     }
 
-    protected void writeNullField(String fieldName) throws IOException, JsonProcessingException {
+    protected void writeNullField(String fieldName) throws IOException {
         if (Feature.WRITE_NULL_PROPERTIES.isEnabled(_features)) {
             _generator.writeNullField(fieldName);
         }
