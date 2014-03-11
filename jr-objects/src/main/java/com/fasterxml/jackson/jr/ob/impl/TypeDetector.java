@@ -1,14 +1,18 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
+import java.beans.*;
 import java.io.File;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.jr.ob.JSON;
 
 /**
  * Helper object used for efficient detection of type information
@@ -17,7 +21,7 @@ import com.fasterxml.jackson.core.TreeNode;
  * Note that usage pattern is such that a single "root" instance is kept
  * by each {@link com.fasterxml.jackson.jr.ob.JSON} instance; and
  * an actual per-operation instance must be constructed by calling
- * {@link #perOperationInstance()}: reason for this is that instances
+ * {@link #perOperationInstance}: reason for this is that instances
  * use simple caching to handle the common case of repeating types
  * within JSON Arrays.
  */
@@ -128,21 +132,20 @@ public class TypeDetector
 
     /*
     /**********************************************************************
-    /* Other constants
-    /**********************************************************************
-     */
-    
-    // TODO: can make configurable if it matters...
-    protected final int MAX_ENTRIES = 1000;
-
-    /*
-    /**********************************************************************
     /* Caching
     /**********************************************************************
      */
-    
+
+    /**
+     * Mapping from classes to resolved type constants or indexes.
+     */
     protected final ConcurrentHashMap<ClassKey, Integer> _knownTypes;
 
+    /**
+     * Set of Bean types that have been resolved.
+     */
+    protected final CopyOnWriteArrayList<BeanDefinition> _knownBeans;
+    
     /*
     /**********************************************************************
     /* Instance state
@@ -155,32 +158,46 @@ public class TypeDetector
 
     protected int _prevType;
 
+    protected int _features;
+    
     /*
     /**********************************************************************
     /* Construction
     /**********************************************************************
      */
     
-    protected TypeDetector(ConcurrentHashMap<ClassKey, Integer> types) {
+    protected TypeDetector(ConcurrentHashMap<ClassKey, Integer> types,
+            CopyOnWriteArrayList<BeanDefinition> beans,
+            int features) {
         _knownTypes = types;
+        _knownBeans = beans;
+        _features = features;
     }
 
-    protected TypeDetector(TypeDetector base) {
+    protected TypeDetector(TypeDetector base, int features) {
         _knownTypes = base._knownTypes;
+        _knownBeans = base._knownBeans;
+        _features = features;
     }
     
-    public final static TypeDetector rootDetector() {
-        return new TypeDetector(new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4));
+    public final static TypeDetector rootDetector(int features) {
+        return new TypeDetector(new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4),
+                new CopyOnWriteArrayList<BeanDefinition>(),
+                features);
     }
 
-    public TypeDetector perOperationInstance() {
-        // Let's try to keep mem usage bounded; safe, if not super clean:
-        if (_knownTypes.size() >= MAX_ENTRIES) {
-            _knownTypes.clear();
-        }
-        return new TypeDetector(this);
+    public TypeDetector perOperationInstance(int features) {
+        return new TypeDetector(this, features);
     }
 
+    public BeanDefinition findBean(int index) {
+        return _knownBeans.get(index);
+    }
+    
+    /**
+     * The main lookup method used to find type identifier for
+     * given raw class.
+     */
     public final int findType(Class<?> raw)
     {
         if (raw == _prevClass) {
@@ -296,8 +313,83 @@ public class TypeDetector
         if (Date.class.isAssignableFrom(raw)) {
             return VT_DATE;
         }
-        
+        if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
+            BeanDefinition def = _resolveBean(raw);
+            // Due to concurrent access, possible that someone might have added it
+            synchronized (_knownBeans) {
+                // Important: do NOT try to reuse shared instance; caller needs it
+                ClassKey k = new ClassKey(raw);
+                Integer I = _knownTypes.get(k);
+                // if it was already concurrently added, we'll just discard this copy, return earlier
+                if (I != null) {
+                    return I.intValue();
+                }
+                // otherwise add at the end, use -(index+1) as id
+                _knownBeans.add(def);
+                int typeId = -_knownBeans.size();
+
+                _knownTypes.put(k, Integer.valueOf(typeId));
+                return typeId;
+            }
+        }
         // Ok. I give up, no idea!
         return VT_OTHER;
+    }
+
+    protected final BeanProperty[] NO_PROPS = new BeanProperty[0];
+
+    protected BeanDefinition _resolveBean(Class<?> raw)
+    {
+        // note: ignore methods in `java.lang.Object` (like "getClass()")
+        BeanInfo info;
+        try {
+            info = Introspector.getBeanInfo(raw, Object.class);
+        } catch (IntrospectionException e) {
+            throw new IllegalArgumentException("Failed to introspect BeanInfo for type '"
+                    +raw.getName()+"': "+e.getMessage(), e);
+        }
+        List<BeanProperty> props = new ArrayList<BeanProperty>();
+        for (PropertyDescriptor prop : info.getPropertyDescriptors()) {
+            // no type means indexed property
+            Class<?> type = prop.getPropertyType();
+            if (type == null) {
+                continue;
+            }
+            final Method readMethod = prop.getReadMethod();
+            final Method writeMethod = prop.getWriteMethod();
+            String name;
+            if (readMethod != null) {
+                name = readMethod.getName();
+                if (name.startsWith("get")) {
+                    name = Introspector.decapitalize(name.substring(3));
+                } else if (name.startsWith("is")) {
+                    name = Introspector.decapitalize(name.substring(3));
+                } else {
+                    name = Introspector.decapitalize(name);
+                }
+            } else if (writeMethod != null) {
+                name = writeMethod.getName();
+                if (name.startsWith("set")) {
+                    name = Introspector.decapitalize(name.substring(3));
+                } else {
+                    name = Introspector.decapitalize(name);
+                }
+            } else { // can this happen?
+                continue;
+            }
+            // One more thing: force access if need be:
+            if (JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features)) {
+                if (readMethod != null) {
+                    readMethod.setAccessible(true);
+                }
+                // no use for write method yet; if we had, should force access
+            }
+            props.add(new BeanProperty(name, readMethod, writeMethod));
+        }
+        final int len = props.size();
+        BeanProperty[] propArray = (len == 0) ? NO_PROPS
+                : props.toArray(new BeanProperty[len]);
+
+        return new BeanDefinition(raw, propArray);
     }
 }

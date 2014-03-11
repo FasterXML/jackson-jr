@@ -71,7 +71,7 @@ public class JSONWriter
     protected JSONWriter(JSONWriter base, JsonGenerator jgen)
     {
         _features = base._features;
-        _typeDetector = base._typeDetector.perOperationInstance();
+        _typeDetector = base._typeDetector.perOperationInstance(_features);
         _treeCodec = base._treeCodec;
         _generator = jgen;
     }

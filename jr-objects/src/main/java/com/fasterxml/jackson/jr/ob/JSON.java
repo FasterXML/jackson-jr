@@ -15,8 +15,7 @@ import com.fasterxml.jackson.jr.ob.impl.*;
  *<p>
  * Note that instances are fully immutable, and thereby thread-safe.
  */
-public class JSON
-    implements Versioned
+public class JSON implements Versioned
 {
     /**
      * Simple on/off (enabled/disabled) features for {@link JSON}; used for simple configuration
@@ -102,6 +101,19 @@ public class JSON
         * are ignored during serialization.
         */
        WRITE_NULL_PROPERTIES(false),
+
+       /**
+        * Feature that determines whether "read-only" properties of Beans
+        * (properties that only have a getter but no matching setter) are
+        * to be included in Bean serialization or not; if disabled,
+        * only properties have have both setter and getter are serialized.
+        * Note that feature is only used if {@link #HANDLE_JAVA_BEANS}
+        * is also enabled.
+        *<p>
+        * Feature is enabled by default, so that all Bean properties
+        * are serialized.
+        */
+       WRITE_READONLY_BEAN_PROPERTIES(true),
        
        /**
         * Feature that can be enabled to use "pretty-printing", basic indentation
@@ -133,6 +145,11 @@ public class JSON
         * will throw a {@JsonObjectException}, if disabled simply
         * calls {@link Object#toString} and uses that JSON String as serialization.
         *<p>
+        * NOTE: if {@link #HANDLE_JAVA_BEANS} is enabled, this setting typically
+        * has no effect, since otherwise unknown types are recognized as
+        * Bean types.
+        *
+        *<p>
         * Feature is disabled by default
         * so that no exceptions are thrown.
         */
@@ -144,6 +161,21 @@ public class JSON
        /**********************************************************************
         */
 
+       /**
+        * Feature that determines whether Bean types (Java objects with
+        * getters and setters that expose state to serialize) will be
+        * recognized and handled or not.
+        * When enabled, any types that are not recognized as standard JDK
+        * data structures, primitives or wrapper values will be introspected
+        * and handled as Java Beans (can be read/written as long as JSON
+        * matches properties discovered); when disabled, they may only be serialized
+        * (using {@link Object#toString} method), and can not be deserialized.
+        *<p>
+        * Feature is enabled by default, but can be disabled do avoid use
+        * of Bean reflection for cases where it is not desired.
+        */
+       HANDLE_JAVA_BEANS(true),
+       
        /**
         * Feature that determines whether access to {@link java.lang.reflect.Method}s and
         * {@link java.lang.reflect.Constructor}s that are used with dynamically
@@ -282,7 +314,7 @@ public class JSON
     }
 
     protected JSONWriter _defaultWriter(int features, TreeCodec tc) {
-        return new JSONWriter(features, TypeDetector.rootDetector(), tc);
+        return new JSONWriter(features, TypeDetector.rootDetector(features), tc);
     }
     
     /*

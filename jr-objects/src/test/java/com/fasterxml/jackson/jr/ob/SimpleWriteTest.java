@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.simple.ob;
+package com.fasterxml.jackson.jr.ob;
 
 import java.io.File;
 import java.net.URI;
@@ -61,7 +61,9 @@ public class SimpleWriteTest extends TestBase
     public void testUnnownType() throws Exception
     {
         try {
-            String json = JSON.std.with(JSON.Feature.FAIL_ON_UNKNOWN_TYPE_WRITE).asString(new POJO());
+            String json = JSON.std.with(JSON.Feature.FAIL_ON_UNKNOWN_TYPE_WRITE)
+                    .without(JSON.Feature.HANDLE_JAVA_BEANS)
+                    .asString(new POJO());
             fail("Should have failed: instead got: "+json);
         } catch (Exception e) {
             verifyException(e, "unrecognized type");

@@ -1,8 +1,5 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.beans.MethodDescriptor;
-import java.lang.reflect.Constructor;
-
 /**
  * Class that contains information about dynamically introspected
  * Bean types.
@@ -10,13 +7,13 @@ import java.lang.reflect.Constructor;
 public class BeanDefinition
 {
     protected final Class<?> _type;
-    
-    protected Constructor<?> _ctorDefault;
+
+    protected BeanProperty[] _properties;
 
     public BeanDefinition(Class<?> type,
-            Constructor<?> defCtor,
-            MethodDescriptor[] methods)
+            BeanProperty[] props)
     {
         _type = type;
+        _properties = props;
     }
 }

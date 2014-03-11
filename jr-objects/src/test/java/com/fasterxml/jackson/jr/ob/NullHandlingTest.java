@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.simple.ob;
+package com.fasterxml.jackson.jr.ob;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
