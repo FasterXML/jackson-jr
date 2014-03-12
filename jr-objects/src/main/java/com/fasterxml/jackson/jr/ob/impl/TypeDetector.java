@@ -202,7 +202,7 @@ public class TypeDetector
      * The main lookup method used to find type identifier for
      * given raw class; including Bean types (if allowed).
      */
-    public final int findType(Class<?> raw)
+    public final int findFullSerializationType(Class<?> raw)
     {
         if (raw == _prevClass) {
             return _prevType;
@@ -224,12 +224,10 @@ public class TypeDetector
         return type;
     }
 
-    /**
-     * Lookup method used to find type identifier for
-     * given raw class, if (and only if) it is a "simple" type,
-     * not a Bean type.
-     */
-    public final int findSimpleType(Class<?> raw)
+    /*
+    // Lookup method used to find type identifier for
+    // given raw class, if (and only if) it is a "simple" type, not a Bean type.
+    public final int findSimpleSerializationType(Class<?> raw)
     {
         if (raw == _prevClass) {
             return _prevType;
@@ -253,6 +251,7 @@ public class TypeDetector
         _prevClass = raw;
         return type;
     }
+    */
 
     protected int _findFull(Class<?> raw)
     {
@@ -280,7 +279,7 @@ public class TypeDetector
         }
         return type;
     }
-    
+
     protected int _findSimple(Class<?> raw)
     {
         if (raw == String.class) {
@@ -331,8 +330,8 @@ public class TypeDetector
             if (raw == BigInteger.class) {
                 return VT_NUMBER_BIG_INTEGER;
             }
-            // What numeric type is this? Regardless, serialize as String
-            return VT_STRING_LIKE;
+            // What numeric type is this? Could consider "string-like" but...
+            return VT_UNKNOWN;
         }
         if (raw == Character.class) {
             return VT_CHAR;
@@ -425,7 +424,13 @@ public class TypeDetector
                 }
                 // no use for write method yet; if we had, should force access
             }
-            props.add(new BeanProperty(name, type, readMethod, writeMethod));
+            // ok, two things: maybe we can pre-resolve the type?
+            BeanProperty bp = new BeanProperty(name, type, readMethod, writeMethod);
+            int typeId = _findSimple(type);
+            if (typeId != VT_UNKNOWN) {
+                bp = bp.withWriteTypeId(typeId);
+            }
+            props.add(bp);
         }
         final int len = props.size();
         BeanProperty[] propArray = (len == 0) ? NO_PROPS

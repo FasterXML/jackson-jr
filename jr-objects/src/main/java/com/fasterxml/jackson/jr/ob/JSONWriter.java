@@ -148,7 +148,7 @@ public class JSONWriter
             writeNullValue();
             return;
         }
-        _writeValue(value, _typeDetector.findType(value.getClass()));
+        _writeValue(value, _typeDetector.findFullSerializationType(value.getClass()));
     }
 
     public void writeField(String fieldName, Object value) throws IOException, JsonProcessingException
@@ -160,7 +160,7 @@ public class JSONWriter
             return;
         }
 
-        int type = _typeDetector.findType(value.getClass());
+        int type = _typeDetector.findFullSerializationType(value.getClass());
         switch (type) {
 
         // Textual types, similar:
@@ -618,7 +618,7 @@ public class JSONWriter
             }
             int typeId = property.getWriteTypeId();
             if (typeId == 0) {
-                typeId = _typeDetector.findType(value.getClass());
+                typeId = _typeDetector.findFullSerializationType(value.getClass());
             }
             _generator.writeFieldName(name);
             _writeValue(value, typeId);
