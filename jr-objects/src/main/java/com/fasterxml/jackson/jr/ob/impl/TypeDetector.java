@@ -45,9 +45,9 @@ public class TypeDetector
      */
     
     /**
-     * Type not otherwise recognized.
+     * Type not yet resolved
      */
-    public final static int VT_OTHER = 0;
+    public final static int VT_UNKNOWN = 0;
     
     /**
      * All kinds of {@link java.util.Map}s.
@@ -129,7 +129,7 @@ public class TypeDetector
      * {@link java.util.Collection}.
      */
     public final static int VT_ITERABLE = 25;
-
+    
     /*
     /**********************************************************************
     /* Caching
@@ -190,13 +190,17 @@ public class TypeDetector
         return new TypeDetector(this, features);
     }
 
-    public BeanDefinition findBean(int index) {
+    public BeanDefinition getBeanDefinition(int index) {
+        // for simplicity, let's allow caller to pass negative id as is
+        if (index < 0) {
+            index = -(index+1);
+        }
         return _knownBeans.get(index);
     }
     
     /**
      * The main lookup method used to find type identifier for
-     * given raw class.
+     * given raw class; including Bean types (if allowed).
      */
     public final int findType(Class<?> raw)
     {
@@ -210,7 +214,7 @@ public class TypeDetector
         Integer I = _knownTypes.get(k);
 
         if (I == null) {
-            type = _find(raw);
+            type = _findFull(raw);
             _knownTypes.put(k, Integer.valueOf(type));
         } else {
             type = I.intValue();
@@ -220,7 +224,64 @@ public class TypeDetector
         return type;
     }
 
-    protected int _find(Class<?> raw)
+    /**
+     * Lookup method used to find type identifier for
+     * given raw class, if (and only if) it is a "simple" type,
+     * not a Bean type.
+     */
+    public final int findSimpleType(Class<?> raw)
+    {
+        if (raw == _prevClass) {
+            return _prevType;
+        }
+        ClassKey k = _key;
+        k.reset(raw);
+        int type;
+
+        Integer I = _knownTypes.get(k);
+
+        if (I == null) {
+            type = _findSimple(raw);
+            if (type == VT_UNKNOWN) {
+                return type;
+            }
+            _knownTypes.put(k, Integer.valueOf(type));
+        } else {
+            type = I.intValue();
+        }
+        _prevType = type;
+        _prevClass = raw;
+        return type;
+    }
+
+    protected int _findFull(Class<?> raw)
+    {
+        int type = _findSimple(raw);
+        if (type == VT_UNKNOWN) {
+            if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
+                BeanDefinition def = _resolveBean(raw);
+                // Due to concurrent access, possible that someone might have added it
+                synchronized (_knownBeans) {
+                    // Important: do NOT try to reuse shared instance; caller needs it
+                    ClassKey k = new ClassKey(raw);
+                    Integer I = _knownTypes.get(k);
+                    // if it was already concurrently added, we'll just discard this copy, return earlier
+                    if (I != null) {
+                        return I.intValue();
+                    }
+                    // otherwise add at the end, use -(index+1) as id
+                    _knownBeans.add(def);
+                    int typeId = -_knownBeans.size();
+    
+                    _knownTypes.put(k, Integer.valueOf(typeId));
+                    return typeId;
+                }
+            }
+        }
+        return type;
+    }
+    
+    protected int _findSimple(Class<?> raw)
     {
         if (raw == String.class) {
             return VT_STRING;
@@ -238,7 +299,7 @@ public class TypeDetector
                     return VT_INT_ARRAY;
                 }
                 // Hmmh. Could support all types but....
-                return VT_OTHER;
+                return VT_UNKNOWN;
             }
             return VT_OBJECT_ARRAY;
         }
@@ -270,9 +331,8 @@ public class TypeDetector
             if (raw == BigInteger.class) {
                 return VT_NUMBER_BIG_INTEGER;
             }
-            
-            // What numeric type is this?!
-            return VT_OTHER;
+            // What numeric type is this? Regardless, serialize as String
+            return VT_STRING_LIKE;
         }
         if (raw == Character.class) {
             return VT_CHAR;
@@ -313,27 +373,8 @@ public class TypeDetector
         if (Date.class.isAssignableFrom(raw)) {
             return VT_DATE;
         }
-        if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
-            BeanDefinition def = _resolveBean(raw);
-            // Due to concurrent access, possible that someone might have added it
-            synchronized (_knownBeans) {
-                // Important: do NOT try to reuse shared instance; caller needs it
-                ClassKey k = new ClassKey(raw);
-                Integer I = _knownTypes.get(k);
-                // if it was already concurrently added, we'll just discard this copy, return earlier
-                if (I != null) {
-                    return I.intValue();
-                }
-                // otherwise add at the end, use -(index+1) as id
-                _knownBeans.add(def);
-                int typeId = -_knownBeans.size();
-
-                _knownTypes.put(k, Integer.valueOf(typeId));
-                return typeId;
-            }
-        }
         // Ok. I give up, no idea!
-        return VT_OTHER;
+        return VT_UNKNOWN;
     }
 
     protected final BeanProperty[] NO_PROPS = new BeanProperty[0];

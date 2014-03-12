@@ -22,4 +22,8 @@ public abstract class TestBase extends TestCase
     protected String quote(String str) {
         return "\"" + str + "\"";
     }
+
+    protected String aposToQuotes(String json) {
+        return json.replace("'", "\"");
+    }
 }

@@ -6,7 +6,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 
-public class SimpleWriteTest extends TestBase
+public class WriteSimpleTest extends TestBase
 {
     final static class POJO {
         public int value = 3;

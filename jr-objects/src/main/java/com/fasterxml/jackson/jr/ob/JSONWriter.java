@@ -7,6 +7,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
+import com.fasterxml.jackson.jr.ob.impl.BeanDefinition;
 import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
 
 import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;
@@ -224,11 +225,20 @@ public class JSONWriter
         case VT_TREE_NODE:
             writeTreeNodeValue((TreeNode) value);
             return;
-        case VT_OTHER:
+        case VT_UNKNOWN:
             writeUnknownValue(value);
             return;
         }
-        throw new IllegalStateException("Unsupported type: "+type);
+        
+        if (type < 0) { // Bean type!
+            BeanDefinition def = _typeDetector.getBeanDefinition(type);
+            if (def == null) { // sanity check
+                throw new IllegalStateException("Internal error: missing BeanDefinition for id "+type
+                        +" (class "+value.getClass().getName()+")");
+            }
+            writeBeanValue(def, value);
+        }
+        throw new IllegalStateException("Unsupported type: "+type+" (class "+value.getClass().getName()+")");
     }
 
     public void writeField(String fieldName, Object value) throws IOException, JsonProcessingException
@@ -321,10 +331,20 @@ public class JSONWriter
             writeTreeNodeField(fieldName, (TreeNode) value);
             return;
 
-        case VT_OTHER:
+        case VT_UNKNOWN:
             writeUnknownField(fieldName, value);
             return;
         }
+
+        if (type < 0) { // Bean type!
+            BeanDefinition def = _typeDetector.getBeanDefinition(type);
+            if (def == null) { // sanity check
+                throw new IllegalStateException("Internal error: missing BeanDefinition for id "+type
+                        +" (class "+value.getClass().getName()+")");
+            }
+            writeBeanField(fieldName, def, value);
+        }
+        
         throw new IllegalStateException("Unsupported type: "+type);
     }
 
@@ -558,6 +578,14 @@ public class JSONWriter
         writeStringField(fieldName, v.toString());
     }
 
+    protected void writeBeanValue(BeanDefinition beanDef, Object v) throws IOException {
+        throw new IllegalStateException("Almost there! "+beanDef);
+    }
+
+    protected void writeBeanField(String fieldName, BeanDefinition beanDef, Object v) throws IOException {
+        throw new IllegalStateException("Almost there! "+beanDef);
+    }
+    
     protected void writeUnknownValue(Object data) throws IOException {
         _checkUnknown(data);
         writeStringValue(data.toString());
