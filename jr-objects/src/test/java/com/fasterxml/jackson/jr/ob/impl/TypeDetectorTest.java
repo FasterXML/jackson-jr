@@ -31,22 +31,22 @@ public class TypeDetectorTest extends TestBase
         assertEquals(3, props.size());
         Map<String, BeanProperty> map = new HashMap<String, BeanProperty>();
         for (BeanProperty prop : props) {
-            map.put(prop._name, prop);
+            map.put(prop._name.getValue(), prop);
         }
 
         BeanProperty prop;
 
         prop = map.get("x");
         assertNotNull(prop);
-        assertNotNull(prop._readMethod);
-        assertNotNull(prop._writeMethod);
+        assertNotNull(prop._getMethod);
+        assertNotNull(prop._setMethod);
         prop = map.get("y");
         assertNotNull(prop);
-        assertNull(prop._readMethod);
-        assertNotNull(prop._writeMethod);
+        assertNull(prop._getMethod);
+        assertNotNull(prop._setMethod);
         prop = map.get("name");
         assertNotNull(prop);
-        assertNotNull(prop._readMethod);
-        assertNull(prop._writeMethod);
+        assertNotNull(prop._getMethod);
+        assertNull(prop._setMethod);
     }
 }

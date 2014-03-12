@@ -6,8 +6,10 @@ import java.math.BigInteger;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
 import com.fasterxml.jackson.jr.ob.impl.BeanDefinition;
+import com.fasterxml.jackson.jr.ob.impl.BeanProperty;
 import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
 
 import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;
@@ -34,11 +36,13 @@ public class JSONWriter
     protected final int _features;
     
     /**
-     * Object that is used to 
+     * Object that is used to resolve types of values dynamically.
      */
     protected final TypeDetector _typeDetector;
 
     protected final TreeCodec _treeCodec;
+
+    protected final boolean _requireSetter;
     
     /*
     /**********************************************************************
@@ -64,6 +68,7 @@ public class JSONWriter
         _typeDetector = td;
         _treeCodec = tc;
         _generator = null;
+        _requireSetter = JSON.Feature.WRITE_READONLY_BEAN_PROPERTIES.isDisabled(features);
     }
 
     /**
@@ -75,6 +80,7 @@ public class JSONWriter
         _typeDetector = base._typeDetector.perOperationInstance(_features);
         _treeCodec = base._treeCodec;
         _generator = jgen;
+        _requireSetter = JSON.Feature.WRITE_READONLY_BEAN_PROPERTIES.isDisabled(_features);
     }
 
     /*
@@ -136,109 +142,13 @@ public class JSONWriter
     /**********************************************************************
      */
 
-    public void writeValue(Object value) throws IOException, JsonProcessingException
+    public final void writeValue(Object value) throws IOException, JsonProcessingException
     {
         if (value == null) {
             writeNullValue();
             return;
         }
-        int type = _typeDetector.findType(value.getClass());
-        switch (type) {
-
-        // Textual types, similar:
-
-        case VT_STRING:
-            writeStringValue((String) value);
-            return;
-        case VT_STRING_LIKE:
-            writeStringValue(value.toString());
-            return;
-        case VT_CHAR_ARRAY:
-            writeStringValue(new String((char[]) value));
-            return;
-        case VT_CHAR:
-            writeStringValue(String.valueOf(value));
-            return;
-        case VT_CHARACTER_SEQUENCE:
-            writeStringValue(((CharSequence) value).toString());
-            return;
-        case VT_BYTE_ARRAY:
-            writeBinaryValue((byte[]) value);
-            return;
-        case VT_INT_ARRAY:
-            writeIntArrayValue((int[]) value);
-            return;
-
-            // Number types:
-        
-        case VT_NUMBER_BIG_DECIMAL:
-            writeBigDecimalValue((BigDecimal) value);
-            return;
-        case VT_NUMBER_BIG_INTEGER:
-            writeBigIntegerValue((BigInteger) value);
-            return;
-        case VT_NUMBER_FLOAT: // fall through
-        case VT_NUMBER_DOUBLE:
-            writeDoubleValue(((Number) value).doubleValue());
-            return;
-        case VT_NUMBER_BYTE: // fall through
-        case VT_NUMBER_SHORT: // fall through
-        case VT_NUMBER_INTEGER:
-            writeIntValue(((Number) value).intValue());
-            return;
-        case VT_NUMBER_LONG:
-            writeLongValue(((Number) value).longValue());
-            return;
-        case VT_NUMBER_OTHER:
-            writeNumberValue((Number) value);
-            return;
-
-        // Scalar types:
-
-        case VT_BOOLEAN:
-            writeBooleanValue(((Boolean) value).booleanValue());
-            return;
-        case VT_DATE:
-            writeDateValue((Date) value);
-            return;
-        case VT_ENUM:
-            writeEnumValue((Enum<?>) value);
-            return;
-            
-        // Structured types:
-
-        case VT_COLLECTION:
-            writeCollectionValue((Collection<?>) value);
-            return;
-        case VT_ITERABLE:
-            writeIterableValue((Iterable<?>) value);
-            return;
-        case VT_LIST:
-            writeListValue((List<?>) value);
-            return;
-        case VT_MAP:
-            writeMapValue((Map<?,?>) value);
-            return;
-        case VT_OBJECT_ARRAY:
-            writeObjectArrayValue((Object[]) value);
-            return;
-        case VT_TREE_NODE:
-            writeTreeNodeValue((TreeNode) value);
-            return;
-        case VT_UNKNOWN:
-            writeUnknownValue(value);
-            return;
-        }
-        
-        if (type < 0) { // Bean type!
-            BeanDefinition def = _typeDetector.getBeanDefinition(type);
-            if (def == null) { // sanity check
-                throw new IllegalStateException("Internal error: missing BeanDefinition for id "+type
-                        +" (class "+value.getClass().getName()+")");
-            }
-            writeBeanValue(def, value);
-        }
-        throw new IllegalStateException("Unsupported type: "+type+" (class "+value.getClass().getName()+")");
+        _writeValue(value, _typeDetector.findType(value.getClass()));
     }
 
     public void writeField(String fieldName, Object value) throws IOException, JsonProcessingException
@@ -342,12 +252,114 @@ public class JSONWriter
                 throw new IllegalStateException("Internal error: missing BeanDefinition for id "+type
                         +" (class "+value.getClass().getName()+")");
             }
-            writeBeanField(fieldName, def, value);
+            _generator.writeFieldName(fieldName);
+            writeBeanValue(def, value);
         }
         
         throw new IllegalStateException("Unsupported type: "+type);
     }
 
+    protected void _writeValue(Object value, int type) throws IOException
+    {
+        switch (type) {
+
+        // Textual types, similar:
+
+        case VT_STRING:
+            writeStringValue((String) value);
+            return;
+        case VT_STRING_LIKE:
+            writeStringValue(value.toString());
+            return;
+        case VT_CHAR_ARRAY:
+            writeStringValue(new String((char[]) value));
+            return;
+        case VT_CHAR:
+            writeStringValue(String.valueOf(value));
+            return;
+        case VT_CHARACTER_SEQUENCE:
+            writeStringValue(((CharSequence) value).toString());
+            return;
+        case VT_BYTE_ARRAY:
+            writeBinaryValue((byte[]) value);
+            return;
+        case VT_INT_ARRAY:
+            writeIntArrayValue((int[]) value);
+            return;
+
+            // Number types:
+        
+        case VT_NUMBER_BIG_DECIMAL:
+            writeBigDecimalValue((BigDecimal) value);
+            return;
+        case VT_NUMBER_BIG_INTEGER:
+            writeBigIntegerValue((BigInteger) value);
+            return;
+        case VT_NUMBER_FLOAT: // fall through
+        case VT_NUMBER_DOUBLE:
+            writeDoubleValue(((Number) value).doubleValue());
+            return;
+        case VT_NUMBER_BYTE: // fall through
+        case VT_NUMBER_SHORT: // fall through
+        case VT_NUMBER_INTEGER:
+            writeIntValue(((Number) value).intValue());
+            return;
+        case VT_NUMBER_LONG:
+            writeLongValue(((Number) value).longValue());
+            return;
+        case VT_NUMBER_OTHER:
+            writeNumberValue((Number) value);
+            return;
+
+        // Scalar types:
+
+        case VT_BOOLEAN:
+            writeBooleanValue(((Boolean) value).booleanValue());
+            return;
+        case VT_DATE:
+            writeDateValue((Date) value);
+            return;
+        case VT_ENUM:
+            writeEnumValue((Enum<?>) value);
+            return;
+            
+        // Structured types:
+
+        case VT_COLLECTION:
+            writeCollectionValue((Collection<?>) value);
+            return;
+        case VT_ITERABLE:
+            writeIterableValue((Iterable<?>) value);
+            return;
+        case VT_LIST:
+            writeListValue((List<?>) value);
+            return;
+        case VT_MAP:
+            writeMapValue((Map<?,?>) value);
+            return;
+        case VT_OBJECT_ARRAY:
+            writeObjectArrayValue((Object[]) value);
+            return;
+        case VT_TREE_NODE:
+            writeTreeNodeValue((TreeNode) value);
+            return;
+        case VT_UNKNOWN:
+            writeUnknownValue(value);
+            return;
+        }
+        
+        if (type < 0) { // Bean type!
+            BeanDefinition def = _typeDetector.getBeanDefinition(type);
+            if (def == null) { // sanity check
+                throw new IllegalStateException("Internal error: missing BeanDefinition for id "+type
+                        +" (class "+value.getClass().getName()+")");
+            }
+            writeBeanValue(def, value);
+            return;
+        }
+        throw new IllegalStateException("Unsupported type: "+type+" (class "+value.getClass().getName()+")");
+    }
+    
     /*
     /**********************************************************************
     /* Overridable concrete typed write methods, structured types
@@ -560,6 +572,13 @@ public class JSONWriter
         }
     }
 
+    protected void writeNullField(SerializedString fieldName) throws IOException {
+        if (Feature.WRITE_NULL_PROPERTIES.isEnabled(_features)) {
+            _generator.writeFieldName(fieldName);
+            _generator.writeNull();
+        }
+    }
+    
     protected void writeDateValue(Date v) throws IOException {
         // TODO: maybe allow serialization using timestamp?
         writeStringValue(v.toString());
@@ -578,14 +597,35 @@ public class JSONWriter
         writeStringField(fieldName, v.toString());
     }
 
-    protected void writeBeanValue(BeanDefinition beanDef, Object v) throws IOException {
-        throw new IllegalStateException("Almost there! "+beanDef);
+    protected void writeBeanValue(BeanDefinition beanDef, Object bean) throws IOException
+    {
+        _generator.writeStartObject();
+        for (BeanProperty property : beanDef.properties()) {
+            SerializedString name;
+            
+            if (_requireSetter) {
+                name =  property.getNameIfHasSetter();
+                if (name == null) {
+                    continue;
+                }
+            } else {
+                name = property.getName();
+            }
+            Object value = property.getValueFor(bean);
+            if (value == null) {
+                writeNullField(name);
+                continue;
+            }
+            int typeId = property.getWriteTypeId();
+            if (typeId == 0) {
+                typeId = _typeDetector.findType(value.getClass());
+            }
+            _generator.writeFieldName(name);
+            _writeValue(value, typeId);
+        }
+        _generator.writeEndObject();
     }
 
-    protected void writeBeanField(String fieldName, BeanDefinition beanDef, Object v) throws IOException {
-        throw new IllegalStateException("Almost there! "+beanDef);
-    }
-    
     protected void writeUnknownValue(Object data) throws IOException {
         _checkUnknown(data);
         writeStringValue(data.toString());

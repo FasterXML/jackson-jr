@@ -425,7 +425,7 @@ public class TypeDetector
                 }
                 // no use for write method yet; if we had, should force access
             }
-            props.add(new BeanProperty(name, readMethod, writeMethod));
+            props.add(new BeanProperty(name, type, readMethod, writeMethod));
         }
         final int len = props.size();
         BeanProperty[] propArray = (len == 0) ? NO_PROPS

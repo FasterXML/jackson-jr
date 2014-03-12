@@ -17,6 +17,7 @@ public class WriteBeansTest extends TestBase
     {
         // first: with default settings, should serialize 2 props
         String json = JSON.std.asString(new TestBean());
+        
         Map<String,Object> map = JSON.std.mapFrom(json);
         if ((2 != map.size())
                 || !Integer.valueOf(1).equals(map.get("x"))
@@ -29,9 +30,8 @@ public class WriteBeansTest extends TestBase
         json = JSON.std.without(Feature.WRITE_READONLY_BEAN_PROPERTIES)
                 .asString(new TestBean());
         map = JSON.std.mapFrom(json);
-        if ((2 != map.size())
+        if ((1 != map.size())
                 || !Integer.valueOf(1).equals(map.get("x"))
-                || !Integer.valueOf(3).equals(map.get("y"))
                 ){
             fail("Wrong Map contents (expected just 'x' for JSON: "+json);
         }

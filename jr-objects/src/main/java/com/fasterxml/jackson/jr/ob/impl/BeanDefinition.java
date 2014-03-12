@@ -16,4 +16,6 @@ public class BeanDefinition
         _type = type;
         _properties = props;
     }
+
+    public BeanProperty[] properties() { return _properties; }
 }
