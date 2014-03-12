@@ -165,83 +165,83 @@ public class JSONWriter
 
         // Textual types, similar:
 
-        case VT_STRING:
+        case SER_STRING:
             writeStringField(fieldName, (String) value);
             return;
-        case VT_CHAR_ARRAY:
+        case SER_CHAR_ARRAY:
             writeStringField(fieldName, new String((char[]) value));
             return;
-        case VT_CHAR:
+        case SER_CHAR:
             writeStringField(fieldName, String.valueOf(value));
             return;
-        case VT_CHARACTER_SEQUENCE:
+        case SER_CHARACTER_SEQUENCE:
             writeStringField(fieldName, ((CharSequence) value).toString());
             return;
-        case VT_BYTE_ARRAY:
+        case SER_BYTE_ARRAY:
             writeBinaryField(fieldName, (byte[]) value);
             return;
 
             // Number types:
         
-        case VT_NUMBER_BIG_DECIMAL:
+        case SER_NUMBER_BIG_DECIMAL:
             writeBigDecimalField(fieldName, (BigDecimal) value);
             return;
-        case VT_NUMBER_BIG_INTEGER:
+        case SER_NUMBER_BIG_INTEGER:
             writeBigIntegerField(fieldName, (BigInteger) value);
             return;
-        case VT_NUMBER_FLOAT: // fall through
-        case VT_NUMBER_DOUBLE:
+        case SER_NUMBER_FLOAT: // fall through
+        case SER_NUMBER_DOUBLE:
             writeDoubleField(fieldName, ((Number) value).doubleValue());
             return;
-        case VT_NUMBER_BYTE: // fall through
-        case VT_NUMBER_SHORT: // fall through
-        case VT_NUMBER_INTEGER:
+        case SER_NUMBER_BYTE: // fall through
+        case SER_NUMBER_SHORT: // fall through
+        case SER_NUMBER_INTEGER:
             writeIntField(fieldName, ((Number) value).intValue());
             return;
-        case VT_NUMBER_LONG:
+        case SER_NUMBER_LONG:
             writeLongField(fieldName, ((Number) value).longValue());
             return;
-        case VT_NUMBER_OTHER:
+        case SER_NUMBER_OTHER:
             writeNumberField(fieldName, (Number) value);
             return;
 
         // Scalar types:
 
-        case VT_BOOLEAN:
+        case SER_BOOLEAN:
             writeBooleanField(fieldName, ((Boolean) value).booleanValue());
             return;
-        case VT_DATE:
+        case SER_DATE:
             writeDateField(fieldName, (Date) value);
             return;
-        case VT_ENUM:
+        case SER_ENUM:
             writeEnumField(fieldName, (Enum<?>) value);
             return;
             
         // Structured types:
 
-        case VT_COLLECTION:
+        case SER_COLLECTION:
             writeCollectionField(fieldName, (Collection<?>) value);
             return;
-        case VT_ITERABLE:
+        case SER_ITERABLE:
             writeIterableField(fieldName, (Iterable<?>) value);
             return;
-        case VT_LIST:
+        case SER_LIST:
             writeListField(fieldName, (List<?>) value);
             return;
-        case VT_MAP:
+        case SER_MAP:
             writeMapField(fieldName, (Map<?,?>) value);
             return;
-        case VT_OBJECT_ARRAY:
+        case SER_OBJECT_ARRAY:
             writeObjectArrayField(fieldName, (Object[]) value);
             return;
-        case VT_INT_ARRAY:
+        case SER_INT_ARRAY:
             writeIntArrayField(fieldName, (int[]) value);
             return;
-        case VT_TREE_NODE:
+        case SER_TREE_NODE:
             writeTreeNodeField(fieldName, (TreeNode) value);
             return;
 
-        case VT_UNKNOWN:
+        case SER_UNKNOWN:
             writeUnknownField(fieldName, value);
             return;
         }
@@ -265,85 +265,85 @@ public class JSONWriter
 
         // Textual types, similar:
 
-        case VT_STRING:
+        case SER_STRING:
             writeStringValue((String) value);
             return;
-        case VT_STRING_LIKE:
+        case SER_STRING_LIKE:
             writeStringValue(value.toString());
             return;
-        case VT_CHAR_ARRAY:
+        case SER_CHAR_ARRAY:
             writeStringValue(new String((char[]) value));
             return;
-        case VT_CHAR:
+        case SER_CHAR:
             writeStringValue(String.valueOf(value));
             return;
-        case VT_CHARACTER_SEQUENCE:
+        case SER_CHARACTER_SEQUENCE:
             writeStringValue(((CharSequence) value).toString());
             return;
-        case VT_BYTE_ARRAY:
+        case SER_BYTE_ARRAY:
             writeBinaryValue((byte[]) value);
             return;
-        case VT_INT_ARRAY:
+        case SER_INT_ARRAY:
             writeIntArrayValue((int[]) value);
             return;
 
             // Number types:
         
-        case VT_NUMBER_BIG_DECIMAL:
+        case SER_NUMBER_BIG_DECIMAL:
             writeBigDecimalValue((BigDecimal) value);
             return;
-        case VT_NUMBER_BIG_INTEGER:
+        case SER_NUMBER_BIG_INTEGER:
             writeBigIntegerValue((BigInteger) value);
             return;
-        case VT_NUMBER_FLOAT: // fall through
-        case VT_NUMBER_DOUBLE:
+        case SER_NUMBER_FLOAT: // fall through
+        case SER_NUMBER_DOUBLE:
             writeDoubleValue(((Number) value).doubleValue());
             return;
-        case VT_NUMBER_BYTE: // fall through
-        case VT_NUMBER_SHORT: // fall through
-        case VT_NUMBER_INTEGER:
+        case SER_NUMBER_BYTE: // fall through
+        case SER_NUMBER_SHORT: // fall through
+        case SER_NUMBER_INTEGER:
             writeIntValue(((Number) value).intValue());
             return;
-        case VT_NUMBER_LONG:
+        case SER_NUMBER_LONG:
             writeLongValue(((Number) value).longValue());
             return;
-        case VT_NUMBER_OTHER:
+        case SER_NUMBER_OTHER:
             writeNumberValue((Number) value);
             return;
 
         // Scalar types:
 
-        case VT_BOOLEAN:
+        case SER_BOOLEAN:
             writeBooleanValue(((Boolean) value).booleanValue());
             return;
-        case VT_DATE:
+        case SER_DATE:
             writeDateValue((Date) value);
             return;
-        case VT_ENUM:
+        case SER_ENUM:
             writeEnumValue((Enum<?>) value);
             return;
             
         // Structured types:
 
-        case VT_COLLECTION:
+        case SER_COLLECTION:
             writeCollectionValue((Collection<?>) value);
             return;
-        case VT_ITERABLE:
+        case SER_ITERABLE:
             writeIterableValue((Iterable<?>) value);
             return;
-        case VT_LIST:
+        case SER_LIST:
             writeListValue((List<?>) value);
             return;
-        case VT_MAP:
+        case SER_MAP:
             writeMapValue((Map<?,?>) value);
             return;
-        case VT_OBJECT_ARRAY:
+        case SER_OBJECT_ARRAY:
             writeObjectArrayValue((Object[]) value);
             return;
-        case VT_TREE_NODE:
+        case SER_TREE_NODE:
             writeTreeNodeValue((TreeNode) value);
             return;
-        case VT_UNKNOWN:
+        case SER_UNKNOWN:
             writeUnknownValue(value);
             return;
         }

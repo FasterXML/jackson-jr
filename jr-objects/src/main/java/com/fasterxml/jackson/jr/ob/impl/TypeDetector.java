@@ -29,7 +29,7 @@ public class TypeDetector
 {
     /*
     /**********************************************************************
-    /* Value constants
+    /* Value constants for serialization
     /**********************************************************************
      */
 
@@ -47,80 +47,80 @@ public class TypeDetector
     /**
      * Type not yet resolved
      */
-    public final static int VT_UNKNOWN = 0;
+    public final static int SER_UNKNOWN = 0;
     
     /**
      * All kinds of {@link java.util.Map}s.
      */
-    public final static int VT_MAP = 1;
+    public final static int SER_MAP = 1;
 
     /**
      * All kinds of {@link java.util.List}s.
      */
-    public final static int VT_LIST = 2;
+    public final static int SER_LIST = 2;
 
     /**
      * All kinds of {@link java.util.Collection}s other than {@link java.util.List}s
      */
-    public final static int VT_COLLECTION = 3;
+    public final static int SER_COLLECTION = 3;
 
     /**
      * Arrays of non-primitive types
      */
-    public final static int VT_OBJECT_ARRAY = 4;
+    public final static int SER_OBJECT_ARRAY = 4;
 
     /**
      * An implementation of {@link com.fasterxml.jackson.core.TreeNode}
      */
-    public final static int VT_TREE_NODE = 5;
+    public final static int SER_TREE_NODE = 5;
     
     // // // String(-like) types
 
-    public final static int VT_STRING = 6;
+    public final static int SER_STRING = 6;
     
     /**
      * General "misc thing that can be serialized by calling 'toString()" type,
      * used as a fallback for things that are barely recognized.
      */
-    public final static int VT_STRING_LIKE = 7;
+    public final static int SER_STRING_LIKE = 7;
 
-    public final static int VT_CHARACTER_SEQUENCE = 8;
+    public final static int SER_CHARACTER_SEQUENCE = 8;
     
-    public final static int VT_CHAR_ARRAY = 9;
+    public final static int SER_CHAR_ARRAY = 9;
 
-    public final static int VT_BYTE_ARRAY = 10;
+    public final static int SER_BYTE_ARRAY = 10;
 
-    public final static int VT_INT_ARRAY = 11;
+    public final static int SER_INT_ARRAY = 11;
 
     // // // Numbers
     
-    public final static int VT_NUMBER_BYTE = 12;
+    public final static int SER_NUMBER_BYTE = 12;
 
-    public final static int VT_NUMBER_SHORT = 13;
+    public final static int SER_NUMBER_SHORT = 13;
     
-    public final static int VT_NUMBER_INTEGER = 14;
+    public final static int SER_NUMBER_INTEGER = 14;
 
-    public final static int VT_NUMBER_LONG = 15;
+    public final static int SER_NUMBER_LONG = 15;
 
-    public final static int VT_NUMBER_FLOAT = 16;
+    public final static int SER_NUMBER_FLOAT = 16;
 
-    public final static int VT_NUMBER_DOUBLE = 17;
+    public final static int SER_NUMBER_DOUBLE = 17;
 
-    public final static int VT_NUMBER_BIG_INTEGER = 18;
+    public final static int SER_NUMBER_BIG_INTEGER = 18;
 
-    public final static int VT_NUMBER_BIG_DECIMAL = 19;
+    public final static int SER_NUMBER_BIG_DECIMAL = 19;
 
-    public final static int VT_NUMBER_OTHER = 20;
+    public final static int SER_NUMBER_OTHER = 20;
     
     // // // Other specific scalar types
     
-    public final static int VT_BOOLEAN = 21;
+    public final static int SER_BOOLEAN = 21;
 
-    public final static int VT_CHAR = 22;
+    public final static int SER_CHAR = 22;
 
-    public final static int VT_DATE = 23;
+    public final static int SER_DATE = 23;
 
-    public final static int VT_ENUM = 24;
+    public final static int SER_ENUM = 24;
 
     // // // Iterate-able types
 
@@ -128,7 +128,14 @@ public class TypeDetector
      * Anything that implements {@link java.lang.Iterable}, but not
      * {@link java.util.Collection}.
      */
-    public final static int VT_ITERABLE = 25;
+    public final static int SER_ITERABLE = 25;
+
+    /*
+    /**********************************************************************
+    /* Value constants for de-serialization; need to be separate since
+    /* aspects (ser vs deser) are often asymmetric
+    /**********************************************************************
+     */
     
     /*
     /**********************************************************************
@@ -240,7 +247,7 @@ public class TypeDetector
 
         if (I == null) {
             type = _findSimple(raw);
-            if (type == VT_UNKNOWN) {
+            if (type == SER_UNKNOWN) {
                 return type;
             }
             _knownTypes.put(k, Integer.valueOf(type));
@@ -256,7 +263,7 @@ public class TypeDetector
     protected int _findFull(Class<?> raw)
     {
         int type = _findSimple(raw);
-        if (type == VT_UNKNOWN) {
+        if (type == SER_UNKNOWN) {
             if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
                 BeanDefinition def = _resolveBean(raw);
                 // Due to concurrent access, possible that someone might have added it
@@ -283,80 +290,80 @@ public class TypeDetector
     protected int _findSimple(Class<?> raw)
     {
         if (raw == String.class) {
-            return VT_STRING;
+            return SER_STRING;
         }
         if (raw.isArray()) {
             Class<?> elemType = raw.getComponentType();
             if (elemType.isPrimitive()) {
                 if (raw == byte[].class) {
-                    return VT_BYTE_ARRAY;
+                    return SER_BYTE_ARRAY;
                 }
                 if (raw == char[].class) {
-                    return VT_CHAR_ARRAY;
+                    return SER_CHAR_ARRAY;
                 }
                 if (raw == int[].class) {
-                    return VT_INT_ARRAY;
+                    return SER_INT_ARRAY;
                 }
                 // Hmmh. Could support all types but....
-                return VT_UNKNOWN;
+                return SER_UNKNOWN;
             }
-            return VT_OBJECT_ARRAY;
+            return SER_OBJECT_ARRAY;
         }
         if (raw == Boolean.class) {
-            return VT_BOOLEAN;
+            return SER_BOOLEAN;
         }
         if (Number.class.isAssignableFrom(raw)) {
             if (raw == Integer.class) {
-                return VT_NUMBER_INTEGER;
+                return SER_NUMBER_INTEGER;
             }
             if (raw == Long.class) {
-                return VT_NUMBER_LONG;
+                return SER_NUMBER_LONG;
             }
             if (raw == Byte.class) {
-                return VT_NUMBER_BYTE;
+                return SER_NUMBER_BYTE;
             }
             if (raw == Short.class) {
-                return VT_NUMBER_SHORT;
+                return SER_NUMBER_SHORT;
             }
             if (raw == Float.class) {
-                return VT_NUMBER_FLOAT;
+                return SER_NUMBER_FLOAT;
             }
             if (raw == Double.class) {
-                return VT_NUMBER_DOUBLE;
+                return SER_NUMBER_DOUBLE;
             }
             if (raw == BigDecimal.class) {
-                return VT_NUMBER_BIG_DECIMAL;
+                return SER_NUMBER_BIG_DECIMAL;
             }
             if (raw == BigInteger.class) {
-                return VT_NUMBER_BIG_INTEGER;
+                return SER_NUMBER_BIG_INTEGER;
             }
             // What numeric type is this? Could consider "string-like" but...
-            return VT_UNKNOWN;
+            return SER_UNKNOWN;
         }
         if (raw == Character.class) {
-            return VT_CHAR;
+            return SER_CHAR;
         }
         if (raw.isEnum()) {
-            return VT_ENUM;
+            return SER_ENUM;
         }
         if (Map.class.isAssignableFrom(raw)) {
-            return VT_MAP;
+            return SER_MAP;
         }
         if (Collection.class.isAssignableFrom(raw)) {
             if (List.class.isAssignableFrom(raw)) {
                 // One more thing: here we assume LIST means efficient random access
                 if (RandomAccess.class.isAssignableFrom(raw)) {
-                    return VT_LIST;
+                    return SER_LIST;
                 }
                 // and if not, consider "only" a collection
             }
-            return VT_COLLECTION;
+            return SER_COLLECTION;
         }
         if (TreeNode.class.isAssignableFrom(raw)) {
-            return VT_TREE_NODE;
+            return SER_TREE_NODE;
         }
         if (CharSequence.class.isAssignableFrom(raw)) {
-            return VT_CHARACTER_SEQUENCE;
+            return SER_CHARACTER_SEQUENCE;
         }
         // Misc String-like types
         if (UUID.class.isAssignableFrom(raw)
@@ -364,16 +371,16 @@ public class TypeDetector
                 || URL.class.isAssignableFrom(raw)
                 || URI.class.isAssignableFrom(raw)
                 ) {
-            return VT_STRING_LIKE;
+            return SER_STRING_LIKE;
         }
         if (Iterable.class.isAssignableFrom(raw)) {
-            return VT_ITERABLE;
+            return SER_ITERABLE;
         }
         if (Date.class.isAssignableFrom(raw)) {
-            return VT_DATE;
+            return SER_DATE;
         }
         // Ok. I give up, no idea!
-        return VT_UNKNOWN;
+        return SER_UNKNOWN;
     }
 
     protected final BeanProperty[] NO_PROPS = new BeanProperty[0];
@@ -427,7 +434,7 @@ public class TypeDetector
             // ok, two things: maybe we can pre-resolve the type?
             BeanProperty bp = new BeanProperty(name, type, readMethod, writeMethod);
             int typeId = _findSimple(type);
-            if (typeId != VT_UNKNOWN) {
+            if (typeId != SER_UNKNOWN) {
                 bp = bp.withWriteTypeId(typeId);
             }
             props.add(bp);
