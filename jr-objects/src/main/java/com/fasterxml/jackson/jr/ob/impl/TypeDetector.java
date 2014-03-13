@@ -69,64 +69,53 @@ public class TypeDetector
      */
     public final static int SER_OBJECT_ARRAY = 4;
 
+    public final static int SER_INT_ARRAY = 5;
+    
     /**
      * An implementation of {@link com.fasterxml.jackson.core.TreeNode}
      */
-    public final static int SER_TREE_NODE = 5;
+    public final static int SER_TREE_NODE = 6;
     
     // // // String(-like) types
 
-    public final static int SER_STRING = 6;
-    
-    /**
-     * General "misc thing that can be serialized by calling 'toString()" type,
-     * used as a fallback for things that are barely recognized.
-     */
-    public final static int SER_STRING_LIKE = 7;
-
+    public final static int SER_STRING = 7;
     public final static int SER_CHARACTER_SEQUENCE = 8;
-    
     public final static int SER_CHAR_ARRAY = 9;
-
     public final static int SER_BYTE_ARRAY = 10;
-
-    public final static int SER_INT_ARRAY = 11;
 
     // // // Numbers
     
-    public final static int SER_NUMBER_BYTE = 12;
+    public final static int SER_NUMBER_BYTE = 11;
 
-    public final static int SER_NUMBER_SHORT = 13;
+    public final static int SER_NUMBER_SHORT = 12;
     
-    public final static int SER_NUMBER_INTEGER = 14;
+    public final static int SER_NUMBER_INTEGER = 13;
 
-    public final static int SER_NUMBER_LONG = 15;
+    public final static int SER_NUMBER_LONG = 14;
 
-    public final static int SER_NUMBER_FLOAT = 16;
+    public final static int SER_NUMBER_FLOAT = 15;
 
-    public final static int SER_NUMBER_DOUBLE = 17;
+    public final static int SER_NUMBER_DOUBLE = 16;
 
-    public final static int SER_NUMBER_BIG_INTEGER = 18;
+    public final static int SER_NUMBER_BIG_INTEGER = 17;
 
-    public final static int SER_NUMBER_BIG_DECIMAL = 19;
+    public final static int SER_NUMBER_BIG_DECIMAL = 18;
 
-    public final static int SER_NUMBER_OTHER = 20;
-    
     // // // Other specific scalar types
 
-    public final static int SER_ENUM = 21;
-    
-    public final static int SER_BOOLEAN = 22;
+    public final static int SER_BOOLEAN = 20;
+    public final static int SER_CHAR = 21;
 
-    public final static int SER_CHAR = 23;
+    public final static int SER_ENUM = 22;
 
-    public final static int SER_DATE = 24;
+    public final static int SER_DATE = 23;
+    public final static int SER_CALENDAR = 24;
 
     public final static int SER_CLASS = 25;
-    public final static int SER_FILE = 26;
-    public final static int SER_UUID = 27;
-    public final static int SER_URL = 28;
-    public final static int SER_URI = 29;
+    public final static int SER_FILE = 27;
+    public final static int SER_UUID = 28;
+    public final static int SER_URL = 29;
+    public final static int SER_URI = 30;
 
 
     // // // Iterate-able types
@@ -135,7 +124,7 @@ public class TypeDetector
      * Anything that implements {@link java.lang.Iterable}, but not
      * {@link java.util.Collection}.
      */
-    public final static int SER_ITERABLE = 30;
+    public final static int SER_ITERABLE = 31;
 
     /*
     /**********************************************************************
@@ -160,7 +149,7 @@ public class TypeDetector
     /**********************************************************************
      */
     
-    protected final ClassKey _key = new ClassKey();
+    protected ClassKey _key = new ClassKey();
 
     /**
      * Whether this instance is used for serialization (true)
@@ -220,7 +209,7 @@ public class TypeDetector
      * The main lookup method used to find type identifier for
      * given raw class; including Bean types (if allowed).
      */
-    public final int findFullSerializationType(Class<?> raw)
+    public final int findFullType(Class<?> raw)
     {
         if (raw == _prevClass) {
             return _prevType;
@@ -233,7 +222,7 @@ public class TypeDetector
 
         if (I == null) {
             type = _findFull(raw);
-            _knownSerTypes.put(k, Integer.valueOf(type));
+            _knownSerTypes.put(new ClassKey(raw), Integer.valueOf(type));
         } else {
             type = I.intValue();
         }
@@ -315,36 +304,36 @@ public class TypeDetector
                 if (raw == int[].class) {
                     return SER_INT_ARRAY;
                 }
-                // Hmmh. Could support all types but....
+                // Hmmh. Could support all types; add as/when needed
                 return SER_UNKNOWN;
             }
-            return SER_OBJECT_ARRAY;
+            if (elemType == Object.class || _forSerialization) {
+                return SER_OBJECT_ARRAY;
+            }
+            return SER_UNKNOWN;
+        }
+        if (raw.isPrimitive()) {
+            if (raw == Boolean.TYPE) return SER_BOOLEAN;
+            if (raw == Integer.TYPE) return SER_NUMBER_INTEGER;
+            if (raw == Long.TYPE) return SER_NUMBER_LONG;
+            if (raw == Byte.TYPE) return SER_NUMBER_BYTE;
+            if (raw == Short.TYPE) return SER_NUMBER_SHORT;
+            if (raw == Double.TYPE) return SER_NUMBER_DOUBLE;
+            if (raw == Float.TYPE) return SER_NUMBER_FLOAT;
+            if (raw == Character.TYPE) return SER_CHAR;
+            throw new IllegalArgumentException("Unrecognized primitive type: "+raw.getName());
         }
         if (raw == Boolean.class) {
             return SER_BOOLEAN;
         }
         if (Number.class.isAssignableFrom(raw)) {
-            if (raw == Integer.class) {
-                return SER_NUMBER_INTEGER;
-            }
-            if (raw == Long.class) {
-                return SER_NUMBER_LONG;
-            }
-            if (raw == Byte.class) {
-                return SER_NUMBER_BYTE;
-            }
-            if (raw == Short.class) {
-                return SER_NUMBER_SHORT;
-            }
-            if (raw == Float.class) {
-                return SER_NUMBER_FLOAT;
-            }
-            if (raw == Double.class) {
-                return SER_NUMBER_DOUBLE;
-            }
-            if (raw == BigDecimal.class) {
-                return SER_NUMBER_BIG_DECIMAL;
-            }
+            if (raw == Integer.class) return SER_NUMBER_INTEGER;
+            if (raw == Long.class) return SER_NUMBER_LONG;
+            if (raw == Byte.class) return SER_NUMBER_BYTE;
+            if (raw == Short.class) return SER_NUMBER_SHORT;
+            if (raw == Double.class) return SER_NUMBER_DOUBLE;
+            if (raw == Float.class) return SER_NUMBER_FLOAT;
+            if (raw == BigDecimal.class) return SER_NUMBER_BIG_DECIMAL;
             if (raw == BigInteger.class) {
                 return SER_NUMBER_BIG_INTEGER;
             }
@@ -371,25 +360,44 @@ public class TypeDetector
             return SER_COLLECTION;
         }
         if (TreeNode.class.isAssignableFrom(raw)) {
+            // should we require more accurate type for deser?
             return SER_TREE_NODE;
         }
-        if (CharSequence.class.isAssignableFrom(raw)) {
-            return SER_CHARACTER_SEQUENCE;
-        }
         // Misc String-like types
-        if (UUID.class.isAssignableFrom(raw)
-                || File.class.isAssignableFrom(raw)
-                || URL.class.isAssignableFrom(raw)
-                || URI.class.isAssignableFrom(raw)
-                ) {
-            return SER_STRING_LIKE;
+        if (Calendar.class.isAssignableFrom(raw)) {
+            return SER_CALENDAR;
         }
-        if (Iterable.class.isAssignableFrom(raw)) {
-            return SER_ITERABLE;
+        if (raw == Class.class) {
+            return SER_CLASS;
         }
         if (Date.class.isAssignableFrom(raw)) {
             return SER_DATE;
         }
+        if (File.class.isAssignableFrom(raw)) {
+            return SER_FILE;
+        }
+        if (URL.class.isAssignableFrom(raw)) {
+            return SER_URL;
+        }
+        if (URI.class.isAssignableFrom(raw)) {
+            return SER_URI;
+        }
+        if (UUID.class.isAssignableFrom(raw)) {
+            return SER_UUID;
+        }
+        /* May or may not help with deser, but recognized nonetheless;
+         * on assumption that Beans should rarely implement `CharSequence`
+         */
+        if (CharSequence.class.isAssignableFrom(raw)) {
+            return SER_CHARACTER_SEQUENCE;
+        }
+        /* `Iterable` can be added on all kinds of things, and it won't
+         * help at all with deserialization; hence only use for serialization.
+         */
+        if (_forSerialization && Iterable.class.isAssignableFrom(raw)) {
+            return SER_ITERABLE;
+        }
+        
         // Ok. I give up, no idea!
         return SER_UNKNOWN;
     }

@@ -25,6 +25,8 @@ com.fasterxml.jackson.core.type,
 </osgi.import>
     <packageVersion.dir>com/fasterxml/jackson/jr/ob</packageVersion.dir>
     <packageVersion.package>${project.groupId}.ob</packageVersion.package>
+    <packageVersion.template.input>${basedir}/src/main/java/${packageVersion.dir}/PackageVersion.java.in</packageVersion.template.input>
+    <packageVersion.template.output>${generatedSourcesDir}/${packageVersion.dir}/PackageVersion.java</packageVersion.template.output>
   </properties>
 
   <build>
@@ -39,33 +41,46 @@ com.fasterxml.jackson.core.type,
             <link>http://fasterxml.github.com/jackson-core/javadoc/2.3.0/</link>
           </links>
         </configuration>
+
       </plugin>
       <plugin>
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>replacer</artifactId>
+        <version>${version.plugin.replacer}</version>
         <executions>
           <execution>
             <id>process-packageVersion</id>
+            <goals>
+                <goal>replace</goal>
+            </goals>
+            <phase>generate-sources</phase>
+<!--
             <phase>process-sources</phase>
+-->
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-          <showDeprecation>true</showDeprecation>
-          <showWarnings>true</showWarnings>
-          <optimize>true</optimize>
-          <!-- 07-Dec-2013, tatu: Usually no point in reducing debug info, but here we absolutely
-             want to minimize jar size. So let's drop "vars" first, and also "lines" for fun
-            -->
-          <debug>true</debug>
-          <debuglevel>source</debuglevel>
-        </configuration>
+          <configuration>
+            <file>${packageVersion.template.input}</file>
+            <outputFile>${packageVersion.template.output}</outputFile>
+            <replacements>
+              <replacement>
+                <token>@package@</token>
+                <value>${packageVersion.package}</value>
+              </replacement>
+              <replacement>
+                <token>@projectversion@</token>
+                <value>${project.version}</value>
+              </replacement>
+              <replacement>
+                <token>@projectgroupid@</token>
+                <value>${project.groupId}</value>
+              </replacement>
+              <replacement>
+                <token>@projectartifactid@</token>
+                <value>${project.artifactId}</value>
+              </replacement>
+            </replacements>
+          </configuration>
       </plugin>
     </plugins>
   </build>

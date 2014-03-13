@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.jr.ob;
 
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -148,7 +148,7 @@ public class JSONWriter
             writeNullValue();
             return;
         }
-        _writeValue(value, _typeDetector.findFullSerializationType(value.getClass()));
+        _writeValue(value, _typeDetector.findFullType(value.getClass()));
     }
 
     public void writeField(String fieldName, Object value) throws IOException, JsonProcessingException
@@ -160,8 +160,30 @@ public class JSONWriter
             return;
         }
 
-        int type = _typeDetector.findFullSerializationType(value.getClass());
+        int type = _typeDetector.findFullType(value.getClass());
         switch (type) {
+
+        // First, structured types:
+
+        // Structured types:
+        case SER_MAP:
+            writeMapField(fieldName, (Map<?,?>) value);
+            return;
+        case SER_LIST:
+            writeListField(fieldName, (List<?>) value);
+            return;
+        case SER_COLLECTION:
+            writeCollectionField(fieldName, (Collection<?>) value);
+            return;
+        case SER_OBJECT_ARRAY:
+            writeObjectArrayField(fieldName, (Object[]) value);
+            return;
+        case SER_INT_ARRAY:
+            writeIntArrayField(fieldName, (int[]) value);
+            return;
+        case SER_TREE_NODE:
+            writeTreeNodeField(fieldName, (TreeNode) value);
+            return;
 
         // Textual types, similar:
 
@@ -171,9 +193,6 @@ public class JSONWriter
         case SER_CHAR_ARRAY:
             writeStringField(fieldName, new String((char[]) value));
             return;
-        case SER_CHAR:
-            writeStringField(fieldName, String.valueOf(value));
-            return;
         case SER_CHARACTER_SEQUENCE:
             writeStringField(fieldName, ((CharSequence) value).toString());
             return;
@@ -181,8 +200,7 @@ public class JSONWriter
             writeBinaryField(fieldName, (byte[]) value);
             return;
 
-            // Number types:
-        
+        // Number types:
         case SER_NUMBER_BIG_DECIMAL:
             writeBigDecimalField(fieldName, (BigDecimal) value);
             return;
@@ -201,44 +219,39 @@ public class JSONWriter
         case SER_NUMBER_LONG:
             writeLongField(fieldName, ((Number) value).longValue());
             return;
-        case SER_NUMBER_OTHER:
-            writeNumberField(fieldName, (Number) value);
-            return;
 
         // Scalar types:
 
         case SER_BOOLEAN:
             writeBooleanField(fieldName, ((Boolean) value).booleanValue());
             return;
+        case SER_CHAR:
+            writeStringField(fieldName, String.valueOf(value));
+            return;
+        case SER_CALENDAR:
+            value = ((Calendar) value).getTime();
+            // fall through
         case SER_DATE:
             writeDateField(fieldName, (Date) value);
             return;
         case SER_ENUM:
             writeEnumField(fieldName, (Enum<?>) value);
             return;
-            
-        // Structured types:
-
-        case SER_COLLECTION:
-            writeCollectionField(fieldName, (Collection<?>) value);
+        case SER_CLASS:
+            writeStringLikeField(fieldName, ((Class<?>) value).getName(), type);
             return;
+        case SER_FILE:
+            writeStringLikeField(fieldName, ((File) value).getAbsolutePath(), type);
+            return;
+        case SER_UUID:
+        case SER_URL:
+        case SER_URI:
+            writeStringLikeValue(value.toString(), type);
+
+        // Others
+            
         case SER_ITERABLE:
             writeIterableField(fieldName, (Iterable<?>) value);
-            return;
-        case SER_LIST:
-            writeListField(fieldName, (List<?>) value);
-            return;
-        case SER_MAP:
-            writeMapField(fieldName, (Map<?,?>) value);
-            return;
-        case SER_OBJECT_ARRAY:
-            writeObjectArrayField(fieldName, (Object[]) value);
-            return;
-        case SER_INT_ARRAY:
-            writeIntArrayField(fieldName, (int[]) value);
-            return;
-        case SER_TREE_NODE:
-            writeTreeNodeField(fieldName, (TreeNode) value);
             return;
 
         case SER_UNKNOWN:
@@ -263,19 +276,32 @@ public class JSONWriter
     {
         switch (type) {
 
-        // Textual types, similar:
+        // Structured types:
+        case SER_MAP:
+            writeMapValue((Map<?,?>) value);
+            return;
+        case SER_LIST:
+            writeListValue((List<?>) value);
+            return;
+        case SER_COLLECTION:
+            writeCollectionValue((Collection<?>) value);
+            return;
+        case SER_OBJECT_ARRAY:
+            writeObjectArrayValue((Object[]) value);
+            return;
+        case SER_INT_ARRAY:
+            writeIntArrayValue((int[]) value);
+            return;
+        case SER_TREE_NODE:
+            writeTreeNodeValue((TreeNode) value);
+            return;
 
+        // Textual types, related:
         case SER_STRING:
             writeStringValue((String) value);
             return;
-        case SER_STRING_LIKE:
-            writeStringValue(value.toString());
-            return;
         case SER_CHAR_ARRAY:
             writeStringValue(new String((char[]) value));
-            return;
-        case SER_CHAR:
-            writeStringValue(String.valueOf(value));
             return;
         case SER_CHARACTER_SEQUENCE:
             writeStringValue(((CharSequence) value).toString());
@@ -283,18 +309,9 @@ public class JSONWriter
         case SER_BYTE_ARRAY:
             writeBinaryValue((byte[]) value);
             return;
-        case SER_INT_ARRAY:
-            writeIntArrayValue((int[]) value);
-            return;
 
-            // Number types:
-        
-        case SER_NUMBER_BIG_DECIMAL:
-            writeBigDecimalValue((BigDecimal) value);
-            return;
-        case SER_NUMBER_BIG_INTEGER:
-            writeBigIntegerValue((BigInteger) value);
-            return;
+        // Number types:
+            
         case SER_NUMBER_FLOAT: // fall through
         case SER_NUMBER_DOUBLE:
             writeDoubleValue(((Number) value).doubleValue());
@@ -307,41 +324,46 @@ public class JSONWriter
         case SER_NUMBER_LONG:
             writeLongValue(((Number) value).longValue());
             return;
-        case SER_NUMBER_OTHER:
-            writeNumberValue((Number) value);
+        case SER_NUMBER_BIG_DECIMAL:
+            writeBigDecimalValue((BigDecimal) value);
+            return;
+        case SER_NUMBER_BIG_INTEGER:
+            writeBigIntegerValue((BigInteger) value);
             return;
 
-        // Scalar types:
+        // Other scalar types:
 
         case SER_BOOLEAN:
             writeBooleanValue(((Boolean) value).booleanValue());
             return;
+        case SER_CHAR:
+            writeStringValue(String.valueOf(value));
+            return;
+        case SER_CALENDAR:
+            value = ((Calendar) value).getTime();
+            // fall through
         case SER_DATE:
             writeDateValue((Date) value);
             return;
+
         case SER_ENUM:
             writeEnumValue((Enum<?>) value);
             return;
-            
-        // Structured types:
-
-        case SER_COLLECTION:
-            writeCollectionValue((Collection<?>) value);
+        case SER_CLASS:
+            writeStringLikeValue(((Class<?>) value).getName(), type);
             return;
+        case SER_FILE:
+            writeStringLikeValue(((File) value).getAbsolutePath(), type);
+            return;
+            // these type should be fine using toString()
+        case SER_UUID:
+        case SER_URL:
+        case SER_URI:
+            writeStringLikeValue(value.toString(), type);
+            return;
+
         case SER_ITERABLE:
             writeIterableValue((Iterable<?>) value);
-            return;
-        case SER_LIST:
-            writeListValue((List<?>) value);
-            return;
-        case SER_MAP:
-            writeMapValue((Map<?,?>) value);
-            return;
-        case SER_OBJECT_ARRAY:
-            writeObjectArrayValue((Object[]) value);
-            return;
-        case SER_TREE_NODE:
-            writeTreeNodeValue((TreeNode) value);
             return;
         case SER_UNKNOWN:
             writeUnknownValue(value);
@@ -524,16 +546,6 @@ public class JSONWriter
         _generator.writeNumberField(fieldName, v);
     }
 
-    protected void writeNumberValue(Number v) throws IOException {
-        // Unknown type; must use fallback method
-        _generator.writeNumber(v.toString());
-    }
-
-    protected void writeNumberField(String fieldName, Number v) throws IOException {
-        _generator.writeFieldName(fieldName);
-        writeNumberValue(v);
-    }
-    
     /*
     /**********************************************************************
     /* Overridable concrete typed write methods, textual
@@ -548,6 +560,14 @@ public class JSONWriter
         _generator.writeStringField(fieldName, v);
     }
 
+    protected void writeStringLikeValue(String v, int actualType) throws IOException {
+        _generator.writeString(v);
+    }
+
+    protected void writeStringLikeField(String fieldName, String v, int actualType) throws IOException {
+        _generator.writeStringField(fieldName, v);
+    }
+    
     protected void writeBinaryValue(byte[] data) throws IOException {
         _generator.writeBinary(data);
     }
@@ -618,7 +638,7 @@ public class JSONWriter
             }
             int typeId = property.getWriteTypeId();
             if (typeId == 0) {
-                typeId = _typeDetector.findFullSerializationType(value.getClass());
+                typeId = _typeDetector.findFullType(value.getClass());
             }
             _generator.writeFieldName(name);
             _writeValue(value, typeId);

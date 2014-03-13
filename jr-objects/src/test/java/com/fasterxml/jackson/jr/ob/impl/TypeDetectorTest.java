@@ -49,4 +49,33 @@ public class TypeDetectorTest extends TestBase
         assertNotNull(prop._getMethod);
         assertNull(prop._setMethod);
     }
+
+    public void testBasicTypeDetectionForSer() {
+        _verifyBasicTypes(true);
+    }
+
+    public void testBasicTypeDetectionForDeser() {
+        _verifyBasicTypes(false);
+    }
+
+    private void _verifyBasicTypes(boolean forSerialization)
+    {
+        TypeDetector td = TypeDetector.rootDetector(forSerialization, JSON.Feature.defaults());
+        assertEquals(TypeDetector.SER_STRING, td.findFullType(String.class));
+        assertEquals(TypeDetector.SER_CHAR_ARRAY, td.findFullType(char[].class));
+        assertEquals(TypeDetector.SER_INT_ARRAY, td.findFullType(int[].class));
+        assertEquals(TypeDetector.SER_OBJECT_ARRAY, td.findFullType(Object[].class));
+        assertEquals(TypeDetector.SER_CHARACTER_SEQUENCE, td.findFullType(StringBuffer.class));
+        assertEquals(TypeDetector.SER_COLLECTION, td.findFullType(LinkedHashSet.class));
+        assertEquals(TypeDetector.SER_LIST, td.findFullType(ArrayList.class));
+
+        assertEquals(TypeDetector.SER_NUMBER_INTEGER, td.findFullType(Integer.class));
+        assertEquals(TypeDetector.SER_NUMBER_INTEGER, td.findFullType(Integer.TYPE));
+        
+        // more specific types
+        assertEquals(TypeDetector.SER_CALENDAR, td.findFullType(Calendar.class));
+        assertEquals(TypeDetector.SER_CALENDAR, td.findFullType(GregorianCalendar.class));
+        assertEquals(TypeDetector.SER_DATE, td.findFullType(new GregorianCalendar().getTime().getClass()));
+        assertEquals(TypeDetector.SER_UUID, td.findFullType(UUID.class));
+    }
 }
