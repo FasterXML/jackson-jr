@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonParser.NumberType;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
 import com.fasterxml.jackson.jr.ob.impl.ListBuilder;
 import com.fasterxml.jackson.jr.ob.impl.MapBuilder;
+import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
 
 import static com.fasterxml.jackson.core.JsonTokenId.*;
 
@@ -32,6 +33,11 @@ public class JSONReader
     protected final int _features;
 
     protected final boolean _arraysAsLists;
+
+    /**
+     * Object that is used to resolve types of values dynamically.
+     */
+    protected final TypeDetector _typeDetector;
     
     /**
      * Handler that takes care of constructing {@link java.util.Map}s as needed
@@ -51,7 +57,6 @@ public class JSONReader
 
     protected final JsonParser _parser;
 
-    
     /*
     /**********************************************************************
     /* Blueprint construction
@@ -61,9 +66,11 @@ public class JSONReader
     /**
      * Constructor used for creating the blueprint instances.
      */
-    protected JSONReader(int features, ListBuilder lb, MapBuilder mb)
+    protected JSONReader(int features, TypeDetector td,
+            ListBuilder lb, MapBuilder mb)
     {
         _features = features;
+        _typeDetector = td;
         _arraysAsLists = Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(features);
         _parser = null;
         _listBuilder = lb;
@@ -77,6 +84,7 @@ public class JSONReader
     {
         int features = base._features;
         _features = features;
+        _typeDetector = base._typeDetector;
         _listBuilder = base._listBuilder.newBuilder(features);
         _mapBuilder = base._mapBuilder.newBuilder(features);
         _arraysAsLists = base._arraysAsLists;
@@ -94,29 +102,30 @@ public class JSONReader
         if (_features == features) {
             return this;
         }
-        return _with(features, _listBuilder, _mapBuilder);
+        return _with(features, _typeDetector, _listBuilder, _mapBuilder);
     }
 
     public final JSONReader with(MapBuilder mb) {
         if (_mapBuilder == mb) return this;
-        return _with(_features, _listBuilder, mb);
+        return _with(_features, _typeDetector, _listBuilder, mb);
     }
 
     public final JSONReader with(ListBuilder lb) {
         if (_listBuilder == lb) return this;
-        return _with(_features, lb, _mapBuilder);
+        return _with(_features, _typeDetector, lb, _mapBuilder);
     }
     
     /**
      * Overridable method that all mutant factories call if a new instance
      * is to be constructed
      */
-    protected JSONReader _with(int features, ListBuilder lb, MapBuilder mb)
+    protected JSONReader _with(int features,
+            TypeDetector td, ListBuilder lb, MapBuilder mb)
     {
         if (getClass() != JSONReader.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override _with(...)");
         }
-        return new JSONReader(features, lb, mb);
+        return new JSONReader(features, td, lb, mb);
     }
 
     /*

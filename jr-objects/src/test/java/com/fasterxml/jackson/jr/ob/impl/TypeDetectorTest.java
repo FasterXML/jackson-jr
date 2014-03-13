@@ -21,9 +21,9 @@ public class TypeDetectorTest extends TestBase
         public void setEmUp(int index, String value) { }
     }
 
-    public void testSimple() 
+    public void testSimpleWithSerialization() 
     {
-        TypeDetector td = TypeDetector.rootDetector(JSON.Feature.defaults());
+        TypeDetector td = TypeDetector.rootDetector(true, JSON.Feature.defaults());
         BeanDefinition def = td._resolveBean(TestBean.class);
         assertNotNull(def);
 

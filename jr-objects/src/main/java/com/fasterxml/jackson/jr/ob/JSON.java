@@ -310,11 +310,13 @@ public class JSON implements Versioned
     }
 
     protected JSONReader _defaultReader(int features) {
-        return new JSONReader(features, ListBuilder.defaultImpl(), MapBuilder.defaultImpl());
+        return new JSONReader(features,
+                TypeDetector.rootDetector(false, features),
+                ListBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
 
     protected JSONWriter _defaultWriter(int features, TreeCodec tc) {
-        return new JSONWriter(features, TypeDetector.rootDetector(features), tc);
+        return new JSONWriter(features, TypeDetector.rootDetector(true, features), tc);
     }
     
     /*

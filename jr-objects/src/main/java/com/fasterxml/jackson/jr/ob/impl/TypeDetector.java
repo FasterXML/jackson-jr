@@ -113,14 +113,21 @@ public class TypeDetector
     public final static int SER_NUMBER_OTHER = 20;
     
     // // // Other specific scalar types
+
+    public final static int SER_ENUM = 21;
     
-    public final static int SER_BOOLEAN = 21;
+    public final static int SER_BOOLEAN = 22;
 
-    public final static int SER_CHAR = 22;
+    public final static int SER_CHAR = 23;
 
-    public final static int SER_DATE = 23;
+    public final static int SER_DATE = 24;
 
-    public final static int SER_ENUM = 24;
+    public final static int SER_CLASS = 25;
+    public final static int SER_FILE = 26;
+    public final static int SER_UUID = 27;
+    public final static int SER_URL = 28;
+    public final static int SER_URI = 29;
+
 
     // // // Iterate-able types
 
@@ -128,15 +135,8 @@ public class TypeDetector
      * Anything that implements {@link java.lang.Iterable}, but not
      * {@link java.util.Collection}.
      */
-    public final static int SER_ITERABLE = 25;
+    public final static int SER_ITERABLE = 30;
 
-    /*
-    /**********************************************************************
-    /* Value constants for de-serialization; need to be separate since
-    /* aspects (ser vs deser) are often asymmetric
-    /**********************************************************************
-     */
-    
     /*
     /**********************************************************************
     /* Caching
@@ -144,10 +144,11 @@ public class TypeDetector
      */
 
     /**
-     * Mapping from classes to resolved type constants or indexes.
+     * Mapping from classes to resolved type constants or indexes, to use
+     * for serialization.
      */
-    protected final ConcurrentHashMap<ClassKey, Integer> _knownTypes;
-
+    protected final ConcurrentHashMap<ClassKey, Integer> _knownSerTypes;
+    
     /**
      * Set of Bean types that have been resolved.
      */
@@ -160,6 +161,12 @@ public class TypeDetector
      */
     
     protected final ClassKey _key = new ClassKey();
+
+    /**
+     * Whether this instance is used for serialization (true)
+     * or deserialization (false).
+     */
+    protected final boolean _forSerialization;
     
     protected Class<?> _prevClass;
 
@@ -173,22 +180,26 @@ public class TypeDetector
     /**********************************************************************
      */
     
-    protected TypeDetector(ConcurrentHashMap<ClassKey, Integer> types,
+    protected TypeDetector(boolean forSerialization,
+            ConcurrentHashMap<ClassKey, Integer> types,
             CopyOnWriteArrayList<BeanDefinition> beans,
             int features) {
-        _knownTypes = types;
+        _forSerialization = forSerialization;
+        _knownSerTypes = types;
         _knownBeans = beans;
         _features = features;
     }
 
     protected TypeDetector(TypeDetector base, int features) {
-        _knownTypes = base._knownTypes;
+        _forSerialization = base._forSerialization;
+        _knownSerTypes = base._knownSerTypes;
         _knownBeans = base._knownBeans;
         _features = features;
     }
     
-    public final static TypeDetector rootDetector(int features) {
-        return new TypeDetector(new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4),
+    public final static TypeDetector rootDetector(boolean forSerialization, int features) {
+        return new TypeDetector(forSerialization,
+                new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4),
                 new CopyOnWriteArrayList<BeanDefinition>(),
                 features);
     }
@@ -218,11 +229,11 @@ public class TypeDetector
         k.reset(raw);
         int type;
 
-        Integer I = _knownTypes.get(k);
+        Integer I = _knownSerTypes.get(k);
 
         if (I == null) {
             type = _findFull(raw);
-            _knownTypes.put(k, Integer.valueOf(type));
+            _knownSerTypes.put(k, Integer.valueOf(type));
         } else {
             type = I.intValue();
         }
@@ -270,7 +281,7 @@ public class TypeDetector
                 synchronized (_knownBeans) {
                     // Important: do NOT try to reuse shared instance; caller needs it
                     ClassKey k = new ClassKey(raw);
-                    Integer I = _knownTypes.get(k);
+                    Integer I = _knownSerTypes.get(k);
                     // if it was already concurrently added, we'll just discard this copy, return earlier
                     if (I != null) {
                         return I.intValue();
@@ -279,7 +290,7 @@ public class TypeDetector
                     _knownBeans.add(def);
                     int typeId = -_knownBeans.size();
     
-                    _knownTypes.put(k, Integer.valueOf(typeId));
+                    _knownSerTypes.put(k, Integer.valueOf(typeId));
                     return typeId;
                 }
             }
