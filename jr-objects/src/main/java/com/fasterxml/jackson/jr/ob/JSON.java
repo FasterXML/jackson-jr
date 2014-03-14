@@ -86,6 +86,16 @@ public class JSON implements Versioned
         */
        FAIL_ON_DUPLICATE_MAP_KEYS(true),
 
+       /**
+        * When encountering a JSON Object property name for which there is no
+        * matching Bean property, should an exception be thrown (true),
+        * or should JSON Property value be quietly skipped (false)?
+        *<p>
+        * Default setting is <code>false</code>, meaning that unmappable
+        * JSON Object properties will simply be ignored.
+        */
+       FAIL_ON_UNKNOWN_BEAN_PROPERTY(false),
+       
        /*
        /**********************************************************************
        /* Write-related features

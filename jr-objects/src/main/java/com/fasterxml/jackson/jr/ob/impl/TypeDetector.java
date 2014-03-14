@@ -2,6 +2,7 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.beans.*;
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -406,6 +407,7 @@ public class TypeDetector
 
     protected BeanDefinition _resolveBean(Class<?> raw)
     {
+        final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
         // note: ignore methods in `java.lang.Object` (like "getClass()")
         BeanInfo info;
         try {
@@ -443,25 +445,56 @@ public class TypeDetector
             } else { // can this happen?
                 continue;
             }
-            // One more thing: force access if need be:
-            if (JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features)) {
+            // ok, two things: maybe we can pre-resolve the type?
+            int typeId = _findSimple(type);
+            if (forceAccess) {
                 if (readMethod != null) {
                     readMethod.setAccessible(true);
                 }
-                // no use for write method yet; if we had, should force access
+                if (writeMethod != null) {
+                    writeMethod.setAccessible(true);
+                }
             }
-            // ok, two things: maybe we can pre-resolve the type?
-            BeanProperty bp = new BeanProperty(name, type, readMethod, writeMethod);
-            int typeId = _findSimple(type);
-            if (typeId != SER_UNKNOWN) {
-                bp = bp.withWriteTypeId(typeId);
-            }
+            BeanProperty bp = new BeanProperty(name, type, typeId, readMethod, writeMethod);
             props.add(bp);
         }
-        final int len = props.size();
-        BeanProperty[] propArray = (len == 0) ? NO_PROPS
-                : props.toArray(new BeanProperty[len]);
+        if (_forSerialization) {
+            final int len = props.size();
+            BeanProperty[] propArray = (len == 0) ? NO_PROPS
+                    : props.toArray(new BeanProperty[len]);
+            return new BeanDefinition(raw, propArray);
+        }
 
-        return new BeanDefinition(raw, propArray);
+        Constructor<?> defaultCtor = null;
+        Constructor<?> stringCtor = null;
+        Constructor<?> longCtor = null;
+
+        for (Constructor<?> ctor : raw.getDeclaredConstructors()) {
+            Class<?>[] argTypes = ctor.getParameterTypes();
+            if (argTypes.length == 0) {
+                defaultCtor = ctor;
+            } else if (argTypes.length == 1) {
+                Class<?> argType = argTypes[0];
+                if (argType == String.class) {
+                    stringCtor = ctor;
+                } else if (argType == Long.class || argType == Long.TYPE) {
+                    longCtor = ctor;
+                } else {
+                    continue;
+                }
+            } else {
+                continue;
+            }
+            if (forceAccess) {
+                ctor.setAccessible(true);
+            }
+        }
+
+        Map<String, BeanProperty> propMap = new HashMap<String, BeanProperty>();
+        for (BeanProperty prop : props) {
+            propMap.put(prop.getName().toString(), prop);
+        }
+        return new BeanDefinition(raw, propMap,
+                defaultCtor, stringCtor, longCtor);
     }
 }

@@ -11,6 +11,8 @@ import java.util.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
+import com.fasterxml.jackson.jr.ob.impl.BeanDefinition;
+import com.fasterxml.jackson.jr.ob.impl.BeanProperty;
 import com.fasterxml.jackson.jr.ob.impl.CollectionBuilder;
 import com.fasterxml.jackson.jr.ob.impl.MapBuilder;
 import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
@@ -289,121 +291,171 @@ public class JSONReader
         case NOT_AVAILABLE:
         */
         }
-        throw JSONObjectException.from(_parser, "Unexpected value token: "+_parser.getCurrentToken());
+        throw JSONObjectException.from(_parser, "Unexpected value token: "+_tokenDesc());
     }
     
     protected Object _readBean(Class<?> type, int typeId) throws IOException
     {
-        if (typeId >= 0) {
-            switch (typeId) {
-            // Structured types:
-            case SER_MAP:
-            {
-                MapBuilder b = _mapBuilder;
-                if (type != Map.class) {
-                    b = b.newBuilder(type);
+        if (typeId < 0) { // actual bean types
+            BeanDefinition def = _typeDetector.getBeanDefinition(typeId);
+            JsonToken t = _parser.getCurrentToken();
+
+            try {
+                Object bean = null;
+                switch (t) {
+                case VALUE_STRING:
+                    bean = def.create(_parser.getText());
+                    break;
+                case VALUE_NUMBER_INT:
+                    bean = def.create(_parser.getLongValue());
+                    break;
+                case START_OBJECT:
+                    {
+                        bean = def.create();
+                        for (; (t = _parser.nextToken()) == JsonToken.FIELD_NAME; ) {
+                            String fieldName = _parser.getCurrentName();
+                            BeanProperty prop = def.findProperty(fieldName);
+                            if (prop == null) {
+                                if (JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY.isEnabled(_features)) {
+                                    throw JSONObjectException.from(_parser, "Unrecognized JSON property '"
+                                            +fieldName+"' for Bean type "+type.getName());
+                                }
+                                _parser.nextToken();
+                                _parser.skipChildren();
+                                continue;
+                            }
+                            _parser.nextToken();
+                            Class<?> rawType = prop.getType();
+                            int propType = prop.getTypeId();
+                            // need to dynamically resolve bean type refs
+                            if (propType == TypeDetector.SER_UNKNOWN) {
+                                propType = _typeDetector.findFullType(rawType);
+                                if (propType != TypeDetector.SER_UNKNOWN) { 
+                                    prop.overridTypeId(propType);
+                                }
+                            }
+                            Object value = _readBean(rawType, propType);
+                            prop.setValueFor(bean, value);
+                        }
+                    }
+                    break;
+                default:
                 }
-                return _readFromObject(b);
+                if (bean != null) {
+                    return bean;
+                }
+            } catch (Exception e) {
+                throw JSONObjectException.from(_parser, "Failed to create an instance of "
+                        +type.getName()+" due to ("+e.getClass().getName()+"): "+e.getMessage(),
+                        e);
             }
-                
-            case SER_LIST:
-            case SER_COLLECTION:
-            {
-                CollectionBuilder b = _collectionBuilder;
-                if (type != List.class && type != Collection.class) {
-                    b = b.newBuilder(type);
-                }
-                return _readFromArray(b, true);
+        } else switch (typeId) {
+        // Structured types:
+        case SER_MAP:
+        {
+            MapBuilder b = _mapBuilder;
+            if (type != Map.class) {
+                b = b.newBuilder(type);
             }
-
-            case SER_OBJECT_ARRAY:
-                return _readFromArray(_collectionBuilder, false);
-
-            case SER_INT_ARRAY:
-                return _readIntArray();
-
-            case SER_TREE_NODE:
-                return _treeCodec().readTree(_parser);
-
-            // Textual types, related:
-            case SER_STRING:
-            case SER_CHARACTER_SEQUENCE:
-                return _parser.getValueAsString();
-            case SER_CHAR_ARRAY:
-                return _parser.getValueAsString().toCharArray();
-            case SER_BYTE_ARRAY:
-                return _readBinary();
-
-            // Number types:
-                
-            case SER_NUMBER_FLOAT: // fall through
-                return Float.valueOf((float) _parser.getValueAsDouble());
-            case SER_NUMBER_DOUBLE:
-                return _parser.getValueAsDouble();
-
-            case SER_NUMBER_BYTE: // fall through
-                return (byte) _parser.getValueAsInt();
-                
-            case SER_NUMBER_SHORT: // fall through
-                return (short) _parser.getValueAsInt();
-            case SER_NUMBER_INTEGER:
-                return _parser.getValueAsInt();
-            case SER_NUMBER_LONG:
-                return _parser.getValueAsLong();
-
-            case SER_NUMBER_BIG_DECIMAL:
-                return _parser.getDecimalValue();
-
-            case SER_NUMBER_BIG_INTEGER:
-                return _parser.getBigIntegerValue();
-
-            // Other scalar types:
-
-            case SER_BOOLEAN:
-                return _parser.getValueAsBoolean();
-                
-            case SER_CHAR:
-                {
-                    String str = _parser.getValueAsString();
-                    return (str == null || str.isEmpty()) ? ' ' : str.charAt(0);
-                }
-                
-            case SER_CALENDAR:
-                {
-                    long l = _fetchLong(type, typeId);
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTimeInMillis(l);
-                    return cal;
-                }
-
-            case SER_DATE:
-                return new Date(_fetchLong(type, typeId));
-
-            case SER_ENUM:
-                return _readEnum(type);
-            
-            case SER_CLASS:
-            {
-                String v = _parser.getValueAsString();
-                try {
-                    return Class.forName(v);
-                } catch (Exception e) {
-                    throw new JSONObjectException("Failed to bind java.lang.Class from value '"+v+"'");
-                }
-            }
-            case SER_FILE:
-                // these type should be fine using toString()
-            case SER_UUID:
-                return UUID.fromString(_parser.getValueAsString());
-            case SER_URL:
-                return new URL(_parser.getValueAsString());
-            case SER_URI:
-                return URI.create(_parser.getValueAsString());
-            }
-        } else { // bean types
-            // !!! TODO
+            return _readFromObject(b);
         }
-        throw JSONObjectException.from(_parser, "Bean binding not implemented yet; type id = "+typeId);
+            
+        case SER_LIST:
+        case SER_COLLECTION:
+        {
+            CollectionBuilder b = _collectionBuilder;
+            if (type != List.class && type != Collection.class) {
+                b = b.newBuilder(type);
+            }
+            return _readFromArray(b, true);
+        }
+
+        case SER_OBJECT_ARRAY:
+            return _readFromArray(_collectionBuilder, false);
+
+        case SER_INT_ARRAY:
+            return _readIntArray();
+
+        case SER_TREE_NODE:
+            return _treeCodec().readTree(_parser);
+
+        // Textual types, related:
+        case SER_STRING:
+        case SER_CHARACTER_SEQUENCE:
+            return _parser.getValueAsString();
+        case SER_CHAR_ARRAY:
+            return _parser.getValueAsString().toCharArray();
+        case SER_BYTE_ARRAY:
+            return _readBinary();
+
+        // Number types:
+            
+        case SER_NUMBER_FLOAT: // fall through
+            return Float.valueOf((float) _parser.getValueAsDouble());
+        case SER_NUMBER_DOUBLE:
+            return _parser.getValueAsDouble();
+
+        case SER_NUMBER_BYTE: // fall through
+            return (byte) _parser.getValueAsInt();
+            
+        case SER_NUMBER_SHORT: // fall through
+            return (short) _parser.getValueAsInt();
+        case SER_NUMBER_INTEGER:
+            return _parser.getValueAsInt();
+        case SER_NUMBER_LONG:
+            return _parser.getValueAsLong();
+
+        case SER_NUMBER_BIG_DECIMAL:
+            return _parser.getDecimalValue();
+
+        case SER_NUMBER_BIG_INTEGER:
+            return _parser.getBigIntegerValue();
+
+        // Other scalar types:
+
+        case SER_BOOLEAN:
+            return _parser.getValueAsBoolean();
+            
+        case SER_CHAR:
+            {
+                String str = _parser.getValueAsString();
+                return (str == null || str.isEmpty()) ? ' ' : str.charAt(0);
+            }
+            
+        case SER_CALENDAR:
+            {
+                long l = _fetchLong(type, typeId);
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(l);
+                return cal;
+            }
+
+        case SER_DATE:
+            return new Date(_fetchLong(type, typeId));
+
+        case SER_ENUM:
+            return _readEnum(type);
+    
+        case SER_CLASS:
+        {
+            String v = _parser.getValueAsString();
+            try {
+                return Class.forName(v);
+            } catch (Exception e) {
+                throw new JSONObjectException("Failed to bind java.lang.Class from value '"+v+"'");
+            }
+        }
+        case SER_FILE:
+            return new File(_parser.getValueAsString());
+        case SER_UUID:
+            return UUID.fromString(_parser.getValueAsString());
+        case SER_URL:
+            return new URL(_parser.getValueAsString());
+        case SER_URI:
+            return URI.create(_parser.getValueAsString());
+        }
+        throw JSONObjectException.from(_parser,
+                "Can not create a "+type.getName()+" instance out of "+_tokenDesc());
     }
 
     protected Object _readFromObject(MapBuilder b) throws IOException

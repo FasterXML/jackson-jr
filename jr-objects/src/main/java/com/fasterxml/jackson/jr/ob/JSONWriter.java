@@ -636,7 +636,7 @@ public class JSONWriter
                 writeNullField(name);
                 continue;
             }
-            int typeId = property.getWriteTypeId();
+            int typeId = property.getTypeId();
             if (typeId == 0) {
                 typeId = _typeDetector.findFullType(value.getClass());
             }

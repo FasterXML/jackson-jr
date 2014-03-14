@@ -6,45 +6,46 @@ import java.lang.reflect.Method;
 import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
-public class BeanProperty
+public final class BeanProperty
 {
     protected final SerializedString _name;
     
     protected final Class<?> _rawType;
 
     /**
-     * Pre-resolved type id for writing values, if statically known.
+     * Pre-resolved type id for reading/writing values, if statically known.
+     *<p>
+     * Note: yes, access is without either volatile or synchronized. But it is
+     * an atomic type; so in the very worst case, modification just won't
+     * stick. It will never result in invalid value being accessible.
      */
-    protected final int _writeTypeId;
+    protected int _typeId;
     
     protected final Method _getMethod, _setMethod;
 
-    public BeanProperty(String name, Class<?> rawType,
+    public BeanProperty(String name, Class<?> rawType, int typeId,
             Method readMethod, Method writeMethod)
     {
-        this(new SerializedString(name), rawType, readMethod, writeMethod,
-                0);
+        this(new SerializedString(name), rawType, typeId, readMethod, writeMethod);
     }
 
-    protected BeanProperty(SerializedString name, Class<?> rawType,
-            Method getMethod, Method setMethod,
-            int writeTypeId)
+    protected BeanProperty(SerializedString name, Class<?> rawType, int typeId,
+            Method getMethod, Method setMethod)
     {
         _name = name;
         _rawType = rawType;
         _getMethod = getMethod;
         _setMethod = setMethod;
-        _writeTypeId = writeTypeId;
+        _typeId = typeId;
     }
 
-    public BeanProperty withWriteTypeId(int id) {
-        if (_writeTypeId == id) {
-            return this;
-        }
-        return new BeanProperty(_name, _rawType, _getMethod, _setMethod, id);
+    public void overridTypeId(int id) {
+        _typeId = id;
     }
 
-    public final int getWriteTypeId() { return _writeTypeId; }
+    public Class<?> getType() { return _rawType; }
+    
+    public int getTypeId() { return _typeId; }
 
     public SerializedString getName() { return _name; }
     
@@ -58,6 +59,17 @@ public class BeanProperty
             return _getMethod.invoke(bean);
         } catch (Exception e) {
             throw new JSONObjectException("Failed to access property '"+_name+"' (type "
+                    +_rawType.getName()+"; exception "+e.getClass().getName()+"): "
+                    +e.getMessage(), e);
+        }
+    }
+
+    public Object setValueFor(Object bean, Object value) throws IOException
+    {
+        try {
+            return _setMethod.invoke(bean, value);
+        } catch (Exception e) {
+            throw new JSONObjectException("Failed to set property '"+_name+"' (type "
                     +_rawType.getName()+"; exception "+e.getClass().getName()+"): "
                     +e.getMessage(), e);
         }

@@ -7,22 +7,34 @@ public class ReadBeansTest extends TestBase
 {
     static class TestBean {
         protected int x;
-        protected String name;
+        protected NameBean name;
         
-        public void setName(String n) { name = n; }
+        public void setName(NameBean n) { name = n; }
         public void setX(int x) { this.x = x; }
 
         public int getX() { return x; }
-        public String getName() { return name; }
+        public NameBean getName() { return name; }
     }
 
+    static class NameBean {
+        protected String first, last;
+        
+        public String getFirst() { return first; }
+        public String getLast() { return last; }
+
+        public void setFirst(String n) { first = n; }
+        public void setLast(String n) { last = n; }
+    }
+    
     public void testSimpleList() throws Exception
     {
-        final String INPUT = aposToQuotes("{'name':'Bob','x':13}");
+        final String INPUT = aposToQuotes("{'name':{'first':'Bob','last':'Burger'},'x':13}");
         TestBean bean = JSON.std.beanFrom(INPUT, TestBean.class);
 
         assertNotNull(bean);
-        assertEquals("Bob", bean.name);
         assertEquals(13, bean.x);
+        assertNotNull(bean.name);
+        assertEquals("Bob", bean.name.first);
+        assertEquals("Burger", bean.name.last);
     }
 }
