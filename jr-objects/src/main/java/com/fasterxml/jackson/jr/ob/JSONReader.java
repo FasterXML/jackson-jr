@@ -148,47 +148,86 @@ public class JSONReader
     /**********************************************************************
      */
 
-    public final Object readValue() throws IOException, JsonProcessingException
-    {
+    /**
+     * Method for reading a "simple" Object of type indicated by JSON
+     * content: {@link java.util.Map} for JSON Object, {@link java.util.Map}
+     * for JSON Array (or, <code>Object[]</code> if so configured),
+     * {@link java.lang.String} for JSON String value and so on.
+     */
+    public final Object readValue() throws IOException {
         return _readFromAny();
     }
-    
+
+    /**
+     * Method for reading a JSON Object from input and building a {@link java.util.Map}
+     * out of it. Note that if input does NOT contain a
+     * JSON Object, {@link JsonProcessingException} will be thrown.
+     */
     @SuppressWarnings("unchecked")
     public Map<Object,Object> readMap() throws IOException, JsonProcessingException
     {
         if (_parser.getCurrentToken() != JsonToken.START_OBJECT) {
             throw JSONObjectException.from(_parser,
-                    "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+_parser.getCurrentToken());
+                    "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+_tokenDesc(_parser));
         }
         return (Map<Object,Object>) _readFromObject();
     }
-
+    
+    /**
+     * Method for reading a JSON Array from input and building a {@link java.util.List}
+     * out of it. Note that if input does NOT contain a
+     * JSON Array, {@link JsonProcessingException} will be thrown.
+     */
     @SuppressWarnings("unchecked")
     public List<Object> readList() throws IOException, JsonProcessingException
     {
         if (_parser.getCurrentToken() != JsonToken.START_ARRAY) {
             throw JSONObjectException.from(_parser,
-                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_parser.getCurrentToken());
+                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
         }
         return (List<Object>) _readFromArray(true);
     }
 
+    /**
+     * Method for reading a JSON Array from input and building a <code>Object[]</code>
+     * out of it. Note that if input does NOT contain a
+     * JSON Array, {@link JsonProcessingException} will be thrown.
+     */
     public Object[] readArray() throws IOException, JsonProcessingException
     {
         if (_parser.getCurrentToken() != JsonToken.START_ARRAY) {
             throw JSONObjectException.from(_parser,
-                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_parser.getCurrentToken());
+                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
         }
         return (Object[]) _readFromArray(false);
     }
 
+    /**
+     * Method for reading a JSON Object from input and building a Bean of
+     * specified type out of it; Bean has to conform to standard Java Bean
+     * specification by having setters for passing JSON Object properties.
+     * Note that if input does NOT contain a
+     * JSON Object, {@link JsonProcessingException} will be thrown.
+     */
+    public <T> T readBean(Class<T> type) throws IOException, JsonProcessingException
+    {
+        if (_parser.getCurrentToken() != JsonToken.START_OBJECT) {
+            throw JSONObjectException.from(_parser,
+                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+        }
+        
+        // !!! TODO
+
+        return null;
+    }
+    
     /*
     /**********************************************************************
     /* Internal parse methods; overridable for custom coercions
     /**********************************************************************
      */
 
-    protected Object _readFromAny() throws IOException, JsonProcessingException
+    protected Object _readFromAny() throws IOException
     {
         JsonToken t = _parser.getCurrentToken();
         int id = (t == null) ? ID_NO_TOKEN : t.id();
@@ -224,7 +263,7 @@ public class JSONReader
         throw JSONObjectException.from(_parser, "Unexpected value token: "+_parser.getCurrentToken());
     }
 
-    protected Object _readFromObject() throws IOException, JsonProcessingException
+    protected Object _readFromObject() throws IOException
     {
         final JsonParser p = _parser;
 
@@ -252,7 +291,7 @@ public class JSONReader
      * @param asList Whether to bind into a {@link java.util.List} (true), or
      *    <code>Object[]</code> (false)
      */
-    protected Object _readFromArray(boolean asList) throws IOException, JsonProcessingException
+    protected Object _readFromArray(boolean asList) throws IOException
     {
         final JsonParser p = _parser;
         // First two special cases; empty, single-element
@@ -271,7 +310,7 @@ public class JSONReader
         return asList ? b.buildList() : b.buildArray();
     }
 
-    protected Object _readFromInteger() throws IOException, JsonProcessingException
+    protected Object _readFromInteger() throws IOException
     {
         NumberType t = _parser.getNumberType();
         if (t == NumberType.INT) {
@@ -283,7 +322,7 @@ public class JSONReader
         return _parser.getBigIntegerValue();
     }
 
-    protected Object _readFromFloat() throws IOException, JsonProcessingException
+    protected Object _readFromFloat() throws IOException
     {
         if (!JSON.Feature.USE_BIG_DECIMAL_FOR_FLOATS.isEnabled(_features)) {
             NumberType t = _parser.getNumberType();
@@ -308,7 +347,7 @@ public class JSONReader
      * read from input.
      * Default implementation returns null as is.
      */
-    protected Object fromNull() throws IOException, JsonProcessingException {
+    protected Object fromNull() throws IOException {
         return null;
     }
     
@@ -317,7 +356,7 @@ public class JSONReader
      * read from input.
      * Default implementation returns Boolean value as is.
      */
-    protected Object fromBoolean(boolean b) throws IOException, JsonProcessingException {
+    protected Object fromBoolean(boolean b) throws IOException {
         return b ? Boolean.TRUE : Boolean.FALSE;
     }
 
@@ -326,7 +365,7 @@ public class JSONReader
      * after being parsed from input.
      * Default implementation returns key as is.
      */
-    protected Object fromKey(String key) throws IOException, JsonProcessingException {
+    protected Object fromKey(String key) throws IOException {
         return key;
     }
 
@@ -335,12 +374,12 @@ public class JSONReader
      * read from input.
      * Default implementation returns Boolean value as is.
      */
-    protected Object fromString(String str) throws IOException, JsonProcessingException {
+    protected Object fromString(String str) throws IOException {
         // Nothing fancy, by default; return as is
         return str;
     }
 
-    protected Object fromEmbedded(Object value) throws IOException, JsonProcessingException {
+    protected Object fromEmbedded(Object value) throws IOException {
         return value;
     }
     
@@ -357,4 +396,32 @@ public class JSONReader
     /* Internal methods, other
     /**********************************************************************
      */
+
+    protected String _tokenDesc(JsonParser p) throws IOException {
+        JsonToken t = _parser.getCurrentToken();
+        if (t == null) {
+            return "NULL";
+        }
+        switch (t) {
+        case FIELD_NAME:
+            return "JSON Field name '"+p.getCurrentName()+"'";
+        case START_ARRAY:
+            return "JSON Array";
+        case START_OBJECT:
+            return "JSON Object";
+        case VALUE_FALSE:
+            return "'false'";
+        case VALUE_NULL:
+            return "'null'";
+        case VALUE_NUMBER_FLOAT:
+        case VALUE_NUMBER_INT:
+            return "JSON Number";
+        case VALUE_STRING:
+            return "JSON String";
+        case VALUE_TRUE:
+            return "'true'";
+        default:
+            return t.toString();
+        }
+    }
 }

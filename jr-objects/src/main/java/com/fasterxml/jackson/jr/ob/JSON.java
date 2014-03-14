@@ -563,8 +563,7 @@ public class JSON implements Versioned
         return result;
     }
 
-    public void write(Object value, JsonGenerator jgen) throws IOException, JSONObjectException
-    {
+    public void write(Object value, JsonGenerator jgen) throws IOException, JSONObjectException {
         // NOTE: no call to _config(); assumed to be fully configured
         _writerForOperation(jgen).writeValue(value);
         if (Feature.FLUSH_AFTER_WRITE_VALUE.isEnabled(_features)) {
@@ -572,19 +571,15 @@ public class JSON implements Versioned
         }
     }
 
-    public void write(Object value, OutputStream out)
-        throws IOException, JSONObjectException
-    {
+    public void write(Object value, OutputStream out) throws IOException, JSONObjectException {
         _writeAndClose(value, _jsonFactory.createGenerator(out));
     }
 
-    public void write(Object value, Writer w) throws IOException, JSONObjectException
-    {
+    public void write(Object value, Writer w) throws IOException, JSONObjectException {
         _writeAndClose(value, _jsonFactory.createGenerator(w));
     }
 
-    public void write(Object value, File f) throws IOException, JSONObjectException
-    {
+    public void write(Object value, File f) throws IOException, JSONObjectException {
         _writeAndClose(value, _jsonFactory.createGenerator(f, JsonEncoding.UTF8));
     }
     
@@ -594,39 +589,33 @@ public class JSON implements Versioned
     /**********************************************************************
      */
 
-    public JSONComposer<OutputStream> composeUsing(JsonGenerator gen) throws IOException, JSONObjectException
-    {
+    public JSONComposer<OutputStream> composeUsing(JsonGenerator gen) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features, gen, false);
     }
     
-    public JSONComposer<OutputStream> composeTo(OutputStream out) throws IOException, JSONObjectException
-    {
+    public JSONComposer<OutputStream> composeTo(OutputStream out) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features,
                 _jsonFactory.createGenerator(out), true);
     }
 
-    public JSONComposer<OutputStream> composeTo(Writer w) throws IOException, JSONObjectException
-    {
+    public JSONComposer<OutputStream> composeTo(Writer w) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features,
                 _jsonFactory.createGenerator(w), true);
     }
 
-    public JSONComposer<OutputStream> composeTo(File f) throws IOException, JSONObjectException
-    {
+    public JSONComposer<OutputStream> composeTo(File f) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features,
                 _jsonFactory.createGenerator(f, JsonEncoding.UTF8), true);
     }
     
     @SuppressWarnings("resource")
-    public JSONComposer<String> composeString() throws IOException, JSONObjectException
-    {
+    public JSONComposer<String> composeString() throws IOException, JSONObjectException {
         SegmentedStringWriter out = new SegmentedStringWriter(_jsonFactory._getBufferRecycler());
         return JSONComposer.stringComposer(_features, _jsonFactory.createGenerator(out), out);
     }
 
     @SuppressWarnings("resource")
-    public JSONComposer<byte[]> composeBytes() throws IOException, JSONObjectException
-    {
+    public JSONComposer<byte[]> composeBytes() throws IOException, JSONObjectException {
         ByteArrayBuilder out = new ByteArrayBuilder(_jsonFactory._getBufferRecycler());
         return JSONComposer.bytesComposer(_features, _jsonFactory.createGenerator(out), out);
     }
@@ -654,85 +643,105 @@ public class JSON implements Versioned
     /**********************************************************************
      */
 
+    @SuppressWarnings("resource")
     public List<Object> listFrom(Object source) throws IOException, JSONObjectException
     {
-        JsonParser jp;
-        List<Object> result;
         if (source instanceof JsonParser) {
             // note: no call to _config(), should come pre-configured
-            jp = _initForReading((JsonParser) source);
-            result = _readerForOperation(jp).readList();
-        } else {
-            jp = _parser(source);
-            boolean closed = false;
-            try {
-                _initForReading(_config(jp));
-                result = _readerForOperation(jp).readList();
-                closed = true;
-            } finally {
-                if (!closed) {
-                    _close(jp);
-                }
-            }
+            JsonParser jp = (JsonParser) source;
+            _initForReading(jp);
+            List<Object> result = _readerForOperation(jp).readList();
+            // Need to consume the token too
+            jp.clearCurrentToken();
+            return result;
         }
-        // Need to consume the token too
-        jp.clearCurrentToken();
-        return result;
+        JsonParser jp = _parser(source);
+        try {
+            _initForReading(_config(jp));
+            List<Object> result = _readerForOperation(jp).readList();
+            JsonParser jp0 = jp;
+            jp = null;
+            _close(jp0, null);
+            return result;
+        } catch (Exception e) {
+            _close(jp, e);
+            return null;
+        }
     }
 
+    @SuppressWarnings("resource")
     public Object[] arrayFrom(Object source) throws IOException, JSONObjectException
     {
-        JsonParser jp;
-        Object[] result;
         if (source instanceof JsonParser) {
-            // note: no call to _config(), should come pre-configured
-            jp = _initForReading((JsonParser) source);
-            result = _readerForOperation(jp).readArray();
-        } else {
-            jp = _parser(source);
-            boolean closed = false;
-            try {
-                _initForReading(_config(jp));
-                result = _readerForOperation(jp).readArray();
-                closed = true;
-            } finally {
-                if (!closed) {
-                    _close(jp);
-                }
-            }
+            JsonParser jp = (JsonParser) source;
+            _initForReading(jp);
+            Object[] result = _readerForOperation(jp).readArray();
+            jp.clearCurrentToken();
+            return result;
         }
-        // Need to consume the token too
-        jp.clearCurrentToken();
-        return result;
+        JsonParser jp = _parser(source);
+        try {
+            _initForReading(_config(jp));
+            Object[] result = _readerForOperation(jp).readArray();
+            JsonParser jp0 = jp;
+            jp = null;
+            _close(jp0, null);
+            return result;
+        } catch (Exception e) {
+            _close(jp, e);
+            return null;
+        }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "resource" })
     public <T> Map<T,Object> mapFrom(Object source) throws IOException, JSONObjectException
     {
-        JsonParser jp;
-        Map<Object,Object> result;
         if (source instanceof JsonParser) {
-            // note: no call to _config(), should come pre-configured
-            jp = _initForReading((JsonParser) source);
-            result = _readerForOperation(jp).readMap();
-        } else {
-            jp = _parser(source);
-            boolean closed = false;
-            try {
-                _initForReading(_config(jp));
-                result = _readerForOperation(jp).readMap();
-                closed = true;
-            } finally {
-                if (!closed) {
-                    _close(jp);
-                }
-            }
+            JsonParser jp = (JsonParser) source;
+            _initForReading(jp);
+            Map<Object,Object> result = _readerForOperation(jp).readMap();
+            jp.clearCurrentToken();
+            return (Map<T,Object>) result;
         }
-        // Need to consume the token too
-        jp.clearCurrentToken();
-        return (Map<T,Object>) result;
+        JsonParser jp = _parser(source);
+        try {
+            _initForReading(_config(jp));
+            Map<Object,Object> result = _readerForOperation(jp).readMap();
+            JsonParser jp0 = jp;
+            jp = null;
+            _close(jp0, null);
+            return (Map<T,Object>) result;
+        } catch (Exception e) {
+            _close(jp, e);
+            return null;
+        }
     }
 
+    @SuppressWarnings("resource")
+    public <T> T beanFrom(Object source, Class<T> type) throws IOException, JSONObjectException
+    {
+        if (source instanceof JsonParser) {
+            // note: no call to _config(), should come pre-configured
+            JsonParser jp = (JsonParser) source;
+            _initForReading(jp);
+            T result = _readerForOperation(jp).readBean(type);
+            jp.clearCurrentToken();
+            return result;
+        }
+        JsonParser jp = _parser(source);
+        try {
+            _initForReading(_config(jp));
+            T result = _readerForOperation(jp).readBean(type);
+            JsonParser jp0 = jp;
+            jp = null;
+            _close(jp0, null);
+            return result;
+        } catch (Exception e) {
+            _close(jp, e);
+            return null;
+        }
+    }
+    
     /**
      * Read method that will take given JSON Source (of one of supported types),
      * read contents and map it to one of simple mappings ({@link java.util.Map}
@@ -751,28 +760,28 @@ public class JSON implements Versioned
      * <li><code>char[]</code></li>
      *</ul>
      */
+    @SuppressWarnings("resource")
     public Object anyFrom(Object source) throws IOException, JSONObjectException
     {
-        JsonParser jp;
-        Object result;
         if (source instanceof JsonParser) {
-            jp = _initForReading((JsonParser) source);
-            result = _readerForOperation(jp).readValue();
-        } else {
-            jp = _parser(source);
-            boolean closed = false;
-            try {
-                _initForReading(_config(jp));
-                result = _readerForOperation(jp).readValue();
-                closed = true;
-            } finally {
-                if (!closed) {
-                    _close(jp);
-                }
-            }
+            JsonParser jp = (JsonParser) source;
+            _initForReading(jp);
+            Object result = _readerForOperation(jp).readValue();
+            jp.clearCurrentToken();
+            return result;
         }
-        jp.clearCurrentToken();
-        return result;
+        JsonParser jp = _parser(source);
+        try {
+            _initForReading(_config(jp));
+            Object result = _readerForOperation(jp).readValue();
+            JsonParser jp0 = jp;
+            jp = null;
+            _close(jp0, null);
+            return result;
+        } catch (Exception e) {
+            _close(jp, e);
+            return null;
+        }
     }
     
     /*
@@ -846,7 +855,7 @@ public class JSON implements Versioned
                 +" as input (use an InputStream, Reader, String, byte[], File or URL");
     }
 
-    protected JsonParser _initForReading(JsonParser jp)
+    protected void _initForReading(JsonParser jp)
         throws IOException, JsonProcessingException
     {
         /* First: must point to a token; if not pointing to one, advance.
@@ -860,7 +869,6 @@ public class JSON implements Versioned
                 throw JSONObjectException.from(jp, "No content to map due to end-of-input");
             }
         }
-        return jp;
     }
     
     /*
@@ -894,5 +902,28 @@ public class JSON implements Versioned
         try {
             cl.close();
         } catch (IOException ioe) { }
+    }
+
+    protected void _close(Closeable cl, Exception e) throws IOException {
+        if (cl != null) {
+            if (e == null) {
+                cl.close();
+            } else {
+                try {
+                    cl.close();
+                } catch (Exception secondaryEx) {
+                    // what should we do here, if anything?
+                }
+            }
+        }
+        if (e != null) {
+            if (e instanceof IOException) {
+                throw (IOException) e;
+            }
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
+            }
+            throw new IOException(e); // should never occur
+        }
     }
 }
