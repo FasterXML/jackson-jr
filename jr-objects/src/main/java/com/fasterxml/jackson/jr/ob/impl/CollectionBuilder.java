@@ -5,20 +5,26 @@ import java.util.*;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
 /**
- * Helper class that is used for constructing {@link java.util.List}s
+ * Helper class that is used for constructing {@link java.util.Collection}s
  * to map JSON Array values in.
  *<p>
  * Objects server both as "factories" for creating new builders (blueprint
  * style), and as actual builders. For each distinct read operation,
  * {@link #newBuilder} will be called at least once; this instance
  * may be used and reused multiple times, as calling {@link #start}
- * will reset the state so that more {@link List}s may be built.
+ * will reset the state so that more {@link Collection}s may be built.
  */
-public abstract class ListBuilder
+public abstract class CollectionBuilder
 {
     protected final static Object[] EMPTY_ARRAY = new Object[0];
     
     protected final int _features;
+
+    /**
+     * Optional {@link Collection} implementation class, used when specific
+     * implementation is desired.
+     */
+    protected final Class<?> _collectionType;
 
     /*
     /**********************************************************************
@@ -26,21 +32,24 @@ public abstract class ListBuilder
     /**********************************************************************
      */
 
-    protected ListBuilder(int features) {
+    protected CollectionBuilder(int features, Class<?> collImpl) {
         _features = features;
+        _collectionType = collImpl;
     }
 
     /**
      * Factory method for getting a blueprint instance of the default
-     * {@link ListBuilder} implementation.
+     * {@link CollectionBuilder} implementation.
      */
-    public static ListBuilder defaultImpl() {
-        return new Default(0);
+    public static CollectionBuilder defaultImpl() {
+        return new Default(0, null);
     }
 
-    public abstract ListBuilder newBuilder(int features);
+    public abstract CollectionBuilder newBuilder(int features);
 
-    public ListBuilder newBuilder() {
+    public abstract CollectionBuilder newBuilder(Class<?> collImpl);
+    
+    public CollectionBuilder newBuilder() {
         return newBuilder(_features);
     }
 
@@ -60,14 +69,14 @@ public abstract class ListBuilder
     /**********************************************************************
      */
     
-    public abstract ListBuilder start();
+    public abstract CollectionBuilder start();
 
-    public abstract ListBuilder add(Object value);
+    public abstract CollectionBuilder add(Object value);
 
     /**
-     * The usual build method to use for constructing {@link List}
+     * The usual build method to use for constructing {@link Collection}
      */
-    public abstract List<Object> buildList();
+    public abstract Collection<Object> buildCollection();
 
     /**
      * Alternative build method used when desired result type is
@@ -75,7 +84,7 @@ public abstract class ListBuilder
      */
     public Object[] buildArray() {
         // sub-optimal, but defined for convenience
-        List<Object> l = buildList();
+        Collection<Object> l = buildCollection();
         return l.toArray(new Object[l.size()]);
     }
 
@@ -86,17 +95,17 @@ public abstract class ListBuilder
      */
     
     /**
-     * Specialized method that is called when an empty list needs to
-     * be constructed; this may be a new list, or an immutable shared
-     * List, depending on implementation.
+     * Specialized method that is called when an empty Collection needs to
+     * be constructed; this may be a new Collection, or an immutable shared
+     * one, depending on implementation.
      *<p>
      * Default implementation simply calls:
      *<pre>
-     *  start().buildList();
+     *  start().buildCollection();
      *</pre>
      */
-    public List<Object> emptyList() {
-        return start().buildList();
+    public Collection<Object> emptyCollection() {
+        return start().buildCollection();
     }
 
     /**
@@ -110,23 +119,21 @@ public abstract class ListBuilder
     }
 
     /**
-     * Specialized method that is called when an empty list needs to
-     * be constructed; this may be a new list, or an immutable shared
-     * List, depending on implementation.
+     * Specialized method that is called when a single-entry Collection needs to
+     * be constructed.
      *<p>
      * Default implementation simply calls:
      *<pre>
-     *  start().add(value).buildList();
+     *  start().add(value).buildCollection();
      *</pre>
      */
-    public List<Object> singletonList(Object value) {
-        return start().add(value).buildList();
+    public Collection<Object> singletonCollection(Object value) {
+        return start().add(value).buildCollection();
     }
 
     /**
-     * Specialized method that is called when an empty list needs to
-     * be constructed; this may be a new list, or an immutable shared
-     * List, depending on implementation.
+     * Specialized method that is called when a single-entry array needs to
+     * be constructed.
      *<p>
      * Default implementation simply returns equivalent of:
      *<pre>
@@ -146,8 +153,8 @@ public abstract class ListBuilder
      */
     
     /**
-     * Default {@link ListBuilder} implementation, which uses {@link ArrayList}
-     * as the type of {@link java.util.List} to build.
+     * Default {@link CollectionBuilder} implementation, which uses {@link ArrayList}
+     * as the type of {@link java.util.List} to build, unless instructed otherwise.
      *<p>
      * When sub-classing to use different underlying mutable {@link java.util.List}
      * type, you need to sub-class following methods:
@@ -160,23 +167,28 @@ public abstract class ListBuilder
      *<p>
      * If constructing builders that use different approaches (like, say, produce
      * immutable Guava Lists), you may need to override more methods; or perhaps
-     * just extend basic {@link ListBuilder}.
+     * just extend basic {@link CollectionBuilder}.
      */
-    public static class Default extends ListBuilder
+    public static class Default extends CollectionBuilder
     {
-        protected List<Object> _current;
+        protected Collection<Object> _current;
         
-        protected Default(int features) {
-            super(features);
+        protected Default(int features, Class<?> collImpl) {
+            super(features, collImpl);
+        }
+
+        @Override
+        public CollectionBuilder newBuilder(int features) {
+            return new Default(features, null);
+        }
+
+        @Override
+        public CollectionBuilder newBuilder(Class<?> collType) {
+            return new Default(_features, collType);
         }
         
         @Override
-        public ListBuilder newBuilder(int features) {
-            return new Default(features);
-        }
-        
-        @Override
-        public ListBuilder start() {
+        public CollectionBuilder start() {
             // If this builder is "busy", create a new one...
             if (_current != null) {
                 return newBuilder().start();
@@ -186,15 +198,15 @@ public abstract class ListBuilder
         }
         
         @Override
-        public List<Object> buildList() {
-            List<Object> result = _current;
+        public Collection<Object> buildCollection() {
+            Collection<Object> result = _current;
             _current = null;
             return result;
         }
 
         @Override
         public Object[] buildArray() {
-            List<Object> l = _current;
+            Collection<Object> l = _current;
             _current = null;
             final int len = l.size();
             Object[] result = new Object[len];
@@ -203,14 +215,14 @@ public abstract class ListBuilder
         }
         
         @Override
-        public ListBuilder add(Object value) {
+        public CollectionBuilder add(Object value) {
             _current.add(value);
             return this;
         }
         
         @Override
-        public List<Object> emptyList() {
-            if (isEnabled(Feature.READ_ONLY)) {
+        public Collection<Object> emptyCollection() {
+            if ((_collectionType == null) && isEnabled(Feature.READ_ONLY)) {
                 return Collections.emptyList();
             }
             return _list(0);
@@ -219,7 +231,7 @@ public abstract class ListBuilder
         /**
          * Overridable factory method for constructing underlying List.
          */
-        protected List<Object> _list(int initialSize) {
+        protected Collection<Object> _list(int initialSize) {
             return new ArrayList<Object>(initialSize);
         }
     }

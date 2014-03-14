@@ -1,16 +1,48 @@
 package com.fasterxml.jackson.jr.ob;
 
+import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
-import com.fasterxml.jackson.jr.ob.impl.ListBuilder;
+import com.fasterxml.jackson.jr.ob.impl.CollectionBuilder;
 import com.fasterxml.jackson.jr.ob.impl.MapBuilder;
 import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
 
 import static com.fasterxml.jackson.core.JsonTokenId.*;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_BOOLEAN;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_BYTE_ARRAY;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_CALENDAR;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_CHAR;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_CHARACTER_SEQUENCE;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_CHAR_ARRAY;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_CLASS;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_COLLECTION;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_DATE;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_ENUM;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_FILE;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_INT_ARRAY;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_ITERABLE;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_LIST;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_MAP;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_BIG_DECIMAL;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_BIG_INTEGER;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_BYTE;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_DOUBLE;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_FLOAT;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_INTEGER;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_LONG;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_SHORT;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_OBJECT_ARRAY;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_STRING;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_TREE_NODE;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_URI;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_URL;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_UUID;
 
 /**
  * Object that handles construction of simple Objects from JSON.
@@ -47,7 +79,7 @@ public class JSONReader
     /**
      * Handler that takes care of constructing {@link java.util.Map}s as needed
      */
-    protected final ListBuilder _listBuilder;
+    protected final CollectionBuilder _collectionBuilder;
     
     /*
     /**********************************************************************
@@ -67,13 +99,13 @@ public class JSONReader
      * Constructor used for creating the blueprint instances.
      */
     protected JSONReader(int features, TypeDetector td,
-            ListBuilder lb, MapBuilder mb)
+            CollectionBuilder lb, MapBuilder mb)
     {
         _features = features;
         _typeDetector = td;
         _arraysAsLists = Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(features);
         _parser = null;
-        _listBuilder = lb;
+        _collectionBuilder = lb;
         _mapBuilder = mb;
     }
 
@@ -85,7 +117,7 @@ public class JSONReader
         int features = base._features;
         _features = features;
         _typeDetector = base._typeDetector.perOperationInstance(features);
-        _listBuilder = base._listBuilder.newBuilder(features);
+        _collectionBuilder = base._collectionBuilder.newBuilder(features);
         _mapBuilder = base._mapBuilder.newBuilder(features);
         _arraysAsLists = base._arraysAsLists;
         _parser = jp;
@@ -102,16 +134,16 @@ public class JSONReader
         if (_features == features) {
             return this;
         }
-        return _with(features, _typeDetector, _listBuilder, _mapBuilder);
+        return _with(features, _typeDetector, _collectionBuilder, _mapBuilder);
     }
 
     public final JSONReader with(MapBuilder mb) {
         if (_mapBuilder == mb) return this;
-        return _with(_features, _typeDetector, _listBuilder, mb);
+        return _with(_features, _typeDetector, _collectionBuilder, mb);
     }
 
-    public final JSONReader with(ListBuilder lb) {
-        if (_listBuilder == lb) return this;
+    public final JSONReader with(CollectionBuilder lb) {
+        if (_collectionBuilder == lb) return this;
         return _with(_features, _typeDetector, lb, _mapBuilder);
     }
     
@@ -120,7 +152,7 @@ public class JSONReader
      * is to be constructed
      */
     protected JSONReader _with(int features,
-            TypeDetector td, ListBuilder lb, MapBuilder mb)
+            TypeDetector td, CollectionBuilder lb, MapBuilder mb)
     {
         if (getClass() != JSONReader.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override _with(...)");
@@ -170,7 +202,7 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+_tokenDesc(_parser));
         }
-        return (Map<Object,Object>) _readFromObject();
+        return (Map<Object,Object>) _readFromObject(_mapBuilder);
     }
     
     /**
@@ -185,7 +217,7 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
         }
-        return (List<Object>) _readFromArray(true);
+        return (List<Object>) _readFromArray(_collectionBuilder, true);
     }
 
     /**
@@ -199,7 +231,7 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
         }
-        return (Object[]) _readFromArray(false);
+        return (Object[]) _readFromArray(_collectionBuilder, false);
     }
 
     /**
@@ -207,15 +239,9 @@ public class JSONReader
      * specified type out of it; Bean has to conform to standard Java Bean
      * specification by having setters for passing JSON Object properties.
      */
-    public <T> T readBean(Class<T> type) throws IOException, JsonProcessingException
-    {
-        int typeId = _typeDetector.findFullType(type);
-
-        throw JSONObjectException.from(_parser, "Bean binding not implemented yet; type id = "+typeId);
-        
-        // !!! TODO
-
-//        return null;
+    @SuppressWarnings("unchecked")
+    public <T> T readBean(Class<T> type) throws IOException, JsonProcessingException {
+        return (T) _readBean(type, _typeDetector.findFullType(type));
     }
     
     /*
@@ -232,9 +258,9 @@ public class JSONReader
         case ID_NULL:
             return nullForRootValue();
         case ID_START_OBJECT:
-            return _readFromObject();
+            return _readFromObject(_mapBuilder);
         case ID_START_ARRAY:
-            return _readFromArray(_arraysAsLists);
+            return _readFromArray(_collectionBuilder, _arraysAsLists);
         case ID_STRING:
             return fromString(_parser.getText());
         case ID_NUMBER_INT:
@@ -260,24 +286,94 @@ public class JSONReader
         throw JSONObjectException.from(_parser, "Unexpected value token: "+_parser.getCurrentToken());
     }
 
-    protected Object _readFromObject() throws IOException
+    protected Object _readBean(Class<?> type, int typeId) throws IOException
+    {
+        if (typeId >= 0) {
+            switch (typeId) {
+            // Structured types:
+            case SER_MAP:
+            {
+                MapBuilder b = _mapBuilder;
+                if (type != Map.class) {
+                    b = b.newBuilder(type);
+                }
+                return _readFromObject(b);
+            }
+                
+            case SER_LIST:
+            case SER_COLLECTION:
+            {
+                CollectionBuilder b = _collectionBuilder;
+                if (type != List.class && type != Collection.class) {
+                    b = b.newBuilder(type);
+                }
+                return _readFromArray(b, true);
+            }
+
+            case SER_OBJECT_ARRAY:
+                return _readFromArray(_collectionBuilder, false);
+
+            case SER_INT_ARRAY:
+            case SER_TREE_NODE:
+
+            // Textual types, related:
+            case SER_STRING:
+            case SER_CHAR_ARRAY:
+            case SER_CHARACTER_SEQUENCE:
+            case SER_BYTE_ARRAY:
+
+            // Number types:
+                
+            case SER_NUMBER_FLOAT: // fall through
+            case SER_NUMBER_DOUBLE:
+
+            case SER_NUMBER_BYTE: // fall through
+            case SER_NUMBER_SHORT: // fall through
+            case SER_NUMBER_INTEGER:
+
+            case SER_NUMBER_LONG:
+            case SER_NUMBER_BIG_DECIMAL:
+            case SER_NUMBER_BIG_INTEGER:
+
+            // Other scalar types:
+
+            case SER_BOOLEAN:
+            case SER_CHAR:
+            case SER_CALENDAR:
+            case SER_DATE:
+
+            case SER_ENUM:
+            case SER_CLASS:
+            case SER_FILE:
+                // these type should be fine using toString()
+            case SER_UUID:
+            case SER_URL:
+            case SER_URI:
+            }
+        } else { // bean types
+            // !!! TODO
+        }
+        throw JSONObjectException.from(_parser, "Bean binding not implemented yet; type id = "+typeId);
+    }
+    
+    protected Object _readFromObject(MapBuilder b) throws IOException
     {
         final JsonParser p = _parser;
-
+        
         // First, a minor optimization for empty Maps
         if (p.nextValue() == JsonToken.END_OBJECT) {
-            return _mapBuilder.emptyMap();
+            return b.emptyMap();
         }
         // and another for singletons...
         Object key = fromKey(p.getCurrentName());
         Object value = _readFromAny();
 
         if (p.nextValue() == JsonToken.END_OBJECT) {
-            return _mapBuilder.singletonMap(key, value);
+            return b.singletonMap(key, value);
         }
 
         // but then it's loop-de-loop
-        MapBuilder b = _mapBuilder.start().put(key, value);
+        b = b.start().put(key, value);
         do {
             b = b.put(fromKey(p.getCurrentName()), _readFromAny());
         } while (p.nextValue() != JsonToken.END_OBJECT);
@@ -288,23 +384,23 @@ public class JSONReader
      * @param asList Whether to bind into a {@link java.util.List} (true), or
      *    <code>Object[]</code> (false)
      */
-    protected Object _readFromArray(boolean asList) throws IOException
+    protected Object _readFromArray(CollectionBuilder b, boolean asList) throws IOException
     {
         final JsonParser p = _parser;
         // First two special cases; empty, single-element
         if (p.nextToken() == JsonToken.END_ARRAY) {
-            return asList ? _listBuilder.emptyList() : _listBuilder.emptyArray();
+            return asList ? b.emptyCollection() : b.emptyArray();
         }
         Object value = _readFromAny();
         if (p.nextToken() == JsonToken.END_ARRAY) {
-            return asList ?  _listBuilder.singletonList(value) : _listBuilder.singletonList(value);
+            return asList ?  b.singletonCollection(value) : b.singletonArray(value);
         }
         // otherwise, loop
-        ListBuilder b = _listBuilder.start().add(value);
+        b = b.start().add(value);
         do {
             b = b.add(_readFromAny());
         } while (p.nextToken() != JsonToken.END_ARRAY);
-        return asList ? b.buildList() : b.buildArray();
+        return asList ? b.buildCollection() : b.buildArray();
     }
 
     protected Object _readFromInteger() throws IOException

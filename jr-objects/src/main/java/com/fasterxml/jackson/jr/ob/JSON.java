@@ -312,7 +312,7 @@ public class JSON implements Versioned
     protected JSONReader _defaultReader(int features) {
         return new JSONReader(features,
                 TypeDetector.rootDetector(false, features),
-                ListBuilder.defaultImpl(), MapBuilder.defaultImpl());
+                CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
 
     protected JSONWriter _defaultWriter(int features, TreeCodec tc) {
@@ -424,10 +424,10 @@ public class JSON implements Versioned
     }
 
     /**
-     * Mutant factory for constructing an instance with specified {@link ListBuilder},
+     * Mutant factory for constructing an instance with specified {@link CollectionBuilder},
      * and returning new instance (or, if there would be no change, this instance).
      */
-    public JSON with(ListBuilder b) {
+    public JSON with(CollectionBuilder b) {
         JSONReader r = _reader.with(b);
         if (r == _reader) {
             return this;

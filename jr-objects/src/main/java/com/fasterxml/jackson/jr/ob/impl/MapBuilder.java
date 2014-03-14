@@ -19,20 +19,29 @@ public abstract class MapBuilder
 {
     protected final int _features;
 
-    protected MapBuilder(int features) {
-        _features = features;
-    }
+    /**
+     * Optional {@link Map} implementation class, used when specific
+     * implementation is desired.
+     */
+    protected final Class<?> _mapType;
     
+    protected MapBuilder(int features, Class<?> type) {
+        _features = features;
+        _mapType = type;
+    }
+
     /**
      * Factory method for getting a blueprint instance of the default
      * {@link MapBuilder} implementation.
      */
     public static MapBuilder defaultImpl() {
-        return new Default(0);
+        return new Default(0, null);
     }
 
     public abstract MapBuilder newBuilder(int features);
 
+    public abstract MapBuilder newBuilder(Class<?> mapImpl);
+    
     public MapBuilder newBuilder() {
         return newBuilder(_features);
     }
@@ -94,15 +103,20 @@ public abstract class MapBuilder
     {
         protected Map<Object,Object> _current;
         
-        protected Default(int features) {
-            super(features);
-        }
-        
-        @Override
-        public MapBuilder newBuilder(int features) {
-            return new Default(features);
+        protected Default(int features, Class<?> type) {
+            super(features, type);
         }
 
+        @Override
+        public MapBuilder newBuilder(int features) {
+            return new Default(features, _mapType);
+        }
+
+        @Override
+        public MapBuilder newBuilder(Class<?> mapImpl) {
+            return new Default(_features, mapImpl);
+        }
+        
         @Override
         public MapBuilder start() {
             // If this builder is "busy", create a new one...
@@ -128,13 +142,28 @@ public abstract class MapBuilder
         
         @Override
         public Map<Object,Object> emptyMap() {
-            if (isEnabled(Feature.READ_ONLY)) {
+            if ((_mapType == null) && isEnabled(Feature.READ_ONLY)) {
                 return Collections.emptyMap();
             }
             return _map(4);
         }
 
-        private final HashMap<Object,Object> _map(int initialSize) {
+        private final Map<Object,Object> _map(int initialSize) {
+            if (_mapType != null) {
+                try {
+                    @SuppressWarnings("unchecked")
+                    Map<Object,Object> m = (Map<Object,Object>) _mapType.newInstance();
+                    return m;
+                } catch (Exception e) {
+                    Throwable t = e;
+                    while (t.getCause() != null) {
+                        t = t.getCause();
+                    }
+                    throw new IllegalArgumentException("Failed to create an instance of "
+                            +_mapType.getName()+" ("+t.getClass().getName()+"): "+t.getMessage());
+                    
+                }
+            }
             return isEnabled(Feature.PRESERVE_FIELD_ORDERING)
                     ? new LinkedHashMap<Object,Object>(initialSize)
                     : new HashMap<Object,Object>(initialSize);
