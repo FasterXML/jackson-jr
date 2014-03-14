@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
@@ -66,6 +68,8 @@ public class JSONReader
 
     protected final boolean _arraysAsLists;
 
+    protected final TreeCodec _treeCodec;
+    
     /**
      * Object that is used to resolve types of values dynamically.
      */
@@ -98,15 +102,16 @@ public class JSONReader
     /**
      * Constructor used for creating the blueprint instances.
      */
-    protected JSONReader(int features, TypeDetector td,
+    protected JSONReader(int features, TypeDetector td, TreeCodec treeCodec,
             CollectionBuilder lb, MapBuilder mb)
     {
         _features = features;
         _typeDetector = td;
-        _arraysAsLists = Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(features);
-        _parser = null;
+        _treeCodec = treeCodec;
         _collectionBuilder = lb;
         _mapBuilder = mb;
+        _arraysAsLists = Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(features);
+        _parser = null;
     }
 
     /**
@@ -117,6 +122,7 @@ public class JSONReader
         int features = base._features;
         _features = features;
         _typeDetector = base._typeDetector.perOperationInstance(features);
+        _treeCodec = base._treeCodec;
         _collectionBuilder = base._collectionBuilder.newBuilder(features);
         _mapBuilder = base._mapBuilder.newBuilder(features);
         _arraysAsLists = base._arraysAsLists;
@@ -134,17 +140,17 @@ public class JSONReader
         if (_features == features) {
             return this;
         }
-        return _with(features, _typeDetector, _collectionBuilder, _mapBuilder);
+        return _with(features, _typeDetector, _treeCodec, _collectionBuilder, _mapBuilder);
     }
 
     public final JSONReader with(MapBuilder mb) {
         if (_mapBuilder == mb) return this;
-        return _with(_features, _typeDetector, _collectionBuilder, mb);
+        return _with(_features, _typeDetector, _treeCodec, _collectionBuilder, mb);
     }
 
     public final JSONReader with(CollectionBuilder lb) {
         if (_collectionBuilder == lb) return this;
-        return _with(_features, _typeDetector, lb, _mapBuilder);
+        return _with(_features, _typeDetector, _treeCodec, lb, _mapBuilder);
     }
     
     /**
@@ -152,12 +158,12 @@ public class JSONReader
      * is to be constructed
      */
     protected JSONReader _with(int features,
-            TypeDetector td, CollectionBuilder lb, MapBuilder mb)
+            TypeDetector td, TreeCodec tc, CollectionBuilder lb, MapBuilder mb)
     {
         if (getClass() != JSONReader.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override _with(...)");
         }
-        return new JSONReader(features, td, lb, mb);
+        return new JSONReader(features, td, tc, lb, mb);
     }
 
     /*
@@ -200,7 +206,7 @@ public class JSONReader
     {
         if (_parser.getCurrentToken() != JsonToken.START_OBJECT) {
             throw JSONObjectException.from(_parser,
-                    "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+_tokenDesc(_parser));
+                    "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+_tokenDesc());
         }
         return (Map<Object,Object>) _readFromObject(_mapBuilder);
     }
@@ -215,7 +221,7 @@ public class JSONReader
     {
         if (_parser.getCurrentToken() != JsonToken.START_ARRAY) {
             throw JSONObjectException.from(_parser,
-                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc());
         }
         return (List<Object>) _readFromArray(_collectionBuilder, true);
     }
@@ -229,7 +235,7 @@ public class JSONReader
     {
         if (_parser.getCurrentToken() != JsonToken.START_ARRAY) {
             throw JSONObjectException.from(_parser,
-                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc());
         }
         return (Object[]) _readFromArray(_collectionBuilder, false);
     }
@@ -285,7 +291,7 @@ public class JSONReader
         }
         throw JSONObjectException.from(_parser, "Unexpected value token: "+_parser.getCurrentToken());
     }
-
+    
     protected Object _readBean(Class<?> type, int typeId) throws IOException
     {
         if (typeId >= 0) {
@@ -314,48 +320,92 @@ public class JSONReader
                 return _readFromArray(_collectionBuilder, false);
 
             case SER_INT_ARRAY:
+                return _readIntArray();
+
             case SER_TREE_NODE:
+                return _treeCodec().readTree(_parser);
 
             // Textual types, related:
             case SER_STRING:
-            case SER_CHAR_ARRAY:
             case SER_CHARACTER_SEQUENCE:
+                return _parser.getValueAsString();
+            case SER_CHAR_ARRAY:
+                return _parser.getValueAsString().toCharArray();
             case SER_BYTE_ARRAY:
+                return _readBinary();
 
             // Number types:
                 
             case SER_NUMBER_FLOAT: // fall through
+                return Float.valueOf((float) _parser.getValueAsDouble());
             case SER_NUMBER_DOUBLE:
+                return _parser.getValueAsDouble();
 
             case SER_NUMBER_BYTE: // fall through
+                return (byte) _parser.getValueAsInt();
+                
             case SER_NUMBER_SHORT: // fall through
+                return (short) _parser.getValueAsInt();
             case SER_NUMBER_INTEGER:
-
+                return _parser.getValueAsInt();
             case SER_NUMBER_LONG:
+                return _parser.getValueAsLong();
+
             case SER_NUMBER_BIG_DECIMAL:
+                return _parser.getDecimalValue();
+
             case SER_NUMBER_BIG_INTEGER:
+                return _parser.getBigIntegerValue();
 
             // Other scalar types:
 
             case SER_BOOLEAN:
+                return _parser.getValueAsBoolean();
+                
             case SER_CHAR:
+                {
+                    String str = _parser.getValueAsString();
+                    return (str == null || str.isEmpty()) ? ' ' : str.charAt(0);
+                }
+                
             case SER_CALENDAR:
+                {
+                    long l = _fetchLong(type, typeId);
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTimeInMillis(l);
+                    return cal;
+                }
+
             case SER_DATE:
+                return new Date(_fetchLong(type, typeId));
 
             case SER_ENUM:
+                return _readEnum(type);
+            
             case SER_CLASS:
+            {
+                String v = _parser.getValueAsString();
+                try {
+                    return Class.forName(v);
+                } catch (Exception e) {
+                    throw new JSONObjectException("Failed to bind java.lang.Class from value '"+v+"'");
+                }
+            }
             case SER_FILE:
                 // these type should be fine using toString()
             case SER_UUID:
+                return UUID.fromString(_parser.getValueAsString());
             case SER_URL:
+                return new URL(_parser.getValueAsString());
             case SER_URI:
+                return URI.create(_parser.getValueAsString());
             }
         } else { // bean types
             // !!! TODO
         }
         throw JSONObjectException.from(_parser, "Bean binding not implemented yet; type id = "+typeId);
     }
-    
+
     protected Object _readFromObject(MapBuilder b) throws IOException
     {
         final JsonParser p = _parser;
@@ -428,7 +478,46 @@ public class JSONReader
         }
         return _parser.getDecimalValue();
     }
+
+    /*
+    /**********************************************************************
+    /* Read methods for scalars
+    /**********************************************************************
+     */
+
+    protected byte[] _readBinary() throws IOException {
+        return _parser.getBinaryValue();
+    }
     
+    protected int[] _readIntArray() throws IOException
+    {
+        // !!! TODO
+        throw new JSONObjectException("Reading of int[] not yet implemented");
+    }
+
+    protected Object _readEnum(Class<?> type) throws IOException
+    {
+        Object[] enums = type.getEnumConstants();
+        JsonToken t = _parser.getCurrentToken();
+        if (t == JsonToken.VALUE_NUMBER_INT) {
+            int ix = _parser.getIntValue();
+            if (ix < 0 || ix >= enums.length) {
+                throw new JSONObjectException("Failed to bind Enum "+type.getName()+" with index "+ix
+                        +" (has "+enums.length+" values)");
+            }
+            return enums[ix];
+        }
+//        String v = _parser.getValueAsString();
+        
+        /*
+        try {
+        } catch (Exception e) {
+            throw new JSONObjectException("Failed to bind Enum "+type.getName()+" from value '"+v+"'");
+        }
+        */
+        throw new JSONObjectException("Reading of Enums from Strings not yet implemented");
+    }
+        
     /*
     /**********************************************************************
     /* Internal methods for handling specific values, possible overrides, conversions
@@ -465,7 +554,7 @@ public class JSONReader
     /**
      * Method called to let implementation change a {@link java.lang.String} value that has been
      * read from input.
-     * Default implementation returns Boolean value as is.
+     * Default implementation returns String value as is.
      */
     protected Object fromString(String str) throws IOException {
         // Nothing fancy, by default; return as is
@@ -490,14 +579,17 @@ public class JSONReader
     /**********************************************************************
      */
 
-    protected String _tokenDesc(JsonParser p) throws IOException {
-        JsonToken t = _parser.getCurrentToken();
+    protected String _tokenDesc() throws IOException {
+        return _tokenDesc(_parser.getCurrentToken());
+    }
+
+    protected String _tokenDesc(JsonToken t) throws IOException {
         if (t == null) {
             return "NULL";
         }
         switch (t) {
         case FIELD_NAME:
-            return "JSON Field name '"+p.getCurrentName()+"'";
+            return "JSON Field name '"+_parser.getCurrentName()+"'";
         case START_ARRAY:
             return "JSON Array";
         case START_OBJECT:
@@ -516,5 +608,23 @@ public class JSONReader
         default:
             return t.toString();
         }
+    }
+
+    protected TreeCodec _treeCodec() throws JSONObjectException {
+        if (_treeCodec == null) {
+            throw new JSONObjectException("No TreeCodec specified: can not bind JSON into TreeNode types");
+        }
+        return _treeCodec;
+        
+    }
+
+    protected long _fetchLong(Class<?> type, int typeId) throws IOException
+    {
+        JsonToken t = _parser.getCurrentToken();
+        if (t == JsonToken.VALUE_NUMBER_INT) {
+            return _parser.getLongValue();
+        }
+        throw JSONObjectException.from(_parser, "Can not get long numeric value from JSON (to construct "
+                +type.getName()+") from "+_tokenDesc(t));
     }
 }

@@ -143,23 +143,19 @@ public class JSONObjectException
     /**********************************************************
      */
 
-    public JSONObjectException(String msg)
-    {
+    public JSONObjectException(String msg) {
         super(msg);
     }
 
-    public JSONObjectException(String msg, Throwable rootCause)
-    {
+    public JSONObjectException(String msg, Throwable rootCause) {
         super(msg, rootCause);
     }
 
-    public JSONObjectException(String msg, JsonLocation loc)
-    {
+    public JSONObjectException(String msg, JsonLocation loc) {
         super(msg, loc);
     }
 
-    public JSONObjectException(String msg, JsonLocation loc, Throwable rootCause)
-    {
+    public JSONObjectException(String msg, JsonLocation loc, Throwable rootCause) {
         super(msg, loc, rootCause);
     }
 

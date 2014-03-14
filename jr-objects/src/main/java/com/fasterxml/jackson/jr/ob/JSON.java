@@ -304,14 +304,13 @@ public class JSON implements Versioned
         _features = features;
         _jsonFactory = jsonF;
         _treeCodec = trees;
-        _reader = (r == null) ? _defaultReader(features) : r;
+        _reader = (r == null) ? _defaultReader(features, trees) : r;
         _writer = (w == null) ? _defaultWriter(features, trees) : w;
         _prettyPrinter = pp;
     }
 
-    protected JSONReader _defaultReader(int features) {
-        return new JSONReader(features,
-                TypeDetector.rootDetector(false, features),
+    protected JSONReader _defaultReader(int features, TreeCodec tc) {
+        return new JSONReader(features, TypeDetector.rootDetector(false, features), tc,
                 CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
 
