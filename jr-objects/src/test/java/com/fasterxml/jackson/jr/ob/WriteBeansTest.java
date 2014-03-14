@@ -13,6 +13,26 @@ public class WriteBeansTest extends TestBase
         public int getY() { return 3; }
     }
 
+    static class BinaryBean {
+        protected final static byte[] STUFF = new byte[] { 1, 2, 3, 4, 5, 6, 7 };
+        
+        public byte[] getStuff() {
+            return STUFF;
+        }
+    }
+
+    public void testBinary() throws Exception
+    {
+        String json = JSON.std.asString(new BinaryBean());
+        Map<String,Object> map = JSON.std.mapFrom(json);
+        if (1 != map.size()) {
+            fail("Wrong Map contents: "+json);
+        }
+        String base64 = (String) map.get("stuff");
+        assertNotNull(base64);
+        assertEquals("AQIDBAUGBw==", base64);
+    }
+    
     public void testSimpleMap() throws Exception
     {
         // first: with default settings, should serialize 2 props

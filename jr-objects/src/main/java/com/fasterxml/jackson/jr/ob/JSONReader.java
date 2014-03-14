@@ -84,7 +84,7 @@ public class JSONReader
     {
         int features = base._features;
         _features = features;
-        _typeDetector = base._typeDetector;
+        _typeDetector = base._typeDetector.perOperationInstance(features);
         _listBuilder = base._listBuilder.newBuilder(features);
         _mapBuilder = base._mapBuilder.newBuilder(features);
         _arraysAsLists = base._arraysAsLists;
@@ -161,7 +161,7 @@ public class JSONReader
     /**
      * Method for reading a JSON Object from input and building a {@link java.util.Map}
      * out of it. Note that if input does NOT contain a
-     * JSON Object, {@link JsonProcessingException} will be thrown.
+     * JSON Object, {@link JSONObjectException} will be thrown.
      */
     @SuppressWarnings("unchecked")
     public Map<Object,Object> readMap() throws IOException, JsonProcessingException
@@ -176,7 +176,7 @@ public class JSONReader
     /**
      * Method for reading a JSON Array from input and building a {@link java.util.List}
      * out of it. Note that if input does NOT contain a
-     * JSON Array, {@link JsonProcessingException} will be thrown.
+     * JSON Array, {@link JSONObjectException} will be thrown.
      */
     @SuppressWarnings("unchecked")
     public List<Object> readList() throws IOException, JsonProcessingException
@@ -191,7 +191,7 @@ public class JSONReader
     /**
      * Method for reading a JSON Array from input and building a <code>Object[]</code>
      * out of it. Note that if input does NOT contain a
-     * JSON Array, {@link JsonProcessingException} will be thrown.
+     * JSON Array, {@link JSONObjectException} will be thrown.
      */
     public Object[] readArray() throws IOException, JsonProcessingException
     {
@@ -206,19 +206,16 @@ public class JSONReader
      * Method for reading a JSON Object from input and building a Bean of
      * specified type out of it; Bean has to conform to standard Java Bean
      * specification by having setters for passing JSON Object properties.
-     * Note that if input does NOT contain a
-     * JSON Object, {@link JsonProcessingException} will be thrown.
      */
     public <T> T readBean(Class<T> type) throws IOException, JsonProcessingException
     {
-        if (_parser.getCurrentToken() != JsonToken.START_OBJECT) {
-            throw JSONObjectException.from(_parser,
-                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
-        }
+        int typeId = _typeDetector.findFullType(type);
+
+        throw JSONObjectException.from(_parser, "Bean binding not implemented yet; type id = "+typeId);
         
         // !!! TODO
 
-        return null;
+//        return null;
     }
     
     /*
