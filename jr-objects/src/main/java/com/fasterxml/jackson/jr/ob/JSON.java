@@ -657,8 +657,7 @@ public class JSON implements Versioned
     {
         if (source instanceof JsonParser) {
             // note: no call to _config(), should come pre-configured
-            JsonParser jp = (JsonParser) source;
-            _initForReading(jp);
+            JsonParser jp = _initForReading((JsonParser) source);
             List<Object> result = _readerForOperation(jp).readList();
             // Need to consume the token too
             jp.clearCurrentToken();
@@ -679,11 +678,35 @@ public class JSON implements Versioned
     }
 
     @SuppressWarnings("resource")
+    public <T> List<T> listOfFrom(Class<T> type, Object source) throws IOException, JSONObjectException
+    {
+        if (source instanceof JsonParser) {
+            // note: no call to _config(), should come pre-configured
+            JsonParser jp = _initForReading((JsonParser) source);
+            List<T> result = _readerForOperation(jp).readListOf(type);
+            // Need to consume the token too
+            jp.clearCurrentToken();
+            return result;
+        }
+        JsonParser jp = _parser(source);
+        try {
+            _initForReading(_config(jp));
+            List<T> result = _readerForOperation(jp).readListOf(type);
+            JsonParser jp0 = jp;
+            jp = null;
+            _close(jp0, null);
+            return result;
+        } catch (Exception e) {
+            _close(jp, e);
+            return null;
+        }
+    }
+    
+    @SuppressWarnings("resource")
     public Object[] arrayFrom(Object source) throws IOException, JSONObjectException
     {
         if (source instanceof JsonParser) {
-            JsonParser jp = (JsonParser) source;
-            _initForReading(jp);
+            JsonParser jp = _initForReading((JsonParser) source);
             Object[] result = _readerForOperation(jp).readArray();
             jp.clearCurrentToken();
             return result;
@@ -702,12 +725,34 @@ public class JSON implements Versioned
         }
     }
 
+    @SuppressWarnings("resource")
+    public <T> T[] arrayOfFrom(Class<T> type, Object source) throws IOException, JSONObjectException
+    {
+        if (source instanceof JsonParser) {
+            JsonParser jp = _initForReading((JsonParser) source);
+            T[] result = _readerForOperation(jp).readArrayOf(type);
+            jp.clearCurrentToken();
+            return result;
+        }
+        JsonParser jp = _parser(source);
+        try {
+            _initForReading(_config(jp));
+            T[] result = _readerForOperation(jp).readArrayOf(type);
+            JsonParser jp0 = jp;
+            jp = null;
+            _close(jp0, null);
+            return result;
+        } catch (Exception e) {
+            _close(jp, e);
+            return null;
+        }
+    }
+    
     @SuppressWarnings({ "unchecked", "resource" })
     public <T> Map<T,Object> mapFrom(Object source) throws IOException, JSONObjectException
     {
         if (source instanceof JsonParser) {
-            JsonParser jp = (JsonParser) source;
-            _initForReading(jp);
+            JsonParser jp = _initForReading((JsonParser) source);
             Map<Object,Object> result = _readerForOperation(jp).readMap();
             jp.clearCurrentToken();
             return (Map<T,Object>) result;
@@ -727,12 +772,10 @@ public class JSON implements Versioned
     }
 
     @SuppressWarnings("resource")
-    public <T> T beanFrom(Object source, Class<T> type) throws IOException, JSONObjectException
+    public <T> T beanFrom(Class<T> type, Object source) throws IOException, JSONObjectException
     {
         if (source instanceof JsonParser) {
-            // note: no call to _config(), should come pre-configured
-            JsonParser jp = (JsonParser) source;
-            _initForReading(jp);
+            JsonParser jp = _initForReading((JsonParser) source);
             T result = _readerForOperation(jp).readBean(type);
             jp.clearCurrentToken();
             return result;
@@ -773,8 +816,7 @@ public class JSON implements Versioned
     public Object anyFrom(Object source) throws IOException, JSONObjectException
     {
         if (source instanceof JsonParser) {
-            JsonParser jp = (JsonParser) source;
-            _initForReading(jp);
+            JsonParser jp = _initForReading((JsonParser) source);
             Object result = _readerForOperation(jp).readValue();
             jp.clearCurrentToken();
             return result;
@@ -864,7 +906,7 @@ public class JSON implements Versioned
                 +" as input (use an InputStream, Reader, String, byte[], File or URL");
     }
 
-    protected void _initForReading(JsonParser jp)
+    protected JsonParser _initForReading(JsonParser jp)
         throws IOException, JsonProcessingException
     {
         /* First: must point to a token; if not pointing to one, advance.
@@ -878,6 +920,7 @@ public class JSON implements Versioned
                 throw JSONObjectException.from(jp, "No content to map due to end-of-input");
             }
         }
+        return jp;
     }
     
     /*

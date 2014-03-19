@@ -1,5 +1,6 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
@@ -88,6 +89,14 @@ public abstract class CollectionBuilder
         return l.toArray(new Object[l.size()]);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> T[] buildArray(Class<T> type) {
+        // as above, sub-optimal etc, but works
+        Collection<Object> l = buildCollection();
+        Object[] a = (Object[]) Array.newInstance(type,  l.size());
+        return (T[]) l.toArray(a);
+    }
+
     /*
     /**********************************************************************
     /* More specialized build methods
@@ -118,6 +127,14 @@ public abstract class CollectionBuilder
         return EMPTY_ARRAY;
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> T[] emptyArray(Class<T> type) {
+        if (type == Object.class) {
+            return (T[]) EMPTY_ARRAY;
+        }
+        return (T[]) Array.newInstance(type, 0);
+    }
+
     /**
      * Specialized method that is called when a single-entry Collection needs to
      * be constructed.
@@ -142,6 +159,13 @@ public abstract class CollectionBuilder
      */
     public Object[] singletonArray(Object value) {
         Object[] result = new Object[1];
+        result[0] = value;
+        return result;
+    }
+
+    public <T> T[] singletonArray(Class<T> type, T value) {
+        @SuppressWarnings("unchecked")
+        T[] result = (T[]) Array.newInstance(type, 1);
         result[0] = value;
         return result;
     }

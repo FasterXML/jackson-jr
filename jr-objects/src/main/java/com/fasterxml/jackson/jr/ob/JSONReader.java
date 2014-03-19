@@ -2,8 +2,6 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
@@ -18,35 +16,7 @@ import com.fasterxml.jackson.jr.ob.impl.MapBuilder;
 import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
 
 import static com.fasterxml.jackson.core.JsonTokenId.*;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_BOOLEAN;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_BYTE_ARRAY;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_CALENDAR;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_CHAR;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_CHARACTER_SEQUENCE;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_CHAR_ARRAY;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_CLASS;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_COLLECTION;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_DATE;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_ENUM;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_FILE;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_INT_ARRAY;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_ITERABLE;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_LIST;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_MAP;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_BIG_DECIMAL;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_BIG_INTEGER;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_BYTE;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_DOUBLE;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_FLOAT;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_INTEGER;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_LONG;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_NUMBER_SHORT;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_OBJECT_ARRAY;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_STRING;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_TREE_NODE;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_URI;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_URL;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.SER_UUID;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;
 
 /**
  * Object that handles construction of simple Objects from JSON.
@@ -204,8 +174,7 @@ public class JSONReader
      * JSON Object, {@link JSONObjectException} will be thrown.
      */
     @SuppressWarnings("unchecked")
-    public Map<Object,Object> readMap() throws IOException, JsonProcessingException
-    {
+    public Map<Object,Object> readMap() throws IOException {
         if (_parser.getCurrentToken() != JsonToken.START_OBJECT) {
             throw JSONObjectException.from(_parser,
                     "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+_tokenDesc());
@@ -219,8 +188,7 @@ public class JSONReader
      * JSON Array, {@link JSONObjectException} will be thrown.
      */
     @SuppressWarnings("unchecked")
-    public List<Object> readList() throws IOException, JsonProcessingException
-    {
+    public List<Object> readList() throws IOException {
         if (_parser.getCurrentToken() != JsonToken.START_ARRAY) {
             throw JSONObjectException.from(_parser,
                     "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc());
@@ -228,6 +196,21 @@ public class JSONReader
         return (List<Object>) _readFromArray(_collectionBuilder, true);
     }
 
+    /**
+     * Method for reading a JSON Array from input and building a {@link java.util.List}
+     * out of it. Note that if input does NOT contain a
+     * JSON Array, {@link JSONObjectException} will be thrown.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> List<T> readListOf(Class<T> type) throws IOException
+    {
+        if (_parser.getCurrentToken() != JsonToken.START_ARRAY) {
+            throw JSONObjectException.from(_parser,
+                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc());
+        }
+        return (List<T>) _readFromArray(_collectionBuilder, type, true);
+    }
+    
     /**
      * Method for reading a JSON Array from input and building a <code>Object[]</code>
      * out of it. Note that if input does NOT contain a
@@ -240,6 +223,15 @@ public class JSONReader
                     "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc());
         }
         return (Object[]) _readFromArray(_collectionBuilder, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T[] readArrayOf(Class<T> type) throws IOException, JsonProcessingException {
+        if (_parser.getCurrentToken() != JsonToken.START_ARRAY) {
+            throw JSONObjectException.from(_parser,
+                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc());
+        }
+        return (T[]) _readFromArray(_collectionBuilder, type, false);
     }
 
     /**
@@ -505,6 +497,26 @@ public class JSONReader
         return asList ? b.buildCollection() : b.buildArray();
     }
 
+    @SuppressWarnings("unchecked")
+    protected <T> Object _readFromArray(CollectionBuilder b, Class<T> type, boolean asList) throws IOException
+    {
+        final JsonParser p = _parser;
+        if (p.nextToken() == JsonToken.END_ARRAY) {
+            return asList ? b.emptyCollection() : b.emptyArray(type);
+        }
+        int typeId = _typeDetector.findFullType(type);
+        Object value = _readBean(type, typeId);
+        if (p.nextToken() == JsonToken.END_ARRAY) {
+            return asList ?  b.singletonCollection(value) : b.singletonArray(type, (T) value);
+        }
+        // otherwise, loop
+        b = b.start().add(value);
+        do {
+            b = b.add(_readBean(type, typeId));
+        } while (p.nextToken() != JsonToken.END_ARRAY);
+        return asList ? b.buildCollection() : b.buildArray(type);
+    }
+    
     protected Object _readFromInteger() throws IOException
     {
         NumberType t = _parser.getNumberType();

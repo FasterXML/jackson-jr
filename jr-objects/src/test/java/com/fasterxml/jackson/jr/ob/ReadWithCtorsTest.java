@@ -27,18 +27,18 @@ public class ReadWithCtorsTest extends TestBase
 
     public void testStringCtor() throws Exception
     {
-        FromString output = JSON.std.beanFrom(quote("abc"), FromString.class);
+        FromString output = JSON.std.beanFrom(FromString.class, quote("abc"));
         assertNotNull(output);
         assertEquals("abc", output.value);
     }
 
     public void testLongCtor() throws Exception
     {
-        FromLong1 output = JSON.std.beanFrom("123", FromLong1.class);
+        FromLong1 output = JSON.std.beanFrom(FromLong1.class, "123");
         assertNotNull(output);
         assertEquals(123L, output.value);
 
-        FromLong2 output2 = JSON.std.beanFrom("456", FromLong2.class);
+        FromLong2 output2 = JSON.std.beanFrom(FromLong2.class, "456");
         assertNotNull(output2);
         assertEquals(456L, output2.value);
     }
