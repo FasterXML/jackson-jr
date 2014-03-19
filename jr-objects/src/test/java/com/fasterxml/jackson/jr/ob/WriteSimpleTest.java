@@ -38,12 +38,18 @@ public class WriteSimpleTest extends TestBase
                 JSON.std.asString(stuff));
     }
 
-    public void testSimpleIntArray() throws Exception {
+    public void testSimpleIntContainers() throws Exception {
         assertEquals("[1,2,3]", JSON.std.asString(new int[] { 1, 2, 3 }));
+        assertEquals("[1,2,3]", JSON.std.asString(new Integer[] { 1, 2, 3 }));
+        List<Integer> list = new ArrayList<Integer>();
+        list.add(4);
+        list.add(-8);
+        assertEquals("[4,-8]", JSON.std.asString(list));
     }
 
     public void testSimpleBooleanArray() throws Exception {
         assertEquals("[true,false]", JSON.std.asString(new boolean[] { true, false }));
+        assertEquals("[true,false]", JSON.std.asString(new Boolean[] { true, false }));
     }
     
     public void testSimpleStringArray() throws Exception {
