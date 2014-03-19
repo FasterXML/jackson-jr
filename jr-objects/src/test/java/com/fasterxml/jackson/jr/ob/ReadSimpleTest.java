@@ -5,7 +5,7 @@ import java.util.*;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
-public class SimpleReadTest extends TestBase
+public class ReadSimpleTest extends TestBase
 {
     public void testSimpleList() throws Exception
     {

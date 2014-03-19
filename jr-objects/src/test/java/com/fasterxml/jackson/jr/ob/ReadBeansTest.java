@@ -25,6 +25,27 @@ public class ReadBeansTest extends TestBase
         public void setFirst(String n) { first = n; }
         public void setLast(String n) { last = n; }
     }
+
+    static class FromString {
+        protected String value;
+        public FromString(String v) { value = v; }
+    }
+
+    static class FromLong1 {
+        protected long value;
+        public FromLong1(long v) { value = v; }
+    }
+
+    static class FromLong2 {
+        protected long value;
+        public FromLong2(Long v) { value = v.longValue(); }
+    }
+    
+    /*
+    /**********************************************************************
+    /* Test methdods
+    /**********************************************************************
+     */
     
     public void testSimpleList() throws Exception
     {
@@ -36,5 +57,23 @@ public class ReadBeansTest extends TestBase
         assertNotNull(bean.name);
         assertEquals("Bob", bean.name.first);
         assertEquals("Burger", bean.name.last);
+    }
+
+    public void testStringCtor() throws Exception
+    {
+        FromString output = JSON.std.beanFrom(quote("abc"), FromString.class);
+        assertNotNull(output);
+        assertEquals("abc", output.value);
+    }
+
+    public void testLongCtor() throws Exception
+    {
+        FromLong1 output = JSON.std.beanFrom("123", FromLong1.class);
+        assertNotNull(output);
+        assertEquals(123L, output.value);
+
+        FromLong2 output2 = JSON.std.beanFrom("456", FromLong2.class);
+        assertNotNull(output2);
+        assertEquals(456L, output2.value);
     }
 }

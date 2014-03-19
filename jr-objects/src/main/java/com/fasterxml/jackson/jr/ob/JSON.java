@@ -247,7 +247,7 @@ public class JSON implements Versioned
      *</pre>
      */
     public final static JSON std = new JSON();
-    
+
     /*
     /**********************************************************************
     /* Configuration, helper objects
