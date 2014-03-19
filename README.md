@@ -25,7 +25,7 @@ size down even further.
 
 ## Usage
 
-### Reading/writing Simple Objects, Beans
+### Reading/writing Simple Objects, Beans, List/arrays thereof
 
 Functionality of this package is contained in Java package `com.fasterxml.jackson.jr.ob`.
 
@@ -43,7 +43,8 @@ Map<String,Object> map = JSON.std.mapFrom(INPUT);
 MyBean bean = JSON.std.beanFrom(MyBean.class, INPUT);
 ```
 
-as well as writing Objects as JSON:
+from any of the usual input sources (`InputStream`, `Reader`, `String` or `byte[]` that contains JSON, `URL`,
+`JsonParser`); and can write same Objects as JSON:
 
 ```java
 String json = JSON.std.asString(map);
@@ -54,6 +55,14 @@ byte[] bytes = JSON.std
     .without(Feature.WRITE_NULL_PROPERTIES)
     .asBytes(bean);
 ```
+
+and may also read `List`s and arrays of simple and Bean types:
+
+```java
+List<MyType> beans = JSON.std.listOfFrom(MyType.class, INPUT);
+```
+
+(writing of `List`s and arrays works without addition effort: just pass List/array as-is)
 
 ### Writing with composers
 
