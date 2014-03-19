@@ -71,48 +71,50 @@ public class TypeDetector
     public final static int SER_OBJECT_ARRAY = 4;
 
     public final static int SER_INT_ARRAY = 5;
+    public final static int SER_LONG_ARRAY = 6;
+    public final static int SER_BOOLEAN_ARRAY = 7;
     
     /**
      * An implementation of {@link com.fasterxml.jackson.core.TreeNode}
      */
-    public final static int SER_TREE_NODE = 6;
+    public final static int SER_TREE_NODE = 8;
     
     // // // String(-like) types
 
-    public final static int SER_STRING = 7;
-    public final static int SER_CHARACTER_SEQUENCE = 8;
-    public final static int SER_CHAR_ARRAY = 9;
-    public final static int SER_BYTE_ARRAY = 10;
+    public final static int SER_STRING = 9;
+    public final static int SER_CHARACTER_SEQUENCE = 10;
+    public final static int SER_CHAR_ARRAY = 11;
+    public final static int SER_BYTE_ARRAY = 12;
 
     // // // Numbers
     
-    public final static int SER_NUMBER_BYTE = 11;
+    public final static int SER_NUMBER_BYTE = 13;
 
-    public final static int SER_NUMBER_SHORT = 12;
+    public final static int SER_NUMBER_SHORT = 14;
     
-    public final static int SER_NUMBER_INTEGER = 13;
+    public final static int SER_NUMBER_INTEGER = 15;
 
-    public final static int SER_NUMBER_LONG = 14;
+    public final static int SER_NUMBER_LONG = 16;
 
-    public final static int SER_NUMBER_FLOAT = 15;
+    public final static int SER_NUMBER_FLOAT = 17;
 
-    public final static int SER_NUMBER_DOUBLE = 16;
+    public final static int SER_NUMBER_DOUBLE = 18;
 
-    public final static int SER_NUMBER_BIG_INTEGER = 17;
+    public final static int SER_NUMBER_BIG_INTEGER = 19;
 
-    public final static int SER_NUMBER_BIG_DECIMAL = 18;
+    public final static int SER_NUMBER_BIG_DECIMAL = 20;
 
     // // // Other specific scalar types
 
-    public final static int SER_BOOLEAN = 20;
-    public final static int SER_CHAR = 21;
+    public final static int SER_BOOLEAN = 21;
+    public final static int SER_CHAR = 22;
 
-    public final static int SER_ENUM = 22;
+    public final static int SER_ENUM = 23;
 
-    public final static int SER_DATE = 23;
-    public final static int SER_CALENDAR = 24;
+    public final static int SER_DATE = 24;
+    public final static int SER_CALENDAR = 25;
 
-    public final static int SER_CLASS = 25;
+    public final static int SER_CLASS = 26;
     public final static int SER_FILE = 27;
     public final static int SER_UUID = 28;
     public final static int SER_URL = 29;
@@ -304,6 +306,12 @@ public class TypeDetector
                 }
                 if (raw == int[].class) {
                     return SER_INT_ARRAY;
+                }
+                if (raw == long[].class) {
+                    return SER_LONG_ARRAY;
+                }
+                if (raw == boolean[].class) {
+                    return SER_BOOLEAN_ARRAY;
                 }
                 // Hmmh. Could support all types; add as/when needed
                 return SER_UNKNOWN;

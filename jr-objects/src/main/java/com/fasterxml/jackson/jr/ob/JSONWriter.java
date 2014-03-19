@@ -181,6 +181,12 @@ public class JSONWriter
         case SER_INT_ARRAY:
             writeIntArrayField(fieldName, (int[]) value);
             return;
+        case SER_LONG_ARRAY:
+            writeLongArrayField(fieldName, (long[]) value);
+            return;
+        case SER_BOOLEAN_ARRAY:
+            writeBooleanArrayField(fieldName, (boolean[]) value);
+            return;
         case SER_TREE_NODE:
             writeTreeNodeField(fieldName, (TreeNode) value);
             return;
@@ -291,6 +297,12 @@ public class JSONWriter
             return;
         case SER_INT_ARRAY:
             writeIntArrayValue((int[]) value);
+            return;
+        case SER_LONG_ARRAY:
+            writeLongArrayValue((long[]) value);
+            return;
+        case SER_BOOLEAN_ARRAY:
+            writeBooleanArrayValue((boolean[]) value);
             return;
         case SER_TREE_NODE:
             writeTreeNodeValue((TreeNode) value);
@@ -458,8 +470,7 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeObjectArrayField(String fieldName, Object[] v) throws IOException
-    {
+    protected void writeObjectArrayField(String fieldName, Object[] v) throws IOException {
         _generator.writeFieldName(fieldName);
         writeObjectArrayValue(v);
     }
@@ -472,10 +483,35 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeIntArrayField(String fieldName, int[] v) throws IOException
-    {
+    protected void writeIntArrayField(String fieldName, int[] v) throws IOException {
         _generator.writeFieldName(fieldName);
         writeIntArrayValue(v);
+    }
+    
+    protected void writeLongArrayValue(long[] v) throws IOException {
+        _generator.writeStartArray();
+        for (int i = 0, len = v.length; i < len; ++i) {
+            _generator.writeNumber(v[i]);
+        }
+        _generator.writeEndArray();
+    }
+
+    protected void writeLongArrayField(String fieldName, long[] v) throws IOException {
+        _generator.writeFieldName(fieldName);
+        writeLongArrayValue(v);
+    }
+    
+    protected void writeBooleanArrayValue(boolean[] v) throws IOException {
+        _generator.writeStartArray();
+        for (int i = 0, len = v.length; i < len; ++i) {
+            _generator.writeBoolean(v[i]);
+        }
+        _generator.writeEndArray();
+    }
+
+    protected void writeBooleanArrayField(String fieldName, boolean[] v) throws IOException {
+        _generator.writeFieldName(fieldName);
+        writeBooleanArrayValue(v);
     }
 
     protected void writeTreeNodeValue(TreeNode v) throws IOException {

@@ -21,6 +21,12 @@ public class TypeDetectorTest extends TestBase
         public void setEmUp(int index, String value) { }
     }
 
+    /*
+    /**********************************************************************
+    /* Test methdods
+    /**********************************************************************
+     */
+    
     public void testSimpleWithSerialization() 
     {
         TypeDetector td = TypeDetector.rootDetector(true, JSON.Feature.defaults());
@@ -64,6 +70,8 @@ public class TypeDetectorTest extends TestBase
         assertEquals(TypeDetector.SER_STRING, td.findFullType(String.class));
         assertEquals(TypeDetector.SER_CHAR_ARRAY, td.findFullType(char[].class));
         assertEquals(TypeDetector.SER_INT_ARRAY, td.findFullType(int[].class));
+        assertEquals(TypeDetector.SER_LONG_ARRAY, td.findFullType(long[].class));
+        assertEquals(TypeDetector.SER_BOOLEAN_ARRAY, td.findFullType(boolean[].class));
         assertEquals(TypeDetector.SER_OBJECT_ARRAY, td.findFullType(Object[].class));
         assertEquals(TypeDetector.SER_CHARACTER_SEQUENCE, td.findFullType(StringBuffer.class));
         assertEquals(TypeDetector.SER_COLLECTION, td.findFullType(LinkedHashSet.class));

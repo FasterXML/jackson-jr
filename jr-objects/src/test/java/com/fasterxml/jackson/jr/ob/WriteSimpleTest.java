@@ -11,6 +11,12 @@ public class WriteSimpleTest extends TestBase
     final static class POJO {
         public int value = 3;
     }
+
+    /*
+    /**********************************************************************
+    /* Test methdods
+    /**********************************************************************
+     */
     
     public void testSimpleList() throws Exception
     {
@@ -32,6 +38,18 @@ public class WriteSimpleTest extends TestBase
                 JSON.std.asString(stuff));
     }
 
+    public void testSimpleIntArray() throws Exception {
+        assertEquals("[1,2,3]", JSON.std.asString(new int[] { 1, 2, 3 }));
+    }
+
+    public void testSimpleBooleanArray() throws Exception {
+        assertEquals("[true,false]", JSON.std.asString(new boolean[] { true, false }));
+    }
+    
+    public void testSimpleStringArray() throws Exception {
+        assertEquals(aposToQuotes("['abc','def']"), JSON.std.asString(new String[] { "abc", "def" }));
+    }
+    
     public void testNest() throws Exception
     {
         Map<String,Object> stuff = new LinkedHashMap<String,Object>();
