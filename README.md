@@ -102,6 +102,28 @@ would produce (since pretty-printing is enabled)
 }
 ```
 
+### Designing your Beans
+
+To support readability and writability of your own types, your Java objects must either:
+
+* Implement Bean style accesors (getters for accessing data to write and/or setter for binding JSON data into objects), and define no-argument (default) constructor, OR
+* Define single-argument constructor if binding from JSON String (single-String argument) or JSON integer number (single-`long` or `Long` argument)
+
+Note that although getters and setters need to be public (since JDK Bean Introspection does not find any other methods),
+constructors may have any access right, including `private`.
+
+Also note that fields are never used for reading or writing Bean properties.
+
+### Customizing behavior with Features
+
+There are many customizable features you can use with `JSON` object; see [Full List of Features](wiki/JSON-Features) for details. But usage itself is via fluent methods like so:
+
+```java
+String json = JSON.std
+  .with(JSON.Feature.PRETTY_PRINT_OUTPUT)
+  .without(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS)
+  .writeValue(...);
+```
 
 ## License
 
