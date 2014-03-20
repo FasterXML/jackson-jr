@@ -1,7 +1,7 @@
 Project: jackson-jr
 Version: 2.3.1 (xx-xxx-2014)
 
-
+#6: Support reading of `Enum` values from String representation
 
 ------------------------------------------------------------------------
 === History: ===

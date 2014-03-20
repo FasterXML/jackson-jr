@@ -571,15 +571,16 @@ public class JSONReader
             }
             return enums[ix];
         }
-//        String v = _parser.getValueAsString();
-        
-        /*
-        try {
-        } catch (Exception e) {
-            throw new JSONObjectException("Failed to bind Enum "+type.getName()+" from value '"+v+"'");
+        String v = _parser.getValueAsString().trim();
+
+        // !!! TODO: 20-Mar-2014, tatu: Need an efficient way to handle this, construct
+        //   EnumResolver etc
+        for (Object e : enums) {
+            if (v.equals(e.toString())) {
+                return e;
+            }
         }
-        */
-        throw new JSONObjectException("Reading of Enums from Strings not yet implemented");
+        throw new JSONObjectException("Failed to bind Enum "+type.getName()+" from value '"+v+"'");
     }
         
     /*
