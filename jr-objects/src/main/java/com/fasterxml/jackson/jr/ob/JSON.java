@@ -120,10 +120,20 @@ public class JSON implements Versioned
         * Note that feature is only used if {@link #HANDLE_JAVA_BEANS}
         * is also enabled.
         *<p>
-        * Feature is enabled by default, so that all Bean properties
-        * are serialized.
+        * Feature is enabled by default,
+        * so that all Bean properties are serialized.
         */
        WRITE_READONLY_BEAN_PROPERTIES(true),
+
+       /**
+        * Feature that determines where Enum values are written using
+        * numeric index (true), or String representation from calling
+        * {@link Enum#toString()} (false).
+        *<p>
+        * Feature is disabled by default,
+        * so that Enums are serialized as JSON Strings.
+        */
+       WRITE_ENUMS_USING_INDEX(false),
        
        /**
         * Feature that can be enabled to use "pretty-printing", basic indentation

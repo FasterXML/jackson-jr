@@ -645,12 +645,19 @@ public class JSONWriter
     }
 
     protected void writeEnumValue(Enum<?> v) throws IOException {
-        // TODO: maybe allow serialization using index?
-        writeStringValue(v.toString());
+        if (Feature.WRITE_ENUMS_USING_INDEX.isEnabled(_features)) {
+            writeIntValue(v.ordinal());
+        } else {
+            writeStringValue(v.toString());
+        }
     }
 
     protected void writeEnumField(String fieldName, Enum<?> v) throws IOException {
-        writeStringField(fieldName, v.toString());
+        if (Feature.WRITE_ENUMS_USING_INDEX.isEnabled(_features)) {
+            writeIntField(fieldName, v.ordinal());
+        } else {
+            writeStringField(fieldName, v.toString());
+        }
     }
 
     protected void writeBeanValue(BeanDefinition beanDef, Object bean) throws IOException

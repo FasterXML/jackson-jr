@@ -7,6 +7,8 @@ import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
 public class ReadSimpleTest extends TestBase
 {
+    enum ABC { A, B, C; }
+    
     public void testSimpleList() throws Exception
     {
         final String INPUT = "[1,2,3]";
@@ -61,5 +63,16 @@ public class ReadSimpleTest extends TestBase
         
         // actually, verify with write...
         assertEquals(INPUT, JSON.std.asString(ob));
+    }
+
+    public void testSimpleEnums() throws Exception
+    {
+        // First using index
+        ABC abc = JSON.std.beanFrom(ABC.class, String.valueOf(ABC.B.ordinal()));
+        assertEquals(ABC.B, abc);
+
+        // then from name
+        abc = JSON.std.beanFrom(ABC.class, quote("C"));
+        assertEquals(ABC.C, abc);
     }
 }

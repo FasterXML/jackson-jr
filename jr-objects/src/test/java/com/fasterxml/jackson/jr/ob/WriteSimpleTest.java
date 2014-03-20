@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.*;
 
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
 public class WriteSimpleTest extends TestBase
 {
@@ -12,6 +13,8 @@ public class WriteSimpleTest extends TestBase
         public int value = 3;
     }
 
+    enum ABC { A, B, C; }
+    
     /*
     /**********************************************************************
     /* Test methdods
@@ -80,6 +83,9 @@ public class WriteSimpleTest extends TestBase
         final String PATH = "/foo/bar.txt";
         assertEquals(quote(PATH),
                 JSON.std.asString(new File(PATH)));
+
+        assertEquals(quote("B"), JSON.std.asString(ABC.B));
+        assertEquals("1", JSON.std.with(Feature.WRITE_ENUMS_USING_INDEX).asString(ABC.B));
     }
 
     public void testUnnownType() throws Exception
