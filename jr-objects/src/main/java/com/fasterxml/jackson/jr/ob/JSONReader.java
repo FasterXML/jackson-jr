@@ -336,6 +336,8 @@ public class JSONReader
                 if (bean != null) {
                     return bean;
                 }
+            } catch (JSONObjectException e) {
+                throw e;
             } catch (Exception e) {
                 throw JSONObjectException.from(_parser, "Failed to create an instance of "
                         +type.getName()+" due to ("+e.getClass().getName()+"): "+e.getMessage(),

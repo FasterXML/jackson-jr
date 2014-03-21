@@ -95,7 +95,7 @@ public class JSON implements Versioned
         * JSON Object properties will simply be ignored.
         */
        FAIL_ON_UNKNOWN_BEAN_PROPERTY(false),
-       
+
        /*
        /**********************************************************************
        /* Write-related features

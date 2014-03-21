@@ -66,9 +66,17 @@ public final class BeanProperty
 
     public Object setValueFor(Object bean, Object value) throws IOException
     {
+        if (_setMethod == null) {
+            String cls = (_getMethod == null) ? "UNKNOWN" : _getMethod.getDeclaringClass().getName();
+            throw new IllegalStateException("No setter for property '"+_name+"' (type "+cls+")");
+        }
         try {
             return _setMethod.invoke(bean, value);
         } catch (Exception e) {
+            Throwable t = e;
+            while (t.getCause() != null) {
+                t = t.getCause();
+            }
             throw new JSONObjectException("Failed to set property '"+_name+"' (type "
                     +_rawType.getName()+"; exception "+e.getClass().getName()+"): "
                     +e.getMessage(), e);
