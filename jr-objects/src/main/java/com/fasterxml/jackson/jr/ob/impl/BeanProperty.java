@@ -55,6 +55,9 @@ public final class BeanProperty
     
     public Object getValueFor(Object bean) throws IOException
     {
+        if (_getMethod == null) {
+            throw new IllegalStateException("No getter for property '"+_name+"' (type "+_bean()+")");
+        }
         try {
             return _getMethod.invoke(bean);
         } catch (Exception e) {
@@ -67,8 +70,7 @@ public final class BeanProperty
     public Object setValueFor(Object bean, Object value) throws IOException
     {
         if (_setMethod == null) {
-            String cls = (_getMethod == null) ? "UNKNOWN" : _getMethod.getDeclaringClass().getName();
-            throw new IllegalStateException("No setter for property '"+_name+"' (type "+cls+")");
+            throw new IllegalStateException("No setter for property '"+_name+"' (type "+_bean()+")");
         }
         try {
             return _setMethod.invoke(bean, value);
@@ -81,5 +83,17 @@ public final class BeanProperty
                     +_rawType.getName()+"; exception "+e.getClass().getName()+"): "
                     +e.getMessage(), e);
         }
+    }
+
+    protected String _bean() {
+        Class<?> cls;
+        if (_getMethod != null) {
+            cls = _getMethod.getDeclaringClass();
+        } else if (_setMethod != null) {
+            cls = _setMethod.getDeclaringClass();
+        } else {
+            return "UNKNOWN";
+        }
+        return cls.getName();
     }
 }
