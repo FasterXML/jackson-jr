@@ -225,7 +225,8 @@ public class ReadBeansTest extends TestBase
         MediaItem input = new MediaItem();
         input.media = content;
 
-        input.addPhoto(new Image("http://javaone.com/keynote_large.jpg", "Javaone Keynote", 1024, 768, Size.LARGE));
+        final String IMAGE_DESC1 = "http://javaone.com/keynote_large.jpg";
+        input.addPhoto(new Image(IMAGE_DESC1, "Javaone Keynote", 1024, 768, Size.LARGE));
         input.addPhoto(new Image("http://javaone.com/keynote_small.jpg", "Javaone Keynote", 320, 240, Size.SMALL));
 
         String json = JSON.std.asString(input);
@@ -237,5 +238,17 @@ public class ReadBeansTest extends TestBase
         assertNotNull(result);
         assertEquals(262144, result.media.bitrate);
         assertEquals("Steve Jobs", result.media.persons.get(1));
+
+        List<Image> im = result.getImages();
+        assertEquals(2, im.size());
+
+        /* 21-Mar-2014, tatu: Curse you, Java generics + type erasure.
+         *    Following will fail for now, so leave commented out.
+         */
+        /*        
+        Image im1 = im.get(0);
+        assertNotNull(im1);
+        assertEquals(IMAGE_DESC1, im1.getTitle());
+        */
     }
 }
