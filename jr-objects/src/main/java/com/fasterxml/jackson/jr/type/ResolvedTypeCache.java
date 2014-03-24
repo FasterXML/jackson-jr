@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.type;
 
-import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -8,14 +7,18 @@ import java.util.*;
  * {@link ResolvedType} instances.
  * Since usage pattern is such that caller needs synchronization, cache access methods
  * are fully synchronized so that caller need not do explicit synchronization.
+ * Note too that instead of LRU (via {@link java.util.LinkedHashMap} sub-classing)
+ * we will instead simply clear out cache once it fills up.
  */
-@SuppressWarnings("serial")
-public class ResolvedTypeCache implements Serializable
+public class ResolvedTypeCache
 {
-    protected final CacheMap _map;
+    protected final int _max;
+
+    protected final Map<ResolvedTypeCache.Key, ResolvedType> _map;
     
-    public ResolvedTypeCache(int maxEntries) {
-        _map = new CacheMap(maxEntries);
+    public ResolvedTypeCache(int max) {
+        _map = new HashMap<ResolvedTypeCache.Key, ResolvedType>(max);
+        _max = max;
     }
 
     /**
@@ -41,31 +44,12 @@ public class ResolvedTypeCache implements Serializable
     }
     
     public synchronized void put(Key key, ResolvedType type) {
+        if (_map.size() >= _max) {
+            _map.clear();
+        }
         _map.put(key, type);
     }
 
-    /*
-    /**********************************************************************
-    /* Methods for unit tests
-    /**********************************************************************
-     */
-    
-    public void add(ResolvedType type)
-    {
-        List<ResolvedType> tp = type.getTypeParameters();
-        ResolvedType[] tpa = tp.toArray(new ResolvedType[tp.size()]);
-        put(key(type.getErasedType(), tpa), type);
-    }
-    
-    /*
-    /**********************************************************************
-    /* Helper classes
-    /**********************************************************************
-     */
-    
-    /**
-     * Key used for type entries.
-     */
     public static class Key
     {
         private final Class<?> _erasedType;
@@ -116,24 +100,6 @@ public class ResolvedTypeCache implements Serializable
                 }
             }
             return true;
-        }
-    }
-
-    /**
-     * Simple sub-class to get LRU cache
-     */
-    private final static class CacheMap
-        extends LinkedHashMap<ResolvedTypeCache.Key, ResolvedType>
-    {
-        protected final int _maxEntries;
-        
-        public CacheMap(int maxEntries) {
-            _maxEntries = maxEntries;
-        }
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<Key, ResolvedType> eldest) {
-            return size() > _maxEntries;
         }
     }
 }
