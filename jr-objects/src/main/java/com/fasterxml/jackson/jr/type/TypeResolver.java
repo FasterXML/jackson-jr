@@ -139,7 +139,7 @@ public class TypeResolver implements Serializable
             return supertype;
         }
         
-        if (supertype.isPrimitive() || supertype.isArray()) {
+        if ((supertype instanceof ResolvedPrimitiveType) || (supertype instanceof ResolvedArrayType)) {
             throw new UnsupportedOperationException("Can not subtype primitive or array types (type "+supertype.getFullDescription()+")");
         }
         // In general, must be able to subtype as per JVM rules:

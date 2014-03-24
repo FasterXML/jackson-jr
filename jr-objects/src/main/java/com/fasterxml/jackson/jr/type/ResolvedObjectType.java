@@ -60,26 +60,6 @@ public class ResolvedObjectType extends ResolvedType
 
     /*
     /**********************************************************************
-    /* Simple property accessors
-    /**********************************************************************
-     */
-    
-    @Override
-    public final boolean isInterface() { return false; }
-
-    @Override
-    public boolean isAbstract() {
-        return Modifier.isAbstract(_modifiers);
-    }
-
-    @Override
-    public final boolean isArray() { return false; }
-
-    @Override
-    public final boolean isPrimitive() { return false; }
-
-    /*
-    /**********************************************************************
     /* String representations
     /**********************************************************************
      */

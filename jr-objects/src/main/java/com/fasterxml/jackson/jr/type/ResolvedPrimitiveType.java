@@ -62,30 +62,10 @@ public final class ResolvedPrimitiveType extends ResolvedType
      */
 
     @Override
-    public boolean isInterface() { return false; }
-    
-    @Override
-    public boolean isAbstract() { return false; }
-
-    @Override
-    public boolean isArray() { return false; }
-
-    @Override
-    public boolean isPrimitive() { return true; }
-
-    @Override
     public List<ResolvedType> getImplementedInterfaces() {
         return Collections.emptyList();
     }
 
-    /*
-    /**********************************************************************
-    /* Accessors for raw (minimally procesed) members
-    /**********************************************************************
-     */
-    
-    // Primitive types are simple; no fields, no methods, no constructors
-    
     /*
     /**********************************************************************
     /* String representations

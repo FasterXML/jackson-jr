@@ -35,24 +35,6 @@ public class TypePlaceHolder extends ResolvedType
 
     /*
     /**********************************************************************
-    /* Simple property accessors
-    /**********************************************************************
-     */
-
-    @Override
-    public boolean isInterface() { return false; }
-
-    @Override
-    public boolean isAbstract() { return true; }
-
-    @Override
-    public boolean isArray() { return false; }
-
-    @Override
-    public boolean isPrimitive() { return false; }
-
-    /*
-    /**********************************************************************
     /* String representations
     /**********************************************************************
      */

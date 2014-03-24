@@ -56,24 +56,6 @@ public class ResolvedRecursiveType extends ResolvedType
 
     /*
     /**********************************************************************
-    /* Simple property accessors
-    /**********************************************************************
-     */
-
-    @Override
-    public boolean isInterface() { return _erasedType.isInterface(); }
-
-    @Override
-    public boolean isAbstract() { return Modifier.isAbstract(_erasedType.getModifiers()); }
-
-    @Override
-    public boolean isArray() { return _erasedType.isArray(); }
-
-    @Override
-    public boolean isPrimitive() { return false; }
-    
-    /*
-    /**********************************************************************
     /* String representations
     /**********************************************************************
      */

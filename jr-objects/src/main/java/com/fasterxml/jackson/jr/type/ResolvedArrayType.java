@@ -37,21 +37,7 @@ public final class ResolvedArrayType extends ResolvedType
      */
 
     @Override
-    public boolean isInterface() {
-        return false;
-    }
-
-    @Override
-    public boolean isAbstract() { return false; }
-
-    @Override
     public ResolvedType getArrayElementType() { return _elementType; }
-
-    @Override
-    public boolean isArray() { return true; }
-
-    @Override
-    public boolean isPrimitive() { return false; }
 
     /*
     /**********************************************************************

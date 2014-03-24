@@ -37,24 +37,6 @@ public class ResolvedInterfaceType extends ResolvedType
 
     /*
     /**********************************************************************
-    /* Simple property accessors
-    /**********************************************************************
-     */
-
-    @Override
-    public boolean isInterface() { return true; }
-
-    @Override
-    public boolean isAbstract() { return true; }
-
-    @Override
-    public boolean isArray() { return false; }
-
-    @Override
-    public boolean isPrimitive() { return false; }
-
-    /*
-    /**********************************************************************
     /* String representations
     /**********************************************************************
      */

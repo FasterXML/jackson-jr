@@ -137,32 +137,6 @@ public abstract class ResolvedType implements java.lang.reflect.Type
         // nope; doesn't look like we extend or implement super type in question
         return null;
     }
-    
-    /*
-    /**********************************************************************
-    /* Accessors for simple properties
-    /**********************************************************************
-     */
-    
-    public abstract boolean isInterface();
-    public final boolean isConcrete() { return !isAbstract(); }
-    public abstract boolean isAbstract();
-
-    /**
-     * Method that indicates whether this type is an array type.
-     */
-    public abstract boolean isArray();
-
-    /**
-     * Method that indicates whether this type is one of small number of primitive
-     * Java types; not including array types of primitive types but just basic
-     * primitive types.
-     */
-    public abstract boolean isPrimitive();
-
-    public final boolean isInstanceOf(Class<?> type) {
-        return type.isAssignableFrom(_erasedType);
-    }
 
     /*
     /**********************************************************************
