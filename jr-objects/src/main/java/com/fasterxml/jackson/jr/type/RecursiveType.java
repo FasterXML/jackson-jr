@@ -8,7 +8,5 @@ public class RecursiveType extends ResolvedType {
     }
 
     void setReference(ResolvedType ref) { _referencedType = ref; }
-
-    @Override public ResolvedType selfRefType() { return _referencedType; }
-    @Override public StringBuilder appendDesc(StringBuilder sb) { return _appendClassDesc(sb); }
+    public ResolvedType selfRefType() { return _referencedType; }
 }

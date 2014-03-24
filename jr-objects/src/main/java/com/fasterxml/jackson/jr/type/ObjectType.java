@@ -22,7 +22,7 @@ public class ObjectType extends ResolvedType
     public ObjectType(Class<?> erased, TypeBindings bindings,
             ObjectType superClass, ResolvedType[] interfaces)
     {
-        super(erased, bindings, interfaces);
+        super(T_REGULAR, erased, bindings, interfaces, null);
         _superClass = superClass;
         _modifiers = erased.getModifiers();
     }

@@ -22,11 +22,9 @@ public class ResolvedType implements java.lang.reflect.Type
     // for arrays, type of element contained
     protected final ResolvedType _elemType;
 
-    // ctor for primitives, arrays
-    protected ResolvedType(Class<?> cls) { this(cls, null); }
-
-    protected ResolvedType(Class<?> cls, TypeBindings bindings) {
-        this(_kind(cls), cls, bindings, null, null);
+    // for primitives
+    protected ResolvedType(Class<?> cls) {
+        this(T_PRIMITIVE, cls, null, null, null);
     }
 
     // for Array type
@@ -48,17 +46,10 @@ public class ResolvedType implements java.lang.reflect.Type
         _elemType = elemType;
     }
 
-    private static int _kind(Class<?> cls) {
-        if (cls.isPrimitive()) return T_PRIMITIVE;
-        if (cls.isArray()) return T_ARRAY;
-        throw new IllegalStateException(cls.getName());
-    }
-    
     public Class<?> erasedType() { return _erasedType; }
 
     public ResolvedType elementType() { return _elemType; }
     public ResolvedType parentType() { return null; }
-    public ResolvedType selfRefType() { return null; }
 
     public boolean isArray() { return _kind == T_ARRAY; }
     
@@ -127,6 +118,12 @@ public class ResolvedType implements java.lang.reflect.Type
     }
 
     public StringBuilder appendDesc(StringBuilder sb) {
+        switch (_kind) {
+        case T_PRIMITIVE:
+            return sb.append(_erasedType.getName());
+        case T_ARRAY:
+            return _elemType.appendDesc(sb).append("[]");
+        }
         return _appendClassDesc(sb);
     }
 

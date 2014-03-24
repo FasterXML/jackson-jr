@@ -83,7 +83,7 @@ public class TypeResolver implements Serializable
             ResolvedType elementType = _fromAny(context, ((GenericArrayType) mainType).getGenericComponentType(), typeBindings);
             // Figuring out raw class for generic array is actually bit tricky...
             Object emptyArray = Array.newInstance(elementType.erasedType(), 0);
-            return new ResolvedType(emptyArray.getClass(), typeBindings);
+            return new ResolvedType(emptyArray.getClass(), typeBindings, elementType);
         }
         if (mainType instanceof TypeVariable<?>) {
             return _fromVariable(context, (TypeVariable<?>) mainType, typeBindings);
