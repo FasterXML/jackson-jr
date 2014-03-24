@@ -13,7 +13,7 @@ public class ResolvedType implements java.lang.reflect.Type
     protected final static int T_REGULAR = 5;
  
     protected final int _kind;
-    
+
     protected final Class<?> _erasedType;
     protected final TypeBindings _bindings;
 
@@ -21,26 +21,41 @@ public class ResolvedType implements java.lang.reflect.Type
     protected final ResolvedType[] _interfaces;
     // for arrays, type of element contained
     protected final ResolvedType _elemType;
+    // for "regular" class types, super-class
+    protected final ResolvedType _super;
 
     // for primitives
     protected ResolvedType(Class<?> cls) {
-        this(T_PRIMITIVE, cls, null, null, null);
+        this(T_PRIMITIVE, cls, null, null, null, null);
     }
 
+    // for recursive types
+    protected ResolvedType(Class<?> cls, TypeBindings bindings) {
+        this(T_PRIMITIVE, cls, null, null, null, null);
+    }
+    
     // for Array type
     protected ResolvedType(Class<?> cls, TypeBindings bindings, ResolvedType elemType) {
-        this(T_ARRAY, cls, bindings, null, elemType);
+        this(T_ARRAY, cls, null, bindings, null, elemType);
     }
 
     // for Interfaces
     protected ResolvedType(Class<?> cls, TypeBindings bindings, ResolvedType[] ifaces) {
-        this(T_INTERFACE, cls, bindings, ifaces, null);
+        this(T_INTERFACE, cls, null, bindings, ifaces, null);
+    }
+
+    // for "Regular" classes
+    protected ResolvedType(Class<?> cls, ResolvedType sup,
+            TypeBindings bindings, ResolvedType[] ifaces) {
+        this(T_REGULAR, cls, sup, bindings, ifaces, null);
     }
     
-    protected ResolvedType(int k, Class<?> cls, TypeBindings bindings,
+    private ResolvedType(int k, Class<?> cls, ResolvedType sup,
+            TypeBindings bindings,
             ResolvedType[] ifs, ResolvedType elemType) {
         _kind = k;
         _erasedType = cls;
+        _super = sup;
         _bindings = (bindings == null) ? TypeBindings.emptyBindings() : bindings;
         _interfaces = ifs;
         _elemType = elemType;
@@ -49,7 +64,7 @@ public class ResolvedType implements java.lang.reflect.Type
     public Class<?> erasedType() { return _erasedType; }
 
     public ResolvedType elementType() { return _elemType; }
-    public ResolvedType parentType() { return null; }
+    public ResolvedType parentType() { return _super; }
 
     public boolean isArray() { return _kind == T_ARRAY; }
     

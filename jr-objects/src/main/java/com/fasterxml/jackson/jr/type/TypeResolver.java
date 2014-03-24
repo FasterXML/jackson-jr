@@ -24,8 +24,9 @@ public class TypeResolver implements Serializable
     
     // // Pre-created instances
 
-    private final static ObjectType TYPE_OBJECT =
-        new ObjectType(Object.class, null, null, NO_TYPES);
+    private final static ResolvedType TYPE_OBJECT =
+        new ResolvedType(Object.class, /* no super-class*/ null,
+                null, null);
 
     protected final static HashMap<ClassKey, ResolvedType> _primitives;
     static {
@@ -152,8 +153,8 @@ public class TypeResolver implements Serializable
                     _resolveSuperInterfaces(context, rawType, typeBindings));
             
         }
-        return new ObjectType(rawType, typeBindings,
-                _resolveSuperClass(context, rawType, typeBindings),
+        return new ResolvedType(rawType, _resolveSuperClass(context, rawType, typeBindings),
+                typeBindings,
                 _resolveSuperInterfaces(context, rawType, typeBindings));
     }
 
@@ -170,14 +171,12 @@ public class TypeResolver implements Serializable
         return resolved;
     }
 
-    private ObjectType _resolveSuperClass(ClassStack context, Class<?> rawType, TypeBindings typeBindings) {
+    private ResolvedType _resolveSuperClass(ClassStack context, Class<?> rawType, TypeBindings typeBindings) {
         Type parent = rawType.getGenericSuperclass();
         if (parent == null) {
             return null;
         }
-        ResolvedType rt = _fromAny(context, parent, typeBindings);
-        // can this ever be something other than class? (primitive, array)
-        return (ObjectType) rt;
+        return _fromAny(context, parent, typeBindings);
     }
     
     private ResolvedType _fromParamType(ClassStack context, ParameterizedType ptype, TypeBindings parentBindings)
