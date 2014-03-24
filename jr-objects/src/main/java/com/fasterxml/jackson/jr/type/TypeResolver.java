@@ -31,20 +31,20 @@ public class TypeResolver implements Serializable
     static {
         _primitives = new HashMap<ClassKey, ResolvedType>(16);
 
-        PrimitiveType[] all = new PrimitiveType[] {
-                new PrimitiveType(Boolean.TYPE, "boolean"),
-                new PrimitiveType(Byte.TYPE, "byte"),
-                new PrimitiveType(Short.TYPE, "short"),
-                new PrimitiveType(Character.TYPE, "char"),
-                new PrimitiveType(Integer.TYPE, "int"),
-                new PrimitiveType(Long.TYPE, "long"),
-                new PrimitiveType(Float.TYPE, "float"),
-                new PrimitiveType(Double.TYPE, "double")
+        ResolvedType[] all = new ResolvedType[] {
+                new ResolvedType(Boolean.TYPE),
+                new ResolvedType(Byte.TYPE),
+                new ResolvedType(Short.TYPE),
+                new ResolvedType(Character.TYPE),
+                new ResolvedType(Integer.TYPE),
+                new ResolvedType(Long.TYPE),
+                new ResolvedType(Float.TYPE),
+                new ResolvedType(Double.TYPE)
         };
-        for (PrimitiveType type : all) {
+        for (ResolvedType type : all) {
             _primitives.put(new ClassKey(type.erasedType()), type);
         }
-        _primitives.put(new ClassKey(Void.TYPE), new PrimitiveType(Void.TYPE, "void"));
+        _primitives.put(new ClassKey(Void.TYPE), new ResolvedType(Void.TYPE));
         _primitives.put(new ClassKey(Object.class), TYPE_OBJECT);
     }
 
@@ -83,7 +83,7 @@ public class TypeResolver implements Serializable
             ResolvedType elementType = _fromAny(context, ((GenericArrayType) mainType).getGenericComponentType(), typeBindings);
             // Figuring out raw class for generic array is actually bit tricky...
             Object emptyArray = Array.newInstance(elementType.erasedType(), 0);
-            return new ArrayType(emptyArray.getClass(), typeBindings, elementType);
+            return new ResolvedType(emptyArray.getClass(), typeBindings);
         }
         if (mainType instanceof TypeVariable<?>) {
             return _fromVariable(context, (TypeVariable<?>) mainType, typeBindings);
@@ -144,11 +144,11 @@ public class TypeResolver implements Serializable
         // Ok: no easy shortcut, let's figure out type of type...
         if (rawType.isArray()) {
             ResolvedType elementType = _fromAny(context, rawType.getComponentType(), typeBindings);
-            return new ArrayType(rawType, typeBindings, elementType);
+            return new ResolvedType(rawType, typeBindings, elementType);
         }
         // For other types super interfaces are needed...
         if (rawType.isInterface()) {
-            return new InterfaceType(rawType, typeBindings,
+            return new ResolvedType(rawType, typeBindings,
                     _resolveSuperInterfaces(context, rawType, typeBindings));
             
         }

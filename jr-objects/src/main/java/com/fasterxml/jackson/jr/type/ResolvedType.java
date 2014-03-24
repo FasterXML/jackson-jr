@@ -2,27 +2,76 @@ package com.fasterxml.jackson.jr.type;
 
 import java.util.*;
 
-public abstract class ResolvedType implements java.lang.reflect.Type
+public class ResolvedType implements java.lang.reflect.Type
 {
     public final static ResolvedType[] NO_TYPES = new ResolvedType[0];
+
+    protected final static int T_ARRAY = 1;
+    protected final static int T_INTERFACE = 2;
+    protected final static int T_PRIMITIVE = 3;
+    protected final static int T_RECURSIVE = 4;
+    protected final static int T_REGULAR = 5;
+ 
+    protected final int _kind;
     
     protected final Class<?> _erasedType;
     protected final TypeBindings _bindings;
 
+    // interfaces implemented
+    protected final ResolvedType[] _interfaces;
+    // for arrays, type of element contained
+    protected final ResolvedType _elemType;
+
+    // ctor for primitives, arrays
+    protected ResolvedType(Class<?> cls) { this(cls, null); }
+
     protected ResolvedType(Class<?> cls, TypeBindings bindings) {
-        _erasedType = cls;
-        _bindings = (bindings == null) ? TypeBindings.emptyBindings() : bindings;
+        this(_kind(cls), cls, bindings, null, null);
     }
 
+    // for Array type
+    protected ResolvedType(Class<?> cls, TypeBindings bindings, ResolvedType elemType) {
+        this(T_ARRAY, cls, bindings, null, elemType);
+    }
+
+    // for Interfaces
+    protected ResolvedType(Class<?> cls, TypeBindings bindings, ResolvedType[] ifaces) {
+        this(T_INTERFACE, cls, bindings, ifaces, null);
+    }
+    
+    protected ResolvedType(int k, Class<?> cls, TypeBindings bindings,
+            ResolvedType[] ifs, ResolvedType elemType) {
+        _kind = k;
+        _erasedType = cls;
+        _bindings = (bindings == null) ? TypeBindings.emptyBindings() : bindings;
+        _interfaces = ifs;
+        _elemType = elemType;
+    }
+
+    private static int _kind(Class<?> cls) {
+        if (cls.isPrimitive()) return T_PRIMITIVE;
+        if (cls.isArray()) return T_ARRAY;
+        throw new IllegalStateException(cls.getName());
+    }
+    
     public Class<?> erasedType() { return _erasedType; }
+
+    public ResolvedType elementType() { return _elemType; }
     public ResolvedType parentType() { return null; }
     public ResolvedType selfRefType() { return null; }
 
-    public List<ResolvedType> implInterfaces() { return Collections.emptyList(); }
+    public boolean isArray() { return _kind == T_ARRAY; }
+    
+    public final List<ResolvedType> implInterfaces() {
+        if (_interfaces == null || _interfaces.length == 0) {
+            return Collections.<ResolvedType>emptyList();
+        }
+        return Arrays.asList(_interfaces);
+    }
 
     public List<ResolvedType> typeParams() { return _bindings.getTypeParameters(); }
 
-    public TypeBindings getTypeBindings() { return _bindings; }
+    public TypeBindings typeBindings() { return _bindings; }
     
     /**
      * Method that will try to find type parameterization this type
@@ -77,7 +126,9 @@ public abstract class ResolvedType implements java.lang.reflect.Type
         return appendDesc(sb).toString();
     }
 
-    public abstract StringBuilder appendDesc(StringBuilder sb);
+    public StringBuilder appendDesc(StringBuilder sb) {
+        return _appendClassDesc(sb);
+    }
 
     @Override public String toString() { return getDesc(); }
 
