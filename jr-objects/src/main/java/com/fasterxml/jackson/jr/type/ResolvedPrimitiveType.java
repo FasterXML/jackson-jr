@@ -13,25 +13,14 @@ public final class ResolvedPrimitiveType extends ResolvedType
 {
     private final static ResolvedPrimitiveType VOID = new ResolvedPrimitiveType(Void.TYPE, "void");
 
-    /**
-     * Human-readable description should be simple as well
-     */
     protected final String _description;
-    
-    /*
-    /**********************************************************************
-    /* Life cycle
-    /**********************************************************************
-     */
 
-    protected ResolvedPrimitiveType(Class<?> erased, String desc)
-    {
+    protected ResolvedPrimitiveType(Class<?> erased, String desc) {
         super(erased, TypeBindings.emptyBindings());
         _description = desc;
     }
     
-    public static List<ResolvedPrimitiveType> all()
-    {
+    public static List<ResolvedPrimitiveType> all() {
         ArrayList<ResolvedPrimitiveType> all = new ArrayList<ResolvedPrimitiveType>();
         all.add(new ResolvedPrimitiveType(Boolean.TYPE, "boolean"));
         all.add(new ResolvedPrimitiveType(Byte.TYPE, "byte"));
@@ -48,24 +37,11 @@ public final class ResolvedPrimitiveType extends ResolvedType
         return VOID;
     }
 
-    /*
-    /**********************************************************************
-    /* Simple property accessors
-    /**********************************************************************
-     */
+    @Override
+    public List<ResolvedType> implInterfaces() { return Collections.emptyList(); }
 
     @Override
-    public List<ResolvedType> getImplementedInterfaces() {
-        return Collections.emptyList();
-    }
-
-    /*
-    /**********************************************************************
-    /* String representations
-    /**********************************************************************
-     */
-    @Override
-    public StringBuilder appendBriefDescription(StringBuilder sb) {
+    public StringBuilder appendDesc(StringBuilder sb) {
         sb.append(_description);
         return sb;
     }

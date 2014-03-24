@@ -20,8 +20,7 @@ public abstract class ResolvedType implements java.lang.reflect.Type
     /**********************************************************************
      */
     
-    protected ResolvedType(Class<?> cls, TypeBindings bindings)
-    {
+    protected ResolvedType(Class<?> cls, TypeBindings bindings) {
         _erasedType = cls;
         _typeBindings = (bindings == null) ? TypeBindings.emptyBindings() : bindings;
     }
@@ -35,7 +34,7 @@ public abstract class ResolvedType implements java.lang.reflect.Type
     /**
      * Returns type-erased Class<?> that this resolved type has.
      */
-    public Class<?> getErasedType() { return _erasedType; }
+    public Class<?> erasedType() { return _erasedType; }
 
     /**
      * Returns parent class of this type, if it has one; primitive types
@@ -44,7 +43,7 @@ public abstract class ResolvedType implements java.lang.reflect.Type
      * Also, placeholders for cyclic (recursive) types return null for
      * this method.
      */
-    public ResolvedType getParentClass() { return null; }
+    public ResolvedType parentType() { return null; }
 
     /**
      * Accessor that must be used to find out actual type in
@@ -53,13 +52,13 @@ public abstract class ResolvedType implements java.lang.reflect.Type
      * For all other types returns null but for self-references "real" type.
      * Separate accessor is provided to avoid accidental infinite loops.
      */
-    public ResolvedType getSelfReferencedType() { return null; }
+    public ResolvedType selfRefType() { return null; }
     
     /**
      * Method that can be used to access element type of array types; will return
      * null for non-array types, and non-null type for array types.
      */
-    public ResolvedType getArrayElementType() { return null; }
+    public ResolvedType elementType() { return null; }
 
     /**
      * Returns ordered list of interfaces (in declaration order) that this type
@@ -67,7 +66,7 @@ public abstract class ResolvedType implements java.lang.reflect.Type
      * 
      * @return List of interfaces this type implements, if any; empty list if none
      */
-    public abstract List<ResolvedType> getImplementedInterfaces();
+    public abstract List<ResolvedType> implInterfaces();
 
     /**
      * Returns list of generic type declarations for this type, in order they
@@ -119,7 +118,7 @@ public abstract class ResolvedType implements java.lang.reflect.Type
         }
         // Check super interfaces first:
         if (erasedSupertype.isInterface()) {
-            for (ResolvedType it : getImplementedInterfaces()) {
+            for (ResolvedType it : implInterfaces()) {
                 ResolvedType type = it.findSupertype(erasedSupertype);
                 if (type != null) {
                     return type;
@@ -127,7 +126,7 @@ public abstract class ResolvedType implements java.lang.reflect.Type
             }
         }
         // and if not found, super class and its supertypes
-        ResolvedType pc = getParentClass();
+        ResolvedType pc = parentType();
         if (pc != null) {
             ResolvedType type = pc.findSupertype(erasedSupertype);
             if (type != null) {
@@ -148,12 +147,12 @@ public abstract class ResolvedType implements java.lang.reflect.Type
      * Human-readable brief description of type, which does not include
      * information about super types.
      */
-    public String getBriefDescription() {
+    public String getDesc() {
         StringBuilder sb = new StringBuilder();
-        return appendBriefDescription(sb).toString();
+        return appendDesc(sb).toString();
     }
 
-    public abstract StringBuilder appendBriefDescription(StringBuilder sb);
+    public abstract StringBuilder appendDesc(StringBuilder sb);
 
     /*
     /**********************************************************************
@@ -162,7 +161,7 @@ public abstract class ResolvedType implements java.lang.reflect.Type
      */
 
     @Override public String toString() {
-        return getBriefDescription();
+        return getDesc();
     }
 
     @Override public int hashCode() {
@@ -189,8 +188,7 @@ public abstract class ResolvedType implements java.lang.reflect.Type
     /**********************************************************************
      */
 
-    protected StringBuilder _appendClassDescription(StringBuilder sb)
-    {
+    protected StringBuilder _appendClassDesc(StringBuilder sb) {
         sb.append(_erasedType.getName());
         int count = _typeBindings.size();
         if (count > 0) {
@@ -199,20 +197,9 @@ public abstract class ResolvedType implements java.lang.reflect.Type
                 if (i > 0) {
                     sb.append(',');
                 }
-                sb = _typeBindings.getBoundType(i).appendBriefDescription(sb);
+                sb = _typeBindings.getBoundType(i).appendDesc(sb);
             }
             sb.append('>');
-        }
-        return sb;
-    }
-    
-    protected StringBuilder _appendClassName(StringBuilder sb)
-    {
-        String name = _erasedType.getName();
-        for (int i = 0, len = name.length(); i < len; ++i) {
-            char c = name.charAt(i);
-            if (c == '.') c = '/';
-            sb.append(c);
         }
         return sb;
     }

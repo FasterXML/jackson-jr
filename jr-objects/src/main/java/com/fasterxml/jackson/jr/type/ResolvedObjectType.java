@@ -9,21 +9,8 @@ import java.util.*;
 public class ResolvedObjectType extends ResolvedType
 {
     protected final ResolvedObjectType _superClass;
-    /**
-     * List of interfaces this type implements; may be empty but never null
-     */
     protected final ResolvedType[] _superInterfaces;
-
-    /**
-     * Modifiers of the underlying class.
-     */
     protected final int _modifiers;
-
-    /*
-    /**********************************************************************
-    /* Life cycle
-    /**********************************************************************
-     */
 
     public ResolvedObjectType(Class<?> erased, TypeBindings bindings,
             ResolvedObjectType superClass, List<ResolvedType> interfaces)
@@ -42,30 +29,13 @@ public class ResolvedObjectType extends ResolvedType
         _modifiers = erased.getModifiers();
     }
 
-    /*
-    /**********************************************************************
-    /* Accessors for related types
-    /**********************************************************************
-     */
+    @Override public ResolvedObjectType parentType() { return _superClass; }
 
-    @Override
-    public ResolvedObjectType getParentClass() { return _superClass; }
-
-    @Override
-    public List<ResolvedType> getImplementedInterfaces() {
+    @Override public List<ResolvedType> implInterfaces() {
         return (_superInterfaces.length == 0) ?
                 Collections.<ResolvedType>emptyList() : Arrays.asList(_superInterfaces);
     }
 
-    /*
-    /**********************************************************************
-    /* String representations
-    /**********************************************************************
-     */
-
-    @Override
-    public StringBuilder appendBriefDescription(StringBuilder sb) {
-        return _appendClassDescription(sb);
-    }
+    @Override public StringBuilder appendDesc(StringBuilder sb) { return _appendClassDesc(sb); }
 }
 

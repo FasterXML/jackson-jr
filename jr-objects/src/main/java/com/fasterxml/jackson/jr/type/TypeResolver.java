@@ -31,7 +31,7 @@ public class TypeResolver implements Serializable
     static {
         _primitiveTypes = new HashMap<ClassKey, ResolvedType>(16);
         for (ResolvedPrimitiveType type : ResolvedPrimitiveType.all()) {
-            _primitiveTypes.put(new ClassKey(type.getErasedType()), type);
+            _primitiveTypes.put(new ClassKey(type.erasedType()), type);
         }
         // should we include "void"? might as well...
         _primitiveTypes.put(new ClassKey(Void.TYPE), ResolvedPrimitiveType.voidType());
@@ -74,7 +74,7 @@ public class TypeResolver implements Serializable
         if (mainType instanceof GenericArrayType) {
             ResolvedType elementType = _fromAny(context, ((GenericArrayType) mainType).getGenericComponentType(), typeBindings);
             // Figuring out raw class for generic array is actually bit tricky...
-            Object emptyArray = Array.newInstance(elementType.getErasedType(), 0);
+            Object emptyArray = Array.newInstance(elementType.erasedType(), 0);
             return new ResolvedArrayType(emptyArray.getClass(), typeBindings, elementType);
         }
         if (mainType instanceof TypeVariable<?>) {
@@ -88,12 +88,13 @@ public class TypeResolver implements Serializable
     }
 
     private ResolvedType _fromClass(ClassStack context, Class<?> rawType, TypeBindings typeBindings) {
-        // First: a primitive type perhaps?
-        ResolvedType type = _primitiveTypes.get(new ClassKey(rawType));
-        if (type != null) {
-            return type;
+        final ClassKey key = new ClassKey(rawType);
+        if (rawType.isPrimitive()) {
+            ResolvedType type = _primitiveTypes.get(key);
+            if (type != null) {
+                return type;
+            }
         }
-        // Second: recursive reference?
         if (context == null) {
             context = new ClassStack(rawType);
         } else {
@@ -107,15 +108,17 @@ public class TypeResolver implements Serializable
             // no, can just add
             context = context.child(rawType);
         }
-        
-        // If not, already recently resolved?
-        ResolvedType[] typeParameters = typeBindings.typeParameterArray();
-        ResolvedTypeCache.Key key = _resolvedTypes.key(rawType, typeParameters);
-                
-        type = _resolvedTypes.find(key);
-        if (type == null) {
+
+        ResolvedType type;
+        if (typeBindings.isEmpty()) {
+            type = _resolvedTypes.find(key);
+            if (type != null) {
+                return type;
+            }
             type = _constructType(context, rawType, typeBindings);
             _resolvedTypes.put(key, type);
+        } else {
+            type = _constructType(context, rawType, typeBindings);
         }
         context.resolveSelfReferences(type);
         return type;

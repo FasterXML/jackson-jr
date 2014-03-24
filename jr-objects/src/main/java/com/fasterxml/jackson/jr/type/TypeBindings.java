@@ -15,23 +15,9 @@ public final class TypeBindings
 
     private final static TypeBindings EMPTY = new TypeBindings(NO_STRINGS, NO_TYPES);
 
-    /**
-     * Array of type (type variable) names.
-     */
     private final String[] _names;
-
-    /**
-     * Types matching names
-     */
     private final ResolvedType[] _types;
-
     private final int _hashCode;
-    
-    /*
-    /**********************************************************************
-    /* Construction
-    /**********************************************************************
-     */
     
     private TypeBindings(String[] names, ResolvedType[] types)
     {
@@ -47,23 +33,15 @@ public final class TypeBindings
         _hashCode = h;
     }
 
-    public static TypeBindings emptyBindings() {
-        return EMPTY;
-    }
+    public static TypeBindings emptyBindings() { return EMPTY; }
 
-    /**
-     * Factory method for constructing bindings for given class using specified type
-     * parameters.
-     */
-    public static TypeBindings create(Class<?> erasedType, List<ResolvedType> typeList)
-    {
+    public static TypeBindings create(Class<?> erasedType, List<ResolvedType> typeList) {
         ResolvedType[] types = (typeList == null || typeList.isEmpty()) ?
                 NO_TYPES : typeList.toArray(new ResolvedType[typeList.size()]);
         return create(erasedType, types);
     }
         
-    public static TypeBindings create(Class<?> erasedType, ResolvedType[] types)
-    {
+    public static TypeBindings create(Class<?> erasedType, ResolvedType[] types) {
         if (types == null) {
             types = NO_TYPES;
         }
@@ -87,12 +65,7 @@ public final class TypeBindings
         return new TypeBindings(names, types);
     }
 
-    /**
-     * Method for creating an instance that has same bindings as this object,
-     * plus one additional binding
-     */
-    public TypeBindings withAdditionalBinding(String name, ResolvedType type)
-    {
+    public TypeBindings withAdditionalBinding(String name, ResolvedType type) {
         int len = _names.length;
         String[] newNames = Arrays.copyOf(_names, len+1);
         newNames[len] = name;
@@ -100,18 +73,8 @@ public final class TypeBindings
         newTypes[len] = type;
         return new TypeBindings(newNames, newTypes);
     }
-    
-    /*
-    /**********************************************************************
-    /* Accessors
-    /**********************************************************************
-     */
-    
-    /**
-     * Find type bound to specified name, if there is one; returns bound type if so, null if not.
-     */
-    public ResolvedType findBoundType(String name)
-    {
+
+    public ResolvedType findBoundType(String name) {
         for (int i = 0, len = _names.length; i < len; ++i) {
             if (name.equals(_names[i])) {
                 return _types[i];
@@ -120,49 +83,30 @@ public final class TypeBindings
         return null;
     }
 
-    public boolean isEmpty() {
-        return (_types.length == 0);
-    }
-    
-    /**
-     * Returns number of bindings contained
-     */
-    public int size() { 
-        return _types.length;
-    }
+    public boolean isEmpty() { return (_types.length == 0); }
 
-    public String getBoundName(int index)
-    {
+    public int size() { return _types.length; }
+
+    public String getBoundName(int index) {
         if (index < 0 || index >= _names.length) {
             return null;
         }
         return _names[index];
     }
 
-    public ResolvedType getBoundType(int index)
-    {
+    public ResolvedType getBoundType(int index) {
         if (index < 0 || index >= _types.length) {
             return null;
         }
         return _types[index];
     }
 
-    /**
-     * Accessor for getting bound types in declaration order
-     */
-    public List<ResolvedType> getTypeParameters()
-    {
+    public List<ResolvedType> getTypeParameters() {
         if (_types.length == 0) {
             return Collections.emptyList();
         }
         return Arrays.asList(_types);
     }
-
-    /*
-    /**********************************************************************
-    /* Standard methods
-    /**********************************************************************
-     */
     
     @Override public String toString()
     {
@@ -175,7 +119,7 @@ public final class TypeBindings
             if (i > 0) {
                 sb.append(',');
             }
-            sb = _types[i].appendBriefDescription(sb);
+            sb = _types[i].appendDesc(sb);
         }
         sb.append('>');
         return sb.toString();
@@ -200,14 +144,6 @@ public final class TypeBindings
         }
         return true;
     }
-    
-    /*
-    /**********************************************************************
-    /* Package accessible methods
-    /**********************************************************************
-     */
 
-    protected ResolvedType[] typeParameterArray() {
-        return _types;
-    }
+    protected ResolvedType[] typeParameterArray() { return _types; }
 }
