@@ -29,18 +29,9 @@ public class TypePlaceHolder extends ResolvedType
     /* Accessors for related types
     /**********************************************************************
      */
-    
-    @Override
-    public ResolvedType getParentClass() { return null; }
 
     @Override
-    public ResolvedType getSelfReferencedType() { return null; }
-    
-    @Override
     public List<ResolvedType> getImplementedInterfaces() { return Collections.<ResolvedType>emptyList(); }
-    
-    @Override
-    public ResolvedType getArrayElementType() { return null; }
 
     /*
     /**********************************************************************

@@ -57,18 +57,6 @@ public final class ResolvedPrimitiveType extends ResolvedType
 
     /*
     /**********************************************************************
-    /* Accessors for related types
-    /**********************************************************************
-     */
-
-    @Override
-    public ResolvedType getSelfReferencedType() { return null; }
-    
-    @Override
-    public ResolvedType getParentClass() { return null; }
-    
-    /*
-    /**********************************************************************
     /* Simple property accessors
     /**********************************************************************
      */
@@ -78,9 +66,6 @@ public final class ResolvedPrimitiveType extends ResolvedType
     
     @Override
     public boolean isAbstract() { return false; }
-
-    @Override
-    public ResolvedType getArrayElementType() { return null; }
 
     @Override
     public boolean isArray() { return false; }

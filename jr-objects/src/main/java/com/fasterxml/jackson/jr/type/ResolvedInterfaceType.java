@@ -28,25 +28,11 @@ public class ResolvedInterfaceType extends ResolvedType
     /* Accessors for related types
     /**********************************************************************
      */
-    
-    @Override
-    public ResolvedType getParentClass() {
-        // interfaces do not have parent class, just interfaces
-        return null;
-    }
 
-    @Override
-    public ResolvedType getSelfReferencedType() { return null; }
-    
     @Override
     public List<ResolvedType> getImplementedInterfaces() {
         return (_superInterfaces.length == 0) ?
                 Collections.<ResolvedType>emptyList() : Arrays.asList(_superInterfaces);
-    }
-    
-    @Override
-    public ResolvedType getArrayElementType() { // interfaces are never arrays, so:
-        return null;
     }
 
     /*

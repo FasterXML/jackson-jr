@@ -44,7 +44,7 @@ public abstract class ResolvedType implements java.lang.reflect.Type
      * Also, placeholders for cyclic (recursive) types return null for
      * this method.
      */
-    public abstract ResolvedType getParentClass();
+    public ResolvedType getParentClass() { return null; }
 
     /**
      * Accessor that must be used to find out actual type in
@@ -53,13 +53,13 @@ public abstract class ResolvedType implements java.lang.reflect.Type
      * For all other types returns null but for self-references "real" type.
      * Separate accessor is provided to avoid accidental infinite loops.
      */
-    public abstract ResolvedType getSelfReferencedType();
+    public ResolvedType getSelfReferencedType() { return null; }
     
     /**
      * Method that can be used to access element type of array types; will return
      * null for non-array types, and non-null type for array types.
      */
-    public abstract ResolvedType getArrayElementType();
+    public ResolvedType getArrayElementType() { return null; }
 
     /**
      * Returns ordered list of interfaces (in declaration order) that this type

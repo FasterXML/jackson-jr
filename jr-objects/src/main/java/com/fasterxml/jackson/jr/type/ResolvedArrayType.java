@@ -24,13 +24,7 @@ public final class ResolvedArrayType extends ResolvedType
     /* Accessors for related types
     /**********************************************************************
      */
-    
-    @Override
-    public ResolvedType getParentClass() { return null; }
-    
-    @Override
-    public ResolvedType getSelfReferencedType() { return null; }
-    
+
     @Override
     public List<ResolvedType> getImplementedInterfaces() {
         return Collections.emptyList();

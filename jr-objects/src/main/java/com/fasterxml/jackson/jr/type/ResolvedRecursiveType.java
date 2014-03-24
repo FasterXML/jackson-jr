@@ -42,14 +42,6 @@ public class ResolvedRecursiveType extends ResolvedType
     /* Accessors for related types
     /**********************************************************************
      */
-    
-    /**
-     * To avoid infinite loops, will return null;
-     */
-    @Override
-    public ResolvedType getParentClass() {
-        return null;
-    }
 
     @Override
     public ResolvedType getSelfReferencedType() { return _referencedType; }
@@ -60,14 +52,6 @@ public class ResolvedRecursiveType extends ResolvedType
     @Override
     public List<ResolvedType> getImplementedInterfaces() {
         return Collections.<ResolvedType>emptyList();
-    }
-    
-    /**
-     * To avoid infinite loops, will return null type
-     */
-    @Override
-    public ResolvedType getArrayElementType() { // interfaces are never arrays, so:
-        return null;
     }
 
     /*
