@@ -145,33 +145,6 @@ public abstract class ResolvedType implements java.lang.reflect.Type
      */
 
     /**
-     * Method that returns full generic signature of the type; suitable
-     * as signature for things like ASM package.
-     */
-    public String getSignature() {
-        StringBuilder sb = new StringBuilder();
-        return appendSignature(sb).toString();
-    }
-
-    /**
-     * Method that returns type erased signature of the type; suitable
-     * as non-generic signature some packages need
-     */
-    public String getErasedSignature() {
-        StringBuilder sb = new StringBuilder();
-        return appendErasedSignature(sb).toString();
-    }
-
-    /**
-     * Human-readable full description of type, which includes specification
-     * of super types (in brief format)
-     */
-    public String getFullDescription() {
-        StringBuilder sb = new StringBuilder();
-        return appendFullDescription(sb).toString();
-    }
-
-    /**
      * Human-readable brief description of type, which does not include
      * information about super types.
      */
@@ -181,10 +154,7 @@ public abstract class ResolvedType implements java.lang.reflect.Type
     }
 
     public abstract StringBuilder appendBriefDescription(StringBuilder sb);
-    public abstract StringBuilder appendFullDescription(StringBuilder sb);
-    public abstract StringBuilder appendSignature(StringBuilder sb);
-    public abstract StringBuilder appendErasedSignature(StringBuilder sb);
-    
+
     /*
     /**********************************************************************
     /* Standard methods
@@ -218,30 +188,6 @@ public abstract class ResolvedType implements java.lang.reflect.Type
     /* Helper methods for sub-classes; string construction
     /**********************************************************************
      */
-    
-    protected StringBuilder _appendClassSignature(StringBuilder sb)
-    {
-        sb.append('L');
-        sb = _appendClassName(sb);
-        int count = _typeBindings.size();
-        if (count > 0) {
-            sb.append('<');
-            for (int i = 0; i < count; ++i) {
-                sb = _typeBindings.getBoundType(i).appendErasedSignature(sb);
-            }
-            sb.append('>');
-        }
-        sb.append(';');
-        return sb;
-    }
-
-    protected StringBuilder _appendErasedClassSignature(StringBuilder sb)
-    {
-        sb.append('L');
-        sb = _appendClassName(sb);
-        sb.append(';');
-        return sb;
-    }
 
     protected StringBuilder _appendClassDescription(StringBuilder sb)
     {

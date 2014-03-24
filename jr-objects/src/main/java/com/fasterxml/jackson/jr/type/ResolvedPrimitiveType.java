@@ -11,13 +11,7 @@ import java.util.*;
  */
 public final class ResolvedPrimitiveType extends ResolvedType
 {
-    private final static ResolvedPrimitiveType VOID = new ResolvedPrimitiveType(Void.TYPE, 'V', "void");
-    
-    /**
-     * Primitive types have single-character Signature, easy and efficient
-     * to just store here
-     */
-    protected final String _signature;
+    private final static ResolvedPrimitiveType VOID = new ResolvedPrimitiveType(Void.TYPE, "void");
 
     /**
      * Human-readable description should be simple as well
@@ -30,24 +24,23 @@ public final class ResolvedPrimitiveType extends ResolvedType
     /**********************************************************************
      */
 
-    protected ResolvedPrimitiveType(Class<?> erased, char sig, String desc)
+    protected ResolvedPrimitiveType(Class<?> erased, String desc)
     {
         super(erased, TypeBindings.emptyBindings());
-        _signature = String.valueOf(sig);
         _description = desc;
     }
     
     public static List<ResolvedPrimitiveType> all()
     {
         ArrayList<ResolvedPrimitiveType> all = new ArrayList<ResolvedPrimitiveType>();
-        all.add(new ResolvedPrimitiveType(Boolean.TYPE, 'Z', "boolean"));
-        all.add(new ResolvedPrimitiveType(Byte.TYPE, 'B', "byte"));
-        all.add(new ResolvedPrimitiveType(Short.TYPE, 'S', "short"));
-        all.add(new ResolvedPrimitiveType(Character.TYPE, 'C', "char"));
-        all.add(new ResolvedPrimitiveType(Integer.TYPE, 'I', "int"));
-        all.add(new ResolvedPrimitiveType(Long.TYPE, 'J', "long"));
-        all.add(new ResolvedPrimitiveType(Float.TYPE, 'F', "float"));
-        all.add(new ResolvedPrimitiveType(Double.TYPE, 'D', "double"));
+        all.add(new ResolvedPrimitiveType(Boolean.TYPE, "boolean"));
+        all.add(new ResolvedPrimitiveType(Byte.TYPE, "byte"));
+        all.add(new ResolvedPrimitiveType(Short.TYPE, "short"));
+        all.add(new ResolvedPrimitiveType(Character.TYPE, "char"));
+        all.add(new ResolvedPrimitiveType(Integer.TYPE, "int"));
+        all.add(new ResolvedPrimitiveType(Long.TYPE, "long"));
+        all.add(new ResolvedPrimitiveType(Float.TYPE, "float"));
+        all.add(new ResolvedPrimitiveType(Double.TYPE, "double"));
         return all;
     }
 
@@ -71,40 +64,6 @@ public final class ResolvedPrimitiveType extends ResolvedType
     /* String representations
     /**********************************************************************
      */
-
-    @Override
-    public String getSignature() {
-        return _signature;
-    }
-
-    @Override
-    public String getErasedSignature() {
-        return _signature;
-    }
-
-    @Override
-    public String getFullDescription() {
-        return _description;
-    }
-
-    @Override
-    public StringBuilder appendSignature(StringBuilder sb) {
-        sb.append(_signature);
-        return sb;
-    }
-
-    @Override
-    public StringBuilder appendErasedSignature(StringBuilder sb) {
-        sb.append(_signature);
-        return sb;
-    }
-    
-    @Override
-    public StringBuilder appendFullDescription(StringBuilder sb) {
-        sb.append(_description);
-        return sb;
-    }
-
     @Override
     public StringBuilder appendBriefDescription(StringBuilder sb) {
         sb.append(_description);

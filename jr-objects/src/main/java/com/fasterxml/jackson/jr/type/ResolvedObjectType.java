@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.type;
 
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -65,40 +64,8 @@ public class ResolvedObjectType extends ResolvedType
      */
 
     @Override
-    public StringBuilder appendSignature(StringBuilder sb) {
-        return _appendClassSignature(sb);
-    }
-
-    @Override
-    public StringBuilder appendErasedSignature(StringBuilder sb) {
-        return _appendErasedClassSignature(sb);
-    }
-
-    @Override
     public StringBuilder appendBriefDescription(StringBuilder sb) {
         return _appendClassDescription(sb);
-    }
-    
-    @Override
-    public StringBuilder appendFullDescription(StringBuilder sb)
-    {
-        sb = _appendClassDescription(sb);
-        if (_superClass != null) {
-            sb.append(" extends ");
-            sb = _superClass.appendBriefDescription(sb);
-        }
-        // interfaces 'extend' other interfaces...
-        int count = _superInterfaces.length;
-        if (count > 0) {
-            sb.append(" implements ");
-            for (int i = 0; i < count; ++i) {
-                if (i > 0) {
-                    sb.append(",");
-                }
-                sb = _superInterfaces[i].appendBriefDescription(sb);
-            }
-        }
-        return sb;
     }
 }
 

@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.type;
 
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -61,25 +60,7 @@ public class ResolvedRecursiveType extends ResolvedType
      */
 
     @Override
-    public StringBuilder appendSignature(StringBuilder sb) {
-        // to avoid infinite recursion, only print type erased version
-        return appendErasedSignature(sb);
-    }
-
-    @Override
-    public StringBuilder appendErasedSignature(StringBuilder sb) {
-        return _appendErasedClassSignature(sb);
-    }
-
-    @Override
     public StringBuilder appendBriefDescription(StringBuilder sb) {
         return _appendClassDescription(sb);
-    }
-
-    @Override
-    public StringBuilder appendFullDescription(StringBuilder sb)
-    {
-        // should never get called, but just in case, only print brief description
-        return appendBriefDescription(sb);
     }
 }

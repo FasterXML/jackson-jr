@@ -40,23 +40,8 @@ public class TypePlaceHolder extends ResolvedType
      */
 
     @Override
-    public StringBuilder appendSignature(StringBuilder sb) {
-        return _appendClassSignature(sb);
-    }
-
-    @Override
-    public StringBuilder appendErasedSignature(StringBuilder sb) {
-        return _appendErasedClassSignature(sb);
-    }
-
-    @Override
     public StringBuilder appendBriefDescription(StringBuilder sb) {
         sb.append('<').append(_ordinal).append('>');
         return sb;
-    }
-
-    @Override
-    public StringBuilder appendFullDescription(StringBuilder sb) {
-        return appendBriefDescription(sb);
     }
 }

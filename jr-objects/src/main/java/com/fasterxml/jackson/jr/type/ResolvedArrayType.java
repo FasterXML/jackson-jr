@@ -41,29 +41,9 @@ public final class ResolvedArrayType extends ResolvedType
 
     /*
     /**********************************************************************
-    /* Accessors for raw (minimally procesed) members
-    /**********************************************************************
-     */
-
-    // defaults are fine (nothing to access)
-    
-    /*
-    /**********************************************************************
     /* String representations
     /**********************************************************************
      */
-
-    @Override
-    public StringBuilder appendSignature(StringBuilder sb) {
-        sb.append('[');
-        return _elementType.appendSignature(sb);
-    }
-
-    @Override
-    public StringBuilder appendErasedSignature(StringBuilder sb) {
-        sb.append('[');
-        return _elementType.appendErasedSignature(sb);
-    }
 
     @Override
     public StringBuilder appendBriefDescription(StringBuilder sb)
@@ -71,10 +51,5 @@ public final class ResolvedArrayType extends ResolvedType
         sb = _elementType.appendBriefDescription(sb);
         sb.append("[]");
         return sb;
-    }
-
-    @Override
-    public StringBuilder appendFullDescription(StringBuilder sb) {
-        return appendBriefDescription(sb);
     }
 }
