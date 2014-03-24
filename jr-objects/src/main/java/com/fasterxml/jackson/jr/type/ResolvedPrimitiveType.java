@@ -4,7 +4,7 @@ public final class ResolvedPrimitiveType extends ResolvedType {
     protected final String _desc;
 
     protected ResolvedPrimitiveType(Class<?> erased, String desc) {
-        super(erased, TypeBindings.emptyBindings());
+        super(erased, null);
         _desc = desc;
     }
 

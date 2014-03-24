@@ -5,7 +5,7 @@ public class TypePlaceHolder extends ResolvedType {
     protected ResolvedType _actualType;
     
     public TypePlaceHolder(int ordinal) {
-        super(Object.class, TypeBindings.emptyBindings());
+        super(Object.class, null);
         _ordinal = ordinal;
     }
 
