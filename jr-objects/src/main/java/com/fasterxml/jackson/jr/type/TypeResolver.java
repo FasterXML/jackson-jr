@@ -50,7 +50,7 @@ public class TypeResolver implements Serializable
 
     // // Caching
     
-    protected final ResolvedTypeCache _resolvedTypes = new ResolvedTypeCache(200);
+    protected final Map<ClassKey,ResolvedType> _cache = new HashMap<ClassKey,ResolvedType>(16, 0.8f);
 
     public TypeResolver() { }
 
@@ -119,12 +119,19 @@ public class TypeResolver implements Serializable
 
         ResolvedType type;
         if (typeBindings.isEmpty()) {
-            type = _resolvedTypes.find(key);
-            if (type != null) {
-                return type;
+            synchronized (_cache) {
+                type = _cache.get(key);
+                if (type != null) {
+                    return type;
+                }
             }
             type = _constructType(context, rawType, typeBindings);
-            _resolvedTypes.put(key, type);
+            synchronized (_cache) {
+                if (_cache.size() >= 100) { // so hash table max 128 entries
+                    _cache.clear();
+                }
+                _cache.put(key, type);
+            }
         } else {
             type = _constructType(context, rawType, typeBindings);
         }
