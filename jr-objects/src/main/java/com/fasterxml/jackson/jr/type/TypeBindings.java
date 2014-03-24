@@ -23,9 +23,6 @@ public final class TypeBindings
     {
         _names = (names == null) ? NO_STRINGS : names;
         _types = (types == null) ? NO_TYPES : types;
-        if (_names.length != _types.length) {
-            throw new IllegalArgumentException("Mismatching names ("+_names.length+"), types ("+_types.length+")");
-        }
         int h = 1;
         for (int i = 0, len = _types.length; i < len; ++i) {
             h += _types[i].hashCode();
@@ -55,12 +52,6 @@ public final class TypeBindings
             for (int i = 0; i < len; ++i) {
                 names[i] = vars[i].getName();
             }
-        }
-        // Check here to give better error message
-        if (names.length != types.length) {
-            throw new IllegalArgumentException("Can not create TypeBinding for class "+erasedType.getName()
-                   +" with "+types.length+" type parameter"
-                   +((types.length == 1) ? "" : "s")+": class expects "+names.length);
         }
         return new TypeBindings(names, types);
     }
@@ -108,8 +99,7 @@ public final class TypeBindings
         return Arrays.asList(_types);
     }
     
-    @Override public String toString()
-    {
+    @Override public String toString() {
         if (_types.length == 0) {
             return "";
         }

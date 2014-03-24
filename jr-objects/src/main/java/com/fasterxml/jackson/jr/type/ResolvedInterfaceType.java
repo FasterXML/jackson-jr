@@ -12,7 +12,8 @@ public class ResolvedInterfaceType extends ResolvedType
     }
 
     @Override
-    public List<ResolvedType> implInterfaces() { return (_superInterfaces.length == 0) ?
+    public List<ResolvedType> implInterfaces() {
+        return (_superInterfaces.length == 0) ?
                 Collections.<ResolvedType>emptyList() : Arrays.asList(_superInterfaces);
     }
 

@@ -53,12 +53,6 @@ public abstract class ResolvedType implements java.lang.reflect.Type
      * Separate accessor is provided to avoid accidental infinite loops.
      */
     public ResolvedType selfRefType() { return null; }
-    
-    /**
-     * Method that can be used to access element type of array types; will return
-     * null for non-array types, and non-null type for array types.
-     */
-    public ResolvedType elementType() { return null; }
 
     /**
      * Returns ordered list of interfaces (in declaration order) that this type
@@ -66,15 +60,13 @@ public abstract class ResolvedType implements java.lang.reflect.Type
      * 
      * @return List of interfaces this type implements, if any; empty list if none
      */
-    public abstract List<ResolvedType> implInterfaces();
+    public List<ResolvedType> implInterfaces() { return Collections.emptyList(); }
 
     /**
      * Returns list of generic type declarations for this type, in order they
      * are declared in class description.
      */
-    public List<ResolvedType> getTypeParameters() {
-        return _typeBindings.getTypeParameters();
-    }
+    public List<ResolvedType> getTypeParameters() { return _typeBindings.getTypeParameters(); }
 
     /**
      * Method for accessing bindings of type variables to resolved types in context

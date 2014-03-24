@@ -1,9 +1,6 @@
 package com.fasterxml.jackson.jr.type;
 
-import java.util.*;
-
-public final class ResolvedArrayType extends ResolvedType
-{
+public final class ResolvedArrayType extends ResolvedType {
     protected final ResolvedType _elementType;
 
     public ResolvedArrayType(Class<?> erased, TypeBindings bindings, ResolvedType elementType) {
@@ -11,12 +8,9 @@ public final class ResolvedArrayType extends ResolvedType
         _elementType = elementType;
     }
 
-    @Override public List<ResolvedType> implInterfaces() { return Collections.emptyList(); }
-    @Override public ResolvedType elementType() { return _elementType; }
+    public ResolvedType elementType() { return _elementType; }
 
     @Override public StringBuilder appendDesc(StringBuilder sb) {
-        sb = _elementType.appendDesc(sb);
-        sb.append("[]");
-        return sb;
+        return _elementType.appendDesc(sb).append("[]");
     }
 }

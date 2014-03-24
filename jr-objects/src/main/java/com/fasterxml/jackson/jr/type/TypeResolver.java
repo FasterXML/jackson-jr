@@ -30,14 +30,22 @@ public class TypeResolver implements Serializable
     protected final static HashMap<ClassKey, ResolvedType> _primitiveTypes;
     static {
         _primitiveTypes = new HashMap<ClassKey, ResolvedType>(16);
-        for (ResolvedPrimitiveType type : ResolvedPrimitiveType.all()) {
+
+        ResolvedPrimitiveType[] all = new ResolvedPrimitiveType[] {
+                new ResolvedPrimitiveType(Boolean.TYPE, "boolean"),
+                new ResolvedPrimitiveType(Byte.TYPE, "byte"),
+                new ResolvedPrimitiveType(Short.TYPE, "short"),
+                new ResolvedPrimitiveType(Character.TYPE, "char"),
+                new ResolvedPrimitiveType(Integer.TYPE, "int"),
+                new ResolvedPrimitiveType(Long.TYPE, "long"),
+                new ResolvedPrimitiveType(Float.TYPE, "float"),
+                new ResolvedPrimitiveType(Double.TYPE, "double")
+        };
+        for (ResolvedPrimitiveType type : all) {
             _primitiveTypes.put(new ClassKey(type.erasedType()), type);
         }
-        // should we include "void"? might as well...
-        _primitiveTypes.put(new ClassKey(Void.TYPE), ResolvedPrimitiveType.voidType());
-        // and at least java.lang.Object should be added too.
+        _primitiveTypes.put(new ClassKey(Void.TYPE), new ResolvedPrimitiveType(Void.TYPE, "void"));
         _primitiveTypes.put(new ClassKey(Object.class), sJavaLangObject);
-        // but most other types can be added dynamically
     }
 
     // // Caching
