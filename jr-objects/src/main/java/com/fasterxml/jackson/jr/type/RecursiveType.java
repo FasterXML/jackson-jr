@@ -1,9 +1,9 @@
 package com.fasterxml.jackson.jr.type;
 
-public class ResolvedRecursiveType extends ResolvedType {
+public class RecursiveType extends ResolvedType {
     protected ResolvedType _referencedType;
 
-    public ResolvedRecursiveType(Class<?> erased, TypeBindings bindings) { super(erased, bindings); }
+    public RecursiveType(Class<?> erased, TypeBindings bindings) { super(erased, bindings); }
 
     void setReference(ResolvedType ref) { _referencedType = ref; }
 

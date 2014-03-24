@@ -7,7 +7,7 @@ final class ClassStack
     private final ClassStack _p;
     private final Class<?> _curr;
     
-    private ArrayList<ResolvedRecursiveType> _selfRefs;
+    private ArrayList<RecursiveType> _selfRefs;
     
     public ClassStack(Class<?> rootType) {
         this(null, rootType);
@@ -22,16 +22,16 @@ final class ClassStack
         return new ClassStack(this, cls);
     }
 
-    public void addSelfReference(ResolvedRecursiveType ref) {
+    public void addSelfReference(RecursiveType ref) {
         if (_selfRefs == null) {
-            _selfRefs = new ArrayList<ResolvedRecursiveType>();
+            _selfRefs = new ArrayList<RecursiveType>();
         }
         _selfRefs.add(ref);
     }
 
     public void resolveSelfReferences(ResolvedType resolved) {
         if (_selfRefs != null) {
-            for (ResolvedRecursiveType ref : _selfRefs) {
+            for (RecursiveType ref : _selfRefs) {
                 ref.setReference(resolved);
             }
         }

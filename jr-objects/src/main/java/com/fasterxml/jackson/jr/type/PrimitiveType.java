@@ -1,9 +1,9 @@
 package com.fasterxml.jackson.jr.type;
 
-public final class ResolvedPrimitiveType extends ResolvedType {
+public final class PrimitiveType extends ResolvedType {
     protected final String _desc;
 
-    protected ResolvedPrimitiveType(Class<?> erased, String desc) {
+    protected PrimitiveType(Class<?> erased, String desc) {
         super(erased, null);
         _desc = desc;
     }

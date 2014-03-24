@@ -2,11 +2,11 @@ package com.fasterxml.jackson.jr.type;
 
 import java.util.*;
 
-public class ResolvedInterfaceType extends ResolvedType
+public class InterfaceType extends ResolvedType
 {
     protected final ResolvedType[] _superInterfaces;
 
-    public ResolvedInterfaceType(Class<?> erased, TypeBindings bindings, ResolvedType[] superInterfaces) {
+    public InterfaceType(Class<?> erased, TypeBindings bindings, ResolvedType[] superInterfaces) {
         super(erased, bindings);
         _superInterfaces = (superInterfaces == null ? NO_TYPES : superInterfaces);
     }

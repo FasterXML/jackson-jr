@@ -6,22 +6,22 @@ import java.util.*;
  * Type implementation for classes that do not represent interfaces,
  * primitive or array types.
  */
-public class ResolvedObjectType extends ResolvedType
+public class ObjectType extends ResolvedType
 {
-    protected final ResolvedObjectType _superClass;
+    protected final ObjectType _superClass;
     protected final ResolvedType[] _superInterfaces;
     protected final int _modifiers;
 
-    public ResolvedObjectType(Class<?> erased, TypeBindings bindings,
-            ResolvedObjectType superClass, List<ResolvedType> interfaces)
+    public ObjectType(Class<?> erased, TypeBindings bindings,
+            ObjectType superClass, List<ResolvedType> interfaces)
     {
         this(erased, bindings, superClass,
                 (interfaces == null || interfaces.isEmpty()) ? NO_TYPES :
                 interfaces.toArray(new ResolvedType[interfaces.size()]));
     }
 
-    public ResolvedObjectType(Class<?> erased, TypeBindings bindings,
-            ResolvedObjectType superClass, ResolvedType[] interfaces)
+    public ObjectType(Class<?> erased, TypeBindings bindings,
+            ObjectType superClass, ResolvedType[] interfaces)
     {
         super(erased, bindings);
         _superClass = superClass;
@@ -29,7 +29,7 @@ public class ResolvedObjectType extends ResolvedType
         _modifiers = erased.getModifiers();
     }
 
-    @Override public ResolvedObjectType parentType() { return _superClass; }
+    @Override public ObjectType parentType() { return _superClass; }
 
     @Override public List<ResolvedType> implInterfaces() {
         return (_superInterfaces.length == 0) ?

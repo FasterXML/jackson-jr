@@ -24,28 +24,28 @@ public class TypeResolver implements Serializable
     
     // // Pre-created instances
 
-    private final static ResolvedObjectType sJavaLangObject =
-        new ResolvedObjectType(Object.class, null, null, NO_TYPES);
+    private final static ObjectType TYPE_OBJECT =
+        new ObjectType(Object.class, null, null, NO_TYPES);
 
-    protected final static HashMap<ClassKey, ResolvedType> _primitiveTypes;
+    protected final static HashMap<ClassKey, ResolvedType> _primitives;
     static {
-        _primitiveTypes = new HashMap<ClassKey, ResolvedType>(16);
+        _primitives = new HashMap<ClassKey, ResolvedType>(16);
 
-        ResolvedPrimitiveType[] all = new ResolvedPrimitiveType[] {
-                new ResolvedPrimitiveType(Boolean.TYPE, "boolean"),
-                new ResolvedPrimitiveType(Byte.TYPE, "byte"),
-                new ResolvedPrimitiveType(Short.TYPE, "short"),
-                new ResolvedPrimitiveType(Character.TYPE, "char"),
-                new ResolvedPrimitiveType(Integer.TYPE, "int"),
-                new ResolvedPrimitiveType(Long.TYPE, "long"),
-                new ResolvedPrimitiveType(Float.TYPE, "float"),
-                new ResolvedPrimitiveType(Double.TYPE, "double")
+        PrimitiveType[] all = new PrimitiveType[] {
+                new PrimitiveType(Boolean.TYPE, "boolean"),
+                new PrimitiveType(Byte.TYPE, "byte"),
+                new PrimitiveType(Short.TYPE, "short"),
+                new PrimitiveType(Character.TYPE, "char"),
+                new PrimitiveType(Integer.TYPE, "int"),
+                new PrimitiveType(Long.TYPE, "long"),
+                new PrimitiveType(Float.TYPE, "float"),
+                new PrimitiveType(Double.TYPE, "double")
         };
-        for (ResolvedPrimitiveType type : all) {
-            _primitiveTypes.put(new ClassKey(type.erasedType()), type);
+        for (PrimitiveType type : all) {
+            _primitives.put(new ClassKey(type.erasedType()), type);
         }
-        _primitiveTypes.put(new ClassKey(Void.TYPE), new ResolvedPrimitiveType(Void.TYPE, "void"));
-        _primitiveTypes.put(new ClassKey(Object.class), sJavaLangObject);
+        _primitives.put(new ClassKey(Void.TYPE), new PrimitiveType(Void.TYPE, "void"));
+        _primitives.put(new ClassKey(Object.class), TYPE_OBJECT);
     }
 
     // // Caching
@@ -83,7 +83,7 @@ public class TypeResolver implements Serializable
             ResolvedType elementType = _fromAny(context, ((GenericArrayType) mainType).getGenericComponentType(), typeBindings);
             // Figuring out raw class for generic array is actually bit tricky...
             Object emptyArray = Array.newInstance(elementType.erasedType(), 0);
-            return new ResolvedArrayType(emptyArray.getClass(), typeBindings, elementType);
+            return new ArrayType(emptyArray.getClass(), typeBindings, elementType);
         }
         if (mainType instanceof TypeVariable<?>) {
             return _fromVariable(context, (TypeVariable<?>) mainType, typeBindings);
@@ -98,7 +98,7 @@ public class TypeResolver implements Serializable
     private ResolvedType _fromClass(ClassStack context, Class<?> rawType, TypeBindings typeBindings) {
         final ClassKey key = new ClassKey(rawType);
         if (rawType.isPrimitive()) {
-            ResolvedType type = _primitiveTypes.get(key);
+            ResolvedType type = _primitives.get(key);
             if (type != null) {
                 return type;
             }
@@ -109,7 +109,7 @@ public class TypeResolver implements Serializable
             ClassStack prev = context.find(rawType);
             if (prev != null) {
                 // Self-reference: needs special handling, then...
-                ResolvedRecursiveType selfRef = new ResolvedRecursiveType(rawType, typeBindings);
+                RecursiveType selfRef = new RecursiveType(rawType, typeBindings);
                 prev.addSelfReference(selfRef);
                 return selfRef;
             }
@@ -144,15 +144,15 @@ public class TypeResolver implements Serializable
         // Ok: no easy shortcut, let's figure out type of type...
         if (rawType.isArray()) {
             ResolvedType elementType = _fromAny(context, rawType.getComponentType(), typeBindings);
-            return new ResolvedArrayType(rawType, typeBindings, elementType);
+            return new ArrayType(rawType, typeBindings, elementType);
         }
         // For other types super interfaces are needed...
         if (rawType.isInterface()) {
-            return new ResolvedInterfaceType(rawType, typeBindings,
+            return new InterfaceType(rawType, typeBindings,
                     _resolveSuperInterfaces(context, rawType, typeBindings));
             
         }
-        return new ResolvedObjectType(rawType, typeBindings,
+        return new ObjectType(rawType, typeBindings,
                 _resolveSuperClass(context, rawType, typeBindings),
                 _resolveSuperInterfaces(context, rawType, typeBindings));
     }
@@ -170,14 +170,14 @@ public class TypeResolver implements Serializable
         return resolved;
     }
 
-    private ResolvedObjectType _resolveSuperClass(ClassStack context, Class<?> rawType, TypeBindings typeBindings) {
+    private ObjectType _resolveSuperClass(ClassStack context, Class<?> rawType, TypeBindings typeBindings) {
         Type parent = rawType.getGenericSuperclass();
         if (parent == null) {
             return null;
         }
         ResolvedType rt = _fromAny(context, parent, typeBindings);
         // can this ever be something other than class? (primitive, array)
-        return (ResolvedObjectType) rt;
+        return (ObjectType) rt;
     }
     
     private ResolvedType _fromParamType(ClassStack context, ParameterizedType ptype, TypeBindings parentBindings)
@@ -200,7 +200,7 @@ public class TypeResolver implements Serializable
         if (type != null) {
             return type;
         }
-        typeBindings = typeBindings.withAdditionalBinding(name, sJavaLangObject);
+        typeBindings = typeBindings.withAdditionalBinding(name, TYPE_OBJECT);
         Type[] bounds = variable.getBounds();
         return _fromAny(context, bounds[0], typeBindings);
     }

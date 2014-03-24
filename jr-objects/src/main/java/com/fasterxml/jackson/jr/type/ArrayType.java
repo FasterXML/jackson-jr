@@ -1,9 +1,9 @@
 package com.fasterxml.jackson.jr.type;
 
-public final class ResolvedArrayType extends ResolvedType {
+public final class ArrayType extends ResolvedType {
     protected final ResolvedType _elementType;
 
-    public ResolvedArrayType(Class<?> erased, TypeBindings bindings, ResolvedType elementType) {
+    public ArrayType(Class<?> erased, TypeBindings bindings, ResolvedType elementType) {
         super(erased, bindings);
         _elementType = elementType;
     }
