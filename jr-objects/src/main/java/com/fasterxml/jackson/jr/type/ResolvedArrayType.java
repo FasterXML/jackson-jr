@@ -18,12 +18,7 @@ public final class ResolvedArrayType extends ResolvedType
         super(erased, bindings);
         _elementType = elementType;
     }
-    
-    @Override
-    public boolean canCreateSubtypes() {
-        return false;
-    }
-    
+
     /*
     /**********************************************************************
     /* Accessors for related types

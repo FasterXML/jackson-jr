@@ -51,16 +51,10 @@ public final class ResolvedPrimitiveType extends ResolvedType
         return all;
     }
 
-    public static ResolvedPrimitiveType voidType()
-    {
+    public static ResolvedPrimitiveType voidType() {
         return VOID;
     }
-    
-    @Override
-    public boolean canCreateSubtypes() {
-        return false;
-    }
-    
+
     /*
     /**********************************************************************
     /* Accessors for related types

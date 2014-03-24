@@ -24,16 +24,10 @@ public class ResolvedRecursiveType extends ResolvedType
     /**********************************************************************
      */
     
-    public ResolvedRecursiveType(Class<?> erased, TypeBindings bindings)
-    {
+    public ResolvedRecursiveType(Class<?> erased, TypeBindings bindings) {
         super(erased, bindings);
     }
-    
-    @Override
-    public boolean canCreateSubtypes() {
-        return _referencedType.canCreateSubtypes();
-    }
-    
+
     public void setReference(ResolvedType ref)
     {
         // sanity check; should not be called multiple times
@@ -42,7 +36,6 @@ public class ResolvedRecursiveType extends ResolvedType
         }
         _referencedType = ref;
     }
-    
 
     /*
     /**********************************************************************

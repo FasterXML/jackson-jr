@@ -21,9 +21,6 @@ public class TypePlaceHolder extends ResolvedType
         _ordinal = ordinal;
     }
 
-    @Override
-    public boolean canCreateSubtypes() { return false; }
-
     public ResolvedType actualType() { return _actualType; }
     public void actualType(ResolvedType t) { _actualType = t; }
     

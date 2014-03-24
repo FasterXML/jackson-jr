@@ -42,12 +42,7 @@ public class ResolvedObjectType extends ResolvedType
         _superInterfaces = (interfaces == null) ? NO_TYPES : interfaces;
         _modifiers = erased.getModifiers();
     }
-    
-    @Override
-    public boolean canCreateSubtypes() {
-        return true;
-    }
-    
+
     /*
     /**********************************************************************
     /* Accessors for related types

@@ -23,11 +23,6 @@ public class ResolvedInterfaceType extends ResolvedType
         _superInterfaces = (superInterfaces == null ? NO_TYPES : superInterfaces);
     }
 
-    @Override
-    public boolean canCreateSubtypes() {
-        return true;
-    }
-    
     /*
     /**********************************************************************
     /* Accessors for related types

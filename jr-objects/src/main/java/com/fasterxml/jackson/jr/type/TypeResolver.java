@@ -118,9 +118,6 @@ public class TypeResolver implements Serializable
      * Note that this method will fail if extension can not succeed; either because
      * this type is not extendable (sub-classable) -- which is true for primitive
      * and array types -- or because given class is not a subtype of this type.
-     * To check whether subtyping could succeed, you can call
-     * {@link ResolvedType#canCreateSubtypes()} to see if supertype can ever
-     * be extended.
      *
      * @param supertype Type to subtype (extend)
      * @param subtype Type-erased sub-class or sub-interface
@@ -142,7 +139,7 @@ public class TypeResolver implements Serializable
             return supertype;
         }
         
-        if (!supertype.canCreateSubtypes()) {
+        if (supertype.isPrimitive() || supertype.isArray()) {
             throw new UnsupportedOperationException("Can not subtype primitive or array types (type "+supertype.getFullDescription()+")");
         }
         // In general, must be able to subtype as per JVM rules:
