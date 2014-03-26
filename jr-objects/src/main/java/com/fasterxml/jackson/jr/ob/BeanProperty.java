@@ -1,10 +1,9 @@
-package com.fasterxml.jackson.jr.ob.impl;
+package com.fasterxml.jackson.jr.ob;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 
 import com.fasterxml.jackson.core.io.SerializedString;
-import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 public final class BeanProperty
 {

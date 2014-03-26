@@ -13,6 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.jr.ob.BeanDefinition;
+import com.fasterxml.jackson.jr.ob.BeanProperty;
 import com.fasterxml.jackson.jr.ob.JSON;
 
 /**
@@ -188,7 +190,7 @@ public class TypeDetector
         _knownBeans = base._knownBeans;
         _features = features;
     }
-    
+
     public final static TypeDetector rootDetector(boolean forSerialization, int features) {
         return new TypeDetector(forSerialization,
                 new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4),
@@ -268,7 +270,7 @@ public class TypeDetector
         int type = _findSimple(raw);
         if (type == SER_UNKNOWN) {
             if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
-                BeanDefinition def = _resolveBean(raw);
+                BeanDefinition def = resolveBean(raw);
                 // Due to concurrent access, possible that someone might have added it
                 synchronized (_knownBeans) {
                     // Important: do NOT try to reuse shared instance; caller needs it
@@ -413,7 +415,8 @@ public class TypeDetector
 
     protected final BeanProperty[] NO_PROPS = new BeanProperty[0];
 
-    protected BeanDefinition _resolveBean(Class<?> raw)
+    // public just to make test accessible
+    public BeanDefinition resolveBean(Class<?> raw)
     {
         final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
         // note: ignore methods in `java.lang.Object` (like "getClass()")

@@ -9,8 +9,6 @@ import java.util.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
-import com.fasterxml.jackson.jr.ob.impl.BeanDefinition;
-import com.fasterxml.jackson.jr.ob.impl.BeanProperty;
 import com.fasterxml.jackson.jr.ob.impl.CollectionBuilder;
 import com.fasterxml.jackson.jr.ob.impl.MapBuilder;
 import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
@@ -241,7 +239,7 @@ public class JSONReader
      */
     @SuppressWarnings("unchecked")
     public <T> T readBean(Class<T> type) throws IOException, JsonProcessingException {
-        return (T) _readBean(type, _typeDetector.findFullType(type));
+        return (T) _readValue(type, _typeDetector.findFullType(type));
     }
     
     /*
@@ -286,64 +284,13 @@ public class JSONReader
         throw JSONObjectException.from(_parser, "Unexpected value token: "+_tokenDesc());
     }
     
-    protected Object _readBean(Class<?> type, int typeId) throws IOException
+    protected Object _readValue(Class<?> type, int typeId) throws IOException
     {
         if (typeId < 0) { // actual bean types
-            BeanDefinition def = _typeDetector.getBeanDefinition(typeId);
-            JsonToken t = _parser.getCurrentToken();
+            return _typeDetector.getBeanDefinition(typeId).read(this, _parser);
+        }
 
-            try {
-                Object bean = null;
-                switch (t) {
-                case VALUE_STRING:
-                    bean = def.create(_parser.getText());
-                    break;
-                case VALUE_NUMBER_INT:
-                    bean = def.create(_parser.getLongValue());
-                    break;
-                case START_OBJECT:
-                    {
-                        bean = def.create();
-                        for (; (t = _parser.nextToken()) == JsonToken.FIELD_NAME; ) {
-                            String fieldName = _parser.getCurrentName();
-                            BeanProperty prop = def.findProperty(fieldName);
-                            if (prop == null) {
-                                if (JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY.isEnabled(_features)) {
-                                    throw JSONObjectException.from(_parser, "Unrecognized JSON property '"
-                                            +fieldName+"' for Bean type "+type.getName());
-                                }
-                                _parser.nextToken();
-                                _parser.skipChildren();
-                                continue;
-                            }
-                            _parser.nextToken();
-                            Class<?> rawType = prop.getType();
-                            int propType = prop.getTypeId();
-                            // need to dynamically resolve bean type refs
-                            if (propType == TypeDetector.SER_UNKNOWN) {
-                                propType = _typeDetector.findFullType(rawType);
-                                if (propType != TypeDetector.SER_UNKNOWN) { 
-                                    prop.overridTypeId(propType);
-                                }
-                            }
-                            Object value = _readBean(rawType, propType);
-                            prop.setValueFor(bean, value);
-                        }
-                    }
-                    break;
-                default:
-                }
-                if (bean != null) {
-                    return bean;
-                }
-            } catch (JSONObjectException e) {
-                throw e;
-            } catch (Exception e) {
-                throw JSONObjectException.from(_parser, "Failed to create an instance of "
-                        +type.getName()+" due to ("+e.getClass().getName()+"): "+e.getMessage(),
-                        e);
-            }
-        } else switch (typeId) {
+        switch (typeId) {
         // Structured types:
         case SER_MAP:
         {
@@ -507,14 +454,14 @@ public class JSONReader
             return asList ? b.emptyCollection() : b.emptyArray(type);
         }
         int typeId = _typeDetector.findFullType(type);
-        Object value = _readBean(type, typeId);
+        Object value = _readValue(type, typeId);
         if (p.nextToken() == JsonToken.END_ARRAY) {
             return asList ?  b.singletonCollection(value) : b.singletonArray(type, (T) value);
         }
         // otherwise, loop
         b = b.start().add(value);
         do {
-            b = b.add(_readBean(type, typeId));
+            b = b.add(_readValue(type, typeId));
         } while (p.nextToken() != JsonToken.END_ARRAY);
         return asList ? b.buildCollection() : b.buildArray(type);
     }

@@ -8,8 +8,6 @@ import java.util.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
-import com.fasterxml.jackson.jr.ob.impl.BeanDefinition;
-import com.fasterxml.jackson.jr.ob.impl.BeanProperty;
 import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
 
 import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;

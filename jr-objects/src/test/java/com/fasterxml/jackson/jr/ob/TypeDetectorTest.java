@@ -1,8 +1,8 @@
-package com.fasterxml.jackson.jr.ob.impl;
+package com.fasterxml.jackson.jr.ob;
 
 import java.util.*;
 
-import com.fasterxml.jackson.jr.ob.*;
+import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
 
 public class TypeDetectorTest extends TestBase
 {
@@ -30,7 +30,7 @@ public class TypeDetectorTest extends TestBase
     public void testSimpleWithSerialization() 
     {
         TypeDetector td = TypeDetector.rootDetector(true, JSON.Feature.defaults());
-        BeanDefinition def = td._resolveBean(TestBean.class);
+        BeanDefinition def = td.resolveBean(TestBean.class);
         assertNotNull(def);
 
         List<BeanProperty> props = Arrays.asList(def._properties);
