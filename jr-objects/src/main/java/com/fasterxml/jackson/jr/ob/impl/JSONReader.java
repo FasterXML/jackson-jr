@@ -238,12 +238,8 @@ public class JSONReader
      */
     @SuppressWarnings("unchecked")
     public <T> T readBean(Class<T> type) throws IOException, JsonProcessingException {
-        int typeId = _typeDetector.findFullType(type);
-        Object ob = (typeId < 0)
-                ? _typeDetector.getBeanDefinition(typeId).read(this, _parser)
-                        : null;
-//                : SimpleValueReader._readSimpleValue(type, typeId);
-        return (T) ob;
+        ValueReader vr = _typeDetector.findReader(type);
+        return (T) vr.read(this, _parser);
     }
 
     @SuppressWarnings("unchecked")

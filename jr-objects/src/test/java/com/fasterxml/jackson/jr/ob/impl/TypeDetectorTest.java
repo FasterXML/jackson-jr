@@ -61,18 +61,7 @@ public class TypeDetectorTest extends TestBase
     }
 
     public void testBasicTypeDetectionForSer() {
-        _verifyBasicTypes(true);
-    }
-
-    public void testBasicTypeDetectionForDeser() {
-        _verifyBasicTypes(false);
-    }
-
-    private void _verifyBasicTypes(boolean forSerialization)
-    {
-        TypeDetector td = forSerialization
-                ? TypeDetector.forWriter(JSON.Feature.defaults())
-                : TypeDetector.forWriter(JSON.Feature.defaults());
+        TypeDetector td = TypeDetector.forWriter(JSON.Feature.defaults());
         assertEquals(TypeDetector.SER_STRING, td.findFullType(String.class));
         assertEquals(TypeDetector.SER_CHAR_ARRAY, td.findFullType(char[].class));
         assertEquals(TypeDetector.SER_INT_ARRAY, td.findFullType(int[].class));

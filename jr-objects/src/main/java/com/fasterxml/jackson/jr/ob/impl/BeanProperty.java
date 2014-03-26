@@ -29,23 +29,25 @@ public final class BeanProperty
     protected final Method _getMethod, _setMethod;
 
     // For serialization
-    public BeanProperty(String name, Class<?> rawType, int typeId, Method getMethod)
+    public BeanProperty(String name, Class<?> rawType, int typeId,
+            Method getMethod, Method setMethod)
     {
         _name = new SerializedString(name);
         _rawType = rawType;
         _typeId = typeId;
         _getMethod = getMethod;
-        _setMethod = null;
+        _setMethod = setMethod;
         _valueReader = null;
     }
 
     // For deserialization
-    public BeanProperty(String name, Class<?> rawType, Method setMethod, ValueReader vr)
+    public BeanProperty(String name, Class<?> rawType, Method getMethod, Method setMethod,
+            ValueReader vr)
     {
         _name = new SerializedString(name);
         _rawType = rawType;
         _typeId = 0;
-        _getMethod = null;
+        _getMethod = getMethod;
         _setMethod = setMethod;
         _valueReader = vr;
     }

@@ -218,13 +218,13 @@ public class TypeDetector
 
     public final static TypeDetector forReader(int features) {
         return new TypeDetector(features,
-                new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4),
-                new CopyOnWriteArrayList<BeanDefinition>());
+                new ConcurrentHashMap<ClassKey, ValueReader>(50, 0.75f, 4));
     }
 
     public final static TypeDetector forWriter(int features) {
         return new TypeDetector(features,
-                new ConcurrentHashMap<ClassKey, ValueReader>(50, 0.75f, 4));
+                new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4),
+                new CopyOnWriteArrayList<BeanDefinition>());
     }
     
     public TypeDetector perOperationInstance(int features) {
@@ -248,13 +248,8 @@ public class TypeDetector
         if (vr != null) {
             return vr;
         }
-        int typeId = _findSimple(raw);
-        if (typeId != SER_UNKNOWN) {
-            vr = new SimpleValueReader(typeId, raw);
-        } else {
-            vr = resolveBean(raw);
-        }
-        _knownReaders.put(new ClassKey(raw), vr);
+        vr = createReader(null, raw);
+        _knownReaders.putIfAbsent(new ClassKey(raw), vr);
         return vr;
     }
     
@@ -454,11 +449,11 @@ public class TypeDetector
             if (type == null) {
                 continue;
             }
-            final Method readMethod = prop.getReadMethod();
-            final Method writeMethod = prop.getWriteMethod();
+            final Method getter = prop.getReadMethod();
+            final Method setter = prop.getWriteMethod();
             String name;
-            if (readMethod != null) {
-                name = readMethod.getName();
+            if (getter != null) {
+                name = getter.getName();
                 if (name.startsWith("get")) {
                     name = Introspector.decapitalize(name.substring(3));
                 } else if (name.startsWith("is")) {
@@ -466,8 +461,8 @@ public class TypeDetector
                 } else {
                     name = Introspector.decapitalize(name);
                 }
-            } else if (writeMethod != null) {
-                name = writeMethod.getName();
+            } else if (setter != null) {
+                name = setter.getName();
                 if (name.startsWith("set")) {
                     name = Introspector.decapitalize(name.substring(3));
                 } else {
@@ -477,11 +472,11 @@ public class TypeDetector
                 continue;
             }
             if (forceAccess) {
-                if (readMethod != null) {
-                    readMethod.setAccessible(true);
+                if (getter != null) {
+                    getter.setAccessible(true);
                 }
-                if (writeMethod != null) {
-                    writeMethod.setAccessible(true);
+                if (setter != null) {
+                    setter.setAccessible(true);
                 }
             }
 
@@ -490,10 +485,10 @@ public class TypeDetector
             // ok, two things: maybe we can pre-resolve the type?
             if (forSer) { // serialization simpler, less futzing about
                 int typeId = _findSimple(type);
-                bp = new BeanProperty(name, type, typeId, readMethod);
+                bp = new BeanProperty(name, type, typeId, getter, setter);
             } else { // deser more involved
-                ValueReader vr = createPropReader(raw, prop, type);
-                bp = new BeanProperty(name, type, writeMethod, vr);
+                ValueReader vr = createReader(raw, type);
+                bp = new BeanProperty(name, type, getter, setter, vr);
             }
 
             props.add(bp);
@@ -542,32 +537,38 @@ public class TypeDetector
         return _knownSerTypes != null;
     }
 
-    private ValueReader createPropReader(Class<?> beanType,
-            PropertyDescriptor prop, Class<?> type)
+    private ValueReader createReader(Class<?> contextType, Class<?> type)
     {
         if (type.isArray()) {
             Class<?> elemType = type.getComponentType();
             if (!elemType.isPrimitive()) {
                 
             }
-        } else if (type.isEnum()) {
+        }
+        else if (type.isEnum()) {
             return enumReader(type);
         } else if (Collection.class.isAssignableFrom(type)) {
-            ResolvedType t = _typeResolver.resolve(TypeBindings.create(beanType, (ResolvedType[]) null),
-                    type);
+            ResolvedType t = _typeResolver.resolve(bindings(contextType), type);
         }
         else if (Map.class.isAssignableFrom(type)) {
-            ResolvedType t = _typeResolver.resolve(TypeBindings.create(beanType, (ResolvedType[]) null),
-                    type);
+            ResolvedType t = _typeResolver.resolve(bindings(contextType), type);
         } else {
             int typeId = _findSimple(type);
             if (typeId > 0) {
                 return new SimpleValueReader(typeId, type);
             }
         }
-        return null;
+        // Is this correct? Or even close?
+        return AnyReader.std;
     }
 
+    private TypeBindings bindings(Class<?> ctxt) {
+        if (ctxt == null) {
+            return TypeBindings.emptyBindings();
+        }
+        return TypeBindings.create(ctxt, (ResolvedType[]) null);
+    }
+    
     public static ValueReader enumReader(Class<?> enumType) {
         Object[] enums = enumType.getEnumConstants();
         Map<String,Object> byName = new HashMap<String,Object>();
