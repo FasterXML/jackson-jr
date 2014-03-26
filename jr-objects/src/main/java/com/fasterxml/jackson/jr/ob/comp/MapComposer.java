@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.jr.ob.impl;
+package com.fasterxml.jackson.jr.ob.comp;
 
 import java.io.IOException;
 import java.util.*;

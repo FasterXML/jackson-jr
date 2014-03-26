@@ -8,6 +8,9 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.Instantiatable;
+import com.fasterxml.jackson.jr.ob.comp.CollectionComposer;
+import com.fasterxml.jackson.jr.ob.comp.ComposerBase;
+import com.fasterxml.jackson.jr.ob.comp.MapComposer;
 import com.fasterxml.jackson.jr.ob.impl.*;
 
 /**
@@ -330,12 +333,12 @@ public class JSON implements Versioned
     }
 
     protected JSONReader _defaultReader(int features, TreeCodec tc) {
-        return new JSONReader(features, TypeDetector.rootDetector(false, features), tc,
+        return new JSONReader(features, TypeDetector.forReader(features), tc,
                 CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
 
     protected JSONWriter _defaultWriter(int features, TreeCodec tc) {
-        return new JSONWriter(features, TypeDetector.rootDetector(true, features), tc);
+        return new JSONWriter(features, TypeDetector.forWriter(features), tc);
     }
     
     /*

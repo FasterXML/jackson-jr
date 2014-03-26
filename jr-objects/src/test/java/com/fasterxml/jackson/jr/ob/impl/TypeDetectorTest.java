@@ -1,7 +1,11 @@
-package com.fasterxml.jackson.jr.ob;
+package com.fasterxml.jackson.jr.ob.impl;
 
 import java.util.*;
 
+import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.TestBase;
+import com.fasterxml.jackson.jr.ob.impl.BeanDefinition;
+import com.fasterxml.jackson.jr.ob.impl.BeanProperty;
 import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
 
 public class TypeDetectorTest extends TestBase
@@ -29,7 +33,7 @@ public class TypeDetectorTest extends TestBase
     
     public void testSimpleWithSerialization() 
     {
-        TypeDetector td = TypeDetector.rootDetector(true, JSON.Feature.defaults());
+        TypeDetector td = TypeDetector.forWriter(JSON.Feature.defaults());
         BeanDefinition def = td.resolveBean(TestBean.class);
         assertNotNull(def);
 
@@ -66,7 +70,9 @@ public class TypeDetectorTest extends TestBase
 
     private void _verifyBasicTypes(boolean forSerialization)
     {
-        TypeDetector td = TypeDetector.rootDetector(forSerialization, JSON.Feature.defaults());
+        TypeDetector td = forSerialization
+                ? TypeDetector.forWriter(JSON.Feature.defaults())
+                : TypeDetector.forWriter(JSON.Feature.defaults());
         assertEquals(TypeDetector.SER_STRING, td.findFullType(String.class));
         assertEquals(TypeDetector.SER_CHAR_ARRAY, td.findFullType(char[].class));
         assertEquals(TypeDetector.SER_INT_ARRAY, td.findFullType(int[].class));

@@ -13,13 +13,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.jr.ob.BeanDefinition;
-import com.fasterxml.jackson.jr.ob.BeanProperty;
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.type.ResolvedType;
+import com.fasterxml.jackson.jr.type.TypeBindings;
+import com.fasterxml.jackson.jr.type.TypeResolver;
 
 /**
  * Helper object used for efficient detection of type information
- * relevant to our conversion needs.
+ * relevant to our conversion needs when writing out Java Objects
+ * as JSON.
  *<p>
  * Note that usage pattern is such that a single "root" instance is kept
  * by each {@link com.fasterxml.jackson.jr.ob.JSON} instance; and
@@ -133,7 +135,7 @@ public class TypeDetector
 
     /*
     /**********************************************************************
-    /* Caching
+    /* Helper objects, serialization
     /**********************************************************************
      */
 
@@ -142,11 +144,28 @@ public class TypeDetector
      * for serialization.
      */
     protected final ConcurrentHashMap<ClassKey, Integer> _knownSerTypes;
-    
+
     /**
      * Set of Bean types that have been resolved.
      */
     protected final CopyOnWriteArrayList<BeanDefinition> _knownBeans;
+    
+    /*
+    /**********************************************************************
+    /* Helper objects, deserialization
+    /**********************************************************************
+     */
+
+    /**
+     * For generic containers (Collections, Maps, arrays), we may need
+     * this guy.
+     */
+    protected final TypeResolver _typeResolver;
+    
+    /**
+     * Set of {@link ValueReader}s that we have resolved
+     */
+    protected final ConcurrentHashMap<ClassKey, ValueReader> _knownReaders;
     
     /*
     /**********************************************************************
@@ -155,12 +174,6 @@ public class TypeDetector
      */
     
     protected ClassKey _key = new ClassKey();
-
-    /**
-     * Whether this instance is used for serialization (true)
-     * or deserialization (false).
-     */
-    protected final boolean _forSerialization;
     
     protected Class<?> _prevClass;
 
@@ -173,31 +186,47 @@ public class TypeDetector
     /* Construction
     /**********************************************************************
      */
-    
-    protected TypeDetector(boolean forSerialization,
+
+    // for serialization
+    protected TypeDetector(int features,
             ConcurrentHashMap<ClassKey, Integer> types,
-            CopyOnWriteArrayList<BeanDefinition> beans,
-            int features) {
-        _forSerialization = forSerialization;
+            CopyOnWriteArrayList<BeanDefinition> beans) {
+        _features = features;
         _knownSerTypes = types;
         _knownBeans = beans;
-        _features = features;
+        _knownReaders = null;
+        _typeResolver = null;
     }
 
+    // for deserialization
+    protected TypeDetector(int features,
+            ConcurrentHashMap<ClassKey, ValueReader> r) {
+        _features = features;
+        _knownSerTypes = null;
+        _knownBeans = null;
+        _knownReaders = r;
+        _typeResolver = new TypeResolver();
+    }
+    
     protected TypeDetector(TypeDetector base, int features) {
-        _forSerialization = base._forSerialization;
+        _features = features;
         _knownSerTypes = base._knownSerTypes;
         _knownBeans = base._knownBeans;
-        _features = features;
+        _knownReaders = base._knownReaders;
+        _typeResolver = base._typeResolver;
     }
 
-    public final static TypeDetector rootDetector(boolean forSerialization, int features) {
-        return new TypeDetector(forSerialization,
+    public final static TypeDetector forReader(int features) {
+        return new TypeDetector(features,
                 new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4),
-                new CopyOnWriteArrayList<BeanDefinition>(),
-                features);
+                new CopyOnWriteArrayList<BeanDefinition>());
     }
 
+    public final static TypeDetector forWriter(int features) {
+        return new TypeDetector(features,
+                new ConcurrentHashMap<ClassKey, ValueReader>(50, 0.75f, 4));
+    }
+    
     public TypeDetector perOperationInstance(int features) {
         return new TypeDetector(this, features);
     }
@@ -208,6 +237,25 @@ public class TypeDetector
             index = -(index+1);
         }
         return _knownBeans.get(index);
+    }
+
+    public ValueReader findReader(Class<?> raw)
+    {
+        ClassKey k = _key;
+        k.reset(raw);
+
+        ValueReader vr = _knownReaders.get(k);
+        if (vr != null) {
+            return vr;
+        }
+        int typeId = _findSimple(raw);
+        if (typeId != SER_UNKNOWN) {
+            vr = new SimpleValueReader(typeId, raw);
+        } else {
+            vr = resolveBean(raw);
+        }
+        _knownReaders.put(new ClassKey(raw), vr);
+        return vr;
     }
     
     /**
@@ -235,35 +283,6 @@ public class TypeDetector
         _prevClass = raw;
         return type;
     }
-
-    /*
-    // Lookup method used to find type identifier for
-    // given raw class, if (and only if) it is a "simple" type, not a Bean type.
-    public final int findSimpleSerializationType(Class<?> raw)
-    {
-        if (raw == _prevClass) {
-            return _prevType;
-        }
-        ClassKey k = _key;
-        k.reset(raw);
-        int type;
-
-        Integer I = _knownTypes.get(k);
-
-        if (I == null) {
-            type = _findSimple(raw);
-            if (type == SER_UNKNOWN) {
-                return type;
-            }
-            _knownTypes.put(k, Integer.valueOf(type));
-        } else {
-            type = I.intValue();
-        }
-        _prevType = type;
-        _prevClass = raw;
-        return type;
-    }
-    */
 
     protected int _findFull(Class<?> raw)
     {
@@ -318,10 +337,7 @@ public class TypeDetector
                 // Hmmh. Could support all types; add as/when needed
                 return SER_UNKNOWN;
             }
-            if (elemType == Object.class || _forSerialization) {
-                return SER_OBJECT_ARRAY;
-            }
-            return SER_UNKNOWN;
+            return SER_OBJECT_ARRAY;
         }
         if (raw.isPrimitive()) {
             if (raw == Boolean.TYPE) return SER_BOOLEAN;
@@ -405,7 +421,7 @@ public class TypeDetector
         /* `Iterable` can be added on all kinds of things, and it won't
          * help at all with deserialization; hence only use for serialization.
          */
-        if (_forSerialization && Iterable.class.isAssignableFrom(raw)) {
+        if (forSer() && Iterable.class.isAssignableFrom(raw)) {
             return SER_ITERABLE;
         }
         
@@ -427,7 +443,11 @@ public class TypeDetector
             throw new IllegalArgumentException("Failed to introspect BeanInfo for type '"
                     +raw.getName()+"': "+e.getMessage(), e);
         }
+        
+        final boolean forSer = forSer();
+        
         List<BeanProperty> props = new ArrayList<BeanProperty>();
+        
         for (PropertyDescriptor prop : info.getPropertyDescriptors()) {
             // no type means indexed property
             Class<?> type = prop.getPropertyType();
@@ -456,8 +476,6 @@ public class TypeDetector
             } else { // can this happen?
                 continue;
             }
-            // ok, two things: maybe we can pre-resolve the type?
-            int typeId = _findSimple(type);
             if (forceAccess) {
                 if (readMethod != null) {
                     readMethod.setAccessible(true);
@@ -466,25 +484,21 @@ public class TypeDetector
                     writeMethod.setAccessible(true);
                 }
             }
+
             BeanProperty bp;
-            switch (typeId) {
-            case SER_ENUM:
-                bp = new BeanProperty(name, type, typeId, readMethod, writeMethod,
-                        ValueReader.enumReader(type));
-                break;
-            case SER_MAP:
-                // !!! TBI
-            case SER_LIST:
-            case SER_COLLECTION:
-                // !!! TBI
-            case SER_OBJECT_ARRAY:
-                // !!! TBI
-            default:
-                bp = new BeanProperty(name, type, typeId, readMethod, writeMethod, null);
+
+            // ok, two things: maybe we can pre-resolve the type?
+            if (forSer) { // serialization simpler, less futzing about
+                int typeId = _findSimple(type);
+                bp = new BeanProperty(name, type, typeId, readMethod);
+            } else { // deser more involved
+                ValueReader vr = createPropReader(raw, prop, type);
+                bp = new BeanProperty(name, type, writeMethod, vr);
             }
+
             props.add(bp);
         }
-        if (_forSerialization) {
+        if (forSer) {
             final int len = props.size();
             BeanProperty[] propArray = (len == 0) ? NO_PROPS
                     : props.toArray(new BeanProperty[len]);
@@ -522,5 +536,44 @@ public class TypeDetector
         }
         return new BeanDefinition(raw, propMap,
                 defaultCtor, stringCtor, longCtor);
+    }
+
+    private boolean forSer() {
+        return _knownSerTypes != null;
+    }
+
+    private ValueReader createPropReader(Class<?> beanType,
+            PropertyDescriptor prop, Class<?> type)
+    {
+        if (type.isArray()) {
+            Class<?> elemType = type.getComponentType();
+            if (!elemType.isPrimitive()) {
+                
+            }
+        } else if (type.isEnum()) {
+            return enumReader(type);
+        } else if (Collection.class.isAssignableFrom(type)) {
+            ResolvedType t = _typeResolver.resolve(TypeBindings.create(beanType, (ResolvedType[]) null),
+                    type);
+        }
+        else if (Map.class.isAssignableFrom(type)) {
+            ResolvedType t = _typeResolver.resolve(TypeBindings.create(beanType, (ResolvedType[]) null),
+                    type);
+        } else {
+            int typeId = _findSimple(type);
+            if (typeId > 0) {
+                return new SimpleValueReader(typeId, type);
+            }
+        }
+        return null;
+    }
+
+    public static ValueReader enumReader(Class<?> enumType) {
+        Object[] enums = enumType.getEnumConstants();
+        Map<String,Object> byName = new HashMap<String,Object>();
+        for (Object e : enums) {
+            byName.put(e.toString(), e);
+        }
+        return new EnumReader(enums, byName);
     }
 }

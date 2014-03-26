@@ -5,8 +5,6 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.jr.ob.JSONObjectException;
-import com.fasterxml.jackson.jr.ob.JSONReader;
 
 /**
  * Helper class used when reading values of complex types other
@@ -21,6 +19,12 @@ public abstract class ValueReader {
     protected final static int T_COLLECTION = 1;
     protected final static int T_ENUM = 2;
     protected final static int T_MAP = 3;
+
+    /*
+    /**********************************************************************
+    /* Factory methods
+    /**********************************************************************
+     */
     
     public static ValueReader arrayReader(Class<?> enumType) {
         // !!! TBI
@@ -32,53 +36,53 @@ public abstract class ValueReader {
         return null;
     }
 
-    public static ValueReader enumReader(Class<?> enumType) {
-        Object[] enums = enumType.getEnumConstants();
-        Map<String,Object> byName = new HashMap<String,Object>();
-        for (Object e : enums) {
-            byName.put(e.toString(), e);
-        }
-        return new EnumR(enums, byName);
-    }
-
     public static ValueReader mapReader(Class<?> enumType) {
         // !!! TBI
         return null;
     }
 
+    /*
+    /**********************************************************************
+    /* Basic API
+    /**********************************************************************
+     */
+    
     public abstract Object read(JSONReader reader, JsonParser p) throws IOException;
 
-    public static class EnumR extends ValueReader
-    {
-        protected final Object[] _byIndex;
-        protected final Map<String,Object> _byName;
+    /*
+    /**********************************************************************
+    /* Helper methods for sub-classes
+    /**********************************************************************
+     */
 
-        public EnumR(Object[] byIndex, Map<String,Object> byName) {
-            _byIndex = byIndex;
-            _byName = byName;
+    protected String _tokenDesc(JsonParser p) throws IOException {
+        return _tokenDesc(p, p.getCurrentToken());
+    }
+    
+    protected static String _tokenDesc(JsonParser p, JsonToken t) throws IOException {
+        if (t == null) {
+            return "NULL";
         }
-
-        private String desc() {
-            return _byIndex[0].getClass().getName();
-        }
-        
-        @Override
-        public Object read(JSONReader reader, JsonParser p) throws IOException {
-            JsonToken t = p.getCurrentToken();
-            if (t == JsonToken.VALUE_NUMBER_INT) {
-                int ix = p.getIntValue();
-                if (ix < 0 || ix >= _byIndex.length) {
-                    throw new JSONObjectException("Failed to bind Enum "+desc()+" with index "+ix
-                            +" (has "+_byIndex.length+" values)");
-                }
-                return _byIndex[ix];
-            }
-            String id = p.getValueAsString().trim();
-            Object e = _byName.get(id);
-            if (e == null) {
-                throw new JSONObjectException("Failed to find Enum of type "+desc()+" for value '"+id+"'");
-            }
-            return e;
+        switch (t) {
+        case FIELD_NAME:
+            return "JSON Field name '"+p.getCurrentName()+"'";
+        case START_ARRAY:
+            return "JSON Array";
+        case START_OBJECT:
+            return "JSON Object";
+        case VALUE_FALSE:
+            return "'false'";
+        case VALUE_NULL:
+            return "'null'";
+        case VALUE_NUMBER_FLOAT:
+        case VALUE_NUMBER_INT:
+            return "JSON Number";
+        case VALUE_STRING:
+            return "JSON String";
+        case VALUE_TRUE:
+            return "'true'";
+        default:
+            return t.toString();
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.jr.ob;
+package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -6,8 +6,9 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
-import com.fasterxml.jackson.jr.ob.impl.ValueReader;
+import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
 /**
  * Class that contains information about dynamically introspected
@@ -63,41 +64,34 @@ public class BeanDefinition
      * type using given parser.
      */
     @Override
-    public Object read(JSONReader reader, JsonParser parser) throws IOException
+    public Object read(JSONReader r, JsonParser p) throws IOException
     {
-        JsonToken t = parser.getCurrentToken();
+        JsonToken t = p.getCurrentToken();
 
         try {
             switch (t) {
             case VALUE_NULL:
                 return null;
             case VALUE_STRING:
-                return create(parser.getText());
+                return create(p.getText());
             case VALUE_NUMBER_INT:
-                return create(parser.getLongValue());
+                return create(p.getLongValue());
             case START_OBJECT:
                 {
                     Object bean = create();
-                    for (; (t = parser.nextToken()) == JsonToken.FIELD_NAME; ) {
-                        String fieldName = parser.getCurrentName();
+                    for (; (t = p.nextToken()) == JsonToken.FIELD_NAME; ) {
+                        String fieldName = p.getCurrentName();
                         BeanProperty prop = findProperty(fieldName);
                         if (prop == null) {
-                            handleUnknown(reader, parser, fieldName);
+                            handleUnknown(r, p, fieldName);
                             continue;
                         }
-                        parser.nextToken();
-                        Class<?> rawType = prop.getType();
-                        int propTypeId = prop.getTypeId();
-                        // need to dynamically resolve bean type refs
-                        if (propTypeId == TypeDetector.SER_UNKNOWN) {
-                            propTypeId = reader._typeDetector.findFullType(rawType);
-                            if (propTypeId != TypeDetector.SER_UNKNOWN) { 
-                                prop.overridTypeId(propTypeId);
-                            }
+                        p.nextToken();
+                        ValueReader vr = prop.getReader();
+                        if (vr == null) { // lazily created
+                            vr = constructPropertyReader(r, prop);
                         }
-                        Object value = (propTypeId < 0)
-                                ? reader._typeDetector.getBeanDefinition(propTypeId).read(reader, parser)
-                                : reader._readSimpleValue(rawType, propTypeId);
+                        Object value = vr.read(r, p);
                         prop.setValueFor(bean, value);
                     }
                     return bean;
@@ -107,12 +101,12 @@ public class BeanDefinition
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
-            throw JSONObjectException.from(parser, "Failed to create an instance of "
+            throw JSONObjectException.from(p, "Failed to create an instance of "
                     +_type.getName()+" due to ("+e.getClass().getName()+"): "+e.getMessage(),
                     e);
         }
-        throw JSONObjectException.from(reader._parser,
-                "Can not create a "+_type.getName()+" instance out of "+reader._tokenDesc());
+        throw JSONObjectException.from(p,
+                "Can not create a "+_type.getName()+" instance out of "+_tokenDesc(p));
     }
     
     protected Object create() throws Exception {
@@ -143,5 +137,28 @@ public class BeanDefinition
         }
         parser.nextToken();
         parser.skipChildren();
+    }
+
+    protected ValueReader constructPropertyReader(JSONReader r, BeanProperty prop)
+    {
+        int propTypeId = prop.getTypeId();
+        // need to dynamically resolve bean type refs
+        if (propTypeId == TypeDetector.SER_UNKNOWN) {
+        //        _resolveProperty(prop)
+            propTypeId = r._typeDetector.findFullType(prop._rawType);
+            if (propTypeId != TypeDetector.SER_UNKNOWN) { 
+                prop.overridTypeId(propTypeId);
+            }
+        }
+
+        /*
+        if (propTypeId < 0) {
+            value = r._typeDetector.getBeanDefinition(propTypeId).read(reader, parser);
+        } else {
+            Class<?> rawType = 
+            value = r._readSimpleValue(prop.getType(), propTypeId);
+        }
+        */
+        return null;
     }
 }

@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.jr.ob;
+package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -7,8 +7,9 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.SerializedString;
+import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
-import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
 
 import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;
 
@@ -60,7 +61,7 @@ public class JSONWriter
      * Constructor used for creating differently configured blueprint
      * instances
      */
-    protected JSONWriter(int features, TypeDetector td, TreeCodec tc)
+    public JSONWriter(int features, TypeDetector td, TreeCodec tc)
     {
         _features = features;
         _typeDetector = td;

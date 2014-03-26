@@ -1,10 +1,10 @@
-package com.fasterxml.jackson.jr.ob;
+package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 
 import com.fasterxml.jackson.core.io.SerializedString;
-import com.fasterxml.jackson.jr.ob.impl.ValueReader;
+import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 public final class BeanProperty
 {
@@ -28,20 +28,25 @@ public final class BeanProperty
     
     protected final Method _getMethod, _setMethod;
 
-    public BeanProperty(String name, Class<?> rawType, int typeId,
-            Method readMethod, Method writeMethod, ValueReader vr)
+    // For serialization
+    public BeanProperty(String name, Class<?> rawType, int typeId, Method getMethod)
     {
-        this(new SerializedString(name), rawType, typeId, readMethod, writeMethod, vr);
+        _name = new SerializedString(name);
+        _rawType = rawType;
+        _typeId = typeId;
+        _getMethod = getMethod;
+        _setMethod = null;
+        _valueReader = null;
     }
 
-    protected BeanProperty(SerializedString name, Class<?> rawType, int typeId,
-            Method getMethod, Method setMethod, ValueReader vr)
+    // For deserialization
+    public BeanProperty(String name, Class<?> rawType, Method setMethod, ValueReader vr)
     {
-        _name = name;
+        _name = new SerializedString(name);
         _rawType = rawType;
-        _getMethod = getMethod;
+        _typeId = 0;
+        _getMethod = null;
         _setMethod = setMethod;
-        _typeId = typeId;
         _valueReader = vr;
     }
 
@@ -50,6 +55,7 @@ public final class BeanProperty
     }
 
     public Class<?> getType() { return _rawType; }
+    public ValueReader getReader() { return _valueReader; }
     
     public int getTypeId() { return _typeId; }
 

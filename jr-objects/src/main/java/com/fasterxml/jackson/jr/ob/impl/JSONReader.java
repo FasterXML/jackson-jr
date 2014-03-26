@@ -1,0 +1,298 @@
+package com.fasterxml.jackson.jr.ob.impl;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
+
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.JsonParser.NumberType;
+import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.JSON.Feature;
+
+import static com.fasterxml.jackson.core.JsonTokenId.*;
+import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;
+
+/**
+ * Object that handles construction of simple Objects from JSON.
+ *<p>
+ * Life-cycle is such that initial instance (called blueprint)
+ * is constructed first (including possible configuration 
+ * using mutant factory methods). This blueprint object
+ * acts as a factory, and is never used for direct writing;
+ * instead, per-call instance is created by calling
+ * {@link #perOperationInstance}.
+ */
+public class JSONReader
+    extends ValueReader // just to get convenience methods
+{
+    /*
+    /**********************************************************************
+    /* Blueprint config
+    /**********************************************************************
+     */
+
+    protected final int _features;
+
+    protected final boolean _arraysAsLists;
+
+    protected final TreeCodec _treeCodec;
+    
+    /**
+     * Object that is used to resolve types of values dynamically.
+     */
+    protected final TypeDetector _typeDetector;
+    
+    /**
+     * Handler that takes care of constructing {@link java.util.Map}s as needed
+     */
+    protected final MapBuilder _mapBuilder;
+
+    /**
+     * Handler that takes care of constructing {@link java.util.Map}s as needed
+     */
+    protected final CollectionBuilder _collectionBuilder;
+    
+    /*
+    /**********************************************************************
+    /* Instance config, state
+    /**********************************************************************
+     */
+
+    protected final JsonParser _parser;
+
+    /*
+    /**********************************************************************
+    /* Blueprint construction
+    /**********************************************************************
+     */
+
+    /**
+     * Constructor used for creating the blueprint instances.
+     */
+    public JSONReader(int features, TypeDetector td, TreeCodec treeCodec,
+            CollectionBuilder lb, MapBuilder mb)
+    {
+        _features = features;
+        _typeDetector = td;
+        _treeCodec = treeCodec;
+        _collectionBuilder = lb;
+        _mapBuilder = mb;
+        _arraysAsLists = Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(features);
+        _parser = null;
+    }
+
+    /**
+     * Constructor used for per-operation (non-blueprint) instance.
+     */
+    protected JSONReader(JSONReader base, JsonParser jp)
+    {
+        int features = base._features;
+        _features = features;
+        _typeDetector = base._typeDetector.perOperationInstance(features);
+        _treeCodec = base._treeCodec;
+        _collectionBuilder = base._collectionBuilder.newBuilder(features);
+        _mapBuilder = base._mapBuilder.newBuilder(features);
+        _arraysAsLists = base._arraysAsLists;
+        _parser = jp;
+    }
+
+    @Override
+    public Object read(JSONReader reader, JsonParser p) throws IOException {
+        // never to be called for this instance
+        throw new UnsupportedOperationException();
+    }
+    
+    /*
+    /**********************************************************************
+    /* Mutant factories for blueprint
+    /**********************************************************************
+     */
+
+    public final JSONReader withFeatures(int features)
+    {
+        if (_features == features) {
+            return this;
+        }
+        return _with(features, _typeDetector, _treeCodec, _collectionBuilder, _mapBuilder);
+    }
+
+    public final JSONReader with(MapBuilder mb) {
+        if (_mapBuilder == mb) return this;
+        return _with(_features, _typeDetector, _treeCodec, _collectionBuilder, mb);
+    }
+
+    public final JSONReader with(CollectionBuilder lb) {
+        if (_collectionBuilder == lb) return this;
+        return _with(_features, _typeDetector, _treeCodec, lb, _mapBuilder);
+    }
+    
+    /**
+     * Overridable method that all mutant factories call if a new instance
+     * is to be constructed
+     */
+    protected JSONReader _with(int features,
+            TypeDetector td, TreeCodec tc, CollectionBuilder lb, MapBuilder mb)
+    {
+        if (getClass() != JSONReader.class) { // sanity check
+            throw new IllegalStateException("Sub-classes MUST override _with(...)");
+        }
+        return new JSONReader(features, td, tc, lb, mb);
+    }
+
+    /*
+    /**********************************************************************
+    /* New instance creation
+    /**********************************************************************
+     */
+
+    public JSONReader perOperationInstance(JsonParser jp)
+    {
+        if (getClass() != JSONReader.class) { // sanity check
+            throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
+        }
+        return new JSONReader(this, jp);
+    }
+
+    /*
+    /**********************************************************************
+    /* Public entry points for reading Simple objects from JSON
+    /**********************************************************************
+     */
+
+    /**
+     * Method for reading a "simple" Object of type indicated by JSON
+     * content: {@link java.util.Map} for JSON Object, {@link java.util.Map}
+     * for JSON Array (or, <code>Object[]</code> if so configured),
+     * {@link java.lang.String} for JSON String value and so on.
+     */
+    public final Object readValue() throws IOException {
+        return AnyReader.std.read(this, _parser);
+    }
+
+    /**
+     * Method for reading a JSON Object from input and building a {@link java.util.Map}
+     * out of it. Note that if input does NOT contain a
+     * JSON Object, {@link JSONObjectException} will be thrown.
+     */
+    public Map<Object,Object> readMap() throws IOException {
+        JsonToken t = _parser.getCurrentToken();
+        if (t == JsonToken.VALUE_NULL) {
+            return null;
+        }
+        if (t != JsonToken.START_OBJECT) {
+            throw JSONObjectException.from(_parser,
+                    "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+_tokenDesc(_parser));
+        }
+        return AnyReader.std._readFromObject(this, _parser, _mapBuilder);
+    }
+    
+    /**
+     * Method for reading a JSON Array from input and building a {@link java.util.List}
+     * out of it. Note that if input does NOT contain a
+     * JSON Array, {@link JSONObjectException} will be thrown.
+     */
+    @SuppressWarnings("unchecked")
+    public List<Object> readList() throws IOException {
+        JsonToken t = _parser.getCurrentToken();
+        if (t == JsonToken.VALUE_NULL) {
+            return null;
+        }
+        if (t != JsonToken.START_ARRAY) {
+            throw JSONObjectException.from(_parser,
+                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+        }
+        return (List<Object>) AnyReader.std._readFromArray(this, _parser, _collectionBuilder, true);
+    }
+    
+    /**
+     * Method for reading a JSON Array from input and building a <code>Object[]</code>
+     * out of it. Note that if input does NOT contain a
+     * JSON Array, {@link JSONObjectException} will be thrown.
+     */
+    public Object[] readArray() throws IOException, JsonProcessingException
+    {
+        JsonToken t = _parser.getCurrentToken();
+        if (t == JsonToken.VALUE_NULL) {
+            return null;
+        }
+        if (t != JsonToken.START_ARRAY) {
+            throw JSONObjectException.from(_parser,
+                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+        }
+        return (Object[]) AnyReader.std._readFromArray(this, _parser, _collectionBuilder, false);
+    }
+
+    /*
+    /**********************************************************************
+    /* Public entry points for reading (more) typed types
+    /**********************************************************************
+     */
+    
+    /**
+     * Method for reading a JSON Object from input and building a Bean of
+     * specified type out of it; Bean has to conform to standard Java Bean
+     * specification by having setters for passing JSON Object properties.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T readBean(Class<T> type) throws IOException, JsonProcessingException {
+        int typeId = _typeDetector.findFullType(type);
+        Object ob = (typeId < 0)
+                ? _typeDetector.getBeanDefinition(typeId).read(this, _parser)
+                        : null;
+//                : SimpleValueReader._readSimpleValue(type, typeId);
+        return (T) ob;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T[] readArrayOf(Class<T> type) throws IOException, JsonProcessingException {
+        JsonToken t = _parser.getCurrentToken();
+        if (t == JsonToken.VALUE_NULL) {
+            return null;
+        }
+        if (t != JsonToken.START_ARRAY) {
+            throw JSONObjectException.from(_parser,
+                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+        }
+        // !!! TBI
+        return null;
+//        return (T[]) AnyReader.std._readFromArray(this, _parser, _collectionBuilder, type, false);
+    }
+
+    /**
+     * Method for reading a JSON Array from input and building a {@link java.util.List}
+     * out of it. Note that if input does NOT contain a
+     * JSON Array, {@link JSONObjectException} will be thrown.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> List<T> readListOf(Class<T> type) throws IOException
+    {
+        JsonToken t = _parser.getCurrentToken();
+        if (t == JsonToken.VALUE_NULL) {
+            return null;
+        }
+        if (t != JsonToken.START_ARRAY) {
+            throw JSONObjectException.from(_parser,
+                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+        }
+        // !!! TBI
+        return null;
+//        return (List<T>) AnyReader.std._readFromArray(this, _parser, _collectionBuilder, type, true);
+    }
+    
+    /*
+    /**********************************************************************
+    /* Internal parse methods; overridable for custom coercions
+    /**********************************************************************
+     */
+
+    protected TreeCodec _treeCodec() throws JSONObjectException {
+        if (_treeCodec == null) {
+            throw new JSONObjectException("No TreeCodec specified: can not bind JSON into TreeNode types");
+        }
+        return _treeCodec;
+        
+    }
+}
