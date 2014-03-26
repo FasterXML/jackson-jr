@@ -7,12 +7,14 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
+import com.fasterxml.jackson.jr.ob.impl.ValueReader;
 
 /**
  * Class that contains information about dynamically introspected
  * Bean types.
  */
 public class BeanDefinition
+    extends ValueReader // so we can chain calls for Collections, arrays
 {
     protected final Class<?> _type;
 
@@ -60,6 +62,7 @@ public class BeanDefinition
      * Method used for deserialization; will read an instance of the bean
      * type using given parser.
      */
+    @Override
     public Object read(JSONReader reader, JsonParser parser) throws IOException
     {
         JsonToken t = parser.getCurrentToken();
@@ -79,25 +82,22 @@ public class BeanDefinition
                         String fieldName = parser.getCurrentName();
                         BeanProperty prop = findProperty(fieldName);
                         if (prop == null) {
-                            if (JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY.isEnabled(reader._features)) {
-                                throw JSONObjectException.from(parser, "Unrecognized JSON property '"
-                                        +fieldName+"' for Bean type "+_type.getName());
-                            }
-                            parser.nextToken();
-                            parser.skipChildren();
+                            handleUnknown(reader, parser, fieldName);
                             continue;
                         }
                         parser.nextToken();
                         Class<?> rawType = prop.getType();
-                        int propType = prop.getTypeId();
+                        int propTypeId = prop.getTypeId();
                         // need to dynamically resolve bean type refs
-                        if (propType == TypeDetector.SER_UNKNOWN) {
-                            propType = reader._typeDetector.findFullType(rawType);
-                            if (propType != TypeDetector.SER_UNKNOWN) { 
-                                prop.overridTypeId(propType);
+                        if (propTypeId == TypeDetector.SER_UNKNOWN) {
+                            propTypeId = reader._typeDetector.findFullType(rawType);
+                            if (propTypeId != TypeDetector.SER_UNKNOWN) { 
+                                prop.overridTypeId(propTypeId);
                             }
                         }
-                        Object value = reader._readValue(rawType, propType);
+                        Object value = (propTypeId < 0)
+                                ? reader._typeDetector.getBeanDefinition(propTypeId).read(reader, parser)
+                                : reader._readSimpleValue(rawType, propTypeId);
                         prop.setValueFor(bean, value);
                     }
                     return bean;
@@ -134,5 +134,14 @@ public class BeanDefinition
             throw new IllegalStateException("Class "+_type.getName()+" does not have single-long constructor to use");
         }
         return _longCtor.newInstance(l);
+    }
+
+    protected void handleUnknown(JSONReader reader, JsonParser parser, String fieldName) throws IOException {
+        if (JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY.isEnabled(reader._features)) {
+            throw JSONObjectException.from(parser, "Unrecognized JSON property '"
+                    +fieldName+"' for Bean type "+_type.getName());
+        }
+        parser.nextToken();
+        parser.skipChildren();
     }
 }

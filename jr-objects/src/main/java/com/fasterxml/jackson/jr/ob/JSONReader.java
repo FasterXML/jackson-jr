@@ -239,7 +239,11 @@ public class JSONReader
      */
     @SuppressWarnings("unchecked")
     public <T> T readBean(Class<T> type) throws IOException, JsonProcessingException {
-        return (T) _readValue(type, _typeDetector.findFullType(type));
+        int typeId = _typeDetector.findFullType(type);
+        Object ob = (typeId < 0)
+                ? _typeDetector.getBeanDefinition(typeId).read(this, _parser)
+                : _readSimpleValue(type, typeId);
+        return (T) ob;
     }
     
     /*
@@ -284,12 +288,8 @@ public class JSONReader
         throw JSONObjectException.from(_parser, "Unexpected value token: "+_tokenDesc());
     }
     
-    protected Object _readValue(Class<?> type, int typeId) throws IOException
+    protected Object _readSimpleValue(Class<?> type, int typeId) throws IOException
     {
-        if (typeId < 0) { // actual bean types
-            return _typeDetector.getBeanDefinition(typeId).read(this, _parser);
-        }
-
         switch (typeId) {
         // Structured types:
         case SER_MAP:
@@ -454,14 +454,20 @@ public class JSONReader
             return asList ? b.emptyCollection() : b.emptyArray(type);
         }
         int typeId = _typeDetector.findFullType(type);
-        Object value = _readValue(type, typeId);
+        Object value = (typeId < 0)
+                ? _typeDetector.getBeanDefinition(typeId).read(this, _parser) 
+                : _readSimpleValue(type, typeId);
+        
         if (p.nextToken() == JsonToken.END_ARRAY) {
             return asList ?  b.singletonCollection(value) : b.singletonArray(type, (T) value);
         }
         // otherwise, loop
         b = b.start().add(value);
         do {
-            b = b.add(_readValue(type, typeId));
+            value = (typeId < 0)
+                    ? _typeDetector.getBeanDefinition(typeId).read(this, _parser) 
+                    : _readSimpleValue(type, typeId);
+            b = b.add(value);
         } while (p.nextToken() != JsonToken.END_ARRAY);
         return asList ? b.buildCollection() : b.buildArray(type);
     }

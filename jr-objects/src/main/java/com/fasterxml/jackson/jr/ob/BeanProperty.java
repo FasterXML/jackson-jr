@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 
 import com.fasterxml.jackson.core.io.SerializedString;
+import com.fasterxml.jackson.jr.ob.impl.ValueReader;
 
 public final class BeanProperty
 {
@@ -19,23 +20,29 @@ public final class BeanProperty
      * stick. It will never result in invalid value being accessible.
      */
     protected int _typeId;
+
+    /**
+     * For non-trivial non-bean types
+     */
+    protected final ValueReader _valueReader;
     
     protected final Method _getMethod, _setMethod;
 
     public BeanProperty(String name, Class<?> rawType, int typeId,
-            Method readMethod, Method writeMethod)
+            Method readMethod, Method writeMethod, ValueReader vr)
     {
-        this(new SerializedString(name), rawType, typeId, readMethod, writeMethod);
+        this(new SerializedString(name), rawType, typeId, readMethod, writeMethod, vr);
     }
 
     protected BeanProperty(SerializedString name, Class<?> rawType, int typeId,
-            Method getMethod, Method setMethod)
+            Method getMethod, Method setMethod, ValueReader vr)
     {
         _name = name;
         _rawType = rawType;
         _getMethod = getMethod;
         _setMethod = setMethod;
         _typeId = typeId;
+        _valueReader = vr;
     }
 
     public void overridTypeId(int id) {

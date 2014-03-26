@@ -466,7 +466,22 @@ public class TypeDetector
                     writeMethod.setAccessible(true);
                 }
             }
-            BeanProperty bp = new BeanProperty(name, type, typeId, readMethod, writeMethod);
+            BeanProperty bp;
+            switch (typeId) {
+            case SER_ENUM:
+                bp = new BeanProperty(name, type, typeId, readMethod, writeMethod,
+                        ValueReader.enumReader(type));
+                break;
+            case SER_MAP:
+                // !!! TBI
+            case SER_LIST:
+            case SER_COLLECTION:
+                // !!! TBI
+            case SER_OBJECT_ARRAY:
+                // !!! TBI
+            default:
+                bp = new BeanProperty(name, type, typeId, readMethod, writeMethod, null);
+            }
             props.add(bp);
         }
         if (_forSerialization) {
