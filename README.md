@@ -3,7 +3,7 @@
 Jackson jr is a compact alternative to full [Jackson Databind](../../../jackson-databind) component.
 It implements a subset of functionality, for example for cases where:
 
-1. Size of jar matters (jackson-jr size is about 50kB)
+1. Size of jar matters (jackson-jr size is under 70kB)
 2. Startup time matters (jackson-jr has very low initialization overhead)
 
 In addition to basic datatypes (core JDK types like `List`s, `Map`s, wrapper types),
@@ -16,7 +16,7 @@ to build an in-memory representation: instead, it can directly use `streaming-ap
 for direct output. It will be, however, also possible to build actual in-memory
 JSON `String` or `byte[]` representation, if that is preferable.
 
-Jackson jr artifact itself is currently about `50 kB` in size, and only depends on
+Jackson jr artifact itself is currently about 68 kB in size, and only depends on
 [Jackson Streaming API](../../../jackson-core) package.
 Combined size, for "all" jar is bit over 250 kilobytes (streaming API is about 200kB),
 for use cases where a single jar is preferred over more modular approach.
