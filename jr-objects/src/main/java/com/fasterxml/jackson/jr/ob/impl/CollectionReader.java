@@ -20,6 +20,6 @@ public class CollectionReader extends ValueReader
     @Override
     public Object read(JSONReader reader, JsonParser p) throws IOException {
         // !!! TODO
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

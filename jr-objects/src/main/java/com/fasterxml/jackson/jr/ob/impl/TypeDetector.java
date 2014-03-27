@@ -573,44 +573,50 @@ public class TypeDetector
         if (type.isArray()) {
             Class<?> elemType = type.getComponentType();
             if (!elemType.isPrimitive()) {
-                
+                return new ArrayReader(elemType, createReader(contextType, elemType));
             }
-        } else if (type.isEnum()) {
-            return enumReader(type);
-        } else if (Collection.class.isAssignableFrom(type)) {
-            return collectionReader(contextType, type);
-        } else if (Map.class.isAssignableFrom(type)) {
-            return mapReader(contextType, type);
-        } else {
             int typeId = _findSimple(type);
             if (typeId > 0) {
                 return new SimpleValueReader(typeId, type);
             }
-            // Beans!
-            final ClassKey key = new ClassKey(type);
-            synchronized (_readerLock) {
-                if (_incompleteReaders == null) {
-                    _incompleteReaders = new HashMap<ClassKey, ValueReader>();
-                } else { // perhaps it has already been resolved?
-                    ValueReader vr = _incompleteReaders.get(new ClassKey(type));
-                    if (vr != null) {
-                        return vr;
-                    }
-                }
-                BeanDefinition def = resolveBean(type);
-                try {
-                    _incompleteReaders.put(key, def);
-                    for (Map.Entry<String, BeanProperty> entry : def.propertiesByName().entrySet()) {
-                        BeanProperty prop = entry.getValue();
-                        entry.setValue(prop.withReader(createReader(contextType, prop.getType())));
-                    }
-                } finally {
-                    _incompleteReaders.remove(key);
+            throw new IllegalArgumentException("Deserialization of "+type.getName()+" not (yet) supported");
+        }
+        if (type.isEnum()) {
+            return enumReader(type);
+        }
+        if (Collection.class.isAssignableFrom(type)) {
+            return collectionReader(contextType, type);
+        }
+        if (Map.class.isAssignableFrom(type)) {
+            return mapReader(contextType, type);
+        }
+        int typeId = _findSimple(type);
+        if (typeId > 0) {
+            return new SimpleValueReader(typeId, type);
+        }
+        // Beans!
+        final ClassKey key = new ClassKey(type);
+        synchronized (_readerLock) {
+            if (_incompleteReaders == null) {
+                _incompleteReaders = new HashMap<ClassKey, ValueReader>();
+            } else { // perhaps it has already been resolved?
+                ValueReader vr = _incompleteReaders.get(new ClassKey(type));
+                if (vr != null) {
+                    return vr;
                 }
             }
+            BeanDefinition def = resolveBean(type);
+            try {
+                _incompleteReaders.put(key, def);
+                for (Map.Entry<String, BeanProperty> entry : def.propertiesByName().entrySet()) {
+                    BeanProperty prop = entry.getValue();
+                    entry.setValue(prop.withReader(createReader(contextType, prop.getType())));
+                }
+            } finally {
+                _incompleteReaders.remove(key);
+            }
+            return def;
         }
-        // Is this correct? Or even close?
-        return AnyReader.std;
     }
 
     private TypeBindings bindings(Class<?> ctxt) {
