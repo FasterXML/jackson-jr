@@ -4,6 +4,7 @@ import java.beans.*;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -312,9 +313,9 @@ public class TypeDetector
             // ok, two things: maybe we can pre-resolve the type?
             if (forSer) { // serialization simpler, less futzing about
                 int typeId = _findSimple(type);
-                bp = new BeanProperty(name, type, typeId, getter, setter);
+                bp = new BeanProperty(name, typeId, getter, setter);
             } else { // deser more involved
-                bp = new BeanProperty(name, type, getter, setter);
+                bp = new BeanProperty(name, getter, setter);
             }
             props.add(bp);
         }
@@ -560,12 +561,13 @@ public class TypeDetector
         if (vr != null) {
             return vr;
         }
-        vr = createReader(null, raw);
+        vr = createReader(null, raw, raw);
         _knownReaders.putIfAbsent(new ClassKey(raw), vr);
         return vr;
     }
     
-    private ValueReader createReader(Class<?> contextType, Class<?> type)
+    private ValueReader createReader(Class<?> contextType, Class<?> type,
+            Type genericType)
     {
         if (type == Object.class) {
             return AnyReader.std;
@@ -573,7 +575,7 @@ public class TypeDetector
         if (type.isArray()) {
             Class<?> elemType = type.getComponentType();
             if (!elemType.isPrimitive()) {
-                return new ArrayReader(elemType, createReader(contextType, elemType));
+                return new ArrayReader(elemType, createReader(contextType, elemType, elemType));
             }
             int typeId = _findSimple(type);
             if (typeId > 0) {
@@ -585,10 +587,10 @@ public class TypeDetector
             return enumReader(type);
         }
         if (Collection.class.isAssignableFrom(type)) {
-            return collectionReader(contextType, type);
+            return collectionReader(contextType, genericType);
         }
         if (Map.class.isAssignableFrom(type)) {
-            return mapReader(contextType, type);
+            return mapReader(contextType, genericType);
         }
         int typeId = _findSimple(type);
         if (typeId > 0) {
@@ -610,7 +612,8 @@ public class TypeDetector
                 _incompleteReaders.put(key, def);
                 for (Map.Entry<String, BeanProperty> entry : def.propertiesByName().entrySet()) {
                     BeanProperty prop = entry.getValue();
-                    entry.setValue(prop.withReader(createReader(contextType, prop.getType())));
+                    entry.setValue(prop.withReader(createReader(contextType,
+                            prop.rawSetterType(), prop.genericSetterType())));
                 }
             } finally {
                 _incompleteReaders.remove(key);
@@ -635,11 +638,11 @@ public class TypeDetector
         return new EnumReader(enums, byName);
     }
 
-    protected ValueReader collectionReader(Class<?> contextType, Class<?> collectionType)
+    protected ValueReader collectionReader(Class<?> contextType, Type collectionType)
     {
         ResolvedType t = _typeResolver.resolve(bindings(contextType), collectionType);
         List<ResolvedType> params = t.typeParametersFor(Collection.class);
-        return collectionReader(collectionType, params.get(0));
+        return collectionReader(t.erasedType(), params.get(0));
     }
 
     protected ValueReader collectionReader(Class<?> collectionType, ResolvedType valueType)
@@ -653,14 +656,14 @@ public class TypeDetector
             List<ResolvedType> params = valueType.typeParametersFor(Map.class);
             return mapReader(raw, params.get(1));
         }
-        return new CollectionReader(collectionType, createReader(null, raw));
+        return new CollectionReader(collectionType, createReader(null, raw, raw));
     }
 
-    protected ValueReader mapReader(Class<?> contextType, Class<?> mapType)
+    protected ValueReader mapReader(Class<?> contextType, Type mapType)
     {
         ResolvedType t = _typeResolver.resolve(bindings(contextType), mapType);
         List<ResolvedType> params = t.typeParametersFor(Collection.class);
-        return mapReader(mapType, params.get(1));
+        return mapReader(t.erasedType(), params.get(1));
     }
     
     protected ValueReader mapReader(Class<?> mapType, ResolvedType valueType)
@@ -674,6 +677,6 @@ public class TypeDetector
             List<ResolvedType> params = valueType.typeParametersFor(Map.class);
             return mapReader(raw, params.get(1));
         }
-        return new MapReader(mapType, createReader(null, raw));
+        return new MapReader(mapType, createReader(null, raw, raw));
     }
 }

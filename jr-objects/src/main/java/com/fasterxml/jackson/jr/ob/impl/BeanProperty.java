@@ -2,6 +2,7 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
@@ -9,8 +10,6 @@ import com.fasterxml.jackson.jr.ob.JSONObjectException;
 public final class BeanProperty
 {
     protected final SerializedString _name;
-    
-    protected final Class<?> _rawType;
 
     /**
      * Pre-resolved type id for reading/writing values, if statically known.
@@ -29,11 +28,8 @@ public final class BeanProperty
     protected final Method _getMethod, _setMethod;
 
     // For serialization
-    public BeanProperty(String name, Class<?> rawType, int typeId,
-            Method getMethod, Method setMethod)
-    {
+    public BeanProperty(String name, int typeId, Method getMethod, Method setMethod) {
         _name = new SerializedString(name);
-        _rawType = rawType;
         _typeId = typeId;
         _getMethod = getMethod;
         _setMethod = setMethod;
@@ -41,9 +37,8 @@ public final class BeanProperty
     }
 
     // For deserialization
-    public BeanProperty(String name, Class<?> rawType, Method getMethod, Method setMethod) {
+    public BeanProperty(String name, Method getMethod, Method setMethod) {
         _name = new SerializedString(name);
-        _rawType = rawType;
         _typeId = 0;
         _getMethod = getMethod;
         _setMethod = setMethod;
@@ -52,7 +47,6 @@ public final class BeanProperty
 
     protected BeanProperty(BeanProperty src, ValueReader vr) {
         _name = src._name;
-        _rawType = src._rawType;
         _typeId = src._typeId;
         _getMethod = src._getMethod;
         _setMethod = src._setMethod;
@@ -67,7 +61,14 @@ public final class BeanProperty
         _typeId = id;
     }
 
-    public Class<?> getType() { return _rawType; }
+    public Type genericSetterType() {
+        return _setMethod.getGenericParameterTypes()[0];
+    }
+
+    public Class<?> rawSetterType() {
+        return _setMethod.getParameterTypes()[0];
+    }
+    
     public ValueReader getReader() { return _valueReader; }
     
     public int getTypeId() { return _typeId; }
@@ -86,8 +87,7 @@ public final class BeanProperty
         try {
             return _getMethod.invoke(bean);
         } catch (Exception e) {
-            throw new JSONObjectException("Failed to access property '"+_name+"' (type "
-                    +_rawType.getName()+"; exception "+e.getClass().getName()+"): "
+            throw new JSONObjectException("Failed to access property '"+_name+"'; exception "+e.getClass().getName()+"): "
                     +e.getMessage(), e);
         }
     }
@@ -104,8 +104,7 @@ public final class BeanProperty
             while (t.getCause() != null) {
                 t = t.getCause();
             }
-            throw new JSONObjectException("Failed to set property '"+_name+"' (type "
-                    +_rawType.getName()+"; exception "+e.getClass().getName()+"): "
+            throw new JSONObjectException("Failed to set property '"+_name+"'; exception "+e.getClass().getName()+"): "
                     +e.getMessage(), e);
         }
     }

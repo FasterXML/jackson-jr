@@ -88,9 +88,6 @@ public class BeanDefinition
                         }
                         p.nextToken();
                         ValueReader vr = prop.getReader();
-                        if (vr == null) { // lazily created
-                            vr = constructPropertyReader(r, prop);
-                        }
                         Object value = vr.read(r, p);
                         prop.setValueFor(bean, value);
                     }
@@ -137,28 +134,5 @@ public class BeanDefinition
         }
         parser.nextToken();
         parser.skipChildren();
-    }
-
-    protected ValueReader constructPropertyReader(JSONReader r, BeanProperty prop)
-    {
-        int propTypeId = prop.getTypeId();
-        // need to dynamically resolve bean type refs
-        if (propTypeId == TypeDetector.SER_UNKNOWN) {
-        //        _resolveProperty(prop)
-            propTypeId = r._typeDetector.findFullType(prop._rawType);
-            if (propTypeId != TypeDetector.SER_UNKNOWN) { 
-                prop.overridTypeId(propTypeId);
-            }
-        }
-
-        /*
-        if (propTypeId < 0) {
-            value = r._typeDetector.getBeanDefinition(propTypeId).read(reader, parser);
-        } else {
-            Class<?> rawType = 
-            value = r._readSimpleValue(prop.getType(), propTypeId);
-        }
-        */
-        return null;
     }
 }
