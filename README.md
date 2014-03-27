@@ -144,3 +144,11 @@ The first official version (2.3.0) has been released, so you can use Maven depen
 and then you can also download jars via [Central Maven repository](http://repo1.maven.org/maven2/com/fasterxml/jackson/simple/).
 
 Or you can also clone the project and build it locally with `mvn clean install`.
+
+## Performance
+
+Initial performance testing using [JVM Serializers](https://github.com/eishay/jvm-serializers/wiki) benchmark
+suggests that it is almost as fast as [full Jackson databind](https://github.com/FasterXML/jackson-databind) --
+additional overhead for tests is 5-10% for both serialization and deserialization.
+So performance should be adequate, and choice should be more based on functionality, convenience and
+deployment factors.
