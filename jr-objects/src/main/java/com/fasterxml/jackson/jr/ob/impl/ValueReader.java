@@ -1,7 +1,6 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
-import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -15,32 +14,6 @@ import com.fasterxml.jackson.core.JsonToken;
  * size of resulting jars.
  */
 public abstract class ValueReader {
-    protected final static int T_ARRAY = 0;
-    protected final static int T_COLLECTION = 1;
-    protected final static int T_ENUM = 2;
-    protected final static int T_MAP = 3;
-
-    /*
-    /**********************************************************************
-    /* Factory methods
-    /**********************************************************************
-     */
-    
-    public static ValueReader arrayReader(Class<?> enumType) {
-        // !!! TBI
-        return null;
-    }
-
-    public static ValueReader collectionReader(Class<?> enumType) {
-        // !!! TBI
-        return null;
-    }
-
-    public static ValueReader mapReader(Class<?> enumType) {
-        // !!! TBI
-        return null;
-    }
-
     /*
     /**********************************************************************
     /* Basic API

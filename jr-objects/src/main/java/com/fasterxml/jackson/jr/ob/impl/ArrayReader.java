@@ -18,8 +18,19 @@ public class ArrayReader extends ValueReader
     }
     
     @Override
-    public Object read(JSONReader reader, JsonParser p) throws IOException {
-        // !!! TODO
-        throw new UnsupportedOperationException();
+    public Object read(JSONReader r, JsonParser p) throws IOException {
+        CollectionBuilder b = r._collectionBuilder(null);
+        if (p.nextToken() == JsonToken.END_ARRAY) {
+            return b.emptyCollection();
+        }
+        Object value = _valueReader.read(r, p);
+        if (p.nextToken() == JsonToken.END_ARRAY) {
+            return b.singletonCollection(value);
+        }
+        b = b.start().add(value);
+        do {
+            b = b.add(_valueReader.read(r, p));
+        } while (p.nextToken() != JsonToken.END_ARRAY);
+        return b.buildArray(_elementType);
     }
 }

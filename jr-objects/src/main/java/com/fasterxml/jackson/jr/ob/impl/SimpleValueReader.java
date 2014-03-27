@@ -10,8 +10,6 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.JsonParser.NumberType;
-import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 /**

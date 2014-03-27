@@ -1,19 +1,11 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
+import java.io.*;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.core.JsonParser.NumberType;
-import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
-
-import static com.fasterxml.jackson.core.JsonTokenId.*;
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;
 
 /**
  * Object that handles construction of simple Objects from JSON.
@@ -186,7 +178,7 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+_tokenDesc(_parser));
         }
-        return AnyReader.std._readFromObject(this, _parser, _mapBuilder);
+        return AnyReader.std.readFromObject(this, _parser, _mapBuilder);
     }
     
     /**
@@ -194,7 +186,6 @@ public class JSONReader
      * out of it. Note that if input does NOT contain a
      * JSON Array, {@link JSONObjectException} will be thrown.
      */
-    @SuppressWarnings("unchecked")
     public List<Object> readList() throws IOException {
         JsonToken t = _parser.getCurrentToken();
         if (t == JsonToken.VALUE_NULL) {
@@ -204,7 +195,7 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
         }
-        return (List<Object>) AnyReader.std._readFromArray(this, _parser, _collectionBuilder, true);
+        return (List<Object>) AnyReader.std.readCollectionFromArray(this, _parser, _collectionBuilder);
     }
     
     /**
@@ -222,7 +213,7 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
         }
-        return (Object[]) AnyReader.std._readFromArray(this, _parser, _collectionBuilder, false);
+        return AnyReader.std.readArrayFromArray(this, _parser, _collectionBuilder);
     }
 
     /*
@@ -252,9 +243,7 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
         }
-        // !!! TBI
-        return null;
-//        return (T[]) AnyReader.std._readFromArray(this, _parser, _collectionBuilder, type, false);
+        return (T[]) new ArrayReader(type, _typeDetector.findReader(type)).read(this, _parser);
     }
 
     /**
@@ -273,14 +262,12 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
         }
-        // !!! TBI
-        return null;
-//        return (List<T>) AnyReader.std._readFromArray(this, _parser, _collectionBuilder, type, true);
+        return (List<T>) new CollectionReader(List.class, _typeDetector.findReader(type)).read(this, _parser);
     }
     
     /*
     /**********************************************************************
-    /* Internal parse methods; overridable for custom coercions
+    /* Internal methods; overridable for custom coercions
     /**********************************************************************
      */
 
@@ -289,6 +276,13 @@ public class JSONReader
             throw new JSONObjectException("No TreeCodec specified: can not bind JSON into TreeNode types");
         }
         return _treeCodec;
-        
+    }
+
+    protected MapBuilder _mapBuilder(Class<?> mapType) {
+        return (mapType == null) ? _mapBuilder : _mapBuilder.newBuilder(mapType);
+    }
+
+    protected CollectionBuilder _collectionBuilder(Class<?> collType) {
+        return (collType == null) ? _collectionBuilder : _collectionBuilder.newBuilder(collType);
     }
 }

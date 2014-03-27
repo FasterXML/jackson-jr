@@ -3,7 +3,7 @@ package com.fasterxml.jackson.jr.ob.impl;
 import static com.fasterxml.jackson.core.JsonTokenId.*;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -29,9 +29,12 @@ public class AnyReader extends ValueReader
         case ID_NULL:
             return null;
         case ID_START_OBJECT:
-            return _readFromObject(r, p, r._mapBuilder);
+            return readFromObject(r, p, r._mapBuilder);
         case ID_START_ARRAY:
-            return _readFromArray(r, p, r._collectionBuilder, r._arraysAsLists);
+            if (r._arraysAsLists) {
+                return readCollectionFromArray(r, p, r._collectionBuilder);
+            }
+            return readArrayFromArray(r, p, r._collectionBuilder);
         case ID_STRING:
             return fromString(p.getText());
         case ID_NUMBER_INT:
@@ -75,7 +78,7 @@ public class AnyReader extends ValueReader
         throw JSONObjectException.from(p, "Unexpected value token: "+_tokenDesc(p));
     }
 
-    protected Map<Object,Object> _readFromObject(JSONReader r, JsonParser p, MapBuilder b) throws IOException
+    public Map<Object,Object> readFromObject(JSONReader r, JsonParser p, MapBuilder b) throws IOException
     {
         // First, a minor optimization for empty Maps
         if (p.nextValue() == JsonToken.END_OBJECT) {
@@ -97,53 +100,38 @@ public class AnyReader extends ValueReader
         return b.build();
     }
 
-    protected Object _readFromArray(JSONReader r, JsonParser p,
-            CollectionBuilder b, boolean asList) throws IOException
+    public Object[] readArrayFromArray(JSONReader r, JsonParser p, CollectionBuilder b) throws IOException
     {
         // First two special cases; empty, single-element
         if (p.nextToken() == JsonToken.END_ARRAY) {
-            return asList ? b.emptyCollection() : b.emptyArray();
+            return b.emptyArray();
         }
         Object value = read(r, p);
         if (p.nextToken() == JsonToken.END_ARRAY) {
-            return asList ?  b.singletonCollection(value) : b.singletonArray(value);
+            return b.singletonArray(value);
         }
-        // otherwise, loop
         b = b.start().add(value);
         do {
             b = b.add(read(r, p));
         } while (p.nextToken() != JsonToken.END_ARRAY);
-        return asList ? b.buildCollection() : b.buildArray();
+        return b.buildArray();
     }
 
-    /*
-    
-    @SuppressWarnings("unchecked")
-    protected <T> Object _readFromArray(JSONReader r, JsonParser p,
-            CollectionBuilder b, Class<T> type, boolean asList) throws IOException
+    public Collection<Object> readCollectionFromArray(JSONReader r, JsonParser p, CollectionBuilder b) throws IOException
     {
         if (p.nextToken() == JsonToken.END_ARRAY) {
-            return asList ? b.emptyCollection() : b.emptyArray(type);
+            return b.emptyCollection();
         }
-        int typeId = r._typeDetector.findFullType(type);
-        Object value = (typeId < 0)
-                ? r._typeDetector.getBeanDefinition(typeId).read(r, p) 
-                : r._readSimpleValue(type, typeId);
-        
+        Object value = read(r, p);
         if (p.nextToken() == JsonToken.END_ARRAY) {
-            return asList ?  b.singletonCollection(value) : b.singletonArray(type, (T) value);
+            return b.singletonCollection(value);
         }
-        // otherwise, loop
         b = b.start().add(value);
         do {
-            value = (typeId < 0)
-                    ? r._typeDetector.getBeanDefinition(typeId).read(r, p) 
-                    : r._readSimpleValue(type, typeId);
-            b = b.add(value);
+            b = b.add(read(r, p));
         } while (p.nextToken() != JsonToken.END_ARRAY);
-        return asList ? b.buildCollection() : b.buildArray(type);
+        return b.buildCollection();
     }
-*/
 
     /*
     /**********************************************************************
