@@ -41,17 +41,28 @@ public final class BeanProperty
     }
 
     // For deserialization
-    public BeanProperty(String name, Class<?> rawType, Method getMethod, Method setMethod,
-            ValueReader vr)
-    {
+    public BeanProperty(String name, Class<?> rawType, Method getMethod, Method setMethod) {
         _name = new SerializedString(name);
         _rawType = rawType;
         _typeId = 0;
         _getMethod = getMethod;
         _setMethod = setMethod;
+        _valueReader = null;
+    }
+
+    protected BeanProperty(BeanProperty src, ValueReader vr) {
+        _name = src._name;
+        _rawType = src._rawType;
+        _typeId = src._typeId;
+        _getMethod = src._getMethod;
+        _setMethod = src._setMethod;
         _valueReader = vr;
     }
 
+    public BeanProperty withReader(ValueReader vr) {
+        return new BeanProperty(this, vr);
+    }
+    
     public void overridTypeId(int id) {
         _typeId = id;
     }

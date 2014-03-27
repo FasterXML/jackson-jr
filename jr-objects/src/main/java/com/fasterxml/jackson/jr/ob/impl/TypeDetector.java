@@ -32,6 +32,8 @@ import com.fasterxml.jackson.jr.type.TypeResolver;
  */
 public class TypeDetector
 {
+    protected final BeanProperty[] NO_PROPS = new BeanProperty[0];
+
     /*
     /**********************************************************************
     /* Value constants for serialization
@@ -166,6 +168,14 @@ public class TypeDetector
      * Set of {@link ValueReader}s that we have resolved
      */
     protected final ConcurrentHashMap<ClassKey, ValueReader> _knownReaders;
+
+    /**
+     * During resolution, some readers may be in-progress, but need to be
+     * linked: for example, with cyclic type references.
+     */
+    protected Map<ClassKey, ValueReader> _incompleteReaders;
+
+    protected final Object _readerLock;
     
     /*
     /**********************************************************************
@@ -196,6 +206,7 @@ public class TypeDetector
         _knownBeans = beans;
         _knownReaders = null;
         _typeResolver = null;
+        _readerLock = null;
     }
 
     // for deserialization
@@ -206,6 +217,7 @@ public class TypeDetector
         _knownBeans = null;
         _knownReaders = r;
         _typeResolver = new TypeResolver();
+        _readerLock = new Object();
     }
     
     protected TypeDetector(TypeDetector base, int features) {
@@ -214,6 +226,7 @@ public class TypeDetector
         _knownBeans = base._knownBeans;
         _knownReaders = base._knownReaders;
         _typeResolver = base._typeResolver;
+        _readerLock = base._readerLock;
     }
 
     public final static TypeDetector forReader(int features) {
@@ -231,26 +244,132 @@ public class TypeDetector
         return new TypeDetector(this, features);
     }
 
+    private boolean forSer() {
+        return _knownSerTypes != null;
+    }
+    
+    /*
+    /**********************************************************************
+    /* Methods for ser and deser
+    /**********************************************************************
+     */
+
+    protected BeanDefinition resolveBean(Class<?> raw)
+    {
+        final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
+        // note: ignore methods in `java.lang.Object` (like "getClass()")
+        BeanInfo info;
+        try {
+            info = Introspector.getBeanInfo(raw, Object.class);
+        } catch (IntrospectionException e) {
+            throw new IllegalArgumentException("Failed to introspect BeanInfo for type '"
+                    +raw.getName()+"': "+e.getMessage(), e);
+        }
+        
+        final boolean forSer = forSer();
+        
+        List<BeanProperty> props = new ArrayList<BeanProperty>();
+        
+        for (PropertyDescriptor prop : info.getPropertyDescriptors()) {
+            // no type means indexed property
+            Class<?> type = prop.getPropertyType();
+            if (type == null) {
+                continue;
+            }
+            final Method getter = prop.getReadMethod();
+            final Method setter = prop.getWriteMethod();
+            String name;
+            if (getter != null) {
+                name = getter.getName();
+                if (name.startsWith("get")) {
+                    name = Introspector.decapitalize(name.substring(3));
+                } else if (name.startsWith("is")) {
+                    name = Introspector.decapitalize(name.substring(3));
+                } else {
+                    name = Introspector.decapitalize(name);
+                }
+            } else if (setter != null) {
+                name = setter.getName();
+                if (name.startsWith("set")) {
+                    name = Introspector.decapitalize(name.substring(3));
+                } else {
+                    name = Introspector.decapitalize(name);
+                }
+            } else { // can this happen?
+                continue;
+            }
+            if (forceAccess) {
+                if (getter != null) {
+                    getter.setAccessible(true);
+                }
+                if (setter != null) {
+                    setter.setAccessible(true);
+                }
+            }
+
+            BeanProperty bp;
+
+            // ok, two things: maybe we can pre-resolve the type?
+            if (forSer) { // serialization simpler, less futzing about
+                int typeId = _findSimple(type);
+                bp = new BeanProperty(name, type, typeId, getter, setter);
+            } else { // deser more involved
+                bp = new BeanProperty(name, type, getter, setter);
+            }
+            props.add(bp);
+        }
+        if (forSer) {
+            final int len = props.size();
+            BeanProperty[] propArray = (len == 0) ? NO_PROPS
+                    : props.toArray(new BeanProperty[len]);
+            return new BeanDefinition(raw, propArray);
+        }
+
+        Constructor<?> defaultCtor = null;
+        Constructor<?> stringCtor = null;
+        Constructor<?> longCtor = null;
+
+        for (Constructor<?> ctor : raw.getDeclaredConstructors()) {
+            Class<?>[] argTypes = ctor.getParameterTypes();
+            if (argTypes.length == 0) {
+                defaultCtor = ctor;
+            } else if (argTypes.length == 1) {
+                Class<?> argType = argTypes[0];
+                if (argType == String.class) {
+                    stringCtor = ctor;
+                } else if (argType == Long.class || argType == Long.TYPE) {
+                    longCtor = ctor;
+                } else {
+                    continue;
+                }
+            } else {
+                continue;
+            }
+            if (forceAccess) {
+                ctor.setAccessible(true);
+            }
+        }
+
+        Map<String, BeanProperty> propMap = new HashMap<String, BeanProperty>();
+        for (BeanProperty prop : props) {
+            propMap.put(prop.getName().toString(), prop);
+        }
+        return new BeanDefinition(raw, propMap,
+                defaultCtor, stringCtor, longCtor);
+    }
+    
+    /*
+    /**********************************************************************
+    /* Methods for serialization
+    /**********************************************************************
+     */
+    
     public BeanDefinition getBeanDefinition(int index) {
         // for simplicity, let's allow caller to pass negative id as is
         if (index < 0) {
             index = -(index+1);
         }
         return _knownBeans.get(index);
-    }
-
-    public ValueReader findReader(Class<?> raw)
-    {
-        ClassKey k = _key;
-        k.reset(raw);
-
-        ValueReader vr = _knownReaders.get(k);
-        if (vr != null) {
-            return vr;
-        }
-        vr = createReader(null, raw);
-        _knownReaders.putIfAbsent(new ClassKey(raw), vr);
-        return vr;
     }
     
     /**
@@ -262,8 +381,7 @@ public class TypeDetector
         if (raw == _prevClass) {
             return _prevType;
         }
-        ClassKey k = _key;
-        k.reset(raw);
+        ClassKey k = _key.with(raw);
         int type;
 
         Integer I = _knownSerTypes.get(k);
@@ -424,138 +542,71 @@ public class TypeDetector
         return SER_UNKNOWN;
     }
 
-    protected final BeanProperty[] NO_PROPS = new BeanProperty[0];
+    /*
+    /**********************************************************************
+    /* Methods for deserialization
+    /**********************************************************************
+     */
 
-    // public just to make test accessible
-    public BeanDefinition resolveBean(Class<?> raw)
+    /**
+     * Method used during deserialization to find handler for given
+     * non-generic type.
+     */
+    public ValueReader findReader(Class<?> raw)
     {
-        final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
-        // note: ignore methods in `java.lang.Object` (like "getClass()")
-        BeanInfo info;
-        try {
-            info = Introspector.getBeanInfo(raw, Object.class);
-        } catch (IntrospectionException e) {
-            throw new IllegalArgumentException("Failed to introspect BeanInfo for type '"
-                    +raw.getName()+"': "+e.getMessage(), e);
+        ClassKey k = _key.with(raw);
+
+        ValueReader vr = _knownReaders.get(k);
+        if (vr != null) {
+            return vr;
         }
-        
-        final boolean forSer = forSer();
-        
-        List<BeanProperty> props = new ArrayList<BeanProperty>();
-        
-        for (PropertyDescriptor prop : info.getPropertyDescriptors()) {
-            // no type means indexed property
-            Class<?> type = prop.getPropertyType();
-            if (type == null) {
-                continue;
-            }
-            final Method getter = prop.getReadMethod();
-            final Method setter = prop.getWriteMethod();
-            String name;
-            if (getter != null) {
-                name = getter.getName();
-                if (name.startsWith("get")) {
-                    name = Introspector.decapitalize(name.substring(3));
-                } else if (name.startsWith("is")) {
-                    name = Introspector.decapitalize(name.substring(3));
-                } else {
-                    name = Introspector.decapitalize(name);
-                }
-            } else if (setter != null) {
-                name = setter.getName();
-                if (name.startsWith("set")) {
-                    name = Introspector.decapitalize(name.substring(3));
-                } else {
-                    name = Introspector.decapitalize(name);
-                }
-            } else { // can this happen?
-                continue;
-            }
-            if (forceAccess) {
-                if (getter != null) {
-                    getter.setAccessible(true);
-                }
-                if (setter != null) {
-                    setter.setAccessible(true);
-                }
-            }
-
-            BeanProperty bp;
-
-            // ok, two things: maybe we can pre-resolve the type?
-            if (forSer) { // serialization simpler, less futzing about
-                int typeId = _findSimple(type);
-                bp = new BeanProperty(name, type, typeId, getter, setter);
-            } else { // deser more involved
-                ValueReader vr = createReader(raw, type);
-                bp = new BeanProperty(name, type, getter, setter, vr);
-            }
-
-            props.add(bp);
-        }
-        if (forSer) {
-            final int len = props.size();
-            BeanProperty[] propArray = (len == 0) ? NO_PROPS
-                    : props.toArray(new BeanProperty[len]);
-            return new BeanDefinition(raw, propArray);
-        }
-
-        Constructor<?> defaultCtor = null;
-        Constructor<?> stringCtor = null;
-        Constructor<?> longCtor = null;
-
-        for (Constructor<?> ctor : raw.getDeclaredConstructors()) {
-            Class<?>[] argTypes = ctor.getParameterTypes();
-            if (argTypes.length == 0) {
-                defaultCtor = ctor;
-            } else if (argTypes.length == 1) {
-                Class<?> argType = argTypes[0];
-                if (argType == String.class) {
-                    stringCtor = ctor;
-                } else if (argType == Long.class || argType == Long.TYPE) {
-                    longCtor = ctor;
-                } else {
-                    continue;
-                }
-            } else {
-                continue;
-            }
-            if (forceAccess) {
-                ctor.setAccessible(true);
-            }
-        }
-
-        Map<String, BeanProperty> propMap = new HashMap<String, BeanProperty>();
-        for (BeanProperty prop : props) {
-            propMap.put(prop.getName().toString(), prop);
-        }
-        return new BeanDefinition(raw, propMap,
-                defaultCtor, stringCtor, longCtor);
+        vr = createReader(null, raw);
+        _knownReaders.putIfAbsent(new ClassKey(raw), vr);
+        return vr;
     }
-
-    private boolean forSer() {
-        return _knownSerTypes != null;
-    }
-
+    
     private ValueReader createReader(Class<?> contextType, Class<?> type)
     {
+        if (type == Object.class) {
+            return AnyReader.std;
+        }
         if (type.isArray()) {
             Class<?> elemType = type.getComponentType();
             if (!elemType.isPrimitive()) {
                 
             }
-        }
-        else if (type.isEnum()) {
+        } else if (type.isEnum()) {
             return enumReader(type);
         } else if (Collection.class.isAssignableFrom(type)) {
-            ResolvedType t = _typeResolver.resolve(bindings(contextType), type);
-        }
-        else if (Map.class.isAssignableFrom(type)) {
-            ResolvedType t = _typeResolver.resolve(bindings(contextType), type);
+            return collectionReader(contextType, type);
+        } else if (Map.class.isAssignableFrom(type)) {
+            return mapReader(contextType, type);
         } else {
             int typeId = _findSimple(type);
             if (typeId > 0) {
                 return new SimpleValueReader(typeId, type);
+            }
+            // Beans!
+            final ClassKey key = new ClassKey(type);
+            synchronized (_readerLock) {
+                if (_incompleteReaders == null) {
+                    _incompleteReaders = new HashMap<ClassKey, ValueReader>();
+                } else { // perhaps it has already been resolved?
+                    ValueReader vr = _incompleteReaders.get(new ClassKey(type));
+                    if (vr != null) {
+                        return vr;
+                    }
+                }
+                BeanDefinition def = resolveBean(type);
+                try {
+                    _incompleteReaders.put(key, def);
+                    for (Map.Entry<String, BeanProperty> entry : def.propertiesByName().entrySet()) {
+                        BeanProperty prop = entry.getValue();
+                        entry.setValue(prop.withReader(createReader(contextType, prop.getType())));
+                    }
+                } finally {
+                    _incompleteReaders.remove(key);
+                }
             }
         }
         // Is this correct? Or even close?
@@ -576,5 +627,47 @@ public class TypeDetector
             byName.put(e.toString(), e);
         }
         return new EnumReader(enums, byName);
+    }
+
+    protected ValueReader collectionReader(Class<?> contextType, Class<?> collectionType)
+    {
+        ResolvedType t = _typeResolver.resolve(bindings(contextType), collectionType);
+        List<ResolvedType> params = t.typeParametersFor(Collection.class);
+        return collectionReader(collectionType, params.get(0));
+    }
+
+    protected ValueReader collectionReader(Class<?> collectionType, ResolvedType valueType)
+    {
+        Class<?> raw = valueType.erasedType();
+        if (Collection.class.isAssignableFrom(raw)) {
+            List<ResolvedType> params = valueType.typeParametersFor(Collection.class);
+            return collectionReader(raw, params.get(0));
+        }
+        if (Map.class.isAssignableFrom(raw)) {
+            List<ResolvedType> params = valueType.typeParametersFor(Map.class);
+            return mapReader(raw, params.get(1));
+        }
+        return new CollectionReader(collectionType, createReader(null, raw));
+    }
+
+    protected ValueReader mapReader(Class<?> contextType, Class<?> mapType)
+    {
+        ResolvedType t = _typeResolver.resolve(bindings(contextType), mapType);
+        List<ResolvedType> params = t.typeParametersFor(Collection.class);
+        return mapReader(mapType, params.get(1));
+    }
+    
+    protected ValueReader mapReader(Class<?> mapType, ResolvedType valueType)
+    {
+        Class<?> raw = valueType.erasedType();
+        if (Collection.class.isAssignableFrom(raw)) {
+            List<ResolvedType> params = valueType.typeParametersFor(Collection.class);
+            return collectionReader(raw, params.get(0));
+        }
+        if (Map.class.isAssignableFrom(raw)) {
+            List<ResolvedType> params = valueType.typeParametersFor(Map.class);
+            return mapReader(raw, params.get(1));
+        }
+        return new MapReader(mapType, createReader(null, raw));
     }
 }

@@ -54,6 +54,7 @@ public class BeanDefinition
     }
     
     public BeanProperty[] properties() { return _properties; }
+    public Map<String,BeanProperty> propertiesByName() { return _propsByName; }
 
     public BeanProperty findProperty(String name) {
         return _propsByName.get(name);
