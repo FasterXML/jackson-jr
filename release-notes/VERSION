@@ -1,12 +1,16 @@
 Project: jackson-jr
-Version: 2.3.1 (26-Mar-2014)
+Version: 2.3.2 (xx-xxx-2014)
 
-#6: Support reading of `Enum` values from String representation
-#8: Handle generic Collection and Map types properly
+Not yet released
 
 ------------------------------------------------------------------------
 === History: ===
 ------------------------------------------------------------------------
+
+2.3.1 (26-Mar-2014)
+
+#6: Support reading of `Enum` values from String representation
+#8: Handle generic Collection and Map types properly
 
 2.3.0 (17-Mar-2014)
 
