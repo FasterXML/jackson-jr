@@ -1,7 +1,7 @@
 Project: jackson-jr
-Version: 2.3.2 (xx-xxx-2014)
+Version: 2.3.3 (10-Apr-2014)
 
-Not yet released
+No changes, but depends on Jackson 2.3.3 core.
 
 ------------------------------------------------------------------------
 === History: ===
