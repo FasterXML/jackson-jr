@@ -131,13 +131,13 @@ Good old [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
 
 ## Get it!
 
-The first official version (2.3.0) has been released, so you can use Maven dependency like:
+The first official version (2.3) has been released, so you can use Maven dependency like:
 
 ```xml
 <dependency>
   <groupId>com.fasterxml.jackson.jr</groupId>
   <artifactId>jackson-jr-objects</artifactId>
-  <version>2.3.0</version>
+  <version>2.3.1</version>
 </dependency>
 ```
 
