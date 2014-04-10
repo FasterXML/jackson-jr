@@ -137,7 +137,7 @@ The first official version (2.3) has been released, so you can use Maven depende
 <dependency>
   <groupId>com.fasterxml.jackson.jr</groupId>
   <artifactId>jackson-jr-objects</artifactId>
-  <version>2.3.1</version>
+  <version>2.3.3</version>
 </dependency>
 ```
 
