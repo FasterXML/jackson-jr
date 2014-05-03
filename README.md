@@ -36,7 +36,7 @@ We can start by reading JSON
 
 ```java
 String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";
-Object ob = JSON.std.from(INPUT);
+Object ob = JSON.std.anyFrom(INPUT);
 // or
 Map<String,Object> map = JSON.std.mapFrom(INPUT);
 // or
