@@ -141,7 +141,7 @@ The first official version (2.3) has been released, so you can use Maven depende
 </dependency>
 ```
 
-and then you can also download jars via [Central Maven repository](http://repo1.maven.org/maven2/com/fasterxml/jackson/simple/).
+and then you can also download jars via [Central Maven repository](http://repo1.maven.org/maven2/com/fasterxml/jackson/jr/jackson-jr-objects/).
 
 Or you can also clone the project and build it locally with `mvn clean install`.
 
