@@ -1,6 +1,8 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.beans.*;
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -262,7 +264,7 @@ public class TypeDetector
         BeanInfo info;
         try {
             info = Introspector.getBeanInfo(raw, Object.class);
-        } catch (IntrospectionException e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException("Failed to introspect BeanInfo for type '"
                     +raw.getName()+"': "+e.getMessage(), e);
         }
