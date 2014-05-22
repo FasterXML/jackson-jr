@@ -27,21 +27,11 @@ public final class BeanProperty
     
     protected final Method _getMethod, _setMethod;
 
-    // For serialization
-    public BeanProperty(String name, int typeId, Method getMethod, Method setMethod) {
-        _name = new SerializedString(name);
-        _typeId = typeId;
-        _getMethod = getMethod;
-        _setMethod = setMethod;
-        _valueReader = null;
-    }
-
-    // For deserialization
-    public BeanProperty(String name, Method getMethod, Method setMethod) {
+    public BeanProperty(String name) {
         _name = new SerializedString(name);
         _typeId = 0;
-        _getMethod = getMethod;
-        _setMethod = setMethod;
+        _getMethod = null;
+        _setMethod = null;
         _valueReader = null;
     }
 
@@ -53,20 +43,55 @@ public final class BeanProperty
         _valueReader = vr;
     }
 
+    protected BeanProperty(BeanProperty src, int typeId, Method getter, Method setter) {
+        _name = src._name;
+        _valueReader = src._valueReader;
+
+        _typeId = typeId;
+        _getMethod = getter;
+        _setMethod = setter;
+    }
+    
+    public BeanProperty withGetter(Method getter) {
+        return new BeanProperty(this, _typeId, getter, _setMethod);
+    }
+
+    public BeanProperty withSetter(Method setter) {
+        return new BeanProperty(this, _typeId, _getMethod, setter);
+    }
+
     public BeanProperty withReader(ValueReader vr) {
         return new BeanProperty(this, vr);
     }
-    
-    public void overridTypeId(int id) {
-        _typeId = id;
+
+    public BeanProperty withTypeId(int typeId) {
+        return (typeId == _typeId) ? this
+                : new BeanProperty(this, typeId, _getMethod, _setMethod);
     }
 
+    public void forceAccess() {
+        if (_getMethod != null) {
+            _getMethod.setAccessible(true);
+        }
+        if (_setMethod != null) {
+            _setMethod.setAccessible(true);
+        }
+        
+    }
+
+    public boolean hasGetter() { return _getMethod != null; }
+    public boolean hasSetter() { return _setMethod != null; }
+    
     public Type genericSetterType() {
         return _setMethod.getGenericParameterTypes()[0];
     }
 
     public Class<?> rawSetterType() {
         return _setMethod.getParameterTypes()[0];
+    }
+
+    public Class<?> rawGetterType() {
+        return _getMethod.getReturnType();
     }
     
     public ValueReader getReader() { return _valueReader; }
@@ -119,5 +144,10 @@ public final class BeanProperty
             return "UNKNOWN";
         }
         return cls.getName();
+    }
+
+    @Override
+    public String toString() {
+        return _name.toString();
     }
 }

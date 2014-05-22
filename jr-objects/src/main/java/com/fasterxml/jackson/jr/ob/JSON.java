@@ -94,6 +94,13 @@ public class JSON implements Versioned
        USE_DEFERRED_MAPS(true),
 
        /**
+        * Whether "is-setters" (like <code>public boolean isValuable()</code>) are detected
+        * for use or not. Note that in addition to naming, and lack of arguments, return
+        * value also has to be <code>boolean</code> or <code>java.lang.Boolean</code>.
+        */
+       USE_IS_SETTERS(true),
+       
+       /**
         * When encountering duplicate keys for JSON Objects, should an exception
         * be thrown or not? If exception is not thrown, <b>the last</b> instance
         * from input document will be used.
@@ -151,7 +158,7 @@ public class JSON implements Versioned
         * so that Enums are serialized as JSON Strings.
         */
        WRITE_ENUMS_USING_INDEX(false),
-       
+
        /**
         * Feature that can be enabled to use "pretty-printing", basic indentation
         * to make resulting JSON easier to read by humans by adding white space

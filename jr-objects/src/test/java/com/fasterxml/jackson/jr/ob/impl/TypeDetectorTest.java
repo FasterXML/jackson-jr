@@ -38,7 +38,9 @@ public class TypeDetectorTest extends TestBase
         assertNotNull(def);
 
         List<BeanProperty> props = Arrays.asList(def._properties);
-        assertEquals(3, props.size());
+        if (props.size() != 2) {
+            fail("Expected 2 properties, found "+props.size()+": "+props);
+        }
         Map<String, BeanProperty> map = new HashMap<String, BeanProperty>();
         for (BeanProperty prop : props) {
             map.put(prop._name.getValue(), prop);
@@ -49,10 +51,6 @@ public class TypeDetectorTest extends TestBase
         prop = map.get("x");
         assertNotNull(prop);
         assertNotNull(prop._getMethod);
-        assertNotNull(prop._setMethod);
-        prop = map.get("y");
-        assertNotNull(prop);
-        assertNull(prop._getMethod);
         assertNotNull(prop._setMethod);
         prop = map.get("name");
         assertNotNull(prop);

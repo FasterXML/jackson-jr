@@ -666,7 +666,7 @@ public class JSONWriter
             SerializedString name;
             
             if (_requireSetter) {
-                name =  property.getNameIfHasSetter();
+                name = property.getNameIfHasSetter();
                 if (name == null) {
                     continue;
                 }
@@ -720,10 +720,4 @@ public class JSONWriter
         }
         return String.valueOf(rawKey);
     }
-    
-    /*
-    /**********************************************************************
-    /* Internal methods
-    /**********************************************************************
-     */
 }
