@@ -164,8 +164,11 @@ public abstract class MapBuilder
                     
                 }
             }
-            return isEnabled(Feature.PRESERVE_FIELD_ORDERING)
-                    ? new LinkedHashMap<Object,Object>(initialSize)
+            final boolean sort = isEnabled(Feature.PRESERVE_FIELD_ORDERING);
+            if (isEnabled(Feature.USE_DEFERRED_MAPS)) {
+                return new DeferredMap(sort, initialSize);
+            }
+            return sort ? new LinkedHashMap<Object,Object>(initialSize)
                     : new HashMap<Object,Object>(initialSize);
         }
     }

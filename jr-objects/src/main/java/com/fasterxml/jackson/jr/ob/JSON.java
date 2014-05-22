@@ -78,7 +78,21 @@ public class JSON implements Versioned
         * preserve ordering of fields read.
         */
        PRESERVE_FIELD_ORDERING(true),
-       
+
+       /**
+        * This feature determines whether {@link Map} instances constructed use
+        * deferred materialization (as implemented by {@link DeferredMap}), in case
+        * user has not specified custom {@link Map} implementation.
+        * Enabling feature typically reduces initial value read time and moves
+        * overhead to actual access of contents (materialization occurs when first
+        * key or value access happens); this makes sense when only a subset of
+        * data is accessed. Conversely, when traversing full object hierarchy, it
+        * makes sense to disable this feature.
+        *<p>
+        * Default setting is <code>true</code>, meaning that reader is expected to try to
+        */
+       USE_DEFERRED_MAPS(true),
+
        /**
         * When encountering duplicate keys for JSON Objects, should an exception
         * be thrown or not? If exception is not thrown, <b>the last</b> instance
