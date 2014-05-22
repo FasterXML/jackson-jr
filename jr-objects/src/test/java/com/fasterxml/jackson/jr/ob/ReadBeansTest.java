@@ -33,6 +33,13 @@ public class ReadBeansTest extends TestBase
         public Map<String,Integer> getStuff() { return stuff; }
         public void setStuff(Map<String,Integer> s) { stuff = s; }
     }
+
+    static class NameListBean {
+        protected List<NameBean> names;
+        
+        public List<NameBean> getNames() { return names; }
+        public void setNames(List<NameBean> n) { names = n; }
+    }
     
     /*
     /**********************************************************************
@@ -75,6 +82,18 @@ public class ReadBeansTest extends TestBase
         }
     }
 
+    public void testPOJOWithList() throws Exception
+    {
+        final String INPUT = aposToQuotes("{'names': [ { 'first':'John','last':'Smith' },"
+                +"{'first':'Bob','last':'Burger' } ] }");
+        NameListBean list = JSON.std.beanFrom(NameListBean.class, INPUT);
+        assertNotNull(list);
+        assertNotNull(list.names);
+        assertEquals(2, list.names.size());
+        NameBean name = list.names.get(1);
+        assertEquals("Burger", name.getLast());
+    }
+    
     public void testPOJOWithMap() throws Exception
     {
         final String INPUT = aposToQuotes("{'stuff': { 'a':3, 'b':4 } }");
