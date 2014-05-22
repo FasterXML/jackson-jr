@@ -58,6 +58,14 @@ Streaming, in a single jar.
         </execution>
       </executions>
     </plugin>
+
+      <!-- only need javadocs to keep Nexus happy -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${javadoc.version}</version>
+      </plugin>
+
     </plugins>
   </build>
 
