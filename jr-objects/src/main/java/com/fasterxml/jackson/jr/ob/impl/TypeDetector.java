@@ -713,7 +713,7 @@ public class TypeDetector
     protected ValueReader mapReader(Class<?> contextType, Type mapType)
     {
         ResolvedType t = _typeResolver.resolve(bindings(contextType), mapType);
-        List<ResolvedType> params = t.typeParametersFor(Collection.class);
+        List<ResolvedType> params = t.typeParametersFor(Map.class);
         return mapReader(t.erasedType(), params.get(1));
     }
     
