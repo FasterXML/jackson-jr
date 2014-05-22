@@ -27,112 +27,11 @@ public class ReadBeansTest extends TestBase
         public void setLast(String n) { last = n; }
     }
 
-    // // Test types from 'jvm-serializers' for bit more complete test
-
-    public static class MediaItem
-    {
-         public Media media;
-         public List<Image> images;
-
-         public MediaItem addPhoto(Image i) {
-             if (images == null) {
-                 images = new ArrayList<Image>();
-             }
-             images.add(i);
-             return this;
-         }
-
-         public Media getMedia() { return media; }
-         public void setMedia(Media m) { media = m; }
-
-         public List<Image> getImages() { return images; }
-         public void setImages(List<Image> i) { images = i; }
-    }
-
-    public enum Size { SMALL, LARGE };
-    
-    public static class Image
-    {
-        public Image() { }
-        public Image(String uri, String title, int w, int h, Size s) {
-            this.uri = uri;
-            this.title = title;
-            width = w;
-            height = h;
-            size = s;
-        }
-
-        public String uri;
-        public String title;
-        public int width, height;
-        public Size size;    
-
-        public String getUri() { return uri; }
-        public String getTitle() { return title; }
-        public int getWidth() { return width; }
-        public int getHeight() { return height; }
-        public Size getSize() { return size; }
-
-        public void setUri(String v) { uri = v; }
-        public void setTitle(String v) { title = v; }
-        public void setWidth(int v) { width = v; }
-        public void setHeight(int v) { height = v; }
-        public void setSize(Size v) { size = v; }
-    } 
-    
-    public enum Player { JAVA, FLASH; }
-
-    public static class Media {
-
-        public String uri;
-        public String title;
-        public int width;
-        public int height;
-        public String format;
-        public long duration;
-        public long size;
-        public int bitrate;
-
-        public List<String> persons;
+    static class MapBean {
+        protected Map<String,Integer> stuff;
         
-        public Player player;
-        public String copyright;
-
-        public Media addPerson(String p) {
-            if (persons == null) {
-                persons = new ArrayList<String>();
-            }
-            persons.add(p);
-            return this;
-        }
-
-        public String getUri() { return uri; }
-        public String getTitle() { return title; }
-        public int getWidth() { return width; }
-        public int getHeight() { return height; }
-
-        public String getFormat() { return format; }
-        public long getDuration() { return duration; }
-        public long getSize() { return size; }
-        public int getBitrate() { return bitrate; }
-
-        public List<String> getPersons() { return persons; }
-        public Player getPlayer() { return player; }
-        public String getCopyright() { return copyright; }
-        
-        public void setUri(String v) { uri = v; }
-        public void setTitle(String v) { title = v; }
-        public void setWidth(int v) { width = v; }
-        public void setHeight(int v) { height = v; }
-
-        public void setFormat(String v) { format = v; }
-        public void setDuration(long v) { duration = v; }
-        public void setSize(long v) { size = v; }
-        public void setBitrate(int v) { bitrate = v; }
-
-        public void setPersons(List<String> v) { persons = v; }
-        public void setPlayer(Player v) { player = v; }
-        public void setCopyright(String v) { copyright = v; }
+        public Map<String,Integer> getStuff() { return stuff; }
+        public void setStuff(Map<String,Integer> s) { stuff = s; }
     }
     
     /*
@@ -175,6 +74,16 @@ public class ReadBeansTest extends TestBase
             verifyException(e, "unrecognized JSON property 'middle'");
         }
     }
+
+    public void testPOJOWithMap() throws Exception
+    {
+        final String INPUT = aposToQuotes("{'stuff': { 'a':3, 'b':4 } }");
+        MapBean map = JSON.std.beanFrom(MapBean.class, INPUT);
+        assertNotNull(map);
+        assertNotNull(map.stuff);
+        assertEquals(2, map.stuff.size());
+        assertEquals(Integer.valueOf(4), map.stuff.get("b"));
+    }
     
     public void testSimpleBeanCollections() throws Exception
     {
@@ -208,26 +117,26 @@ public class ReadBeansTest extends TestBase
 
     public void testJvmSerializersPOJO() throws Exception
     {
-        Media content = new Media();
-        content.player = Player.JAVA;
-        content.uri = "http://javaone.com/keynote.mpg";
-        content.title = "Javaone Keynote";
-        content.width = 640;
-        content.height = 480;
-        content.format = "video/mpeg4";
-        content.duration = 18000000L;
-        content.size = 58982400L;
-        content.bitrate = 262144;
-        content.copyright = "None";
+        MediaItem.Content content = new MediaItem.Content();
+        content.setPlayer(MediaItem.Player.JAVA);
+        content.setUri("http://javaone.com/keynote.mpg");
+        content.setTitle("Javaone Keynote");
+        content.setWidth(640);
+        content.setHeight(480);
+        content.setFormat("video/mpeg4");
+        content.setDuration(18000000L);
+        content.setSize(58982400L);
+        content.setBitrate(262144);
+        content.setCopyright("None");
         content.addPerson("Bill Gates");
         content.addPerson("Steve Jobs");
 
-        MediaItem input = new MediaItem();
-        input.media = content;
+        MediaItem input = new MediaItem(content);
 
         final String IMAGE_URI1 = "http://javaone.com/keynote_large.jpg";
-        input.addPhoto(new Image(IMAGE_URI1, "Javaone Keynote", 1024, 768, Size.LARGE));
-        input.addPhoto(new Image("http://javaone.com/keynote_small.jpg", "Javaone Keynote", 320, 240, Size.SMALL));
+        input.addPhoto(new MediaItem.Photo(IMAGE_URI1, "Javaone Keynote", 1024, 768, MediaItem.Size.LARGE));
+        input.addPhoto(new MediaItem.Photo("http://javaone.com/keynote_small.jpg", "Javaone Keynote",
+                320, 240, MediaItem.Size.SMALL));
 
         String json = JSON.std.asString(input);
 
@@ -236,14 +145,14 @@ public class ReadBeansTest extends TestBase
             .beanFrom(MediaItem.class, json);
 
         assertNotNull(result);
-        assertEquals(262144, result.media.bitrate);
-        assertEquals("Steve Jobs", result.media.persons.get(1));
+        assertEquals(262144, result.getContent().getBitrate());
+        assertEquals("Steve Jobs", result.getContent().getPersons().get(1));
 
         List<?> im = result.getImages();
         assertEquals(2, im.size());
-        assertEquals(Image.class, im.get(0).getClass());
+        assertEquals(MediaItem.Photo.class, im.get(0).getClass());
 
-        Image im1 = (Image) im.get(0);
+        MediaItem.Photo im1 = (MediaItem.Photo) im.get(0);
         assertNotNull(im1);
         assertEquals(IMAGE_URI1, im1.getUri());
     }
