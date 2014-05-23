@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.fasterxml.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
-    <version>2.4.0-rc4-SNAPSHOT</version>
+    <version>2.4.0-rc5-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-all</artifactId>
   <name>jackson-jr-all</name>
@@ -42,9 +42,24 @@ Streaming, in a single jar.
                     <exclude>META-INF/*.SF</exclude>
                     <exclude>META-INF/*.DSA</exclude>
                     <exclude>META-INF/*.RSA</exclude>
+                    <!-- This is only needed to remove bogus placeholder class
+                         that we need to force packaging of src, javadoc jars,
+                         which Nexus requires (even though we don't really care)
+                      -->
+                    <exclude>jrall/*.class</exclude>
                 </excludes>
             </filter>
         </filters>
+        <!-- Also: let's relocate Jackson core stuff; this is to avoid any conflicts
+             between shaded version and proper non-shaded modules. If one wants original
+             packages, should just use non-uber-jar version anyways.
+          -->
+        <relocations>
+          <relocation>
+            <pattern>com.fasterxml.jackson.core</pattern>
+            <shadedPattern>com.fasterxml.jackson.jr.private</shadedPattern>
+          </relocation>
+        </relocations>
       </configuration>
       <executions>
         <execution>
@@ -58,6 +73,14 @@ Streaming, in a single jar.
         </execution>
       </executions>
     </plugin>
+
+      <!-- only need javadocs to keep Nexus happy -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${javadoc.version}</version>
+      </plugin>
+
     </plugins>
   </build>
 

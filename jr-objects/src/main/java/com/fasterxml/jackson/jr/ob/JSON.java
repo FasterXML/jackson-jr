@@ -186,7 +186,7 @@ public class JSON implements Versioned
        /**
         * Feature that determines what happens when we encounter a value of
         * unrecognized type for which we do not have handling: if enabled,
-        * will throw a {@JsonObjectException}, if disabled simply
+        * will throw a {@link JsonObjectException}, if disabled simply
         * calls {@link Object#toString} and uses that JSON String as serialization.
         *<p>
         * NOTE: if {@link #HANDLE_JAVA_BEANS} is enabled, this setting typically
