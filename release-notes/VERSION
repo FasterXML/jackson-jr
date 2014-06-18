@@ -1,12 +1,16 @@
 Project: jackson-jr
-Version: 2.4.0 (29-May-2014)
+Version: 2.4.1 (17-Jun-2014)
 
-#9: Support lazily materialized Maps with `JSON.Feature.USE_DEFERRED_MAPS`
-#11: Replace use of `java.bean.Introspector` since Android SDK doesn't have it.
+No changes since 2.4.0
 
 ------------------------------------------------------------------------
 === History: ===
 ------------------------------------------------------------------------
+
+2.4.0 (29-May-2014)
+
+#9: Support lazily materialized Maps with `JSON.Feature.USE_DEFERRED_MAPS`
+#11: Replace use of `java.bean.Introspector` since Android SDK doesn't have it.
 
 2.3.3 (10-Apr-2014)
 

@@ -23,12 +23,12 @@
     <connection>scm:git:git@github.com:FasterXML/jackson-jr.git</connection>
     <developerConnection>scm:git:git@github.com:FasterXML/jackson-jr.git</developerConnection>
     <url>http://github.com/FasterXML/jackson-jr</url>    
-    <tag>jackson-jr-parent-2.4.0-rc4</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.jackson>2.4.1-SNAPSHOT</version.jackson>
+    <version.jackson>2.4.1</version.jackson>
     <javac.src.version>1.6</javac.src.version>
     <javac.target.version>1.6</javac.target.version>
     <!-- Aggressively minimize jar size; drop 'lines' and 'vars' -->
