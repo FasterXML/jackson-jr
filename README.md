@@ -117,7 +117,7 @@ Also note that fields are never used for reading or writing Bean properties.
 
 ### Customizing behavior with Features
 
-There are many customizable features you can use with `JSON` object; see [Full List of Features](wiki/JSON-Features) for details. But usage itself is via fluent methods like so:
+There are many customizable features you can use with `JSON` object; see [Full List of Features](../../wiki/JSON-Features) for details. But usage itself is via fluent methods like so:
 
 ```java
 String json = JSON.std
