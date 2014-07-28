@@ -11,9 +11,18 @@ public class WriteSimpleTest extends TestBase
 {
     final static class POJO {
         public int value = 3;
+
+        public POJO() { }
+        public POJO(int v) { value = v; }
     }
 
     enum ABC { A, B, C; }
+
+    final static class Address {
+        public String name;
+
+        public Address(String n) { name = n; }
+    }
     
     /*
     /**********************************************************************
@@ -88,7 +97,7 @@ public class WriteSimpleTest extends TestBase
         assertEquals("1", JSON.std.with(Feature.WRITE_ENUMS_USING_INDEX).asString(ABC.B));
     }
 
-    public void testUnnownType() throws Exception
+    public void testUnknownType() throws Exception
     {
         try {
             String json = JSON.std.with(JSON.Feature.FAIL_ON_UNKNOWN_TYPE_WRITE)
@@ -99,5 +108,27 @@ public class WriteSimpleTest extends TestBase
             verifyException(e, "unrecognized type");
             verifyException(e, "POJO");
         }
+    }
+
+    // For [Issue#16]
+    public void testTypedMaps() throws Exception
+    {
+        final Address from = new Address("xyz");
+        final Map<String,Set<Address>> to = new HashMap<String,Set<Address>>();
+        to.put("static_addr", new HashSet<Address>());
+        to.get("static_addr").add(new Address("abc"));
+
+        final   Map<String,Object> temp = new HashMap<String,Object>();
+        temp.put("from", from);
+        temp.put("TO", to);
+
+        String json = JSON.std.asString(temp);
+
+        assertNotNull(json);
+        
+        // and sanity check for back direction
+        Map<?,?> map = JSON.std.mapFrom(json);
+        assertNotNull(map);
+        assertEquals(2, map.size());
     }
 }
