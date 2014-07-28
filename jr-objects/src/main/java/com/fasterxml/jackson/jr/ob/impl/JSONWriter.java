@@ -272,8 +272,8 @@ public class JSONWriter
             }
             _generator.writeFieldName(fieldName);
             writeBeanValue(def, value);
+            return;
         }
-        
         throw new IllegalStateException("Unsupported type: "+type);
     }
 
