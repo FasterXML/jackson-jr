@@ -41,9 +41,14 @@ public class ReadBeansTest extends TestBase
         public void setNames(List<NameBean> n) { names = n; }
     }
 
-    static class LongBean {
+    interface Bean<T> {
+        public void setValue(T t);
+    }
+    
+    static class LongBean implements Bean<Long> {
         Long value;
 
+        @Override
         public void setValue(Long v) {
             value = v;
         }
@@ -184,6 +189,7 @@ public class ReadBeansTest extends TestBase
         assertEquals(IMAGE_URI1, im1.getUri());
     }
 
+    // For [Issue#15]
     public void testLongBind() throws Exception
     {
         final String INPUT = "{\"value\":2}";
