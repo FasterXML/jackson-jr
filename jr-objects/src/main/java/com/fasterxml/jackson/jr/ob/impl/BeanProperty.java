@@ -57,6 +57,16 @@ public final class BeanProperty
     }
 
     public BeanProperty withSetter(Method setter) {
+        /* 28-Jul-2014, tatu: Need to figure out a way to resolve multiple similarly
+         *    named setters, mostly to avoid bridge methods (see [Issue#15]),
+         *    but possible also to try to find most optimal of overloads.
+         */
+        if (_setMethod != null) {
+            // start with minimal conflict resolution, however
+            if (setter.isBridge() || setter.isSynthetic()) {
+                return this;
+            }
+        }
         return new BeanProperty(this, _typeId, _getMethod, setter);
     }
 

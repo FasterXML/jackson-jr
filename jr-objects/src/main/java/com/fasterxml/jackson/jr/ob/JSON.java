@@ -94,11 +94,20 @@ public class JSON implements Versioned
        USE_DEFERRED_MAPS(true),
 
        /**
-        * Whether "is-setters" (like <code>public boolean isValuable()</code>) are detected
+        * Mis-spelled variant of {@link #USE_IS_GETTERS}; deprecated, but works
+        * until removed.
+        * 
+        * @deprecated Since 2.4.2 (when misnaming was noticed); will be removed from 2.5.
+        */
+       @Deprecated
+       USE_IS_SETTERS(true),
+
+       /**
+        * Whether "is-getters" (like <code>public boolean isValuable()</code>) are detected
         * for use or not. Note that in addition to naming, and lack of arguments, return
         * value also has to be <code>boolean</code> or <code>java.lang.Boolean</code>.
         */
-       USE_IS_SETTERS(true),
+       USE_IS_GETTERS(true),
        
        /**
         * When encountering duplicate keys for JSON Objects, should an exception

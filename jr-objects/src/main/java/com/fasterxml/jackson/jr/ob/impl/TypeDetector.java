@@ -373,16 +373,21 @@ public class TypeDetector
                         BeanProperty prop = _propFrom(props, name);
                         props.put(name, prop.withGetter(m));
                     }
-                } else if (JSON.Feature.USE_IS_SETTERS.isEnabled(_features) && name.startsWith("is")
-                        && name.length() > 2) {
-                    // only add if no getter found (i.e. prefer regular getter, if one found)
-                    BeanProperty prop = props.get(name);
-                    if (prop == null) {
-                        name = decap(name.substring(2));
-                        props.put(name, new BeanProperty(name).withGetter(m));
-                    } else if (!prop.hasGetter()) {
-                        name = decap(name.substring(2));
-                        props.put(name, prop.withGetter(m));
+                } else if (name.startsWith("is") && name.length() > 2) {
+                    // 28-Jul-2014, tatu: Stupid misnaming complicates things here;
+                    //   basically, until we remove wrong one, need to require both
+                    //   to be set...
+                    if (JSON.Feature.USE_IS_GETTERS.isEnabled(_features)
+                                && JSON.Feature.USE_IS_SETTERS.isEnabled(_features)) {
+                        // only add if no getter found (i.e. prefer regular getter, if one found)
+                        BeanProperty prop = props.get(name);
+                        if (prop == null) {
+                            name = decap(name.substring(2));
+                            props.put(name, new BeanProperty(name).withGetter(m));
+                        } else if (!prop.hasGetter()) {
+                            name = decap(name.substring(2));
+                            props.put(name, prop.withGetter(m));
+                        }
                     }
                 }
             } else if (argTypes.length == 1) { // setter?

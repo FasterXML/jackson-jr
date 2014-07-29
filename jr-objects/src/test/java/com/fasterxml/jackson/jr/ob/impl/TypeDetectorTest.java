@@ -25,12 +25,25 @@ public class TypeDetectorTest extends TestBase
         public void setEmUp(int index, String value) { }
     }
 
+    interface Bean<T> {
+        public void setValue(T t);
+    }
+    
+    static class LongBean implements Bean<Long> {
+        Long value;
+
+        @Override
+        public void setValue(Long v) {
+            value = v;
+        }
+    }
+    
     /*
     /**********************************************************************
     /* Test methdods
     /**********************************************************************
      */
-    
+
     public void testSimpleWithSerialization() 
     {
         TypeDetector td = TypeDetector.forWriter(JSON.Feature.defaults());
@@ -78,5 +91,25 @@ public class TypeDetectorTest extends TestBase
         assertEquals(TypeDetector.SER_CALENDAR, td.findFullType(GregorianCalendar.class));
         assertEquals(TypeDetector.SER_DATE, td.findFullType(new GregorianCalendar().getTime().getClass()));
         assertEquals(TypeDetector.SER_UUID, td.findFullType(UUID.class));
+    }
+
+    public void testGenericTypeWithDeser()
+    {
+        TypeDetector td = TypeDetector.forReader(JSON.Feature.defaults());
+        BeanDefinition def = td.resolveBean(LongBean.class);
+        assertNotNull(def);
+
+        Map<String,BeanProperty> props = def._propsByName;
+        assertNotNull(props);
+        
+        if (props.size() != 1) {
+            fail("Expected 1 properties, found "+props.size()+": "+props);
+        }
+        BeanProperty prop = props.values().iterator().next();
+
+        assertNotNull(prop);
+        assertNotNull(prop._setMethod);
+
+        assertEquals(Long.class, prop.rawSetterType());
     }
 }
