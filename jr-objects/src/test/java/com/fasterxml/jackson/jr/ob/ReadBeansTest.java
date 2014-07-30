@@ -40,6 +40,19 @@ public class ReadBeansTest extends TestBase
         public List<NameBean> getNames() { return names; }
         public void setNames(List<NameBean> n) { names = n; }
     }
+
+    interface Bean<T> {
+        public void setValue(T t);
+    }
+    
+    static class LongBean implements Bean<Long> {
+        Long value;
+
+        @Override
+        public void setValue(Long v) {
+            value = v;
+        }
+    }
     
     /*
     /**********************************************************************
@@ -174,5 +187,14 @@ public class ReadBeansTest extends TestBase
         MediaItem.Photo im1 = (MediaItem.Photo) im.get(0);
         assertNotNull(im1);
         assertEquals(IMAGE_URI1, im1.getUri());
+    }
+
+    // For [Issue#15]
+    public void testLongBind() throws Exception
+    {
+        final String INPUT = "{\"value\":2}";
+        LongBean bean = JSON.std.beanFrom(LongBean.class, INPUT);
+        assertNotNull(bean);
+        assertEquals(Long.valueOf(2L), bean.value);
     }
 }
