@@ -1,5 +1,5 @@
 Project: jackson-jr
-Version: 2.4.2 (xx-Aug-2014)
+Version: 2.4.2 (13-Aug-2014)
 
 #15: Problem with Number to Long conversions
  (reported by "gsmiro@github")
