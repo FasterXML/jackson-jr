@@ -13,14 +13,17 @@ import com.fasterxml.jackson.core.JsonToken;
  * creating multiple separate classes, which in turn is done to minimize
  * size of resulting jars.
  */
-public abstract class ValueReader {
+public abstract class ValueReader
+{
     /*
     /**********************************************************************
     /* Basic API
     /**********************************************************************
      */
-    
+
     public abstract Object read(JSONReader reader, JsonParser p) throws IOException;
+
+    public abstract Object readNext(JSONReader reader, JsonParser p) throws IOException;
 
     /*
     /**********************************************************************

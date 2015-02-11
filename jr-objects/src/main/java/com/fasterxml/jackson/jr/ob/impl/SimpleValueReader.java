@@ -24,9 +24,50 @@ public class SimpleValueReader extends ValueReader
         _typeId = typeId;
         _rawType = raw;
     }
-
+    
     @Override
-    public Object read(JSONReader reader, JsonParser parser) throws IOException
+    public Object readNext(JSONReader reader, JsonParser p) throws IOException
+    {
+        // NOTE: only cases where we can optimize
+        switch (_typeId) {
+        // Textual types, related:
+        case SER_STRING:
+        case SER_CHARACTER_SEQUENCE:
+            return _nextString(p);
+
+        case SER_CHAR_ARRAY:
+            String str = _nextString(p);
+            return (str == null) ? null : str.toCharArray();
+
+        // Number types:
+
+        case SER_NUMBER_SHORT: // fall through
+            return Short.valueOf((short) _nextInt(p));
+
+        case SER_NUMBER_INTEGER:
+            return Integer.valueOf(_nextInt(p));
+
+        case SER_NUMBER_LONG:
+            return Long.valueOf(_nextLong(p));
+
+        // Other scalar types:
+
+        case SER_BOOLEAN:
+            {
+                Boolean b = p.nextBooleanValue();
+                if (b != null) {
+                    return b;
+                }
+                return p.getValueAsBoolean();
+            }
+        }
+
+        p.nextToken();
+        return read(reader, p);
+    }    
+    
+    @Override
+    public Object read(JSONReader reader, JsonParser p) throws IOException
     {
         switch (_typeId) {
 
@@ -38,68 +79,68 @@ public class SimpleValueReader extends ValueReader
             break;
 
         case SER_INT_ARRAY:
-            return _readIntArray(parser);
+            return _readIntArray(p);
 
         case SER_TREE_NODE:
-            return reader._treeCodec().readTree(parser);
+            return reader._treeCodec().readTree(p);
 
         // Textual types, related:
         case SER_STRING:
         case SER_CHARACTER_SEQUENCE:
-            return parser.getValueAsString();
+            return p.getValueAsString();
         case SER_CHAR_ARRAY:
-            return parser.getValueAsString().toCharArray();
+            return p.getValueAsString().toCharArray();
         case SER_BYTE_ARRAY:
-            return _readBinary(parser);
+            return _readBinary(p);
 
         // Number types:
             
         case SER_NUMBER_FLOAT: // fall through
-            return Float.valueOf((float) parser.getValueAsDouble());
+            return Float.valueOf((float) p.getValueAsDouble());
         case SER_NUMBER_DOUBLE:
-            return parser.getValueAsDouble();
+            return p.getValueAsDouble();
 
         case SER_NUMBER_BYTE: // fall through
-            return (byte) parser.getValueAsInt();
+            return (byte) p.getValueAsInt();
             
         case SER_NUMBER_SHORT: // fall through
-            return (short) parser.getValueAsInt();
+            return (short) p.getValueAsInt();
         case SER_NUMBER_INTEGER:
-            return parser.getValueAsInt();
+            return p.getValueAsInt();
         case SER_NUMBER_LONG:
-            return parser.getValueAsLong();
+            return p.getValueAsLong();
 
         case SER_NUMBER_BIG_DECIMAL:
-            return parser.getDecimalValue();
+            return p.getDecimalValue();
 
         case SER_NUMBER_BIG_INTEGER:
-            return parser.getBigIntegerValue();
+            return p.getBigIntegerValue();
 
         // Other scalar types:
 
         case SER_BOOLEAN:
-            return parser.getValueAsBoolean();
+            return p.getValueAsBoolean();
             
         case SER_CHAR:
             {
-                String str = parser.getValueAsString();
+                String str = p.getValueAsString();
                 return (str == null || str.isEmpty()) ? ' ' : str.charAt(0);
             }
             
         case SER_CALENDAR:
             {
-                long l = _fetchLong(parser);
+                long l = _fetchLong(p);
                 Calendar cal = Calendar.getInstance();
                 cal.setTimeInMillis(l);
                 return cal;
             }
 
         case SER_DATE:
-            return new Date(_fetchLong(parser));
+            return new Date(_fetchLong(p));
 
         case SER_CLASS:
         {
-            String v = parser.getValueAsString();
+            String v = p.getValueAsString();
             try {
                 return Class.forName(v);
             } catch (Exception e) {
@@ -107,22 +148,23 @@ public class SimpleValueReader extends ValueReader
             }
         }
         case SER_FILE:
-            return new File(parser.getValueAsString());
+            return new File(p.getValueAsString());
         case SER_UUID:
-            return UUID.fromString(parser.getValueAsString());
+            return UUID.fromString(p.getValueAsString());
         case SER_URL:
-            return new URL(parser.getValueAsString());
+            return new URL(p.getValueAsString());
         case SER_URI:
         
-            return URI.create(parser.getValueAsString());
+            return URI.create(p.getValueAsString());
 
         default: // types that shouldn't get here
         //case SER_ENUM:
         }
         
-        throw JSONObjectException.from(parser,
-                "Can not create a "+_rawType.getName()+" instance out of "+_tokenDesc(parser));
+        throw JSONObjectException.from(p,
+                "Can not create a "+_rawType.getName()+" instance out of "+_tokenDesc(p));
     }    
+
     /*
     /**********************************************************************
     /* Read methods for scalars
@@ -147,5 +189,26 @@ public class SimpleValueReader extends ValueReader
         }
         throw JSONObjectException.from(p, "Can not get long numeric value from JSON (to construct "
                 +_rawType.getName()+") from "+_tokenDesc(p, t));
+    }
+
+    private final String _nextString(JsonParser p) throws IOException {
+        String str = p.nextTextValue();
+        return (str == null) ? p.getValueAsString() : str;
+    }
+
+    private final int _nextInt(JsonParser p) throws IOException {
+        int i = p.nextIntValue(-2);
+        if (i != -2) {
+            return i;
+        }
+        return p.getValueAsInt();
+    }
+
+    private final long _nextLong(JsonParser p) throws IOException {
+        long l = p.nextLongValue(-2L);
+        if (l != -2L) {
+            return l;
+        }
+        return p.getValueAsLong();
     }
 }

@@ -96,6 +96,12 @@ public class JSONReader
         // never to be called for this instance
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public Object readNext(JSONReader reader, JsonParser p) throws IOException {
+        // never to be called for this instance
+        throw new UnsupportedOperationException();
+    }
     
     /*
     /**********************************************************************
@@ -203,7 +209,7 @@ public class JSONReader
      * out of it. Note that if input does NOT contain a
      * JSON Array, {@link JSONObjectException} will be thrown.
      */
-    public Object[] readArray() throws IOException, JsonProcessingException
+    public Object[] readArray() throws IOException
     {
         JsonToken t = _parser.getCurrentToken();
         if (t == JsonToken.VALUE_NULL) {
@@ -228,13 +234,13 @@ public class JSONReader
      * specification by having setters for passing JSON Object properties.
      */
     @SuppressWarnings("unchecked")
-    public <T> T readBean(Class<T> type) throws IOException, JsonProcessingException {
+    public <T> T readBean(Class<T> type) throws IOException {
         ValueReader vr = _typeDetector.findReader(type);
         return (T) vr.read(this, _parser);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T[] readArrayOf(Class<T> type) throws IOException, JsonProcessingException {
+    public <T> T[] readArrayOf(Class<T> type) throws IOException {
         JsonToken t = _parser.getCurrentToken();
         if (t == JsonToken.VALUE_NULL) {
             return null;

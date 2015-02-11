@@ -20,6 +20,44 @@ public class MapReader extends ValueReader
         _mapType = (t == Map.class) ? null : t;
         _valueReader = vr;
     }
+
+    @Override
+    public Object readNext(JSONReader r, JsonParser p) throws IOException {
+        if (p.nextToken() != JsonToken.START_OBJECT) {
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
+            return JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get START_OBJECT");
+        }
+        
+        MapBuilder b = r._mapBuilder(_mapType);
+        String propName0 = p.nextFieldName();
+        if (propName0 == null) {
+            if (p.hasToken(JsonToken.END_OBJECT)) {
+                return b.emptyMap();
+            }
+            throw _reportProblem(p);
+        }
+        Object value = _valueReader.readNext(r, p);
+        String propName = p.nextFieldName();
+        if (propName == null) {
+            if (p.hasToken(JsonToken.END_OBJECT)) {
+                return b.singletonMap(propName0, value);
+            }
+            throw _reportProblem(p);
+        }
+        b = b.start().put(propName0, value);
+        while (true) {
+            b = b.put(propName, _valueReader.readNext(r, p));
+            propName = p.nextFieldName();
+            if (propName == null) {
+                if (p.hasToken(JsonToken.END_OBJECT)) {
+                    return b.build();
+                }
+                throw _reportProblem(p);
+            }
+        }
+    }
     
     @Override
     public Object read(JSONReader r, JsonParser p) throws IOException {
@@ -31,8 +69,7 @@ public class MapReader extends ValueReader
             }
             throw _reportProblem(p);
         }
-        p.nextToken();
-        Object value = _valueReader.read(r, p);
+        Object value = _valueReader.readNext(r, p);
         String propName = p.nextFieldName();
         if (propName == null) {
             if (p.hasToken(JsonToken.END_OBJECT)) {
@@ -42,8 +79,7 @@ public class MapReader extends ValueReader
         }
         b = b.start().put(propName0, value);
         while (true) {
-            p.nextToken();
-            b = b.put(propName, _valueReader.read(r, p));
+            b = b.put(propName, _valueReader.readNext(r, p));
             propName = p.nextFieldName();
             if (propName == null) {
                 if (p.hasToken(JsonToken.END_OBJECT)) {

@@ -59,6 +59,52 @@ public class BeanDefinition
         return _propsByName.get(name);
     }
 
+    @Override
+    public Object readNext(JSONReader r, JsonParser p) throws IOException
+    {
+        JsonToken t = p.nextToken();
+        try {
+            switch (t) {
+            case VALUE_NULL:
+                return null;
+            case VALUE_STRING:
+                return create(p.getText());
+            case VALUE_NUMBER_INT:
+                return create(p.getLongValue());
+            case START_OBJECT:
+                {
+                    Object bean = create();
+                    String propName;
+                    
+                    for (; (propName = p.nextFieldName()) != null; ) {
+                        BeanProperty prop = findProperty(propName);
+                        if (prop == null) {
+                            handleUnknown(r, p, propName);
+                            continue;
+                        }
+                        ValueReader vr = prop.getReader();
+                        prop.setValueFor(bean, vr.readNext(r, p));
+                    }
+                    // also verify we are not confused...
+                    if (!p.hasToken(JsonToken.END_OBJECT)) {
+                        throw _reportProblem(p);
+                    }                    
+                    
+                    return bean;
+                }
+            default:
+            }
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw JSONObjectException.from(p, "Failed to create an instance of "
+                    +_type.getName()+" due to ("+e.getClass().getName()+"): "+e.getMessage(),
+                    e);
+        }
+        throw JSONObjectException.from(p,
+                "Can not create a "+_type.getName()+" instance out of "+_tokenDesc(p));
+    }
+    
     /**
      * Method used for deserialization; will read an instance of the bean
      * type using given parser.
@@ -87,10 +133,8 @@ public class BeanDefinition
                             handleUnknown(r, p, propName);
                             continue;
                         }
-                        p.nextToken();
                         ValueReader vr = prop.getReader();
-                        Object value = vr.read(r, p);
-                        prop.setValueFor(bean, value);
+                        prop.setValueFor(bean, vr.readNext(r, p));
                     }
                     // also verify we are not confused...
                     if (!p.hasToken(JsonToken.END_OBJECT)) {

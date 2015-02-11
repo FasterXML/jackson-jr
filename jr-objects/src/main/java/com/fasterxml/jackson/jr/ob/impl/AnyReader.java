@@ -19,6 +19,13 @@ import com.fasterxml.jackson.jr.ob.*;
 public class AnyReader extends ValueReader
 {
     public final static AnyReader std = new AnyReader();
+
+    @Override
+    public Object readNext(JSONReader r, JsonParser p) throws IOException
+    {
+        p.nextToken();
+        return read(r, p);
+    }
     
     @Override
     public Object read(JSONReader r, JsonParser p) throws IOException
