@@ -4,7 +4,11 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
-2.5.0 (06-Feb-2015)
+2.6.0 (not yet released)
+
+- Minor performance optimizations, using new jackson-core 2.6 methods
+
+2.5.1 (06-Feb-2015)
 2.5.0 (01-Jan-2015)
 
 No changes since 2.4.

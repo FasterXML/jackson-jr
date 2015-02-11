@@ -54,7 +54,7 @@ public class MapReader extends ValueReader
         }
     }
 
-    private IOException _reportProblem(JsonParser p) {
+    protected IOException _reportProblem(JsonParser p) {
         return JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get FIELD_NAME or END_OBJECT");
     }
 }

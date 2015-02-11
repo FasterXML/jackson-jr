@@ -31,8 +31,7 @@ public class EnumReader extends ValueReader
     
     @Override
     public Object read(JSONReader reader, JsonParser p) throws IOException {
-        JsonToken t = p.getCurrentToken();
-        if (t == JsonToken.VALUE_NUMBER_INT) {
+        if (p.hasToken(JsonToken.VALUE_NUMBER_INT)) {
             int ix = p.getIntValue();
             if (ix < 0 || ix >= _byIndex.length) {
                 throw new JSONObjectException("Failed to bind Enum "+desc()+" with index "+ix

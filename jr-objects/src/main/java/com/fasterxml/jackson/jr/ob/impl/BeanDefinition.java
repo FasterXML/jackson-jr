@@ -79,11 +79,12 @@ public class BeanDefinition
             case START_OBJECT:
                 {
                     Object bean = create();
-                    for (; (t = p.nextToken()) == JsonToken.FIELD_NAME; ) {
-                        String fieldName = p.getCurrentName();
-                        BeanProperty prop = findProperty(fieldName);
+                    String propName;
+                    
+                    for (; (propName = p.nextFieldName()) != null; ) {
+                        BeanProperty prop = findProperty(propName);
                         if (prop == null) {
-                            handleUnknown(r, p, fieldName);
+                            handleUnknown(r, p, propName);
                             continue;
                         }
                         p.nextToken();
@@ -91,6 +92,11 @@ public class BeanDefinition
                         Object value = vr.read(r, p);
                         prop.setValueFor(bean, value);
                     }
+                    // also verify we are not confused...
+                    if (!p.hasToken(JsonToken.END_OBJECT)) {
+                        throw _reportProblem(p);
+                    }                    
+                    
                     return bean;
                 }
             default:
@@ -134,5 +140,9 @@ public class BeanDefinition
         }
         parser.nextToken();
         parser.skipChildren();
+    }
+
+    protected IOException _reportProblem(JsonParser p) {
+        return JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get FIELD_NAME or END_OBJECT");
     }
 }
