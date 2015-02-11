@@ -3,7 +3,7 @@
 Jackson jr is a compact alternative to full [Jackson Databind](../../../jackson-databind) component.
 It implements a subset of functionality, for example for cases where:
 
-1. Size of jar matters (jackson-jr size is under 70kB)
+1. Size of jar matters (jackson-jr size is about 70kB)
 2. Startup time matters (jackson-jr has very low initialization overhead)
 
 In addition to basic datatypes (core JDK types like `List`s, `Map`s, wrapper types),
@@ -155,9 +155,13 @@ Alternatively if you want a single jar deployment, you can use `jackson-jr-all` 
 
 Initial performance testing using [JVM Serializers](https://github.com/eishay/jvm-serializers/wiki) benchmark
 suggests that it is almost as fast as [full Jackson databind](https://github.com/FasterXML/jackson-databind) --
-additional overhead for tests is 5-20% for both serialization and deserialization.
+additional overhead for tests is 5-10% for both serialization and deserialization.
+So performance is practically identical.
 
-In fact, when only handling `List`s and `Map`s style content, speed `jackson-jr` speed matches `jackson-databind`
+In fact, when only handling `List`s and `Map`s style content, speed `jackson-jr` speed fully matches `jackson-databind`
 performance (Bean/POJO case is where full databinding's extensive optimizations help more).
 So performance should be adequate, and choice should be more based on functionality, convenience and
 deployment factors.
+
+About the only thing missing is that there is no equivalent to [Afterburner](../../jackson-module-afterburner), which
+can further speed up databind by 20-30%, for most performance-sensitive systems.
