@@ -163,5 +163,5 @@ performance (Bean/POJO case is where full databinding's extensive optimizations 
 So performance should be adequate, and choice should be more based on functionality, convenience and
 deployment factors.
 
-About the only thing missing is that there is no equivalent to [Afterburner](../../jackson-module-afterburner), which
+About the only thing missing is that there is no equivalent to [Afterburner](../../../jackson-module-afterburner), which
 can further speed up databind by 20-30%, for most performance-sensitive systems.
