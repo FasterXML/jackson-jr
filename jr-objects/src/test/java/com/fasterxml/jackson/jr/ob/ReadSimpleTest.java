@@ -9,19 +9,6 @@ public class ReadSimpleTest extends TestBase
 {
     enum ABC { A, B, C; }
 
-    static class WithEnumMap {
-        private Map<ABC, String> values;
-
-        WithEnumMap() { }
-        public WithEnumMap(ABC key, String value) {
-            values = new LinkedHashMap<ABC,String>();
-            values.put(key, value);
-        }
-
-        public Map<ABC, String> getValues() { return values; }
-        public void setValues(Map<ABC, String> v) { values = v; }
-    }
-    
     public void testSimpleList() throws Exception
     {
         final String INPUT = "[1,2,3]";
@@ -87,27 +74,5 @@ public class ReadSimpleTest extends TestBase
         // then from name
         abc = JSON.std.beanFrom(ABC.class, quote("C"));
         assertEquals(ABC.C, abc);
-    }
-
-    // [issue#21]
-    public void testMapWithEnumKey() throws Exception
-    {
-        WithEnumMap input = new WithEnumMap(ABC.B, "bar");
-        // verify serialization, should be ok:
-        String json = JSON.std.asString(input);
-        assertEquals(aposToQuotes("{'values':{'B':'bar'}}"), json);
-
-        // and then get it back too
-        WithEnumMap result = JSON.std.beanFrom(WithEnumMap.class, json);
-        assertNotNull(result);
-        Map<ABC, String> map = result.getValues();
-        assertNotNull(map);
-        assertEquals(1, map.size());
-        Map.Entry<?,?> entry = map.entrySet().iterator().next();
-        assertEquals("bar", entry.getValue());
-        if (!(entry.getKey() instanceof ABC)) {
-            fail("Expected key to be of type ABC, is: "+entry.getKey().getClass().getName());
-        }
-        assertEquals(ABC.B, entry.getKey());
     }
 }
