@@ -24,6 +24,10 @@ for use cases where a single jar is preferred over more modular approach.
 Finally, use of jar minimizers like [ProGuard](http://proguard.sourceforge.net/) can bring the jar
 size down even further, by renaming and removing debug information.
 
+## Status
+
+[![Build Status](https://travis-ci.org/FasterXML/jackson-jr.svg)](https://travis-ci.org/FasterXML/jackson-jr)
+
 ## Usage
 
 ### Reading/writing Simple Objects, Beans, List/arrays thereof
