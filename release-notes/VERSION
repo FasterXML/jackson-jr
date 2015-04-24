@@ -8,6 +8,8 @@ Project: jackson-jr
 
 - Minor performance optimizations, using new jackson-core 2.6 methods
 
+2.5.3 (24-Apr-2015)
+2.5.2 (29-Mar-2015)
 2.5.1 (06-Feb-2015)
 2.5.0 (01-Jan-2015)
 
