@@ -50,6 +50,10 @@ public class ReadSimpleTest extends TestBase
         assertEquals(3, ((Map<?,?>) ob).size());
         // actually, verify with write...
         assertEquals(INPUT, JSON.std.asString(ob));
+
+        // or, via explicit Map read
+        Map<String,Object> stuff = JSON.std.mapFrom(INPUT);
+        assertEquals(3, stuff.size());
     }
 
     public void testSimpleMixed() throws Exception

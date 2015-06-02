@@ -6,6 +6,7 @@ Project: jackson-jr
 
 2.6.0 (not yet released)
 
+#24: String/byte[] composers can not write POJOs (ObjectCodec not linked)
 - Minor performance optimizations, using new jackson-core 2.6 methods
 
 2.5.3 (24-Apr-2015)

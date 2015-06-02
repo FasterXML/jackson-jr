@@ -143,7 +143,7 @@ public class CollectionComposer<PARENT extends ComposerBase,
     /**
      * Method used to add Java Object ("POJO") into sequence being
      * composed: this <b>requires</b> that the underlying {@link JsonGenerator}
-     * has a properly configure {@link com.fasterxml.jackson.core.ObjectCodec}
+     * has a properly configured {@link com.fasterxml.jackson.core.ObjectCodec}
      * to use for serializer object.
      */
     public CollectionComposer<PARENT,C> addObject(Object pojo)

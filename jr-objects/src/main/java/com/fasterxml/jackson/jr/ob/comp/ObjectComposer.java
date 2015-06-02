@@ -118,6 +118,21 @@ public class ObjectComposer<PARENT extends ComposerBase>
         return this;
     }
 
+    /**
+     * Method used to put a Java Object ("POJO") value into Object being
+     * composed: this <b>requires</b> that the underlying {@link JsonGenerator}
+     * has a properly configured {@link com.fasterxml.jackson.core.ObjectCodec}
+     * to use for serializer object.
+     * 
+     * @since 2.6
+     */
+    public ObjectComposer<PARENT> putObject(String fieldName, Object value)
+        throws IOException, JsonProcessingException
+    {
+        _generator.writeObjectField(fieldName, value);
+        return this;
+    }
+
     public ObjectComposer<PARENT> put(String fieldName, int value)
         throws IOException, JsonProcessingException
     {

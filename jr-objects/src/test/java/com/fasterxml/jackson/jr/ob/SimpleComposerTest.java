@@ -6,6 +6,17 @@ import com.fasterxml.jackson.jr.ob.JSON;
 
 public class SimpleComposerTest extends TestBase
 {
+    public static class NameBean {
+        String first;
+
+        public NameBean(String f) {
+            first = f;
+        }
+        
+        public String getFirst() { return first; }
+        public void setFirst(String s) { first = s; }
+    }
+
     public void testSimpleNonNestedObject() throws Exception
     {
         String json = JSON.std.composeString()
@@ -103,5 +114,18 @@ public class SimpleComposerTest extends TestBase
                 .end()
                 .finish();
         assertEquals("[-3,{\"a\":1,\"b\":2}]", JSON.std.asString(list));
+    }
+
+    public void testComposerWithPojo() throws Exception
+    {
+        String json = JSON.std.composeString()
+                .startArray()
+                    .addObject(new NameBean("Bob"))
+                    .startObject()
+                        .putObject("name", new NameBean("Bill"))
+                    .end()
+                .end()
+                .finish();
+        assertEquals(aposToQuotes("[{'first':'Bob'},{'name':{'first':'Bill'}}]"), json);
     }
 }

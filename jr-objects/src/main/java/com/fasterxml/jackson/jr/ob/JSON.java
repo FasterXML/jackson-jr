@@ -663,13 +663,17 @@ public class JSON implements Versioned
     @SuppressWarnings("resource")
     public JSONComposer<String> composeString() throws IOException, JSONObjectException {
         SegmentedStringWriter out = new SegmentedStringWriter(_jsonFactory._getBufferRecycler());
-        return JSONComposer.stringComposer(_features, _jsonFactory.createGenerator(out), out);
+        JsonGenerator gen = _jsonFactory.createGenerator(out)
+                .setCodec(asCodec());
+        return JSONComposer.stringComposer(_features, gen, out);
     }
 
     @SuppressWarnings("resource")
     public JSONComposer<byte[]> composeBytes() throws IOException, JSONObjectException {
         ByteArrayBuilder out = new ByteArrayBuilder(_jsonFactory._getBufferRecycler());
-        return JSONComposer.bytesComposer(_features, _jsonFactory.createGenerator(out), out);
+        JsonGenerator gen = _jsonFactory.createGenerator(out)
+                .setCodec(asCodec());
+        return JSONComposer.bytesComposer(_features, gen, out);
     }
 
     public CollectionComposer<?,List<Object>> composeList() {
