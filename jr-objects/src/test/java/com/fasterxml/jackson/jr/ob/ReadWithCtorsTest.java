@@ -18,7 +18,7 @@ public class ReadWithCtorsTest extends TestBase
         protected long value;
         public FromLong2(Long v) { value = v.longValue(); }
     }
-    
+
     /*
     /**********************************************************************
     /* Test methdods
