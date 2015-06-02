@@ -127,7 +127,7 @@ There are many customizable features you can use with `JSON` object; see [Full L
 String json = JSON.std
   .with(JSON.Feature.PRETTY_PRINT_OUTPUT)
   .without(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS)
-  .writeValue(...);
+  .asString(...);
 ```
 
 ## License
@@ -142,7 +142,7 @@ You can use Maven dependency like:
 <dependency>
   <groupId>com.fasterxml.jackson.jr</groupId>
   <artifactId>jackson-jr-objects</artifactId>
-  <version>2.5.0</version>
+  <version>2.5.3</version>
 </dependency>
 ```
 
