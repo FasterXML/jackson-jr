@@ -109,7 +109,7 @@ public class JSONReader
     /**********************************************************************
      */
 
-    public final JSONReader withFeatures(int features)
+    public JSONReader withFeatures(int features)
     {
         if (_features == features) {
             return this;
@@ -117,12 +117,12 @@ public class JSONReader
         return _with(features, _typeDetector, _treeCodec, _collectionBuilder, _mapBuilder);
     }
 
-    public final JSONReader with(MapBuilder mb) {
+    public JSONReader with(MapBuilder mb) {
         if (_mapBuilder == mb) return this;
         return _with(_features, _typeDetector, _treeCodec, _collectionBuilder, mb);
     }
 
-    public final JSONReader with(CollectionBuilder lb) {
+    public JSONReader with(CollectionBuilder lb) {
         if (_collectionBuilder == lb) return this;
         return _with(_features, _typeDetector, _treeCodec, lb, _mapBuilder);
     }
@@ -166,7 +166,7 @@ public class JSONReader
      * for JSON Array (or, <code>Object[]</code> if so configured),
      * {@link java.lang.String} for JSON String value and so on.
      */
-    public final Object readValue() throws IOException {
+    public Object readValue() throws IOException {
         return AnyReader.std.read(this, _parser);
     }
 

@@ -88,21 +88,21 @@ public class JSONWriter
     /**********************************************************************
      */
 
-    public final JSONWriter withFeatures(int features) {
+    public JSONWriter withFeatures(int features) {
         if (_features == features) {
             return this;
         }
         return _with(features, _typeDetector, _treeCodec);
     }
 
-    public final JSONWriter with(TypeDetector td) {
+    public JSONWriter with(TypeDetector td) {
         if (_typeDetector == td) {
             return this;
         }
         return _with(_features, td, _treeCodec);
     }
 
-    public final JSONWriter with(TreeCodec tc) {
+    public JSONWriter with(TreeCodec tc) {
         if (_treeCodec == tc) {
             return this;
         }
@@ -141,7 +141,7 @@ public class JSONWriter
     /**********************************************************************
      */
 
-    public final void writeValue(Object value) throws IOException, JsonProcessingException
+    public void writeValue(Object value) throws IOException, JsonProcessingException
     {
         if (value == null) {
             writeNullValue();

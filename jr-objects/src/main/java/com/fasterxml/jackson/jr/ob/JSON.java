@@ -37,7 +37,7 @@ public class JSON implements Versioned
         * for floating-point numbers; or should {@link java.lang.Double} be used.
         * Trade-off is between accuracy -- only {@link java.math.BigDecimal} is
         * guaranteed to store the EXACT decimal value parsed -- and performance
-        * ({@link java.lang.Double} is typically faster to parser).
+        * ({@link java.lang.Double} is typically faster to parse).
         *<p>
         * Default setting is <code>false</code>, meaning that {@link java.lang.Double}
         * is used.
@@ -159,7 +159,7 @@ public class JSON implements Versioned
        WRITE_READONLY_BEAN_PROPERTIES(true),
 
        /**
-        * Feature that determines where Enum values are written using
+        * Feature that determines whether Enum values are written using
         * numeric index (true), or String representation from calling
         * {@link Enum#toString()} (false).
         *<p>
@@ -180,7 +180,7 @@ public class JSON implements Versioned
        
        /**
         * Feature that determines whether <code>JsonGenerator.flush()</code> is
-        * called after <code>writeJSON()</code> method <b>that takes JsonGenerator
+        * called after <code>write()</code> method <b>that takes JsonGenerator
         * as an argument</b> completes (that is, does NOT affect methods
         * that use other destinations).
         * This usually makes sense; but there are cases where flushing
@@ -194,7 +194,7 @@ public class JSON implements Versioned
 
        /**
         * Feature that determines what happens when we encounter a value of
-        * unrecognized type for which we do not have handling: if enabled,
+        * unrecognized type for which we do not have standard handler: if enabled,
         * will throw a {@link JSONObjectException}, if disabled simply
         * calls {@link Object#toString} and uses that JSON String as serialization.
         *<p>
