@@ -62,9 +62,6 @@ public class TypeResolver implements Serializable
      * Use of this method is discouraged (use if and only if you really know what you
      * are doing!); but if used, type bindings passed should come from {@link ResolvedType}
      * instance of declaring class (or interface).
-     *<p>
-     * NOTE: order of arguments was reversed for 0.8, to avoid problems with
-     * overload varargs method.
      */
     public ResolvedType resolve(TypeBindings typeBindings, Type jdkType) {
         return _fromAny(null, jdkType, typeBindings);
