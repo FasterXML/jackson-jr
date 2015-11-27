@@ -341,6 +341,7 @@ public class TypeDetector
         return result;
     }
 
+    @SuppressWarnings("deprecation")
     protected void _introspect(Class<?> currType, Map<String,BeanProperty> props)
     {
         if (currType == null || currType == Object.class) {

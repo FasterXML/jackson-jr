@@ -62,9 +62,6 @@ public class TypeResolver implements Serializable
      * Use of this method is discouraged (use if and only if you really know what you
      * are doing!); but if used, type bindings passed should come from {@link ResolvedType}
      * instance of declaring class (or interface).
-     *<p>
-     * NOTE: order of arguments was reversed for 0.8, to avoid problems with
-     * overload varargs method.
      */
     public ResolvedType resolve(TypeBindings typeBindings, Type jdkType) {
         return _fromAny(null, jdkType, typeBindings);
@@ -199,7 +196,11 @@ public class TypeResolver implements Serializable
         if (type != null) {
             return type;
         }
-        typeBindings = typeBindings.withAdditionalBinding(name, TYPE_OBJECT);
+        if (typeBindings.hasUnbound(name)) {
+            return TYPE_OBJECT;
+        }
+
+        typeBindings = typeBindings.withUnboundVariable(name);
         Type[] bounds = variable.getBounds();
         return _fromAny(context, bounds[0], typeBindings);
     }

@@ -106,9 +106,11 @@ public class JSON implements Versioned
         * Whether "is-getters" (like <code>public boolean isValuable()</code>) are detected
         * for use or not. Note that in addition to naming, and lack of arguments, return
         * value also has to be <code>boolean</code> or <code>java.lang.Boolean</code>.
+        *
+        * @since 2.5
         */
        USE_IS_GETTERS(true),
-       
+
        /**
         * When encountering duplicate keys for JSON Objects, should an exception
         * be thrown or not? If exception is not thrown, <b>the last</b> instance
@@ -177,7 +179,7 @@ public class JSON implements Versioned
         * (unless explicitly constructed with a pretty printer object)
         */
        PRETTY_PRINT_OUTPUT(false),
-       
+
        /**
         * Feature that determines whether <code>JsonGenerator.flush()</code> is
         * called after <code>write()</code> method <b>that takes JsonGenerator
@@ -228,7 +230,7 @@ public class JSON implements Versioned
         * of Bean reflection for cases where it is not desired.
         */
        HANDLE_JAVA_BEANS(true),
-       
+
        /**
         * Feature that determines whether access to {@link java.lang.reflect.Method}s and
         * {@link java.lang.reflect.Constructor}s that are used with dynamically
@@ -238,7 +240,7 @@ public class JSON implements Versioned
         * Feature is enabled by default, so that access may be forced.
         */
        FORCE_REFLECTION_ACCESS(true),
-       
+
        ;
 
        /*
@@ -250,7 +252,7 @@ public class JSON implements Versioned
        private final boolean _defaultState;
 
        private final int _mask;
-       
+
        private Feature(boolean defaultState) {
            _defaultState = defaultState;
            _mask = (1 << ordinal());
