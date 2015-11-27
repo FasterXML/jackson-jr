@@ -251,7 +251,8 @@ public class JSONWriter
         case SER_UUID:
         case SER_URL:
         case SER_URI:
-            writeStringLikeValue(value.toString(), type);
+            writeStringLikeField(fieldName, value.toString(), type);
+            return;
 
         // Others
             
