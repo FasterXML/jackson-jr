@@ -2,6 +2,7 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URL;
 import java.util.*;
 
 import com.fasterxml.jackson.jr.ob.JSON;
@@ -45,8 +46,12 @@ public class WriteSimpleTest extends TestBase
         stuff.put("a", 15);
         stuff.put("b", Boolean.TRUE);
         stuff.put("c", "foobar");
-        
-        assertEquals("{\"a\":15,\"b\":true,\"c\":\"foobar\"}",
+        stuff.put("d", UUID.fromString("8f88e079-7dc6-46f8-abfb-a533130f4ea0"));
+        stuff.put("e", new URL("https://github.com/FasterXML/jackson-jr?a=x&b=y"));
+        stuff.put("f", URI.create("https://github.com/FasterXML/jackson-jr?c=x&c=y"));
+
+        assertEquals("{\"a\":15,\"b\":true,\"c\":\"foobar\",\"d\":\"8f88e079-7dc6-46f8-abfb-a533130f4ea0\"," +
+                        "\"e\":\"https://github.com/FasterXML/jackson-jr?a=x&b=y\",\"f\":\"https://github.com/FasterXML/jackson-jr?c=x&c=y\"}",
                 JSON.std.asString(stuff));
     }
 
