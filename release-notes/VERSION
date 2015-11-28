@@ -4,6 +4,11 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.7.0 (not yet released)
+
+#31: Fix failure writing UUID, URL and URI
+ (reported by Mitsunori K (komamitsu@github))
+
 2.6.4 (not yet released)
 
 #27: JSON.Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS does not work
