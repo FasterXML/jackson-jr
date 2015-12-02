@@ -341,7 +341,6 @@ public class TypeDetector
         return result;
     }
 
-    @SuppressWarnings("deprecation")
     protected void _introspect(Class<?> currType, Map<String,BeanProperty> props)
     {
         if (currType == null || currType == Object.class) {
@@ -378,8 +377,7 @@ public class TypeDetector
                     // 28-Jul-2014, tatu: Stupid misnaming complicates things here;
                     //   basically, until we remove wrong one, need to require both
                     //   to be set...
-                    if (JSON.Feature.USE_IS_GETTERS.isEnabled(_features)
-                                && JSON.Feature.USE_IS_SETTERS.isEnabled(_features)) {
+                    if (JSON.Feature.USE_IS_GETTERS.isEnabled(_features)) {
                         // only add if no getter found (i.e. prefer regular getter, if one found)
                         BeanProperty prop = props.get(name);
                         if (prop == null) {
