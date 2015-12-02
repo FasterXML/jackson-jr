@@ -53,11 +53,15 @@ Streaming, in a single jar.
         <!-- Also: let's relocate Jackson core stuff; this is to avoid any conflicts
              between shaded version and proper non-shaded modules. If one wants original
              packages, should just use non-uber-jar version anyways.
+
+             01-Dec-2015, tatu: earlier package "private" was used to prevent any accidental
+               IDE-provided import, but due to reported issues with IDEs, had to drop that idea.
+               So for now it's just "private_" and will have to do.
           -->
         <relocations>
           <relocation>
             <pattern>com.fasterxml.jackson.core</pattern>
-            <shadedPattern>com.fasterxml.jackson.jr.private</shadedPattern>
+            <shadedPattern>com.fasterxml.jackson.jr.private_</shadedPattern>
           </relocation>
         </relocations>
       </configuration>
