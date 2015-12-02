@@ -12,19 +12,7 @@ has no other dependencies, and provides additional builder-style content generat
 </description>
   <url>http://wiki.fasterxml.com/JacksonHome</url>
   <properties>
-    <osgi.export>
-com.fasterxml.jackson.jr.ob,
-com.fasterxml.jackson.jr.ob.comp,
-com.fasterxml.jackson.jr.ob.impl,
-com.fasterxml.jackson.jr.type
-    </osgi.export>
-    <osgi.import>
-com.fasterxml.jackson.core,
-com.fasterxml.jackson.core.json,
-com.fasterxml.jackson.core.io,
-com.fasterxml.jackson.core.util,
-com.fasterxml.jackson.core.type,
-</osgi.import>
+    <!-- 01-Dec-2015, tatu: OSGi imports, exports should be fine with defaults from parent -->
     <packageVersion.dir>com/fasterxml/jackson/jr/ob</packageVersion.dir>
     <packageVersion.package>${project.groupId}.ob</packageVersion.package>
     <packageVersion.template.input>${basedir}/src/main/java/${packageVersion.dir}/PackageVersion.java.in</packageVersion.template.input>
@@ -39,8 +27,8 @@ com.fasterxml.jackson.core.type,
         <version>${version.plugin.javadoc}</version>
         <configuration>
           <links>
-            <link>http://docs.oracle.com/javase/6/docs/api/</link>
-            <link>http://fasterxml.github.com/jackson-core/javadoc/2.3.0/</link>
+            <link>http://docs.oracle.com/javase/7/docs/api/</link>
+            <link>http://fasterxml.github.com/jackson-core/javadoc/2.7</link>
           </links>
         </configuration>
 
