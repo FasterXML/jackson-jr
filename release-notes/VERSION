@@ -7,6 +7,9 @@ Project: jackson-jr
 2.7.0 (not yet released)
 
 #28: Remove misspelled `JSON.Feature.USE_IS_SETTERS`
+#29: Add `JSON.Feature.WRITE_DATES_AS_TIMESTAMP`, enabling of which allows
+ serialization of `java.util.Date` as long
+ (suggested by Giulio P (gpiancastelli@github))
 #31: Fix failure writing UUID, URL and URI
  (reported by Mitsunori K (komamitsu@github))
 

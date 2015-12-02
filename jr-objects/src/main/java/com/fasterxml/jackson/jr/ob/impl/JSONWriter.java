@@ -26,6 +26,8 @@ import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;
  */
 public class JSONWriter
 {
+    private final static TimeZone DEFAULT_TIMEZONE = TimeZone.getTimeZone("UTC");
+
     /*
     /**********************************************************************
     /* Blueprint config
@@ -42,7 +44,7 @@ public class JSONWriter
     protected final TreeCodec _treeCodec;
 
     protected final boolean _requireSetter;
-    
+
     /*
     /**********************************************************************
     /* Instance config
@@ -50,7 +52,9 @@ public class JSONWriter
      */
 
     protected final JsonGenerator _generator;
-    
+
+    protected final TimeZone _timezone;
+
     /*
     /**********************************************************************
     /* Blueprint construction
@@ -68,6 +72,7 @@ public class JSONWriter
         _treeCodec = tc;
         _generator = null;
         _requireSetter = JSON.Feature.WRITE_READONLY_BEAN_PROPERTIES.isDisabled(features);
+        _timezone = DEFAULT_TIMEZONE;
     }
 
     /**
@@ -80,6 +85,7 @@ public class JSONWriter
         _treeCodec = base._treeCodec;
         _generator = jgen;
         _requireSetter = JSON.Feature.WRITE_READONLY_BEAN_PROPERTIES.isDisabled(_features);
+        _timezone = DEFAULT_TIMEZONE;
     }
 
     /*
@@ -634,14 +640,21 @@ public class JSONWriter
             _generator.writeNull();
         }
     }
-    
+
     protected void writeDateValue(Date v) throws IOException {
-        // TODO: maybe allow serialization using timestamp?
-        writeStringValue(v.toString());
+        if (Feature.WRITE_DATES_AS_TIMESTAMP.isEnabled(_features)) {
+            writeLongValue(v.getTime());
+        } else {
+            writeStringValue(dateToString(v));
+        }
     }
 
     protected void writeDateField(String fieldName, Date v) throws IOException {
-        writeStringField(fieldName, v.toString());
+        if (Feature.WRITE_DATES_AS_TIMESTAMP.isEnabled(_features)) {
+            writeLongField(fieldName, v.getTime());
+        } else {
+            writeStringField(fieldName, dateToString(v));
+        }
     }
 
     protected void writeEnumValue(Enum<?> v) throws IOException {
@@ -720,5 +733,18 @@ public class JSONWriter
             return (String) rawKey;
         }
         return String.valueOf(rawKey);
+    }
+
+    /**
+     * @since 2.7
+     */
+    protected String dateToString(Date v) {
+        if (v == null) {
+            return "";
+        }
+        // !!! 01-Dec-2015, tatu: Should really use proper DateFormat or something
+        //   since this relies on system-wide defaults, and hard/impossible to
+        //   change easily
+        return v.toString();
     }
 }

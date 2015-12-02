@@ -5,7 +5,8 @@ import java.util.*;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.TestBase;
 
-public class ReadEnumMapTest extends TestBase
+// for [jackson-jr#21]
+public class ReadEnumMap21Test extends TestBase
 {
     enum DEF { D, E, F; }
 

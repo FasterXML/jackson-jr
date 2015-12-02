@@ -162,6 +162,19 @@ public class JSON implements Versioned
        WRITE_ENUMS_USING_INDEX(false),
 
        /**
+        * Feature that determines whether Date (and date/time) values
+        * (and Date-based things like {@link java.util.Calendar}s) are to be
+        * serialized as numeric timestamps (true),
+        * or using a textual representation (false)
+        *<p>
+        * Feature is disabled by default, so that date/time values are
+        * serialized as text, NOT timestamp.
+        *
+        * @since 2.7
+        */
+       WRITE_DATES_AS_TIMESTAMP(false),
+       
+       /**
         * Feature that can be enabled to use "pretty-printing", basic indentation
         * to make resulting JSON easier to read by humans by adding white space
         * such as line feeds and indentation.
