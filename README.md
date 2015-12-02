@@ -24,6 +24,24 @@ for use cases where a single jar is preferred over more modular approach.
 Finally, use of jar minimizers like [ProGuard](http://proguard.sourceforge.net/) can bring the jar
 size down even further, by renaming and removing debug information.
 
+## License
+
+Good old [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+
+## Packaging
+
+Project is composed of multiple Maven sub-modules, each corresponding to a jar:
+
+* `jr-objects` contains the "core" databinding implementation, and is commonly the only depenedncy to use
+    * Depends on `jackson-core` for low-level reading/writing
+* `jr-retrofit2` contains `jackson-jr` - based handlers for [Retrofit 2](http://square.github.io/retrofit/) library
+    * Depends on `jackson-jr` and `Retrofit` API jars, and indirectly on `jackson-core`
+* `jr-all` creates an "uber-jar" that contains eve
+    * `jr-objects` classes as-is, without relocating
+    * Jackson streaming (`jackson-core`) contents *relocated* ("shaded"), for private use by `jackson-jr`
+
+If you are not sure which package to use, the answer is usually `jr-objects`, and build system (maven, gradle) will fetch the dependency needed. `jr-all` jar is only used if the single-jar deployment (self-contained, no external dependencies) is needed.
+
 ## Status
 
 [![Build Status](https://travis-ci.org/FasterXML/jackson-jr.svg)](https://travis-ci.org/FasterXML/jackson-jr)
@@ -129,10 +147,6 @@ String json = JSON.std
   .without(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS)
   .asString(...);
 ```
-
-## License
-
-Good old [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
 
 ## Get it!
 
