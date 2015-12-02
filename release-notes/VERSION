@@ -10,6 +10,8 @@ Project: jackson-jr
 #29: Add `JSON.Feature.WRITE_DATES_AS_TIMESTAMP`, enabling of which allows
  serialization of `java.util.Date` as long
  (suggested by Giulio P (gpiancastelli@github))
+#30: Add initial version of jackson-jr - based Retrofit2 Converter
+ (contributed by GulajavaMinistudio@github)
 #31: Fix failure writing UUID, URL and URI
  (reported by Mitsunori K (komamitsu@github))
 
