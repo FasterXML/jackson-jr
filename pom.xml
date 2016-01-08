@@ -16,6 +16,7 @@
   <modules>
     <module>jr-objects</module>
     <module>jr-retrofit2</module>
+    <module>jr-stree</module>
     <module>jr-all</module>
   </modules>
 

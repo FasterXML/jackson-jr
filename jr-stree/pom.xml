@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.fasterxml.jackson.jr</groupId>
+    <artifactId>jackson-jr-parent</artifactId>
+    <version>2.7.0-rc4-SNAPSHOT</version>
+  </parent>
+  <artifactId>jackson-jr-stree</artifactId>
+  <packaging>bundle</packaging>
+  <description>Simple immutable (read-only) tree model that builds directly on `jackson-core` (streaming),
+has no other dependencies.
+</description>
+  <url>https://github.com/FasterXML/jackson-jr</url>
+  <properties>
+    <packageVersion.dir>com/fasterxml/jackson/jr/stree</packageVersion.dir>
+    <packageVersion.package>${project.groupId}.stree</packageVersion.package>
+    <packageVersion.template.input>${basedir}/src/main/java/${packageVersion.dir}/PackageVersion.java.in</packageVersion.template.input>
+    <packageVersion.template.output>${generatedSourcesDir}/${packageVersion.dir}/PackageVersion.java</packageVersion.template.output>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Inherited from oss-base. Generate PackageVersion.java.-->
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <executions>
+          <execution>
+            <id>process-packageVersion</id>
+            <phase>generate-sources</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <redirectTestOutputToFile>${surefire.redirectTestOutputToFile}</redirectTestOutputToFile>
+          <excludes>
+            <exclude>**/failing/*.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

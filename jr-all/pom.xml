@@ -25,6 +25,11 @@ Streaming, in a single jar.
         <artifactId>jackson-jr-objects</artifactId>
         <version>${project.version}</version>
     </dependency>
+    <dependency>
+        <groupId>com.fasterxml.jackson.jr</groupId>
+        <artifactId>jackson-jr-stree</artifactId>
+        <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -32,7 +37,7 @@ Streaming, in a single jar.
       <plugin>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-shade-plugin</artifactId>
-      <version>1.6</version>
+      <version>${version.plugin.shade}</version>
       <configuration>
         <createDependencyReducedPom>true</createDependencyReducedPom>
         <filters>
