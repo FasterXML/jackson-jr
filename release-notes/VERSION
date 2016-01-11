@@ -4,7 +4,7 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
-2.7.0 (not yet released)
+2.7.0 (10-Jan-2016)
 
 #28: Remove misspelled `JSON.Feature.USE_IS_SETTERS`
 #29: Add `JSON.Feature.WRITE_DATES_AS_TIMESTAMP`, enabling of which allows
@@ -14,6 +14,7 @@ Project: jackson-jr
  (contributed by GulajavaMinistudio@github)
 #31: Fix failure writing UUID, URL and URI
  (reported by Mitsunori K (komamitsu@github))
+#34: Add basic read-only (immutable) tree model impementation (stree)
 
 2.6.4 (not yet released)
 
