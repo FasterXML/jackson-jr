@@ -4,6 +4,10 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.7.1 (02-Feb-2016)
+
+No changes since 2.7.0
+
 2.7.0 (10-Jan-2016)
 
 #28: Remove misspelled `JSON.Feature.USE_IS_SETTERS`
