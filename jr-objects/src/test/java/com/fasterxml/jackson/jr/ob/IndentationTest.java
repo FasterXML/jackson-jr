@@ -21,5 +21,4 @@ public class IndentationTest extends TestBase
                 +"}",
                 JSON.std.with(JSON.Feature.PRETTY_PRINT_OUTPUT).asString(map));
     }
-
 }

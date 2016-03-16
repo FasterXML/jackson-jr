@@ -5,6 +5,10 @@ Project: jackson-jr
 ------------------------------------------------------------------------
 
 2.7.3 (16-Mar-2016)
+
+#38: PRETTY_PRINT_OUTPUT with composer doesn't work
+ (reported by weizhu-us@github)
+
 2.7.2 (26-Feb-2016)
 2.7.1 (02-Feb-2016)
 

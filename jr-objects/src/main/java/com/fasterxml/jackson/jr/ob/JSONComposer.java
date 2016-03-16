@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
+
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
 import com.fasterxml.jackson.jr.ob.comp.SequenceComposer;
 
@@ -112,7 +112,7 @@ public class JSONComposer<T>
      * and return instance of specified result type.
      */
     @SuppressWarnings("unchecked")
-    public T finish() throws IOException, JsonProcessingException
+    public T finish() throws IOException
     {
         if (_open) {
             _closeChild();
@@ -146,13 +146,13 @@ public class JSONComposer<T>
      */
 
     @Override
-    protected JSONComposer<T> _start() throws IOException, JsonProcessingException {
+    protected JSONComposer<T> _start() throws IOException {
         // Should never be called
         throw _illegalCall();
     }
 
     @Override
-    protected Object _finish() throws IOException, JsonProcessingException {
+    protected Object _finish() throws IOException {
         // Should never be called
         throw _illegalCall();
     }

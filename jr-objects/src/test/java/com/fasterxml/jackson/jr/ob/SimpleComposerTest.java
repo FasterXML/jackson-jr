@@ -128,4 +128,19 @@ public class SimpleComposerTest extends TestBase
                 .finish();
         assertEquals(aposToQuotes("[{'first':'Bob'},{'name':{'first':'Bill'}}]"), json);
     }
+
+    public void testComposerWithIndent() throws Exception
+    {
+        String json = JSON.std
+                .with(JSON.Feature.PRETTY_PRINT_OUTPUT)
+                .composeString()
+                .startObject()
+                    .put("name", "Bill")
+                .end()
+                .finish();
+        assertEquals(aposToQuotes("{\n"
+                +"  'name' : 'Bill'\n"
+                +"}"),
+                json);
+    }
 }

@@ -621,11 +621,11 @@ public class JSON implements Versioned
         return result;
     }
 
-    public void write(Object value, JsonGenerator jgen) throws IOException, JSONObjectException {
+    public void write(Object value, JsonGenerator gen) throws IOException, JSONObjectException {
         // NOTE: no call to _config(); assumed to be fully configured
-        _writerForOperation(jgen).writeValue(value);
+        _writerForOperation(gen).writeValue(value);
         if (Feature.FLUSH_AFTER_WRITE_VALUE.isEnabled(_features)) {
-            jgen.flush();
+            gen.flush();
         }
     }
 
@@ -653,32 +653,32 @@ public class JSON implements Versioned
     
     public JSONComposer<OutputStream> composeTo(OutputStream out) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features,
-                _jsonFactory.createGenerator(out), true);
+                _config(_jsonFactory.createGenerator(out)), true);
     }
 
     public JSONComposer<OutputStream> composeTo(Writer w) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features,
-                _jsonFactory.createGenerator(w), true);
+                _config(_jsonFactory.createGenerator(w)), true);
     }
 
     public JSONComposer<OutputStream> composeTo(File f) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features,
-                _jsonFactory.createGenerator(f, JsonEncoding.UTF8), true);
+                _config(_jsonFactory.createGenerator(f, JsonEncoding.UTF8)), true);
     }
     
     @SuppressWarnings("resource")
     public JSONComposer<String> composeString() throws IOException, JSONObjectException {
         SegmentedStringWriter out = new SegmentedStringWriter(_jsonFactory._getBufferRecycler());
-        JsonGenerator gen = _jsonFactory.createGenerator(out)
-                .setCodec(asCodec());
+        JsonGenerator gen = _config(_jsonFactory.createGenerator(out)
+                .setCodec(asCodec()));
         return JSONComposer.stringComposer(_features, gen, out);
     }
 
     @SuppressWarnings("resource")
     public JSONComposer<byte[]> composeBytes() throws IOException, JSONObjectException {
         ByteArrayBuilder out = new ByteArrayBuilder(_jsonFactory._getBufferRecycler());
-        JsonGenerator gen = _jsonFactory.createGenerator(out)
-                .setCodec(asCodec());
+        JsonGenerator gen = _config(_jsonFactory.createGenerator(out)
+                .setCodec(asCodec()));
         return JSONComposer.bytesComposer(_features, gen, out);
     }
 
@@ -866,7 +866,7 @@ public class JSON implements Versioned
      *</ul>
      */
     @SuppressWarnings("resource")
-    public Object anyFrom(Object source) throws IOException, JSONObjectException
+    public Object anyFrom(Object source) throws IOException
     {
         if (source instanceof JsonParser) {
             JsonParser jp = _initForReading((JsonParser) source);
@@ -894,27 +894,27 @@ public class JSON implements Versioned
     /**********************************************************************
      */
 
-    protected final void _writeAndClose(Object value, JsonGenerator jgen)
-        throws IOException, JSONObjectException
+    protected final void _writeAndClose(Object value, JsonGenerator g)
+        throws IOException
     {
         boolean closed = false;
         try {
-            _config(jgen);
-            _writerForOperation(jgen).writeValue(value);
+            _config(g);
+            _writerForOperation(g).writeValue(value);
             closed = true;
-            jgen.close();
+            g.close();
         } finally {
             if (!closed) {
                 // need to catch possible failure, so as not to mask problem
                 try {
-                    jgen.close();
+                    g.close();
                 } catch (IOException ioe) { }
             }
         }
     }
 
-    protected JSONWriter _writerForOperation(JsonGenerator jgen) {
-        return _writer.perOperationInstance(jgen);
+    protected JSONWriter _writerForOperation(JsonGenerator gen) {
+        return _writer.perOperationInstance(gen);
     }
 
     /*
@@ -923,8 +923,8 @@ public class JSON implements Versioned
     /**********************************************************************
      */
     
-    protected JSONReader _readerForOperation(JsonParser jp) {
-        return _reader.perOperationInstance(jp);
+    protected JSONReader _readerForOperation(JsonParser p) {
+        return _reader.perOperationInstance(p);
     }
 
     protected JsonParser _parser(Object source) throws IOException, JSONObjectException
@@ -959,21 +959,20 @@ public class JSON implements Versioned
                 +" as input (use an InputStream, Reader, String, byte[], File or URL");
     }
 
-    protected JsonParser _initForReading(JsonParser jp)
-        throws IOException, JsonProcessingException
+    protected JsonParser _initForReading(JsonParser p) throws IOException
     {
         /* First: must point to a token; if not pointing to one, advance.
          * This occurs before first read from JsonParser, as well as
          * after clearing of current token.
          */
-        JsonToken t = jp.getCurrentToken();
+        JsonToken t = p.getCurrentToken();
         if (t == null) { // and then we must get something...
-            t = jp.nextToken();
+            t = p.nextToken();
             if (t == null) { // not cool is it?
-                throw JSONObjectException.from(jp, "No content to map due to end-of-input");
+                throw JSONObjectException.from(p, "No content to map due to end-of-input");
             }
         }
-        return jp;
+        return p;
     }
     
     /*
@@ -982,7 +981,7 @@ public class JSON implements Versioned
     /**********************************************************************
      */
 
-    protected JsonGenerator _config(JsonGenerator jgen)
+    protected JsonGenerator _config(JsonGenerator g)
     {
         // First, possible pretty printing
         PrettyPrinter pp = _prettyPrinter;
@@ -990,11 +989,11 @@ public class JSON implements Versioned
             if (pp instanceof Instantiatable<?>) {
                 pp = (PrettyPrinter) ((Instantiatable<?>) pp).createInstance();
             }
-            jgen.setPrettyPrinter(pp);
+            g.setPrettyPrinter(pp);
         } else if (isEnabled(Feature.PRETTY_PRINT_OUTPUT)) {
-            jgen.useDefaultPrettyPrinter();
+            g.useDefaultPrettyPrinter();
         }
-        return jgen;
+        return g;
     }
 
     protected JsonParser _config(JsonParser jp)
