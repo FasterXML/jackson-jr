@@ -1,11 +1,12 @@
 package com.fasterxml.jackson.jr.retrofit2;
 
 import com.fasterxml.jackson.jr.ob.JSON;
-import com.squareup.okhttp.ResponseBody;
+
+import okhttp3.ResponseBody;
 
 import java.io.IOException;
 
-import retrofit.Converter;
+import retrofit2.Converter;
 
 public class JacksonJrResponseConverter<T> implements Converter<ResponseBody, T>
 {

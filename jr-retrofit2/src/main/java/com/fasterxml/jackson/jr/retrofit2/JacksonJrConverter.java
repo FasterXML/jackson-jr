@@ -4,10 +4,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import com.fasterxml.jackson.jr.ob.JSON;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.ResponseBody;
 
-import retrofit.Converter;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Converter;
+import retrofit2.Retrofit;
 
 public class JacksonJrConverter<T> extends Converter.Factory
 {
@@ -25,8 +26,9 @@ public class JacksonJrConverter<T> extends Converter.Factory
     }
     
     @Override
-    public Converter<ResponseBody, ?> fromResponseBody(Type type, Annotation[] annotations) {
-        super.fromResponseBody(type, annotations);
+    public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit)
+    {
+        super.responseBodyConverter(type, annotations, retrofit);
 
         //if same as class type return as class, otherwise, return as list
         if (_type == type) {
@@ -36,8 +38,9 @@ public class JacksonJrConverter<T> extends Converter.Factory
     }
 
     @Override
-    public Converter<?, RequestBody> toRequestBody(Type type, Annotation[] annotations) {
-        super.toRequestBody(type, annotations);
+    public Converter<?, RequestBody> requestBodyConverter(Type type, Annotation[] parameterAnnotations, Annotation[] methodAnnotations, Retrofit retrofit)
+    {
+        super.requestBodyConverter(type, parameterAnnotations, methodAnnotations, retrofit);
         return new JacksonJrRequestBodyConverter<T>(_jr);
     }
 }

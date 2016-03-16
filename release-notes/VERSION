@@ -6,6 +6,8 @@ Project: jackson-jr
 
 2.7.3 (16-Mar-2016)
 
+#37: Update Jackson Jr Retrofit 2 Converter for Retrofit 2.0.0
+ (contributed by GulajavaMinistudio@github)
 #38: PRETTY_PRINT_OUTPUT with composer doesn't work
  (reported by weizhu-us@github)
 

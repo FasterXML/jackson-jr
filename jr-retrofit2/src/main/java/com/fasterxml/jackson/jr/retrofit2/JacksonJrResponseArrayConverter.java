@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.util.List;
 
 import com.fasterxml.jackson.jr.ob.JSON;
-import com.squareup.okhttp.ResponseBody;
 
-import retrofit.Converter;
+import okhttp3.ResponseBody;
+
+import retrofit2.Converter;
 
 public class JacksonJrResponseArrayConverter<T> implements Converter<ResponseBody, List<T>>
 {
