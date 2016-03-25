@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 /**
- * Reader for typed {@link java.util.Map} values.
+ * Reader for typed Array values.
  */
 public class ArrayReader extends ValueReader
 {
@@ -29,11 +29,11 @@ public class ArrayReader extends ValueReader
         
         CollectionBuilder b = r._collectionBuilder(null);
         if (p.nextToken() == JsonToken.END_ARRAY) {
-            return b.emptyCollection();
+            return b.emptyArray(_elementType);
         }
         Object value = _valueReader.read(r, p);
         if (p.nextToken() == JsonToken.END_ARRAY) {
-            return b.singletonCollection(value);
+            return b.singletonArray(_elementType, value);
         }
         b = b.start().add(value);
         do {
@@ -46,11 +46,11 @@ public class ArrayReader extends ValueReader
     public Object read(JSONReader r, JsonParser p) throws IOException {
         CollectionBuilder b = r._collectionBuilder(null);
         if (p.nextToken() == JsonToken.END_ARRAY) {
-            return b.emptyCollection();
+            return b.emptyArray(_elementType);
         }
         Object value = _valueReader.read(r, p);
         if (p.nextToken() == JsonToken.END_ARRAY) {
-            return b.singletonCollection(value);
+            return b.singletonArray(_elementType, value);
         }
         b = b.start().add(value);
         do {

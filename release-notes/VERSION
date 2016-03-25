@@ -4,6 +4,11 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.6.6 (not yet released)
+
+#40: Cannot read empty or singleton arrays with JSON.arrayOfFrom
+ (reported by Giulio P)
+
 2.6.5 (19-Jan-2015)
 2.6.4 (07-Dec-2015)
 2.6.3 (12-Oct-2015)

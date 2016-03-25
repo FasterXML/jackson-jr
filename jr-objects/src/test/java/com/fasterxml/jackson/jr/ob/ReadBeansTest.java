@@ -189,12 +189,28 @@ public class ReadBeansTest extends TestBase
         assertEquals(IMAGE_URI1, im1.getUri());
     }
 
-    // For [Issue#15]
+    // For [#15]
     public void testLongBind() throws Exception
     {
         final String INPUT = "{\"value\":2}";
         LongBean bean = JSON.std.beanFrom(LongBean.class, INPUT);
         assertNotNull(bean);
         assertEquals(Long.valueOf(2L), bean.value);
+    }
+
+    public void testPojoArray() throws Exception
+    {
+        LongBean[] empty = JSON.std
+                .with(JSON.Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS)
+                .arrayOfFrom(LongBean.class, "[ ]");
+        assertNotNull(empty);
+        assertEquals(0, empty.length);
+
+        LongBean[] result = JSON.std
+                .with(JSON.Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS)
+                .arrayOfFrom(LongBean.class, "[{\"value\":3}]");
+        assertNotNull(result);
+        assertEquals(1, result.length);
+        assertEquals(3L, result[0].value.longValue());
     }
 }
