@@ -28,13 +28,18 @@ No changes since 2.7.0
  (reported by Mitsunori K (komamitsu@github))
 #34: Add basic read-only (immutable) tree model impementation (stree)
 
-2.6.4 (not yet released)
+
+2.6.6 (not yet released)
+
+#40: Cannot read empty or singleton arrays with JSON.arrayOfFrom
+ (reported by Giulio P)
+
+2.6.5 (19-Jan-2015)
+2.6.4 (07-Dec-2015)
 
 #27: JSON.Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS does not work
 - Minor fix to resolution of self-referential types (fix #28 from java-classmate)
 
-2.6.5 (19-Jan-2015)
-2.6.4 (07-Dec-2015)
 2.6.3 (12-Oct-2015)
 2.6.2 (14-Sep-2015)
 2.6.1 (09-Aug-2015)

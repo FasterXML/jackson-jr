@@ -7,7 +7,7 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 /**
- * Reader for typed {@link java.util.Map} values.
+ * Reader for typed {@link java.util.Collection} values.
  */
 public class CollectionReader extends ValueReader
 {

@@ -163,7 +163,7 @@ public abstract class CollectionBuilder
         return result;
     }
 
-    public <T> T[] singletonArray(Class<T> type, T value) {
+    public <T> T[] singletonArray(Class<?> type, T value) {
         @SuppressWarnings("unchecked")
         T[] result = (T[]) Array.newInstance(type, 1);
         result[0] = value;
