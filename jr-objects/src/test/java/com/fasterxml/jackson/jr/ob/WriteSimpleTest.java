@@ -136,27 +136,4 @@ public class WriteSimpleTest extends TestBase
         assertNotNull(map);
         assertEquals(2, map.size());
     }
-
-    // For [jackson-jr#29]
-    public void testSimpleDates() throws Exception
-    {
-        final Date input = new Date(0L);
-        JSON j = JSON.std;
-        
-        assertFalse(j.isEnabled(Feature.WRITE_DATES_AS_TIMESTAMP));
-
-        String json = j.asString(input);
-        // What to test? For now, accept two variants we may get, depending
-        // on timezone (which we can not, alas, control)
-        if (!json.contains("Dec 31")
-                && !json.contains("Jan 1")) {
-            fail("Invalid output: "+json);
-        }
-
-        j = j.with(Feature.WRITE_DATES_AS_TIMESTAMP);
-        assertTrue(j.isEnabled(Feature.WRITE_DATES_AS_TIMESTAMP));
-
-        json = j.asString(input);
-        assertEquals("0", json);
-    }
 }
