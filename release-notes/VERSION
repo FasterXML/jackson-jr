@@ -4,6 +4,10 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.7.4 (29-Apr-2016)
+
+No changes since 2.7.3.
+
 2.7.3 (16-Mar-2016)
 
 #37: Update Jackson Jr Retrofit 2 Converter for Retrofit 2.0.0
