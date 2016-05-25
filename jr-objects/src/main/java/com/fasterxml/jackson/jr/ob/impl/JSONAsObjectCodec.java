@@ -35,7 +35,7 @@ public class JSONAsObjectCodec
     {
         this(json, jf, json.getTreeCodec());
     }
-    
+
     public JSONAsObjectCodec(JSON json, JsonFactory jf, TreeCodec treeCodec)
     {
         _json = json;
@@ -43,6 +43,12 @@ public class JSONAsObjectCodec
         _treeCodec = treeCodec;
     }
 
+    // We are tightly coupled to core version so:
+    @Override
+    public Version version() {
+        return _jsonFactory.version();
+    }
+    
     /*
     /**********************************************************************
     /* ObjectCodec: Object reads
