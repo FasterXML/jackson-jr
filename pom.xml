@@ -8,7 +8,7 @@
   <groupId>com.fasterxml.jackson.jr</groupId>
   <artifactId>jackson-jr-parent</artifactId>
   <name>Parent pom for Jackson jr components</name>
-  <version>2.7.5-SNAPSHOT</version>
+  <version>2.8.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>Parent pom for Jackson jr components
   </description>
@@ -31,20 +31,37 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.jackson>2.8.0-SNAPSHOT</version.jackson>
-    <!-- 03-May-2016, tatu: This should still work with 2.8, as jackson-core
+    <!-- 04-May-2016, tatu: This should still work with 2.8, as jackson-core
         only requires Java 6 (unlike databind and other modules)
       -->
     <javac.src.version>1.6</javac.src.version>
     <javac.target.version>1.6</javac.target.version>
+
+    <!-- 04-May-2016, tatu: Bundle-plugin 3.x seems to require Java 7, so to
+           build for Java 6 need to downgrade here to last working 2.x version
+          (2.5.4 had some issues wrt shading)
+      -->
+    <version.plugin.bundle>2.5.3</version.plugin.bundle>
+
     <!-- Aggressively minimize jar size; drop 'lines' and 'vars' -->
     <javac.debuglevel>source</javac.debuglevel>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${version.jackson}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
-   <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${version.jackson}</version>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>

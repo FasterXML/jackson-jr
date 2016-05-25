@@ -4,6 +4,12 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.7.5 (not yet released)
+
+#42: Incorrect `jackson-core` dependency form parent pom leads to inclusion
+  of non-shaded core jar in `jr-all`
+ (reported by Adam V)
+
 2.7.4 (29-Apr-2016)
 
 No changes since 2.7.3.

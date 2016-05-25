@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.type.ResolvedType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.PackageVersion;
 
 /**
  * Convenience wrapper around {@link JSON} that implements {@link ObjectCodec}.
@@ -43,12 +44,11 @@ public class JSONAsObjectCodec
         _treeCodec = treeCodec;
     }
 
-    // We are tightly coupled to core version so:
     @Override
     public Version version() {
-        return _jsonFactory.version();
+        return PackageVersion.VERSION;
     }
-    
+
     /*
     /**********************************************************************
     /* ObjectCodec: Object reads
