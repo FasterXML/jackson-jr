@@ -18,6 +18,7 @@ import com.fasterxml.jackson.jr.ob.impl.*;
  *<p>
  * Note that instances are fully immutable, and thereby thread-safe.
  */
+@SuppressWarnings("resource")
 public class JSON implements Versioned
 {
     /**
@@ -591,7 +592,6 @@ public class JSON implements Versioned
     /**********************************************************************
      */
 
-    @SuppressWarnings("resource")
     public String asString(Object value) throws IOException, JSONObjectException
     {
         SegmentedStringWriter sw = new SegmentedStringWriter(_jsonFactory._getBufferRecycler());
@@ -605,7 +605,6 @@ public class JSON implements Versioned
         return sw.getAndClear();
     }
 
-    @SuppressWarnings("resource")
     public byte[] asBytes(Object value) throws IOException, JSONObjectException
     {
         ByteArrayBuilder bb = new ByteArrayBuilder(_jsonFactory._getBufferRecycler());
@@ -665,8 +664,7 @@ public class JSON implements Versioned
         return JSONComposer.streamComposer(_features,
                 _config(_jsonFactory.createGenerator(f, JsonEncoding.UTF8)), true);
     }
-    
-    @SuppressWarnings("resource")
+
     public JSONComposer<String> composeString() throws IOException, JSONObjectException {
         SegmentedStringWriter out = new SegmentedStringWriter(_jsonFactory._getBufferRecycler());
         JsonGenerator gen = _config(_jsonFactory.createGenerator(out)
@@ -674,7 +672,6 @@ public class JSON implements Versioned
         return JSONComposer.stringComposer(_features, gen, out);
     }
 
-    @SuppressWarnings("resource")
     public JSONComposer<byte[]> composeBytes() throws IOException, JSONObjectException {
         ByteArrayBuilder out = new ByteArrayBuilder(_jsonFactory._getBufferRecycler());
         JsonGenerator gen = _config(_jsonFactory.createGenerator(out)
@@ -698,151 +695,146 @@ public class JSON implements Versioned
     public MapComposer<?> composeMap(Map<String,Object> map) {
         return new MapComposer<ComposerBase>(map);
     }
-    
+
     /*
     /**********************************************************************
     /* API: reading JSON as Simple Objects
     /**********************************************************************
      */
 
-    @SuppressWarnings("resource")
     public List<Object> listFrom(Object source) throws IOException, JSONObjectException
     {
         if (source instanceof JsonParser) {
             // note: no call to _config(), should come pre-configured
-            JsonParser jp = _initForReading((JsonParser) source);
-            List<Object> result = _readerForOperation(jp).readList();
+            JsonParser p = _initForReading((JsonParser) source);
+            List<Object> result = _readerForOperation(p).readList();
             // Need to consume the token too
-            jp.clearCurrentToken();
+            p.clearCurrentToken();
             return result;
         }
-        JsonParser jp = _parser(source);
+        JsonParser p = _parser(source);
         try {
-            _initForReading(_config(jp));
-            List<Object> result = _readerForOperation(jp).readList();
-            JsonParser jp0 = jp;
-            jp = null;
-            _close(jp0, null);
+            _initForReading(_config(p));
+            List<Object> result = _readerForOperation(p).readList();
+            JsonParser p0 = p;
+            p = null;
+            _close(p0, null);
             return result;
         } catch (Exception e) {
-            _close(jp, e);
+            _close(p, e);
             return null;
         }
     }
 
-    @SuppressWarnings("resource")
     public <T> List<T> listOfFrom(Class<T> type, Object source) throws IOException, JSONObjectException
     {
         if (source instanceof JsonParser) {
             // note: no call to _config(), should come pre-configured
-            JsonParser jp = _initForReading((JsonParser) source);
-            List<T> result = _readerForOperation(jp).readListOf(type);
+            JsonParser p = _initForReading((JsonParser) source);
+            List<T> result = _readerForOperation(p).readListOf(type);
             // Need to consume the token too
-            jp.clearCurrentToken();
+            p.clearCurrentToken();
             return result;
         }
-        JsonParser jp = _parser(source);
+        JsonParser p = _parser(source);
         try {
-            _initForReading(_config(jp));
-            List<T> result = _readerForOperation(jp).readListOf(type);
-            JsonParser jp0 = jp;
-            jp = null;
-            _close(jp0, null);
+            _initForReading(_config(p));
+            List<T> result = _readerForOperation(p).readListOf(type);
+            JsonParser p0 = p;
+            p = null;
+            _close(p0, null);
             return result;
         } catch (Exception e) {
-            _close(jp, e);
+            _close(p, e);
             return null;
         }
     }
-    
-    @SuppressWarnings("resource")
+
     public Object[] arrayFrom(Object source) throws IOException, JSONObjectException
     {
         if (source instanceof JsonParser) {
-            JsonParser jp = _initForReading((JsonParser) source);
-            Object[] result = _readerForOperation(jp).readArray();
-            jp.clearCurrentToken();
+            JsonParser p = _initForReading((JsonParser) source);
+            Object[] result = _readerForOperation(p).readArray();
+            p.clearCurrentToken();
             return result;
         }
-        JsonParser jp = _parser(source);
+        JsonParser p = _parser(source);
         try {
-            _initForReading(_config(jp));
-            Object[] result = _readerForOperation(jp).readArray();
-            JsonParser jp0 = jp;
-            jp = null;
-            _close(jp0, null);
+            _initForReading(_config(p));
+            Object[] result = _readerForOperation(p).readArray();
+            JsonParser p0 = p;
+            p = null;
+            _close(p0, null);
             return result;
         } catch (Exception e) {
-            _close(jp, e);
+            _close(p, e);
             return null;
         }
     }
 
-    @SuppressWarnings("resource")
     public <T> T[] arrayOfFrom(Class<T> type, Object source) throws IOException, JSONObjectException
     {
         if (source instanceof JsonParser) {
-            JsonParser jp = _initForReading((JsonParser) source);
-            T[] result = _readerForOperation(jp).readArrayOf(type);
-            jp.clearCurrentToken();
+            JsonParser p = _initForReading((JsonParser) source);
+            T[] result = _readerForOperation(p).readArrayOf(type);
+            p.clearCurrentToken();
             return result;
         }
-        JsonParser jp = _parser(source);
+        JsonParser p = _parser(source);
         try {
-            _initForReading(_config(jp));
-            T[] result = _readerForOperation(jp).readArrayOf(type);
-            JsonParser jp0 = jp;
-            jp = null;
-            _close(jp0, null);
+            _initForReading(_config(p));
+            T[] result = _readerForOperation(p).readArrayOf(type);
+            JsonParser p0 = p;
+            p = null;
+            _close(p0, null);
             return result;
         } catch (Exception e) {
-            _close(jp, e);
-            return null;
-        }
-    }
-    
-    @SuppressWarnings({ "unchecked", "resource" })
-    public <T> Map<T,Object> mapFrom(Object source) throws IOException, JSONObjectException
-    {
-        if (source instanceof JsonParser) {
-            JsonParser jp = _initForReading((JsonParser) source);
-            Map<Object,Object> result = _readerForOperation(jp).readMap();
-            jp.clearCurrentToken();
-            return (Map<T,Object>) result;
-        }
-        JsonParser jp = _parser(source);
-        try {
-            _initForReading(_config(jp));
-            Map<Object,Object> result = _readerForOperation(jp).readMap();
-            JsonParser jp0 = jp;
-            jp = null;
-            _close(jp0, null);
-            return (Map<T,Object>) result;
-        } catch (Exception e) {
-            _close(jp, e);
+            _close(p, e);
             return null;
         }
     }
 
-    @SuppressWarnings("resource")
+    @SuppressWarnings("unchecked")
+    public <T> Map<T,Object> mapFrom(Object source) throws IOException, JSONObjectException
+    {
+        if (source instanceof JsonParser) {
+            JsonParser p = _initForReading((JsonParser) source);
+            Map<Object,Object> result = _readerForOperation(p).readMap();
+            p.clearCurrentToken();
+            return (Map<T,Object>) result;
+        }
+        JsonParser p = _parser(source);
+        try {
+            _initForReading(_config(p));
+            Map<Object,Object> result = _readerForOperation(p).readMap();
+            JsonParser p0 = p;
+            p = null;
+            _close(p0, null);
+            return (Map<T,Object>) result;
+        } catch (Exception e) {
+            _close(p, e);
+            return null;
+        }
+    }
+
     public <T> T beanFrom(Class<T> type, Object source) throws IOException, JSONObjectException
     {
         if (source instanceof JsonParser) {
-            JsonParser jp = _initForReading((JsonParser) source);
-            T result = _readerForOperation(jp).readBean(type);
-            jp.clearCurrentToken();
+            JsonParser p = _initForReading((JsonParser) source);
+            T result = _readerForOperation(p).readBean(type);
+            p.clearCurrentToken();
             return result;
         }
-        JsonParser jp = _parser(source);
+        JsonParser p = _parser(source);
         try {
-            _initForReading(_config(jp));
-            T result = _readerForOperation(jp).readBean(type);
-            JsonParser jp0 = jp;
-            jp = null;
-            _close(jp0, null);
+            _initForReading(_config(p));
+            T result = _readerForOperation(p).readBean(type);
+            JsonParser p0 = p;
+            p = null;
+            _close(p0, null);
             return result;
         } catch (Exception e) {
-            _close(jp, e);
+            _close(p, e);
             return null;
         }
     }
@@ -865,29 +857,62 @@ public class JSON implements Versioned
      * <li><code>char[]</code></li>
      *</ul>
      */
-    @SuppressWarnings("resource")
     public Object anyFrom(Object source) throws IOException
     {
         if (source instanceof JsonParser) {
-            JsonParser jp = _initForReading((JsonParser) source);
-            Object result = _readerForOperation(jp).readValue();
-            jp.clearCurrentToken();
+            JsonParser p = _initForReading((JsonParser) source);
+            Object result = _readerForOperation(p).readValue();
+            p.clearCurrentToken();
             return result;
         }
-        JsonParser jp = _parser(source);
+        JsonParser p = _parser(source);
         try {
-            _initForReading(_config(jp));
-            Object result = _readerForOperation(jp).readValue();
-            JsonParser jp0 = jp;
-            jp = null;
-            _close(jp0, null);
+            _initForReading(_config(p));
+            Object result = _readerForOperation(p).readValue();
+            JsonParser p0 = p;
+            p = null;
+            _close(p0, null);
             return result;
         } catch (Exception e) {
-            _close(jp, e);
+            _close(p, e);
             return null;
         }
     }
-    
+
+    /**
+     * Method for reading content as a JSON Tree (of type that configured
+     * {@link TreeCodec}, see {@link #with(TreeCodec)}) supports.
+     *
+     * @since 2.8
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends TreeNode> TreeNode treeFrom(Object source)
+            throws IOException, JSONObjectException
+    {
+        if (_treeCodec == null) {
+            throw new IllegalStateException("JSON instance does not have configured TreeCodec to read trees");
+        }
+        
+        if (source instanceof JsonParser) {
+            JsonParser p = _initForReading((JsonParser) source);
+            T result = (T) _treeCodec.readTree(p);
+            p.clearCurrentToken();
+            return result;
+        }
+        JsonParser p = _parser(source);
+        try {
+            _initForReading(_config(p));
+            T result = (T) _treeCodec.readTree(p);
+            JsonParser p0 = p;
+            p = null;
+            _close(p0, null);
+            return result;
+        } catch (Exception e) {
+            _close(p, e);
+            return null;
+        }
+    }
+
     /*
     /**********************************************************************
     /* Internal methods, writing
@@ -996,10 +1021,10 @@ public class JSON implements Versioned
         return g;
     }
 
-    protected JsonParser _config(JsonParser jp)
+    protected JsonParser _config(JsonParser p)
     {
         // nothing to do, yet
-        return jp;
+        return p;
     }
 
     protected void _close(Closeable cl) {
