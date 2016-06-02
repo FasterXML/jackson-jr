@@ -43,7 +43,6 @@ has no other dependencies, and provides additional builder-style content generat
       <plugin>
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>replacer</artifactId>
-        <version>${version.plugin.replacer}</version>
         <executions>
           <execution>
             <id>process-packageVersion</id>

@@ -1,39 +1,24 @@
 package com.fasterxml.jackson.jr.stree;
 
+import java.io.StringWriter;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.TreeCodec;
 import com.fasterxml.jackson.core.TreeNode;
 
-import com.fasterxml.jackson.jr.ob.JSON;
-
-import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
-import com.fasterxml.jackson.jr.stree.JrsArray;
-import com.fasterxml.jackson.jr.stree.JrsBoolean;
-import com.fasterxml.jackson.jr.stree.JrsNumber;
-import com.fasterxml.jackson.jr.stree.JrsObject;
-import com.fasterxml.jackson.jr.stree.JrsValue;
-
-import java.io.StringWriter;
-
-public class SimpleReadTest extends TestBase
+/**
+ * Tests for reading content directly using codec, and not
+ * through <code>JSON</code>
+ */
+public class ReadViaCodecTest extends TestBase
 {
     private final TreeCodec TREE_CODEC = new JacksonJrsTreeCodec();
-
-    private final JSON treeJSON = JSON.std.with(TREE_CODEC);
 
     public void testSimpleList() throws Exception
     {
         final String INPUT = "[true,\"abc\"]";
         TreeNode node = TREE_CODEC.readTree(_factory.createParser(INPUT));
-        _verifySimpleTree(INPUT, node);
 
-        // and then through jr-objects:
-        node = treeJSON.treeFrom(INPUT);
-        _verifySimpleTree(INPUT, node);
-    }
-
-    private void _verifySimpleTree(String input, TreeNode node) throws Exception
-    {
         assertTrue(node instanceof JrsArray);
         assertEquals(2, node.size());
         // actually, verify with write...
@@ -41,7 +26,7 @@ public class SimpleReadTest extends TestBase
         final JsonGenerator g = _factory.createGenerator(writer);
         TREE_CODEC.writeTree(g, node);
         g.close();
-        assertEquals(input, writer.toString());
+        assertEquals(INPUT, writer.toString());
     }
     
     public void testSimpleMap() throws Exception

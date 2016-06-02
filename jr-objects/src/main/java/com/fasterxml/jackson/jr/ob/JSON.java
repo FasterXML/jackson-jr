@@ -639,7 +639,7 @@ public class JSON implements Versioned
     public void write(Object value, File f) throws IOException, JSONObjectException {
         _writeAndClose(value, _jsonFactory.createGenerator(f, JsonEncoding.UTF8));
     }
-    
+
     /*
     /**********************************************************************
     /* API: writing using Composers
@@ -649,7 +649,7 @@ public class JSON implements Versioned
     public JSONComposer<OutputStream> composeUsing(JsonGenerator gen) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features, gen, false);
     }
-    
+
     public JSONComposer<OutputStream> composeTo(OutputStream out) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features,
                 _config(_jsonFactory.createGenerator(out)), true);
@@ -890,9 +890,8 @@ public class JSON implements Versioned
             throws IOException, JSONObjectException
     {
         if (_treeCodec == null) {
-            throw new IllegalStateException("JSON instance does not have configured TreeCodec to read trees");
+             _noTreeCodec("read TreeNode");
         }
-        
         if (source instanceof JsonParser) {
             JsonParser p = _initForReading((JsonParser) source);
             T result = (T) _treeCodec.readTree(p);
@@ -911,6 +910,48 @@ public class JSON implements Versioned
             _close(p, e);
             return null;
         }
+    }
+
+    /*
+    /**********************************************************************
+    /* API: TreeNode construction
+    /**********************************************************************
+     */
+
+    /**
+     * Convenience method, equivalent to:
+     *<pre>
+     *   getTreeCodec().createArrayNode();
+     *</pre>
+     * Note that for call to succeed a {@link TreeCodec} must have been
+     * configured with this instance using {@link #with(TreeCodec)} method.
+     *
+     * @since 2.8
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends TreeNode> T createArrayNode() {
+         if (_treeCodec == null) {
+              _noTreeCodec("create Object node");
+          }
+         return (T) _treeCodec.createArrayNode();
+    }
+    
+    /**
+     * Convenience method, equivalent to:
+     *<pre>
+     *   getTreeCodec().createObjectNode();
+     *</pre>
+     * Note that for call to succeed a {@link TreeCodec} must have been
+     * configured with this instance using {@link #with(TreeCodec)} method.
+     *
+     * @since 2.8
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends TreeNode> T createObjectNode() {
+         if (_treeCodec == null) {
+              _noTreeCodec("create Object node");
+          }
+         return (T) _treeCodec.createObjectNode();
     }
 
     /*
@@ -1054,5 +1095,9 @@ public class JSON implements Versioned
             }
             throw new IOException(e); // should never occur
         }
+    }
+
+    protected void _noTreeCodec(String msg) {
+         throw new IllegalStateException("JSON instance does not have configured TreeCodec to "+msg);
     }
 }

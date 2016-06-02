@@ -2,23 +2,19 @@ package com.fasterxml.jackson.jr.stree;
 
 import java.util.*;
 
-import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
-import com.fasterxml.jackson.jr.stree.JrsArray;
-import com.fasterxml.jackson.jr.stree.JrsBoolean;
-import com.fasterxml.jackson.jr.stree.JrsNumber;
-import com.fasterxml.jackson.jr.stree.JrsObject;
-import com.fasterxml.jackson.jr.stree.JrsString;
-import com.fasterxml.jackson.jr.stree.JrsValue;
+import com.fasterxml.jackson.jr.ob.JSON;
 
-public class SimpleWriteTest extends TestBase
+public class WriteViaJSONTest extends TestBase
 {
-    public void testSimpleList() throws Exception
+     private final JSON treeJSON = JSON.std.with(new JacksonJrsTreeCodec());
+
+     public void testSimpleList() throws Exception
     {
         List<JrsValue> stuff = new LinkedList<JrsValue>();
         stuff.add(new JrsString("x"));
         stuff.add(JrsBoolean.TRUE);
         stuff.add(new JrsNumber(123));
-        assertEquals("[\"x\",true,123]", writeTree(new JacksonJrsTreeCodec(), new JrsArray(stuff)));
+        assertEquals("[\"x\",true,123]", treeJSON.asString(new JrsArray(stuff)));
     }
 
     public void testSimpleMap() throws Exception
@@ -29,7 +25,7 @@ public class SimpleWriteTest extends TestBase
         stuff.put("c", new JrsString("foobar"));
 
         assertEquals("{\"a\":15,\"b\":true,\"c\":\"foobar\"}",
-                writeTree(new JacksonJrsTreeCodec(), new JrsObject(stuff)));
+                  treeJSON.asString(new JrsObject(stuff)));
     }
 
     public void testNest() throws Exception
@@ -45,6 +41,6 @@ public class SimpleWriteTest extends TestBase
         second.put("bar", new JrsArray());
 
         assertEquals("{\"first\":[123,456],\"second\":{\"foo\":\"bar\",\"bar\":[]}}",
-                writeTree(new JacksonJrsTreeCodec(), new JrsObject(stuff)));
+                  treeJSON.asString(new JrsObject(stuff)));
     }
 }

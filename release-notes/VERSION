@@ -4,6 +4,10 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.8.0 (not yet released)
+
+#43: Add convenience read method for reading trees via `JSON`
+
 2.7.5 (not yet released)
 
 #42: Incorrect `jackson-core` dependency form parent pom leads to inclusion

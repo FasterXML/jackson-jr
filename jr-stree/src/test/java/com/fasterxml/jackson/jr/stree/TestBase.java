@@ -1,29 +1,14 @@
 package com.fasterxml.jackson.jr.stree;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.TreeCodec;
-import com.fasterxml.jackson.core.TreeNode;
+import java.util.Arrays;
+
+import com.fasterxml.jackson.core.*;
 
 import junit.framework.TestCase;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Arrays;
 
 public abstract class TestBase extends TestCase
 {
     protected final JsonFactory _factory = new JsonFactory();
-
-    protected String writeTree(TreeCodec treeCodec, TreeNode treeNode) throws IOException {
-        StringWriter writer = new StringWriter();
-        JsonGenerator g = _factory.createGenerator(writer);
-        treeCodec.writeTree(g, treeNode);
-        g.close();
-        return writer.toString();
-    }
 
     protected void assertToken(JsonToken expToken, JsonToken actToken)
     {

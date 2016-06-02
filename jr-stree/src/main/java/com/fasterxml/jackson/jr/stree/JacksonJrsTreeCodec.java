@@ -112,6 +112,33 @@ public class JacksonJrsTreeCodec extends TreeCodec
         return JrsMissing.instance;
     }
 
+    /**
+     * @since 2.8
+     */
+    public JrsBoolean booleanNode(boolean state) {
+         return state? JrsBoolean.TRUE : JrsBoolean.FALSE;
+    }
+
+    /**
+     * @since 2.8
+     */
+    public JrsString stringNode(String text) {
+        if (text == null) {
+            text = "";
+        }
+        return new JrsString(text);
+    }
+
+    /**
+     * @since 2.8
+     */
+    public JrsNumber numberNode(Number nr) {
+        if (nr == null) {
+            throw new NullPointerException();
+        }
+        return new JrsNumber(nr);
+    }
+
     /*
     /**********************************************************************
     /* Internal methods
