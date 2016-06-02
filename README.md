@@ -34,11 +34,14 @@ Project is composed of multiple Maven sub-modules, each corresponding to a jar:
 
 * [jr-objects](../../tree/master/jr-objects) contains the "core" databinding implementation, and is commonly the only depenedncy to use
     * Depends on `jackson-core` for low-level reading/writing
-* `jr-retrofit2` contains `jackson-jr` - based handlers for [Retrofit 2](http://square.github.io/retrofit/) library
+* [jr-stree](../../tree/master/jr-stree) contains a simple `TreeCodec` implementation, with which it is possible to read JSON as `TreeNode`s (see more below)
+* [jr-retrofit2](../../tree/master/jr-retrofit2) contains `jackson-jr` - based handlers for [Retrofit 2](http://square.github.io/retrofit/) library
     * Depends on `jackson-jr` and `Retrofit` API jars, and indirectly on `jackson-core`
-* `jr-all` creates an "uber-jar" that contains eve
+* jr-all` creates an "uber-jar" that contains individual modules along with all their dependencies:
     * `jr-objects` classes as-is, without relocating
+    * `jr-stree` classes as-is, without relocating
     * Jackson streaming (`jackson-core`) contents *relocated* ("shaded"), for private use by `jackson-jr`
+    * Does NOT contain `jr-retrofit2` component
 
 If you are not sure which package to use, the answer is usually `jr-objects`, and build system (maven, gradle) will fetch the dependency needed. `jr-all` jar is only used if the single-jar deployment (self-contained, no external dependencies) is needed.
 
@@ -126,6 +129,30 @@ would produce (since pretty-printing is enabled)
   "last" : true
 }
 ```
+
+### Reading/writing JSON Trees
+
+Jackson jr allows pluggable "tree models", and also provides one implementation, `jr-stree`.
+Usage for `jr-stree` is by configuring `JSON` with codec, and then using `treeFrom` and `write` methods
+like so:
+
+```java
+JSON json = JSON.std.with(new JacksonJrsTreeCodec());
+TreeNode root = json.treeFrom("{\"value\" : [1, 2, 3]}");
+assertTrue(root.isObject());
+TreeNode array = root.get("value");
+assertTrue(array.isArray());
+JrsNumber n = (JrsNumber) array.get(1);
+assertEquals(2, n.getValue().intValue());
+
+String json = json.asString(root);
+```
+
+Note that `jr-stree` implementation is a small minimalistic implementation with immutable
+nodes. It is most useful for simple reading use cases.
+
+It is however possible to write your own `TreeCodec` implementations that integrate seamlessly,
+and in future other tree models may be offered as part of jackson-jr, or via other libraries.
 
 ### Designing your Beans
 
