@@ -32,7 +32,7 @@ Good old [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
 
 Project is composed of multiple Maven sub-modules, each corresponding to a jar:
 
-* `jr-objects` contains the "core" databinding implementation, and is commonly the only depenedncy to use
+* [jr-objects](../../tree/master/jr-objects) contains the "core" databinding implementation, and is commonly the only depenedncy to use
     * Depends on `jackson-core` for low-level reading/writing
 * `jr-retrofit2` contains `jackson-jr` - based handlers for [Retrofit 2](http://square.github.io/retrofit/) library
     * Depends on `jackson-jr` and `Retrofit` API jars, and indirectly on `jackson-core`
@@ -158,7 +158,7 @@ You can use Maven dependency like:
 <dependency>
   <groupId>com.fasterxml.jackson.jr</groupId>
   <artifactId>jackson-jr-objects</artifactId>
-  <version>2.5.3</version>
+  <version>2.7.4</version>
 </dependency>
 ```
 
