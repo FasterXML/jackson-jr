@@ -29,7 +29,7 @@ public class JSON implements Versioned
     {
        /*
        /**********************************************************************
-       /* Read-related features
+       /* Read-related features that do not affect caching
        /**********************************************************************
         */
 
@@ -95,15 +95,6 @@ public class JSON implements Versioned
        USE_DEFERRED_MAPS(true),
 
        /**
-        * Whether "is-getters" (like <code>public boolean isValuable()</code>) are detected
-        * for use or not. Note that in addition to naming, and lack of arguments, return
-        * value also has to be <code>boolean</code> or <code>java.lang.Boolean</code>.
-        *
-        * @since 2.5
-        */
-       USE_IS_GETTERS(true),
-
-       /**
         * When encountering duplicate keys for JSON Objects, should an exception
         * be thrown or not? If exception is not thrown, <b>the last</b> instance
         * from input document will be used.
@@ -125,7 +116,7 @@ public class JSON implements Versioned
 
        /*
        /**********************************************************************
-       /* Write-related features
+       /* Write-related features that do not affect caching
        /**********************************************************************
         */
 
@@ -217,7 +208,7 @@ public class JSON implements Versioned
 
        /*
        /**********************************************************************
-       /* Other features
+       /* Features that affect introspection
        /**********************************************************************
         */
 
@@ -234,7 +225,7 @@ public class JSON implements Versioned
         * Feature is enabled by default, but can be disabled do avoid use
         * of Bean reflection for cases where it is not desired.
         */
-       HANDLE_JAVA_BEANS(true),
+       HANDLE_JAVA_BEANS(true, true),
 
        /**
         * Feature that determines whether access to {@link java.lang.reflect.Method}s and
@@ -244,8 +235,17 @@ public class JSON implements Versioned
         *<p>
         * Feature is enabled by default, so that access may be forced.
         */
-       FORCE_REFLECTION_ACCESS(true),
+       FORCE_REFLECTION_ACCESS(true, true),
 
+       /**
+        * Whether "is-getters" (like <code>public boolean isValuable()</code>) are detected
+        * for use or not. Note that in addition to naming, and lack of arguments, return
+        * value also has to be <code>boolean</code> or <code>java.lang.Boolean</code>.
+        *
+        * @since 2.5
+        */
+       USE_IS_GETTERS(true, true),
+       
        /**
         * Feature that enables use of public fields instead of setters and getters,
         * in cases where no setter/getter is available.
@@ -255,7 +255,7 @@ public class JSON implements Versioned
         *
         * @since 2.8
         */
-       USE_FIELDS(false),
+       USE_FIELDS(false, true),
        
        ;
 
@@ -267,10 +267,23 @@ public class JSON implements Versioned
 
        private final boolean _defaultState;
 
+       /**
+        * Flag for features that affect caching of readers, writers,
+        * and changing of which needs to result in flushing.
+        *
+        * @since 2.8
+        */
+       private final boolean _affectsCaching;
+
        private final int _mask;
 
        private Feature(boolean defaultState) {
+           this(defaultState, false);
+       }
+       
+       private Feature(boolean defaultState, boolean affectsCaching) {
            _defaultState = defaultState;
+           _affectsCaching = affectsCaching;
            _mask = (1 << ordinal());
        }
 
@@ -286,6 +299,7 @@ public class JSON implements Versioned
        }
        
        public final boolean enabledByDefault() { return _defaultState; }
+       public final boolean affectsCaching() { return _affectsCaching; }
 
        public final int mask() { return _mask; }
 
