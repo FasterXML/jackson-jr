@@ -348,8 +348,8 @@ public class TypeDetector
         }
         // First, check base type
         _introspect(currType.getSuperclass(), props);
+
         // then get methods from within this class
-        
         for (Method m : currType.getDeclaredMethods()) {
             final int flags = m.getModifiers();
             if (Modifier.isStatic(flags)) {
@@ -374,9 +374,6 @@ public class TypeDetector
                         props.put(name, prop.withGetter(m));
                     }
                 } else if (name.startsWith("is") && name.length() > 2) {
-                    // 28-Jul-2014, tatu: Stupid misnaming complicates things here;
-                    //   basically, until we remove wrong one, need to require both
-                    //   to be set...
                     if (JSON.Feature.USE_IS_GETTERS.isEnabled(_features)) {
                         // only add if no getter found (i.e. prefer regular getter, if one found)
                         BeanProperty prop = props.get(name);
@@ -404,6 +401,8 @@ public class TypeDetector
                 props.put(name, prop.withSetter(m));
             }
         }
+
+        // and, fields too
     }
 
     private BeanProperty _propFrom(Map<String,BeanProperty> props, String name) {

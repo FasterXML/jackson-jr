@@ -246,6 +246,17 @@ public class JSON implements Versioned
         */
        FORCE_REFLECTION_ACCESS(true),
 
+       /**
+        * Feature that enables use of public fields instead of setters and getters,
+        * in cases where no setter/getter is available.
+        *<p>
+        * Feature is disabled by default (for backwards compatibility), so fields
+        * are not used unless explicitly enabled.
+        *
+        * @since 2.8
+        */
+       USE_FIELDS(false),
+       
        ;
 
        /*

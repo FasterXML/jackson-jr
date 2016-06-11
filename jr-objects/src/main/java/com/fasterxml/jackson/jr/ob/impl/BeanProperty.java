@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
@@ -24,12 +25,18 @@ public final class BeanProperty
      * For non-trivial non-bean types
      */
     protected final ValueReader _valueReader;
-    
+
     protected final Method _getMethod, _setMethod;
+
+    /**
+     * @since 2.8
+     */
+    protected final Field _field;
 
     public BeanProperty(String name) {
         _name = new SerializedString(name);
         _typeId = 0;
+        _field = null;
         _getMethod = null;
         _setMethod = null;
         _valueReader = null;
@@ -38,27 +45,36 @@ public final class BeanProperty
     protected BeanProperty(BeanProperty src, ValueReader vr) {
         _name = src._name;
         _typeId = src._typeId;
+        _field = src._field;
         _getMethod = src._getMethod;
         _setMethod = src._setMethod;
         _valueReader = vr;
     }
 
+    @Deprecated // since 2.8
     protected BeanProperty(BeanProperty src, int typeId, Method getter, Method setter) {
+        this(src, typeId, getter, setter, null);
+    }
+
+    protected BeanProperty(BeanProperty src, int typeId,
+            Method getter, Method setter, Field field)
+    {
         _name = src._name;
         _valueReader = src._valueReader;
 
         _typeId = typeId;
+        _field = field;
         _getMethod = getter;
         _setMethod = setter;
     }
     
     public BeanProperty withGetter(Method getter) {
-        return new BeanProperty(this, _typeId, getter, _setMethod);
+        return new BeanProperty(this, _typeId, getter, _setMethod, _field);
     }
 
     public BeanProperty withSetter(Method setter) {
         /* 28-Jul-2014, tatu: Need to figure out a way to resolve multiple similarly
-         *    named setters, mostly to avoid bridge methods (see [Issue#15]),
+         *    named setters, mostly to avoid bridge methods (see [jackson-jr#15]),
          *    but possible also to try to find most optimal of overloads.
          */
         if (_setMethod != null) {
@@ -67,7 +83,7 @@ public final class BeanProperty
                 return this;
             }
         }
-        return new BeanProperty(this, _typeId, _getMethod, setter);
+        return new BeanProperty(this, _typeId, _getMethod, setter, _field);
     }
 
     public BeanProperty withReader(ValueReader vr) {
@@ -76,7 +92,7 @@ public final class BeanProperty
 
     public BeanProperty withTypeId(int typeId) {
         return (typeId == _typeId) ? this
-                : new BeanProperty(this, typeId, _getMethod, _setMethod);
+                : new BeanProperty(this, typeId, _getMethod, _setMethod, _field);
     }
 
     public void forceAccess() {
@@ -91,6 +107,7 @@ public final class BeanProperty
 
     public boolean hasGetter() { return _getMethod != null; }
     public boolean hasSetter() { return _setMethod != null; }
+    public boolean hasField() { return _field != null; }
     
     public Type genericSetterType() {
         return _setMethod.getGenericParameterTypes()[0];

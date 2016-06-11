@@ -21,6 +21,27 @@ public class WriteBeansTest extends TestBase
         }
     }
 
+    static class BeanBase {
+        public int _value;
+
+        public int getValue() { return _value; }
+        public void setValue(int v) { _value = v; }
+    }
+
+    static class BaseImpl extends BeanBase {
+        public int _extra;
+
+        protected BaseImpl() { }
+        public BaseImpl(int v, int x) {
+            _value = v;
+            _extra = x;
+        }
+
+        public int getExtra() { return _extra; }
+        public void setExtra(int v) { _extra = v; }
+        
+    }
+    
     public void testBinary() throws Exception
     {
         String json = JSON.std.asString(new BinaryBean());
@@ -37,7 +58,7 @@ public class WriteBeansTest extends TestBase
     {
         // first: with default settings, should serialize 2 props
         String json = JSON.std.asString(new TestBean());
-        
+
         Map<String,Object> map = JSON.std.mapFrom(json);
         if ((2 != map.size())
                 || !Integer.valueOf(1).equals(map.get("x"))
@@ -56,5 +77,22 @@ public class WriteBeansTest extends TestBase
             fail("Wrong Map contents (expected just 'x' for JSON: "+json);
         }
     }
-    
+
+    // Make sure we handle stuff from base class too
+    public void testMethodsFromSuperclass() throws Exception
+    {
+        String json = JSON.std.asString(new BaseImpl(1, 2));
+        Map<String,Object> map = JSON.std.mapFrom(json);
+        if ((2 != map.size())
+                || !Integer.valueOf(1).equals(map.get("value"))
+                || !Integer.valueOf(2).equals(map.get("extra"))
+                ){
+            fail("Wrong Map contents (expected 'value' and 'extra' for JSON: "+json);
+        }
+
+        BaseImpl result = JSON.std.beanFrom(BaseImpl.class,
+                aposToQuotes("{ 'extra':5, 'value':-245 }"));
+        assertEquals(5, result.getExtra());
+        assertEquals(-245, result.getValue());
+    }
 }
