@@ -138,6 +138,17 @@ public class TypeDetector
 
     /*
     /**********************************************************************
+    /* Helper objects, both deser/ser
+    /**********************************************************************
+     */
+
+    /**
+     * Set of Bean types that have been resolved.
+     */
+    protected final CopyOnWriteArrayList<BeanDefinition> _knownBeans;
+
+    /*
+    /**********************************************************************
     /* Helper objects, serialization
     /**********************************************************************
      */
@@ -148,11 +159,6 @@ public class TypeDetector
      */
     protected final ConcurrentHashMap<ClassKey, Integer> _knownSerTypes;
 
-    /**
-     * Set of Bean types that have been resolved.
-     */
-    protected final CopyOnWriteArrayList<BeanDefinition> _knownBeans;
-    
     /*
     /**********************************************************************
     /* Helper objects, deserialization

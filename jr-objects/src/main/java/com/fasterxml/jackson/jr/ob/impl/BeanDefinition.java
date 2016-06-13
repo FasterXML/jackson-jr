@@ -11,7 +11,8 @@ import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 /**
  * Class that contains information about dynamically introspected
- * Bean types.
+ * Bean types, to be able to deserialize (read) JSON into a POJO
+ * and serialize (write) POJO as JSON.
  */
 public class BeanDefinition
     extends ValueReader // so we can chain calls for Collections, arrays
