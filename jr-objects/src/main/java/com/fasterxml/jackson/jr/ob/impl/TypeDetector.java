@@ -2,8 +2,6 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -263,162 +261,61 @@ public class TypeDetector
     
     protected BeanDefinition resolveBean(Class<?> raw)
     {
-        final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
-        final boolean forSer = forSer();
-        
-        List<BeanProperty> props0;
-
+        ClassDefinition classDef;
         try {
-            props0 = _introspectBean(raw, forSer, forceAccess);
+            classDef = ClassDefinition.find(raw);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Failed to introspect BeanInfo for type '"
-                    +raw.getName()+"': "+e.getMessage(), e);
+            throw new IllegalArgumentException(String.format
+                    ("Failed to introspect ClassDefinition for type '%s': %s",
+                    raw.getName(), e.getMessage()), e);
         }
-        if (forSer) {
-            ArrayList<BeanProperty> props = new ArrayList<BeanProperty>(props0.size());
-            // Need to pre-resolve the type?
-            for (BeanProperty prop : props0) {
-                prop = prop.withTypeId(_findSimple(prop.rawGetterType()));
-                props.add(prop);
-            }
-            final int len = props.size();
-            BeanProperty[] propArray = (len == 0) ? NO_PROPS
-                    : props.toArray(new BeanProperty[len]);
-            return new BeanDefinition(raw, propArray);
+        if (forSer()) {
+            return resolveBeanForSer(raw, classDef);
         }
+        return resolveBeanForDeser(raw, classDef);
+    }
 
-        Constructor<?> defaultCtor = null;
-        Constructor<?> stringCtor = null;
-        Constructor<?> longCtor = null;
+    protected BeanDefinition resolveBeanForSer(Class<?> raw, ClassDefinition classDef)
+    {
+        List<BeanProperty> props = classDef.propertiesForSerialization(_features);
+        ListIterator<BeanProperty> it = props.listIterator();
+        while (it.hasNext()) {
+            BeanProperty prop = it.next();
+            it.set(prop.withTypeId(_findSimple(prop.rawGetterType())));
+        }
+        final int len = props.size();
+        BeanProperty[] propArray = (len == 0) ? NO_PROPS
+                : props.toArray(new BeanProperty[len]);
+        return new BeanDefinition(raw, propArray);
+    }
 
-        for (Constructor<?> ctor : raw.getDeclaredConstructors()) {
-            Class<?>[] argTypes = ctor.getParameterTypes();
-            if (argTypes.length == 0) {
-                defaultCtor = ctor;
-            } else if (argTypes.length == 1) {
-                Class<?> argType = argTypes[0];
-                if (argType == String.class) {
-                    stringCtor = ctor;
-                } else if (argType == Long.class || argType == Long.TYPE) {
-                    longCtor = ctor;
-                } else {
-                    continue;
-                }
-            } else {
-                continue;
+    protected BeanDefinition resolveBeanForDeser(Class<?> raw, ClassDefinition classDef)
+    {
+        Constructor<?> defaultCtor = classDef.defaultCtor;
+        Constructor<?> stringCtor = classDef.stringCtor;
+        Constructor<?> longCtor = classDef.longCtor;
+
+        final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
+        if (forceAccess) {
+            if (defaultCtor != null) {
+                defaultCtor.setAccessible(true);
             }
-            if (forceAccess) {
-                ctor.setAccessible(true);
+            if (stringCtor != null) {
+                stringCtor.setAccessible(true);
+            }
+            if (longCtor != null) {
+                longCtor.setAccessible(true);
             }
         }
 
         Map<String, BeanProperty> propMap = new HashMap<String, BeanProperty>();
-        for (BeanProperty prop : props0) {
+        for (BeanProperty prop : classDef.propertiesForDeserialization(_features)) {
             propMap.put(prop.getName().toString(), prop);
         }
         return new BeanDefinition(raw, propMap,
                 defaultCtor, stringCtor, longCtor);
     }
 
-    protected List<BeanProperty> _introspectBean(Class<?> beanType, boolean forSer, boolean forceAccess)
-    {
-        Map<String,BeanProperty> props = new TreeMap<String,BeanProperty>();
-        _introspect(beanType, props);
-        List<BeanProperty> result = new ArrayList<BeanProperty>(props.size());
-
-        for (BeanProperty prop : props.values()) {
-            // First: weed out props without proper accessor
-            if (forSer) {
-                if (!prop.hasGetter()) {
-                    continue;
-                }
-            } else {
-                if (!prop.hasSetter()) {
-                    continue;
-                }
-            }
-            
-            // and if it's fit, force access as needed
-            if (forceAccess) {
-                prop.forceAccess();
-            }
-            result.add(prop);
-        }
-        return result;
-    }
-
-    protected void _introspect(Class<?> currType, Map<String,BeanProperty> props)
-    {
-        if (currType == null || currType == Object.class) {
-            return;
-        }
-        // First, check base type
-        _introspect(currType.getSuperclass(), props);
-
-        // then get methods from within this class
-        for (Method m : currType.getDeclaredMethods()) {
-            final int flags = m.getModifiers();
-            if (Modifier.isStatic(flags)) {
-                continue;
-            }
-            Class<?> argTypes[] = m.getParameterTypes();
-            if (argTypes.length == 0) { // getter?
-                // getters must be public to be used
-                if (!Modifier.isPublic(flags)) {
-                    continue;
-                }
-                
-                Class<?> resultType = m.getReturnType();
-                if (resultType == Void.class) {
-                    continue;
-                }
-                String name = m.getName();
-                if (name.startsWith("get")) {
-                    if (name.length() > 3) {
-                        name = decap(name.substring(3));
-                        BeanProperty prop = _propFrom(props, name);
-                        props.put(name, prop.withGetter(m));
-                    }
-                } else if (name.startsWith("is") && name.length() > 2) {
-                    if (JSON.Feature.USE_IS_GETTERS.isEnabled(_features)) {
-                        // only add if no getter found (i.e. prefer regular getter, if one found)
-                        BeanProperty prop = props.get(name);
-                        if (prop == null) {
-                            name = decap(name.substring(2));
-                            props.put(name, new BeanProperty(name).withGetter(m));
-                        } else if (!prop.hasGetter()) {
-                            name = decap(name.substring(2));
-                            props.put(name, prop.withGetter(m));
-                        }
-                    }
-                }
-            } else if (argTypes.length == 1) { // setter?
-                // Non-public setters are fine, if we can force access
-                if (!Modifier.isPublic(flags) && !JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features)) {
-                    continue;
-                }
-                // but let's not bother about return type; setters that return value are fine
-                String name = m.getName();
-                if (!name.startsWith("set") || name.length() == 3) {
-                    continue;
-                }
-                name = decap(name.substring(3));
-                BeanProperty prop = _propFrom(props, name);
-                props.put(name, prop.withSetter(m));
-            }
-        }
-
-        // and, fields too
-    }
-
-    private BeanProperty _propFrom(Map<String,BeanProperty> props, String name) {
-        BeanProperty prop = props.get(name);
-        if (prop == null) {
-            prop = new BeanProperty(name);
-        }
-        return prop;
-    }
-    
     /*
     /**********************************************************************
     /* Methods for serialization
@@ -738,23 +635,5 @@ public class TypeDetector
             return mapReader(raw, params.get(1));
         }
         return new MapReader(mapType, createReader(null, raw, raw));
-    }
-
-    /*
-    /**********************************************************************
-    /* Other helper methods
-    /**********************************************************************
-     */
-    
-    private static String decap(String name) {
-        char c = name.charAt(0);
-        if (name.length() > 1
-                && Character.isUpperCase(name.charAt(1))
-                && Character.isUpperCase(c)){
-            return name;
-        }
-        char chars[] = name.toCharArray();
-        chars[0] = Character.toLowerCase(c);
-        return new String(chars);
     }
 }

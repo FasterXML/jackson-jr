@@ -42,6 +42,15 @@ public final class BeanProperty
         _valueReader = null;
     }
 
+    private BeanProperty(String name, Method getter, Method setter, Field field) {
+        _name = new SerializedString(name);
+        _typeId = 0;
+        _field = field;
+        _getMethod = getter;
+        _setMethod = setter;
+        _valueReader = null;
+    }
+    
     protected BeanProperty(BeanProperty src, ValueReader vr) {
         _name = src._name;
         _typeId = src._typeId;
@@ -49,11 +58,6 @@ public final class BeanProperty
         _getMethod = src._getMethod;
         _setMethod = src._setMethod;
         _valueReader = vr;
-    }
-
-    @Deprecated // since 2.8
-    protected BeanProperty(BeanProperty src, int typeId, Method getter, Method setter) {
-        this(src, typeId, getter, setter, null);
     }
 
     protected BeanProperty(BeanProperty src, int typeId,
@@ -67,7 +71,15 @@ public final class BeanProperty
         _getMethod = getter;
         _setMethod = setter;
     }
-    
+
+    public static BeanProperty forSerialization(String name, Method getter) {
+        return new BeanProperty(name, getter, null, null);
+    }
+
+    public static BeanProperty forDeserialization(String name, Method setter, Field field) {
+        return new BeanProperty(name, null, setter, field);
+    }
+
     public BeanProperty withGetter(Method getter) {
         return new BeanProperty(this, _typeId, getter, _setMethod, _field);
     }
