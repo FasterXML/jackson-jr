@@ -7,7 +7,6 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.jr.ob.JSON;
 
 /**
@@ -61,6 +60,10 @@ public class ClassDefinition
         return def;
     }
 
+    public Prop[] properties() {
+        return _properties;
+    }
+    
     public List<BeanProperty> propertiesForDeserialization(int features)
     {
         final int len = _properties.length;
@@ -87,34 +90,7 @@ public class ClassDefinition
         }
         return result;
     }
-    
-    public List<BeanProperty> propertiesForSerialization(int features)
-    {
-        final int len = _properties.length;
-        if (len == 0) {
-            return Collections.emptyList();
-        }
-        List<BeanProperty> result = new ArrayList<BeanProperty>(len);
-        final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(features);
-        for (int i = 0; i < len; ++i) {
-            Prop prop = _properties[i];
-            Method m = prop.getter;
-            if (m == null) {
-                if (JSON.Feature.USE_IS_GETTERS.isEnabled(features)) {
-                    m = prop.isGetter;
-                }
-            }
-            if (m != null) {
-                if (forceAccess) {
-                    m.setAccessible(true);
-                }
-                result.add(BeanProperty.forSerialization(prop.name, m,
-                        prop.hasSetter()));
-            }
-        }
-        return result;
-    }
-    
+
     /*
     /**********************************************************************
     /* Internal methods
@@ -239,7 +215,7 @@ public class ClassDefinition
     /**********************************************************************
      */
 
-    static class Prop
+    public static final class Prop
     {
         public final String name;
 

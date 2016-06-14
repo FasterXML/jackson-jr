@@ -30,5 +30,4 @@ public class ReadFeaturesTest extends TestBase
                 .asString(new IsBean());
         assertEquals(aposToQuotes("{'value':42}"), json);
     }
-
 }

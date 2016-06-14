@@ -1,8 +1,7 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -31,7 +30,7 @@ import com.fasterxml.jackson.jr.type.TypeResolver;
  */
 public class TypeDetector
 {
-    protected final BeanProperty[] NO_PROPS = new BeanProperty[0];
+    protected final BeanPropertyWriter[] NO_PROPS_FOR_WRITE = new BeanPropertyWriter[0];
 
     /*
     /**********************************************************************
@@ -143,7 +142,7 @@ public class TypeDetector
     /**
      * Set of Bean types that have been resolved.
      */
-    protected final CopyOnWriteArrayList<BeanDefinition> _knownBeans;
+//    protected final CopyOnWriteArrayList<BeanDefinition> _knownBeans;
 
     /*
     /**********************************************************************
@@ -156,6 +155,8 @@ public class TypeDetector
      * for serialization.
      */
     protected final ConcurrentHashMap<ClassKey, Integer> _knownSerTypes;
+
+    protected final CopyOnWriteArrayList<BeanPropertyWriter[]> _knownWriters;
 
     /*
     /**********************************************************************
@@ -205,10 +206,10 @@ public class TypeDetector
     // for serialization
     protected TypeDetector(int features,
             ConcurrentHashMap<ClassKey, Integer> types,
-            CopyOnWriteArrayList<BeanDefinition> beans) {
+            CopyOnWriteArrayList<BeanPropertyWriter[]> writers) {
         _features = features;
         _knownSerTypes = types;
-        _knownBeans = beans;
+        _knownWriters = writers;
         _knownReaders = null;
         _typeResolver = null;
         _readerLock = null;
@@ -219,7 +220,7 @@ public class TypeDetector
             ConcurrentHashMap<ClassKey, ValueReader> r) {
         _features = features;
         _knownSerTypes = null;
-        _knownBeans = null;
+        _knownWriters = null;
         _knownReaders = r;
         _typeResolver = new TypeResolver();
         _readerLock = new Object();
@@ -228,7 +229,7 @@ public class TypeDetector
     protected TypeDetector(TypeDetector base, int features) {
         _features = features;
         _knownSerTypes = base._knownSerTypes;
-        _knownBeans = base._knownBeans;
+        _knownWriters = base._knownWriters;
         _knownReaders = base._knownReaders;
         _typeResolver = base._typeResolver;
         _readerLock = base._readerLock;
@@ -242,7 +243,7 @@ public class TypeDetector
     public final static TypeDetector forWriter(int features) {
         return new TypeDetector(features,
                 new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4),
-                new CopyOnWriteArrayList<BeanDefinition>());
+                new CopyOnWriteArrayList<BeanPropertyWriter[]>());
     }
     
     public TypeDetector perOperationInstance(int features) {
@@ -258,62 +259,16 @@ public class TypeDetector
     /* Methods for ser and deser
     /**********************************************************************
      */
-    
-    protected BeanDefinition resolveBean(Class<?> raw)
+
+    protected ClassDefinition resolveClassDefinition(Class<?> raw)
     {
-        ClassDefinition classDef;
         try {
-            classDef = ClassDefinition.find(raw);
+            return ClassDefinition.find(raw);
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format
                     ("Failed to introspect ClassDefinition for type '%s': %s",
                     raw.getName(), e.getMessage()), e);
         }
-        if (forSer()) {
-            return resolveBeanForSer(raw, classDef);
-        }
-        return resolveBeanForDeser(raw, classDef);
-    }
-
-    protected BeanDefinition resolveBeanForSer(Class<?> raw, ClassDefinition classDef)
-    {
-        List<BeanProperty> props = classDef.propertiesForSerialization(_features);
-        ListIterator<BeanProperty> it = props.listIterator();
-        while (it.hasNext()) {
-            BeanProperty prop = it.next();
-            it.set(prop.withTypeId(_findSimple(prop.rawGetterType())));
-        }
-        final int len = props.size();
-        BeanProperty[] propArray = (len == 0) ? NO_PROPS
-                : props.toArray(new BeanProperty[len]);
-        return new BeanDefinition(raw, propArray);
-    }
-
-    protected BeanDefinition resolveBeanForDeser(Class<?> raw, ClassDefinition classDef)
-    {
-        Constructor<?> defaultCtor = classDef.defaultCtor;
-        Constructor<?> stringCtor = classDef.stringCtor;
-        Constructor<?> longCtor = classDef.longCtor;
-
-        final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
-        if (forceAccess) {
-            if (defaultCtor != null) {
-                defaultCtor.setAccessible(true);
-            }
-            if (stringCtor != null) {
-                stringCtor.setAccessible(true);
-            }
-            if (longCtor != null) {
-                longCtor.setAccessible(true);
-            }
-        }
-
-        Map<String, BeanProperty> propMap = new HashMap<String, BeanProperty>();
-        for (BeanProperty prop : classDef.propertiesForDeserialization(_features)) {
-            propMap.put(prop.getName().toString(), prop);
-        }
-        return new BeanDefinition(raw, propMap,
-                defaultCtor, stringCtor, longCtor);
     }
 
     /*
@@ -322,12 +277,12 @@ public class TypeDetector
     /**********************************************************************
      */
     
-    public BeanDefinition getBeanDefinition(int index) {
+    public BeanPropertyWriter[] getWritableProperties(int index) {
         // for simplicity, let's allow caller to pass negative id as is
         if (index < 0) {
             index = -(index+1);
         }
-        return _knownBeans.get(index);
+        return _knownWriters.get(index);
     }
     
     /**
@@ -360,9 +315,10 @@ public class TypeDetector
         int type = _findSimple(raw);
         if (type == SER_UNKNOWN) {
             if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
-                BeanDefinition def = resolveBean(raw);
+                ClassDefinition cd = resolveClassDefinition(raw);
+                BeanPropertyWriter[] props = resolveBeanForSer(raw, cd);
                 // Due to concurrent access, possible that someone might have added it
-                synchronized (_knownBeans) {
+                synchronized (_knownWriters) {
                     // Important: do NOT try to reuse shared instance; caller needs it
                     ClassKey k = new ClassKey(raw);
                     Integer I = _knownSerTypes.get(k);
@@ -371,15 +327,61 @@ public class TypeDetector
                         return I.intValue();
                     }
                     // otherwise add at the end, use -(index+1) as id
-                    _knownBeans.add(def);
-                    int typeId = -_knownBeans.size();
-    
+                    _knownWriters.add(props);
+                    int typeId = -_knownWriters.size();
                     _knownSerTypes.put(k, Integer.valueOf(typeId));
                     return typeId;
                 }
             }
         }
         return type;
+    }
+
+    protected BeanPropertyWriter[] resolveBeanForSer(Class<?> raw, ClassDefinition classDef)
+    {
+        ClassDefinition.Prop[] rawProps = classDef.properties();
+        final int len = rawProps.length;
+        List<BeanPropertyWriter> props = new ArrayList<BeanPropertyWriter>(len);
+        final boolean includeReadOnly = JSON.Feature.WRITE_READONLY_BEAN_PROPERTIES.isEnabled(_features);
+        final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
+        final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
+
+        for (int i = 0; i < len; ++i) {
+            ClassDefinition.Prop rawProp = rawProps[i];
+            Method m = rawProp.getter;
+            if (m == null) {
+                if (JSON.Feature.USE_IS_GETTERS.isEnabled(_features)) {
+                    m = rawProp.isGetter;
+                }
+            }
+            Field f = useFields ? rawProp.field : null;
+
+            // But if neither regular nor is-getter, move on
+            if ((m == null) && (f == null)) {
+                continue;
+            }
+            // also: if setter is required to match, skip if none
+            if (!includeReadOnly && !rawProp.hasSetter()) {
+                continue;
+            }
+            Class<?> type;
+            if (m != null) {
+                type = m.getReturnType();
+                if (forceAccess) {
+                    m.setAccessible(true);
+                }
+            } else {
+                type = f.getType();
+                if (forceAccess) {
+                    f.setAccessible(true);
+                }
+            }
+            int typeId = _findSimple(type);
+            props.add(new BeanPropertyWriter(typeId, rawProp.name, rawProp.field, m));
+        }
+        BeanPropertyWriter[] propArray = (len == 0) ? NO_PROPS_FOR_WRITE
+                : props.toArray(new BeanPropertyWriter[len]);
+        return propArray;
     }
 
     protected int _findSimple(Class<?> raw)
@@ -564,7 +566,8 @@ public class TypeDetector
                     return vr;
                 }
             }
-            BeanDefinition def = resolveBean(type);
+            ClassDefinition cd = resolveClassDefinition(type);
+            BeanDefinition def = resolveBeanForDeser(type, cd);
             try {
                 _incompleteReaders.put(key, def);
                 for (Map.Entry<String, BeanProperty> entry : def.propertiesByName().entrySet()) {
@@ -579,6 +582,33 @@ public class TypeDetector
         }
     }
 
+    protected BeanDefinition resolveBeanForDeser(Class<?> raw, ClassDefinition classDef)
+    {
+        Constructor<?> defaultCtor = classDef.defaultCtor;
+        Constructor<?> stringCtor = classDef.stringCtor;
+        Constructor<?> longCtor = classDef.longCtor;
+
+        final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
+        if (forceAccess) {
+            if (defaultCtor != null) {
+                defaultCtor.setAccessible(true);
+            }
+            if (stringCtor != null) {
+                stringCtor.setAccessible(true);
+            }
+            if (longCtor != null) {
+                longCtor.setAccessible(true);
+            }
+        }
+
+        Map<String, BeanProperty> propMap = new HashMap<String, BeanProperty>();
+        for (BeanProperty prop : classDef.propertiesForDeserialization(_features)) {
+            propMap.put(prop.getName().toString(), prop);
+        }
+        return new BeanDefinition(raw, propMap,
+                defaultCtor, stringCtor, longCtor);
+    }
+    
     private TypeBindings bindings(Class<?> ctxt) {
         if (ctxt == null) {
             return TypeBindings.emptyBindings();

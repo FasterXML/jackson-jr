@@ -81,10 +81,6 @@ public final class BeanProperty
         _setMethod = setter;
     }
 
-    public static BeanProperty forSerialization(String name, Method getter, boolean hasSetter) {
-        return new BeanProperty(name, getter, null, null, hasSetter);
-    }
-
     public static BeanProperty forDeserialization(String name, Method setter, Field field) {
         return new BeanProperty(name, null, setter, field, false);
     }
@@ -106,32 +102,10 @@ public final class BeanProperty
         return _setMethod.getParameterTypes()[0];
     }
 
-    public Class<?> rawGetterType() {
-        return _getMethod.getReturnType();
-    }
-    
     public ValueReader getReader() { return _valueReader; }
     
     public int getTypeId() { return _typeId; }
-
     public SerializedString getName() { return _name; }
-    
-    public SerializedString getNameIfHasSetter() {
-        return _hasSetter ? _name : null;
-    }
-    
-    public Object getValueFor(Object bean) throws IOException
-    {
-        if (_getMethod == null) {
-            throw new IllegalStateException("No getter for property '"+_name+"' (type "+_bean()+")");
-        }
-        try {
-            return _getMethod.invoke(bean);
-        } catch (Exception e) {
-            throw new JSONObjectException("Failed to access property '"+_name+"'; exception "+e.getClass().getName()+"): "
-                    +e.getMessage(), e);
-        }
-    }
 
     public Object setValueFor(Object bean, Object value) throws IOException
     {

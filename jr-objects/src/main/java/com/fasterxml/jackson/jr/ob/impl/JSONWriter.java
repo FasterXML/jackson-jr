@@ -7,7 +7,6 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.SerializedString;
-import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
@@ -43,8 +42,6 @@ public class JSONWriter
 
     protected final TreeCodec _treeCodec;
 
-    protected final boolean _requireSetter;
-
     /*
     /**********************************************************************
     /* Instance config
@@ -71,7 +68,6 @@ public class JSONWriter
         _typeDetector = td;
         _treeCodec = tc;
         _generator = null;
-        _requireSetter = JSON.Feature.WRITE_READONLY_BEAN_PROPERTIES.isDisabled(features);
         _timezone = DEFAULT_TIMEZONE;
     }
 
@@ -84,7 +80,6 @@ public class JSONWriter
         _typeDetector = base._typeDetector.perOperationInstance(_features);
         _treeCodec = base._treeCodec;
         _generator = jgen;
-        _requireSetter = JSON.Feature.WRITE_READONLY_BEAN_PROPERTIES.isDisabled(_features);
         _timezone = DEFAULT_TIMEZONE;
     }
 
@@ -272,16 +267,14 @@ public class JSONWriter
         }
 
         if (type < 0) { // Bean type!
-            BeanDefinition def = _typeDetector.getBeanDefinition(type);
-            if (def == null) { // sanity check
-                throw new IllegalStateException("Internal error: missing BeanDefinition for id "+type
-                        +" (class "+value.getClass().getName()+")");
+            BeanPropertyWriter[] props = _typeDetector.getWritableProperties(type);
+            if (props != null) { // sanity check
+                _generator.writeFieldName(fieldName);
+                writeBeanValue(props, value);
+                return;
             }
-            _generator.writeFieldName(fieldName);
-            writeBeanValue(def, value);
-            return;
         }
-        throw new IllegalStateException("Unsupported type: "+type);
+        _badType(type, value);
     }
 
     protected void _writeValue(Object value, int type) throws IOException
@@ -387,19 +380,17 @@ public class JSONWriter
             writeUnknownValue(value);
             return;
         }
-        
+
         if (type < 0) { // Bean type!
-            BeanDefinition def = _typeDetector.getBeanDefinition(type);
-            if (def == null) { // sanity check
-                throw new IllegalStateException("Internal error: missing BeanDefinition for id "+type
-                        +" (class "+value.getClass().getName()+")");
+            BeanPropertyWriter[] props = _typeDetector.getWritableProperties(type);
+            if (props != null) { // sanity check
+                writeBeanValue(props, value);
+                return;
             }
-            writeBeanValue(def, value);
-            return;
         }
-        throw new IllegalStateException("Unsupported type: "+type+" (class "+value.getClass().getName()+")");
+        _badType(type, value);
     }
-    
+
     /*
     /**********************************************************************
     /* Overridable concrete typed write methods, structured types
@@ -673,26 +664,18 @@ public class JSONWriter
         }
     }
 
-    protected void writeBeanValue(BeanDefinition beanDef, Object bean) throws IOException
+    protected void writeBeanValue(BeanPropertyWriter[] props, Object bean) throws IOException
     {
         _generator.writeStartObject();
-        for (BeanProperty property : beanDef.properties()) {
-            SerializedString name;
-            
-            if (_requireSetter) {
-                name = property.getNameIfHasSetter();
-                if (name == null) {
-                    continue;
-                }
-            } else {
-                name = property.getName();
-            }
+        for (int i = 0, end = props.length; i < end; ++i) {
+            BeanPropertyWriter property = props[i];
+            SerializedString name = property.name;
             Object value = property.getValueFor(bean);
             if (value == null) {
                 writeNullField(name);
                 continue;
             }
-            int typeId = property.getTypeId();
+            int typeId = property.typeId;
             if (typeId == 0) {
                 typeId = _typeDetector.findFullType(value.getClass());
             }
@@ -720,7 +703,7 @@ public class JSONWriter
                     +" to avoid exception)");
         }
     }
-    
+
     /*
     /**********************************************************************
     /* Overridable concrete typed write methods; key conversions:
@@ -746,5 +729,22 @@ public class JSONWriter
         //   since this relies on system-wide defaults, and hard/impossible to
         //   change easily
         return v.toString();
+    }
+
+    /*
+    /**********************************************************************
+    /* Other internal methods
+    /**********************************************************************
+     */
+    
+    private void _badType(int type, Object value)
+    {
+        if (type < 0) {
+            throw new IllegalStateException(String.format(
+                    "Internal error: missing BeanDefinition for id %d (class %s)",
+                    type, value.getClass().getName()));
+        }
+        throw new IllegalStateException(String.format(
+                "Unsupported type: %s (%s)", type, value.getClass().getName()));
     }
 }
