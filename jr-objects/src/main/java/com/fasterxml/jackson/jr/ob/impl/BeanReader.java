@@ -14,12 +14,11 @@ import com.fasterxml.jackson.jr.ob.JSONObjectException;
  * Bean types, to be able to deserialize (read) JSON into a POJO
  * and serialize (write) POJO as JSON.
  */
-public class BeanDefinition
+public class BeanReader
     extends ValueReader // so we can chain calls for Collections, arrays
 {
     protected final Class<?> _type;
 
-    protected final BeanProperty[] _properties; // for serialization
     protected final Map<String,BeanProperty> _propsByName; // for deserialization
 
     protected final Constructor<?> _defaultCtor;
@@ -27,33 +26,18 @@ public class BeanDefinition
     protected final Constructor<?> _longCtor;
 
     /**
-     * Constructors used for serialization use case
-     */
-    public BeanDefinition(Class<?> type, BeanProperty[] props)
-    {
-        _type = type;
-        _properties = props;
-        _propsByName = null;
-        _defaultCtor = null;
-        _stringCtor = null;
-        _longCtor = null;
-    }
-
-    /**
      * Constructors used for deserialization use case
      */
-    public BeanDefinition(Class<?> type, Map<String, BeanProperty> props,
+    public BeanReader(Class<?> type, Map<String, BeanProperty> props,
             Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor)
     {
         _type = type;
-        _properties = null;
         _propsByName = props;
         _defaultCtor = defaultCtor;
         _stringCtor = stringCtor;
         _longCtor = longCtor;
     }
-    
-    public BeanProperty[] properties() { return _properties; }
+
     public Map<String,BeanProperty> propertiesByName() { return _propsByName; }
 
     public BeanProperty findProperty(String name) {
@@ -149,12 +133,12 @@ public class BeanDefinition
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
-            throw JSONObjectException.from(p, "Failed to create an instance of "
-                    +_type.getName()+" due to ("+e.getClass().getName()+"): "+e.getMessage(),
-                    e);
+            throw JSONObjectException.from(p, e,
+                    "Failed to create an instance of %s due to (%s): %s",
+                    _type.getName(), e.getClass().getName(), e.getMessage());
         }
-        throw JSONObjectException.from(p,
-                "Can not create a "+_type.getName()+" instance out of "+_tokenDesc(p));
+        throw JSONObjectException.from(p, "Can not create a %s instance out of %s",
+                _type.getName(), _tokenDesc(p));
     }
     
     protected Object create() throws Exception {

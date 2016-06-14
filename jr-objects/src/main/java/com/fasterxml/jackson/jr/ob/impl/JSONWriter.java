@@ -148,7 +148,7 @@ public class JSONWriter
             writeNullValue();
             return;
         }
-        _writeValue(value, _typeDetector.findFullType(value.getClass()));
+        _writeValue(value, _typeDetector.findSerializationType(value.getClass()));
     }
 
     public void writeField(String fieldName, Object value) throws IOException, JsonProcessingException
@@ -160,7 +160,7 @@ public class JSONWriter
             return;
         }
 
-        int type = _typeDetector.findFullType(value.getClass());
+        int type = _typeDetector.findSerializationType(value.getClass());
         switch (type) {
 
         // First, structured types:
@@ -267,7 +267,7 @@ public class JSONWriter
         }
 
         if (type < 0) { // Bean type!
-            BeanPropertyWriter[] props = _typeDetector.getWritableProperties(type);
+            BeanPropertyWriter[] props = _typeDetector.getPropertyWriters(type);
             if (props != null) { // sanity check
                 _generator.writeFieldName(fieldName);
                 writeBeanValue(props, value);
@@ -382,7 +382,7 @@ public class JSONWriter
         }
 
         if (type < 0) { // Bean type!
-            BeanPropertyWriter[] props = _typeDetector.getWritableProperties(type);
+            BeanPropertyWriter[] props = _typeDetector.getPropertyWriters(type);
             if (props != null) { // sanity check
                 writeBeanValue(props, value);
                 return;
@@ -677,7 +677,7 @@ public class JSONWriter
             }
             int typeId = property.typeId;
             if (typeId == 0) {
-                typeId = _typeDetector.findFullType(value.getClass());
+                typeId = _typeDetector.findSerializationType(value.getClass());
             }
             _generator.writeFieldName(name);
             _writeValue(value, typeId);

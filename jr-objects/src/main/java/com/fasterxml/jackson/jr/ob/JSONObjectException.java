@@ -159,14 +159,24 @@ public class JSONObjectException
         super(msg, loc, rootCause);
     }
 
-    public static JSONObjectException from(JsonParser jp, String msg) {
-        return new JSONObjectException(msg, ((jp == null) ? null : jp.getTokenLocation()));
+    public static JSONObjectException from(JsonParser p, String msg) {
+        return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()));
     }
 
-    public static JSONObjectException from(JsonParser jp, String msg,
-            Throwable problem)
+    public static JSONObjectException from(JsonParser p, String msg, Object... args) {
+        if (args.length > 0) {
+            msg = String.format(msg, args);
+        }
+        return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()));
+    }
+
+    public static JSONObjectException from(JsonParser p, Throwable problem,
+            String msg, Object... args)
     {
-        return new JSONObjectException(msg, ((jp == null) ? null : jp.getTokenLocation()), problem);
+        if (args.length > 0) {
+            msg = String.format(msg, args);
+        }
+        return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()), problem);
     }
     
     /**

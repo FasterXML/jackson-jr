@@ -135,17 +135,6 @@ public class TypeDetector
 
     /*
     /**********************************************************************
-    /* Helper objects, both deser/ser
-    /**********************************************************************
-     */
-
-    /**
-     * Set of Bean types that have been resolved.
-     */
-//    protected final CopyOnWriteArrayList<BeanDefinition> _knownBeans;
-
-    /*
-    /**********************************************************************
     /* Helper objects, serialization
     /**********************************************************************
      */
@@ -188,7 +177,10 @@ public class TypeDetector
     /* Instance state
     /**********************************************************************
      */
-    
+
+    /**
+     * Reusable lookup key; only used by per-thread instances.
+     */
     protected ClassKey _key = new ClassKey();
     
     protected Class<?> _prevClass;
@@ -250,10 +242,6 @@ public class TypeDetector
         return new TypeDetector(this, features);
     }
 
-    private boolean forSer() {
-        return _knownSerTypes != null;
-    }
-    
     /*
     /**********************************************************************
     /* Methods for ser and deser
@@ -271,120 +259,7 @@ public class TypeDetector
         }
     }
 
-    /*
-    /**********************************************************************
-    /* Methods for serialization
-    /**********************************************************************
-     */
-    
-    public BeanPropertyWriter[] getWritableProperties(int index) {
-        // for simplicity, let's allow caller to pass negative id as is
-        if (index < 0) {
-            index = -(index+1);
-        }
-        return _knownWriters.get(index);
-    }
-    
-    /**
-     * The main lookup method used to find type identifier for
-     * given raw class; including Bean types (if allowed).
-     */
-    public final int findFullType(Class<?> raw)
-    {
-        if (raw == _prevClass) {
-            return _prevType;
-        }
-        ClassKey k = _key.with(raw);
-        int type;
-
-        Integer I = _knownSerTypes.get(k);
-
-        if (I == null) {
-            type = _findFull(raw);
-            _knownSerTypes.put(new ClassKey(raw), Integer.valueOf(type));
-        } else {
-            type = I.intValue();
-        }
-        _prevType = type;
-        _prevClass = raw;
-        return type;
-    }
-
-    protected int _findFull(Class<?> raw)
-    {
-        int type = _findSimple(raw);
-        if (type == SER_UNKNOWN) {
-            if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
-                ClassDefinition cd = resolveClassDefinition(raw);
-                BeanPropertyWriter[] props = resolveBeanForSer(raw, cd);
-                // Due to concurrent access, possible that someone might have added it
-                synchronized (_knownWriters) {
-                    // Important: do NOT try to reuse shared instance; caller needs it
-                    ClassKey k = new ClassKey(raw);
-                    Integer I = _knownSerTypes.get(k);
-                    // if it was already concurrently added, we'll just discard this copy, return earlier
-                    if (I != null) {
-                        return I.intValue();
-                    }
-                    // otherwise add at the end, use -(index+1) as id
-                    _knownWriters.add(props);
-                    int typeId = -_knownWriters.size();
-                    _knownSerTypes.put(k, Integer.valueOf(typeId));
-                    return typeId;
-                }
-            }
-        }
-        return type;
-    }
-
-    protected BeanPropertyWriter[] resolveBeanForSer(Class<?> raw, ClassDefinition classDef)
-    {
-        ClassDefinition.Prop[] rawProps = classDef.properties();
-        final int len = rawProps.length;
-        List<BeanPropertyWriter> props = new ArrayList<BeanPropertyWriter>(len);
-        final boolean includeReadOnly = JSON.Feature.WRITE_READONLY_BEAN_PROPERTIES.isEnabled(_features);
-        final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
-        final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
-
-        for (int i = 0; i < len; ++i) {
-            ClassDefinition.Prop rawProp = rawProps[i];
-            Method m = rawProp.getter;
-            if (m == null) {
-                if (JSON.Feature.USE_IS_GETTERS.isEnabled(_features)) {
-                    m = rawProp.isGetter;
-                }
-            }
-            Field f = useFields ? rawProp.field : null;
-
-            // But if neither regular nor is-getter, move on
-            if ((m == null) && (f == null)) {
-                continue;
-            }
-            // also: if setter is required to match, skip if none
-            if (!includeReadOnly && !rawProp.hasSetter()) {
-                continue;
-            }
-            Class<?> type;
-            if (m != null) {
-                type = m.getReturnType();
-                if (forceAccess) {
-                    m.setAccessible(true);
-                }
-            } else {
-                type = f.getType();
-                if (forceAccess) {
-                    f.setAccessible(true);
-                }
-            }
-            int typeId = _findSimple(type);
-            props.add(new BeanPropertyWriter(typeId, rawProp.name, rawProp.field, m));
-        }
-        BeanPropertyWriter[] propArray = (len == 0) ? NO_PROPS_FOR_WRITE
-                : props.toArray(new BeanPropertyWriter[len]);
-        return propArray;
-    }
-
-    protected int _findSimple(Class<?> raw)
+    protected int _findSimple(Class<?> raw, boolean forSer)
     {
         if (raw == String.class) {
             return SER_STRING;
@@ -494,12 +369,125 @@ public class TypeDetector
         /* `Iterable` can be added on all kinds of things, and it won't
          * help at all with deserialization; hence only use for serialization.
          */
-        if (forSer() && Iterable.class.isAssignableFrom(raw)) {
+        if (forSer && Iterable.class.isAssignableFrom(raw)) {
             return SER_ITERABLE;
         }
         
         // Ok. I give up, no idea!
         return SER_UNKNOWN;
+    }
+
+    /*
+    /**********************************************************************
+    /* Methods for serialization
+    /**********************************************************************
+     */
+    
+    public BeanPropertyWriter[] getPropertyWriters(int index) {
+        // for simplicity, let's allow caller to pass negative id as is
+        if (index < 0) {
+            index = -(index+1);
+        }
+        return _knownWriters.get(index);
+    }
+    
+    /**
+     * The main lookup method used to find type identifier for
+     * given raw class; including Bean types (if allowed).
+     */
+    public final int findSerializationType(Class<?> raw)
+    {
+        if (raw == _prevClass) {
+            return _prevType;
+        }
+        ClassKey k = _key.with(raw);
+        int type;
+
+        Integer I = _knownSerTypes.get(k);
+
+        if (I == null) {
+            type = _findPOJOSerializationType(raw);
+            _knownSerTypes.put(new ClassKey(raw), Integer.valueOf(type));
+        } else {
+            type = I.intValue();
+        }
+        _prevType = type;
+        _prevClass = raw;
+        return type;
+    }
+
+    protected int _findPOJOSerializationType(Class<?> raw)
+    {
+        int type = _findSimple(raw, true);
+        if (type == SER_UNKNOWN) {
+            if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
+                ClassDefinition cd = resolveClassDefinition(raw);
+                BeanPropertyWriter[] props = resolveBeanForSer(raw, cd);
+                // Due to concurrent access, possible that someone might have added it
+                synchronized (_knownWriters) {
+                    // Important: do NOT try to reuse shared instance; caller needs it
+                    ClassKey k = new ClassKey(raw);
+                    Integer I = _knownSerTypes.get(k);
+                    // if it was already concurrently added, we'll just discard this copy, return earlier
+                    if (I != null) {
+                        return I.intValue();
+                    }
+                    // otherwise add at the end, use -(index+1) as id
+                    _knownWriters.add(props);
+                    int typeId = -_knownWriters.size();
+                    _knownSerTypes.put(k, Integer.valueOf(typeId));
+                    return typeId;
+                }
+            }
+        }
+        return type;
+    }
+
+    protected BeanPropertyWriter[] resolveBeanForSer(Class<?> raw, ClassDefinition classDef)
+    {
+        ClassDefinition.Prop[] rawProps = classDef.properties();
+        final int len = rawProps.length;
+        List<BeanPropertyWriter> props = new ArrayList<BeanPropertyWriter>(len);
+        final boolean includeReadOnly = JSON.Feature.WRITE_READONLY_BEAN_PROPERTIES.isEnabled(_features);
+        final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
+        final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
+
+        for (int i = 0; i < len; ++i) {
+            ClassDefinition.Prop rawProp = rawProps[i];
+            Method m = rawProp.getter;
+            if (m == null) {
+                if (JSON.Feature.USE_IS_GETTERS.isEnabled(_features)) {
+                    m = rawProp.isGetter;
+                }
+            }
+            Field f = useFields ? rawProp.field : null;
+
+            // But if neither regular nor is-getter, move on
+            if ((m == null) && (f == null)) {
+                continue;
+            }
+            // also: if setter is required to match, skip if none
+            if (!includeReadOnly && !rawProp.hasSetter()) {
+                continue;
+            }
+            Class<?> type;
+            if (m != null) {
+                type = m.getReturnType();
+                if (forceAccess) {
+                    m.setAccessible(true);
+                }
+            } else {
+                type = f.getType();
+                if (forceAccess) {
+                    f.setAccessible(true);
+                }
+            }
+            int typeId = _findSimple(type, true);
+            props.add(new BeanPropertyWriter(typeId, rawProp.name, rawProp.field, m));
+        }
+        BeanPropertyWriter[] propArray = (len == 0) ? NO_PROPS_FOR_WRITE
+                : props.toArray(new BeanPropertyWriter[len]);
+        return propArray;
     }
 
     /*
@@ -525,7 +513,7 @@ public class TypeDetector
         return vr;
     }
     
-    private ValueReader createReader(Class<?> contextType, Class<?> type,
+    protected ValueReader createReader(Class<?> contextType, Class<?> type,
             Type genericType)
     {
         if (type == Object.class) {
@@ -536,7 +524,7 @@ public class TypeDetector
             if (!elemType.isPrimitive()) {
                 return new ArrayReader(elemType, createReader(contextType, elemType, elemType));
             }
-            int typeId = _findSimple(type);
+            int typeId = _findSimple(type, false);
             if (typeId > 0) {
                 return new SimpleValueReader(typeId, type);
             }
@@ -551,7 +539,7 @@ public class TypeDetector
         if (Map.class.isAssignableFrom(type)) {
             return mapReader(contextType, genericType);
         }
-        int typeId = _findSimple(type);
+        int typeId = _findSimple(type, false);
         if (typeId > 0) {
             return new SimpleValueReader(typeId, type);
         }
@@ -566,8 +554,7 @@ public class TypeDetector
                     return vr;
                 }
             }
-            ClassDefinition cd = resolveClassDefinition(type);
-            BeanDefinition def = resolveBeanForDeser(type, cd);
+            BeanReader def = _resolveBeanForDeser(type);
             try {
                 _incompleteReaders.put(key, def);
                 for (Map.Entry<String, BeanProperty> entry : def.propertiesByName().entrySet()) {
@@ -582,8 +569,10 @@ public class TypeDetector
         }
     }
 
-    protected BeanDefinition resolveBeanForDeser(Class<?> raw, ClassDefinition classDef)
+    protected BeanReader _resolveBeanForDeser(Class<?> raw)
     {
+        ClassDefinition classDef = resolveClassDefinition(raw);
+
         Constructor<?> defaultCtor = classDef.defaultCtor;
         Constructor<?> stringCtor = classDef.stringCtor;
         Constructor<?> longCtor = classDef.longCtor;
@@ -605,7 +594,7 @@ public class TypeDetector
         for (BeanProperty prop : classDef.propertiesForDeserialization(_features)) {
             propMap.put(prop.getName().toString(), prop);
         }
-        return new BeanDefinition(raw, propMap,
+        return new BeanReader(raw, propMap,
                 defaultCtor, stringCtor, longCtor);
     }
     

@@ -44,23 +44,23 @@ public class TypeDetectorTest extends TestBase
 
     public void testBasicTypeDetectionForSer() {
         TypeDetector td = TypeDetector.forWriter(JSON.Feature.defaults());
-        assertEquals(TypeDetector.SER_STRING, td.findFullType(String.class));
-        assertEquals(TypeDetector.SER_CHAR_ARRAY, td.findFullType(char[].class));
-        assertEquals(TypeDetector.SER_INT_ARRAY, td.findFullType(int[].class));
-        assertEquals(TypeDetector.SER_LONG_ARRAY, td.findFullType(long[].class));
-        assertEquals(TypeDetector.SER_BOOLEAN_ARRAY, td.findFullType(boolean[].class));
-        assertEquals(TypeDetector.SER_OBJECT_ARRAY, td.findFullType(Object[].class));
-        assertEquals(TypeDetector.SER_CHARACTER_SEQUENCE, td.findFullType(StringBuffer.class));
-        assertEquals(TypeDetector.SER_COLLECTION, td.findFullType(LinkedHashSet.class));
-        assertEquals(TypeDetector.SER_LIST, td.findFullType(ArrayList.class));
+        assertEquals(TypeDetector.SER_STRING, td.findSerializationType(String.class));
+        assertEquals(TypeDetector.SER_CHAR_ARRAY, td.findSerializationType(char[].class));
+        assertEquals(TypeDetector.SER_INT_ARRAY, td.findSerializationType(int[].class));
+        assertEquals(TypeDetector.SER_LONG_ARRAY, td.findSerializationType(long[].class));
+        assertEquals(TypeDetector.SER_BOOLEAN_ARRAY, td.findSerializationType(boolean[].class));
+        assertEquals(TypeDetector.SER_OBJECT_ARRAY, td.findSerializationType(Object[].class));
+        assertEquals(TypeDetector.SER_CHARACTER_SEQUENCE, td.findSerializationType(StringBuffer.class));
+        assertEquals(TypeDetector.SER_COLLECTION, td.findSerializationType(LinkedHashSet.class));
+        assertEquals(TypeDetector.SER_LIST, td.findSerializationType(ArrayList.class));
 
-        assertEquals(TypeDetector.SER_NUMBER_INTEGER, td.findFullType(Integer.class));
-        assertEquals(TypeDetector.SER_NUMBER_INTEGER, td.findFullType(Integer.TYPE));
+        assertEquals(TypeDetector.SER_NUMBER_INTEGER, td.findSerializationType(Integer.class));
+        assertEquals(TypeDetector.SER_NUMBER_INTEGER, td.findSerializationType(Integer.TYPE));
         
         // more specific types
-        assertEquals(TypeDetector.SER_CALENDAR, td.findFullType(Calendar.class));
-        assertEquals(TypeDetector.SER_CALENDAR, td.findFullType(GregorianCalendar.class));
-        assertEquals(TypeDetector.SER_DATE, td.findFullType(new GregorianCalendar().getTime().getClass()));
-        assertEquals(TypeDetector.SER_UUID, td.findFullType(UUID.class));
+        assertEquals(TypeDetector.SER_CALENDAR, td.findSerializationType(Calendar.class));
+        assertEquals(TypeDetector.SER_CALENDAR, td.findSerializationType(GregorianCalendar.class));
+        assertEquals(TypeDetector.SER_DATE, td.findSerializationType(new GregorianCalendar().getTime().getClass()));
+        assertEquals(TypeDetector.SER_UUID, td.findSerializationType(UUID.class));
     }
 }
