@@ -19,7 +19,7 @@ public class BeanReader
 {
     protected final Class<?> _type;
 
-    protected final Map<String,BeanProperty> _propsByName; // for deserialization
+    protected final Map<String,BeanPropertyReader> _propsByName; // for deserialization
 
     protected final Constructor<?> _defaultCtor;
     protected final Constructor<?> _stringCtor;
@@ -28,7 +28,7 @@ public class BeanReader
     /**
      * Constructors used for deserialization use case
      */
-    public BeanReader(Class<?> type, Map<String, BeanProperty> props,
+    public BeanReader(Class<?> type, Map<String, BeanPropertyReader> props,
             Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor)
     {
         _type = type;
@@ -38,9 +38,9 @@ public class BeanReader
         _longCtor = longCtor;
     }
 
-    public Map<String,BeanProperty> propertiesByName() { return _propsByName; }
+    public Map<String,BeanPropertyReader> propertiesByName() { return _propsByName; }
 
-    public BeanProperty findProperty(String name) {
+    public BeanPropertyReader findProperty(String name) {
         return _propsByName.get(name);
     }
 
@@ -62,7 +62,7 @@ public class BeanReader
                     String propName;
                     
                     for (; (propName = p.nextFieldName()) != null; ) {
-                        BeanProperty prop = findProperty(propName);
+                        BeanPropertyReader prop = findProperty(propName);
                         if (prop == null) {
                             handleUnknown(r, p, propName);
                             continue;
@@ -113,7 +113,7 @@ public class BeanReader
                     String propName;
                     
                     for (; (propName = p.nextFieldName()) != null; ) {
-                        BeanProperty prop = findProperty(propName);
+                        BeanPropertyReader prop = findProperty(propName);
                         if (prop == null) {
                             handleUnknown(r, p, propName);
                             continue;

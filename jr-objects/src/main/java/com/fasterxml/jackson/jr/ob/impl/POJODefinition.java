@@ -7,8 +7,6 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.fasterxml.jackson.jr.ob.JSON;
-
 /**
  * Definition of a single Bean-style Java class, without assumptions
  * on usage for serialization or deserialization, used as input
@@ -16,12 +14,12 @@ import com.fasterxml.jackson.jr.ob.JSON;
  *
  * @since 2.8
  */
-public class ClassDefinition
+public class POJODefinition
 {
     private final static Prop[] NO_PROPS = new Prop[0];
 
-    protected final static ConcurrentHashMap<Class<?>, ClassDefinition> DEFS
-        = new ConcurrentHashMap<Class<?>, ClassDefinition>(50, 0.75f, 4);
+    protected final static ConcurrentHashMap<Class<?>, POJODefinition> DEFS
+        = new ConcurrentHashMap<Class<?>, POJODefinition>(50, 0.75f, 4);
     
     protected final Class<?> _type;
 
@@ -34,7 +32,7 @@ public class ClassDefinition
     /**
      * Constructors used for serialization use case
      */
-    public ClassDefinition(Class<?> type, Prop[] props,
+    public POJODefinition(Class<?> type, Prop[] props,
             Constructor<?> defaultCtor0, Constructor<?> stringCtor0, Constructor<?> longCtor0)
     {
         _type = type;
@@ -50,8 +48,8 @@ public class ClassDefinition
     /**********************************************************************
      */
     
-    public static ClassDefinition find(Class<?> forType) {
-        ClassDefinition def = DEFS.get(forType);
+    public static POJODefinition find(Class<?> forType) {
+        POJODefinition def = DEFS.get(forType);
         if (def == null) {
             // !!! TODO: clear if too big
             def = _construct(forType);
@@ -63,33 +61,6 @@ public class ClassDefinition
     public Prop[] properties() {
         return _properties;
     }
-    
-    public List<BeanProperty> propertiesForDeserialization(int features)
-    {
-        final int len = _properties.length;
-        if (len == 0) {
-            return Collections.emptyList();
-        }
-        List<BeanProperty> result = new ArrayList<BeanProperty>(len);
-        final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(features);
-        for (int i = 0; i < len; ++i) {
-            Prop prop = _properties[i];
-            Method m = prop.setter;
-            if (m == null) {
-                continue;
-            }
-            // access to non-public setters must be forced:
-            if (!Modifier.isPublic(m.getModifiers())
-                    && !JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(features)) {
-                continue;
-            }
-            if (forceAccess) {
-                m.setAccessible(true);
-            }
-            result.add(BeanProperty.forDeserialization(prop.name, m, prop.field));
-        }
-        return result;
-    }
 
     /*
     /**********************************************************************
@@ -97,7 +68,7 @@ public class ClassDefinition
     /**********************************************************************
      */
 
-    private static ClassDefinition _construct(Class<?> beanType)
+    private static POJODefinition _construct(Class<?> beanType)
     {
         Map<String,Prop> propsByName = new TreeMap<String,Prop>();
         _introspect(beanType, propsByName);
@@ -129,7 +100,7 @@ public class ClassDefinition
         } else {
             props = propsByName.values().toArray(new Prop[propsByName.size()]);
         }
-        return new ClassDefinition(beanType, props, defaultCtor, stringCtor, longCtor);
+        return new POJODefinition(beanType, props, defaultCtor, stringCtor, longCtor);
     }
 
     private static void _introspect(Class<?> currType, Map<String,Prop> props)

@@ -12,6 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.impl.POJODefinition.Prop;
 import com.fasterxml.jackson.jr.type.ResolvedType;
 import com.fasterxml.jackson.jr.type.TypeBindings;
 import com.fasterxml.jackson.jr.type.TypeResolver;
@@ -248,10 +249,10 @@ public class TypeDetector
     /**********************************************************************
      */
 
-    protected ClassDefinition resolveClassDefinition(Class<?> raw)
+    protected POJODefinition resolvePOJODefinition(Class<?> raw)
     {
         try {
-            return ClassDefinition.find(raw);
+            return POJODefinition.find(raw);
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format
                     ("Failed to introspect ClassDefinition for type '%s': %s",
@@ -421,7 +422,7 @@ public class TypeDetector
         int type = _findSimple(raw, true);
         if (type == SER_UNKNOWN) {
             if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
-                ClassDefinition cd = resolveClassDefinition(raw);
+                POJODefinition cd = resolvePOJODefinition(raw);
                 BeanPropertyWriter[] props = resolveBeanForSer(raw, cd);
                 // Due to concurrent access, possible that someone might have added it
                 synchronized (_knownWriters) {
@@ -443,9 +444,9 @@ public class TypeDetector
         return type;
     }
 
-    protected BeanPropertyWriter[] resolveBeanForSer(Class<?> raw, ClassDefinition classDef)
+    protected BeanPropertyWriter[] resolveBeanForSer(Class<?> raw, POJODefinition classDef)
     {
-        ClassDefinition.Prop[] rawProps = classDef.properties();
+        POJODefinition.Prop[] rawProps = classDef.properties();
         final int len = rawProps.length;
         List<BeanPropertyWriter> props = new ArrayList<BeanPropertyWriter>(len);
         final boolean includeReadOnly = JSON.Feature.WRITE_READONLY_BEAN_PROPERTIES.isEnabled(_features);
@@ -453,7 +454,7 @@ public class TypeDetector
         final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
 
         for (int i = 0; i < len; ++i) {
-            ClassDefinition.Prop rawProp = rawProps[i];
+            POJODefinition.Prop rawProp = rawProps[i];
             Method m = rawProp.getter;
             if (m == null) {
                 if (JSON.Feature.USE_IS_GETTERS.isEnabled(_features)) {
@@ -492,7 +493,64 @@ public class TypeDetector
 
     /*
     /**********************************************************************
-    /* Methods for deserialization
+    /* Methods for deserialization; simple factory methods
+    /**********************************************************************
+     */
+
+    public ValueReader enumReader(Class<?> enumType) {
+        Object[] enums = enumType.getEnumConstants();
+        Map<String,Object> byName = new HashMap<String,Object>();
+        for (Object e : enums) {
+            byName.put(e.toString(), e);
+        }
+        return new EnumReader(enums, byName);
+    }
+
+    protected ValueReader collectionReader(Class<?> contextType, Type collectionType)
+    {
+        ResolvedType t = _typeResolver.resolve(bindings(contextType), collectionType);
+        List<ResolvedType> params = t.typeParametersFor(Collection.class);
+        return collectionReader(t.erasedType(), params.get(0));
+    }
+
+    protected ValueReader collectionReader(Class<?> collectionType, ResolvedType valueType)
+    {
+        Class<?> raw = valueType.erasedType();
+        if (Collection.class.isAssignableFrom(raw)) {
+            List<ResolvedType> params = valueType.typeParametersFor(Collection.class);
+            return collectionReader(raw, params.get(0));
+        }
+        if (Map.class.isAssignableFrom(raw)) {
+            List<ResolvedType> params = valueType.typeParametersFor(Map.class);
+            return mapReader(raw, params.get(1));
+        }
+        return new CollectionReader(collectionType, createReader(null, raw, raw));
+    }
+
+    protected ValueReader mapReader(Class<?> contextType, Type mapType)
+    {
+        ResolvedType t = _typeResolver.resolve(bindings(contextType), mapType);
+        List<ResolvedType> params = t.typeParametersFor(Map.class);
+        return mapReader(t.erasedType(), params.get(1));
+    }
+    
+    protected ValueReader mapReader(Class<?> mapType, ResolvedType valueType)
+    {
+        Class<?> raw = valueType.erasedType();
+        if (Collection.class.isAssignableFrom(raw)) {
+            List<ResolvedType> params = valueType.typeParametersFor(Collection.class);
+            return collectionReader(raw, params.get(0));
+        }
+        if (Map.class.isAssignableFrom(raw)) {
+            List<ResolvedType> params = valueType.typeParametersFor(Map.class);
+            return mapReader(raw, params.get(1));
+        }
+        return new MapReader(mapType, createReader(null, raw, raw));
+    }
+
+    /*
+    /**********************************************************************
+    /* Methods for deserialization; other
     /**********************************************************************
      */
 
@@ -557,8 +615,8 @@ public class TypeDetector
             BeanReader def = _resolveBeanForDeser(type);
             try {
                 _incompleteReaders.put(key, def);
-                for (Map.Entry<String, BeanProperty> entry : def.propertiesByName().entrySet()) {
-                    BeanProperty prop = entry.getValue();
+                for (Map.Entry<String, BeanPropertyReader> entry : def.propertiesByName().entrySet()) {
+                    BeanPropertyReader prop = entry.getValue();
                     entry.setValue(prop.withReader(createReader(contextType,
                             prop.rawSetterType(), prop.genericSetterType())));
                 }
@@ -571,11 +629,11 @@ public class TypeDetector
 
     protected BeanReader _resolveBeanForDeser(Class<?> raw)
     {
-        ClassDefinition classDef = resolveClassDefinition(raw);
+        final POJODefinition pojoDef = resolvePOJODefinition(raw);
 
-        Constructor<?> defaultCtor = classDef.defaultCtor;
-        Constructor<?> stringCtor = classDef.stringCtor;
-        Constructor<?> longCtor = classDef.longCtor;
+        Constructor<?> defaultCtor = pojoDef.defaultCtor;
+        Constructor<?> stringCtor = pojoDef.stringCtor;
+        Constructor<?> longCtor = pojoDef.longCtor;
 
         final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
         if (forceAccess) {
@@ -590,69 +648,50 @@ public class TypeDetector
             }
         }
 
-        Map<String, BeanProperty> propMap = new HashMap<String, BeanProperty>();
-        for (BeanProperty prop : classDef.propertiesForDeserialization(_features)) {
-            propMap.put(prop.getName().toString(), prop);
+        final POJODefinition.Prop[] rawProps = pojoDef.properties();
+        Map<String, BeanPropertyReader> propMap = new HashMap<String, BeanPropertyReader>();
+        final int len = rawProps.length;
+        if (len == 0) {
+            propMap = Collections.emptyMap();
+        } else {
+            final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
+            propMap = new HashMap<String, BeanPropertyReader>();
+            for (int i = 0; i < len; ++i) {
+                POJODefinition.Prop rawProp = rawProps[i];                
+                Method m = rawProp.setter;
+                Field f = useFields ? rawProp.field : null;
+
+                if (m != null) {
+                    if (forceAccess) {
+                        m.setAccessible(true);
+                    } else if (!Modifier.isPublic(m.getModifiers())) {
+                        // access to non-public setters must be forced to be usable:
+                        m = null;
+                    }
+                }
+                // if no setter, field would do as well
+                if (m == null) {
+                    if (f == null) {
+                        continue;
+                    }
+                    // fields should always be public, but let's just double-check
+                    if (forceAccess) {
+                        f.setAccessible(true);
+                    } else if (!Modifier.isPublic(f.getModifiers())) {
+                        continue;
+                    }
+                }
+                propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, f, m));
+            }
         }
         return new BeanReader(raw, propMap,
                 defaultCtor, stringCtor, longCtor);
     }
-    
+
     private TypeBindings bindings(Class<?> ctxt) {
         if (ctxt == null) {
             return TypeBindings.emptyBindings();
         }
         return TypeBindings.create(ctxt, (ResolvedType[]) null);
-    }
-    
-    public static ValueReader enumReader(Class<?> enumType) {
-        Object[] enums = enumType.getEnumConstants();
-        Map<String,Object> byName = new HashMap<String,Object>();
-        for (Object e : enums) {
-            byName.put(e.toString(), e);
-        }
-        return new EnumReader(enums, byName);
-    }
-
-    protected ValueReader collectionReader(Class<?> contextType, Type collectionType)
-    {
-        ResolvedType t = _typeResolver.resolve(bindings(contextType), collectionType);
-        List<ResolvedType> params = t.typeParametersFor(Collection.class);
-        return collectionReader(t.erasedType(), params.get(0));
-    }
-
-    protected ValueReader collectionReader(Class<?> collectionType, ResolvedType valueType)
-    {
-        Class<?> raw = valueType.erasedType();
-        if (Collection.class.isAssignableFrom(raw)) {
-            List<ResolvedType> params = valueType.typeParametersFor(Collection.class);
-            return collectionReader(raw, params.get(0));
-        }
-        if (Map.class.isAssignableFrom(raw)) {
-            List<ResolvedType> params = valueType.typeParametersFor(Map.class);
-            return mapReader(raw, params.get(1));
-        }
-        return new CollectionReader(collectionType, createReader(null, raw, raw));
-    }
-
-    protected ValueReader mapReader(Class<?> contextType, Type mapType)
-    {
-        ResolvedType t = _typeResolver.resolve(bindings(contextType), mapType);
-        List<ResolvedType> params = t.typeParametersFor(Map.class);
-        return mapReader(t.erasedType(), params.get(1));
-    }
-    
-    protected ValueReader mapReader(Class<?> mapType, ResolvedType valueType)
-    {
-        Class<?> raw = valueType.erasedType();
-        if (Collection.class.isAssignableFrom(raw)) {
-            List<ResolvedType> params = valueType.typeParametersFor(Collection.class);
-            return collectionReader(raw, params.get(0));
-        }
-        if (Map.class.isAssignableFrom(raw)) {
-            List<ResolvedType> params = valueType.typeParametersFor(Map.class);
-            return mapReader(raw, params.get(1));
-        }
-        return new MapReader(mapType, createReader(null, raw, raw));
     }
 }
