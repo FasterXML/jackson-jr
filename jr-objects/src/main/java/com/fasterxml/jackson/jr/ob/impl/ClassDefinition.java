@@ -108,7 +108,8 @@ public class ClassDefinition
                 if (forceAccess) {
                     m.setAccessible(true);
                 }
-                result.add(BeanProperty.forSerialization(prop.name, m));
+                result.add(BeanProperty.forSerialization(prop.name, m,
+                        prop.hasSetter()));
             }
         }
         return result;
@@ -244,6 +245,10 @@ public class ClassDefinition
         
         public Prop(String name) {
             this.name = name;
+        }
+
+        public boolean hasSetter() {
+            return (setter != null) || (field != null);
         }
     }
 }

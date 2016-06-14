@@ -2,6 +2,7 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
@@ -33,6 +34,8 @@ public final class BeanProperty
      */
     protected final Field _field;
 
+    protected final boolean _hasSetter;
+
     public BeanProperty(String name) {
         _name = new SerializedString(name);
         _typeId = 0;
@@ -40,15 +43,19 @@ public final class BeanProperty
         _getMethod = null;
         _setMethod = null;
         _valueReader = null;
+        _hasSetter = false;
     }
 
-    private BeanProperty(String name, Method getter, Method setter, Field field) {
+    private BeanProperty(String name, Method getter, Method setter, Field field,
+            boolean hasSetter)
+    {
         _name = new SerializedString(name);
         _typeId = 0;
         _field = field;
         _getMethod = getter;
         _setMethod = setter;
         _valueReader = null;
+        _hasSetter = hasSetter;
     }
     
     protected BeanProperty(BeanProperty src, ValueReader vr) {
@@ -58,6 +65,7 @@ public final class BeanProperty
         _getMethod = src._getMethod;
         _setMethod = src._setMethod;
         _valueReader = vr;
+        _hasSetter = src._hasSetter;
     }
 
     protected BeanProperty(BeanProperty src, int typeId,
@@ -65,6 +73,7 @@ public final class BeanProperty
     {
         _name = src._name;
         _valueReader = src._valueReader;
+        _hasSetter = src._hasSetter;
 
         _typeId = typeId;
         _field = field;
@@ -72,30 +81,12 @@ public final class BeanProperty
         _setMethod = setter;
     }
 
-    public static BeanProperty forSerialization(String name, Method getter) {
-        return new BeanProperty(name, getter, null, null);
+    public static BeanProperty forSerialization(String name, Method getter, boolean hasSetter) {
+        return new BeanProperty(name, getter, null, null, hasSetter);
     }
 
     public static BeanProperty forDeserialization(String name, Method setter, Field field) {
-        return new BeanProperty(name, null, setter, field);
-    }
-
-    public BeanProperty withGetter(Method getter) {
-        return new BeanProperty(this, _typeId, getter, _setMethod, _field);
-    }
-
-    public BeanProperty withSetter(Method setter) {
-        /* 28-Jul-2014, tatu: Need to figure out a way to resolve multiple similarly
-         *    named setters, mostly to avoid bridge methods (see [jackson-jr#15]),
-         *    but possible also to try to find most optimal of overloads.
-         */
-        if (_setMethod != null) {
-            // start with minimal conflict resolution, however
-            if (setter.isBridge() || setter.isSynthetic()) {
-                return this;
-            }
-        }
-        return new BeanProperty(this, _typeId, _getMethod, setter, _field);
+        return new BeanProperty(name, null, setter, field, false);
     }
 
     public BeanProperty withReader(ValueReader vr) {
@@ -107,20 +98,6 @@ public final class BeanProperty
                 : new BeanProperty(this, typeId, _getMethod, _setMethod, _field);
     }
 
-    public void forceAccess() {
-        if (_getMethod != null) {
-            _getMethod.setAccessible(true);
-        }
-        if (_setMethod != null) {
-            _setMethod.setAccessible(true);
-        }
-        
-    }
-
-    public boolean hasGetter() { return _getMethod != null; }
-    public boolean hasSetter() { return _setMethod != null; }
-    public boolean hasField() { return _field != null; }
-    
     public Type genericSetterType() {
         return _setMethod.getGenericParameterTypes()[0];
     }
@@ -140,7 +117,7 @@ public final class BeanProperty
     public SerializedString getName() { return _name; }
     
     public SerializedString getNameIfHasSetter() {
-        return (_setMethod == null) ? null : _name;
+        return _hasSetter ? _name : null;
     }
     
     public Object getValueFor(Object bean) throws IOException
@@ -165,11 +142,11 @@ public final class BeanProperty
             return _setMethod.invoke(bean, value);
         } catch (Exception e) {
             Throwable t = e;
-            while (t.getCause() != null) {
+            if (t instanceof InvocationTargetException) {
                 t = t.getCause();
             }
             throw new JSONObjectException("Failed to set property '"+_name+"'; exception "+e.getClass().getName()+"): "
-                    +e.getMessage(), e);
+                    +t.getMessage(), t);
         }
     }
 
