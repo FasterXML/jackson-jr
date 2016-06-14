@@ -111,6 +111,16 @@ public class POJODefinition
         // First, check base type
         _introspect(currType.getSuperclass(), props);
 
+        // then public fields (since 2.8); may or may not be ultimately included
+        // but at this point still possible
+        for (Field f : currType.getDeclaredFields()) {
+            if (!Modifier.isPublic(f.getModifiers())
+                    || f.isEnumConstant() || f.isSynthetic()) {
+                continue;
+            }
+            _propFrom(props, f.getName()).field = f;
+        }
+
         // then get methods from within this class
         for (Method m : currType.getDeclaredMethods()) {
             final int flags = m.getModifiers();
@@ -155,8 +165,6 @@ public class POJODefinition
                 _propFrom(props, name).setter = m;
             }
         }
-
-        // and, fields too
     }
 
     private static Prop _propFrom(Map<String,Prop> props, String name) {

@@ -34,5 +34,4 @@ public class RoundtripTest extends TestBase
                 320, 240, MediaItem.Size.SMALL));
         return item;
     }
-
 }

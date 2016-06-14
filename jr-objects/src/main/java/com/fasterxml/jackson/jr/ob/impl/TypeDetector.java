@@ -12,7 +12,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.jr.ob.JSON;
-import com.fasterxml.jackson.jr.ob.impl.POJODefinition.Prop;
 import com.fasterxml.jackson.jr.type.ResolvedType;
 import com.fasterxml.jackson.jr.type.TypeBindings;
 import com.fasterxml.jackson.jr.type.TypeResolver;
@@ -486,8 +485,9 @@ public class TypeDetector
             int typeId = _findSimple(type, true);
             props.add(new BeanPropertyWriter(typeId, rawProp.name, rawProp.field, m));
         }
-        BeanPropertyWriter[] propArray = (len == 0) ? NO_PROPS_FOR_WRITE
-                : props.toArray(new BeanPropertyWriter[len]);
+        int plen = props.size();
+        BeanPropertyWriter[] propArray = (plen == 0) ? NO_PROPS_FOR_WRITE
+                : props.toArray(new BeanPropertyWriter[plen]);
         return propArray;
     }
 

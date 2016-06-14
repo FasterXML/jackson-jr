@@ -297,6 +297,23 @@ public class JSON implements Versioned
            }
            return flags;
        }
+
+       /**
+        * Method for calculating bitset of features that force flushing of
+        * POJO handler caches.
+        *
+        * @since 2.8
+        */
+       public static int cacheBreakers()
+       {
+           int flags = 0;
+           for (Feature value : values()) {
+               if (value.affectsCaching()) {
+                   flags |= value.mask();
+               }
+           }
+           return flags;
+       }
        
        public final boolean enabledByDefault() { return _defaultState; }
        public final boolean affectsCaching() { return _affectsCaching; }
@@ -314,6 +331,8 @@ public class JSON implements Versioned
     // Important: has to come before 'std' instance, since it refers to it
     private final static int DEFAULT_FEATURES = Feature.defaults();
 
+    private final static int CACHE_BREAKERS = Feature.cacheBreakers();
+    
     /**
      * Singleton instance with standard, default configuration.
      * May be used with direct references like:
@@ -570,6 +589,11 @@ public class JSON implements Versioned
     {
         if (_features == features) {
             return this;
+        }
+        int diff = features ^ _features;
+        // Does this lead to having to flush all definitions?
+        if ((diff & CACHE_BREAKERS) != 0) {
+            // !!! TBI: flush caches
         }
         return _with(features, _jsonFactory, _treeCodec,
                 _reader.withFeatures(features), _writer.withFeatures(features),

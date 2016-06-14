@@ -10,6 +10,7 @@ public class ReadFeaturesTest extends TestBase
 
         public int getValue() { return 42; }
     }
+
     /*
     /**********************************************************************
     /* Test methdods
@@ -18,6 +19,8 @@ public class ReadFeaturesTest extends TestBase
 
     public void testPojoWithIsGetter() throws Exception
     {
+        assertTrue(JSON.std.isEnabled(JSON.Feature.USE_IS_GETTERS));
+        
         String json;
 
         json = JSON.std.asString(new IsBean());
