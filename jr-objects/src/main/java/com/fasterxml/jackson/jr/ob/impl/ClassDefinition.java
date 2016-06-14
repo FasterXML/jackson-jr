@@ -167,7 +167,10 @@ public class ClassDefinition
         // then get methods from within this class
         for (Method m : currType.getDeclaredMethods()) {
             final int flags = m.getModifiers();
-            if (Modifier.isStatic(flags)) {
+            // 13-Jun-2015, tatu: Skip synthetic, bridge methods altogether, for now
+            //    at least (add more complex handling only if absolutely necessary)
+            if (Modifier.isStatic(flags)
+                    || m.isSynthetic() || m.isBridge()) {
                 continue;
             }
             Class<?> argTypes[] = m.getParameterTypes();
