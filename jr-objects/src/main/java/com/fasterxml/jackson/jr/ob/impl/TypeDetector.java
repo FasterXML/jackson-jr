@@ -391,6 +391,9 @@ public class TypeDetector
         if (raw == _prevClass) {
             return _prevType;
         }
+        if (raw == String.class) {
+            return SER_STRING;
+        }
         ClassKey k = (_key == null) ? new ClassKey(raw, _features) : _key.with(raw, _features);
         int type;
 
