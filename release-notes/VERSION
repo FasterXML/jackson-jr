@@ -6,6 +6,7 @@ Project: jackson-jr
 
 2.8.0 (not yet released)
 
+#26: Allow use of public fields for getting/setting values
 #43: Add convenience read method for reading trees via `JSON`
 
 2.7.5 (11-Jun-2016)
