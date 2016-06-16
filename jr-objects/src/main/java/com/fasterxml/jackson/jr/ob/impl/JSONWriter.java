@@ -34,7 +34,9 @@ public class JSONWriter
      */
 
     protected final int _features;
-    
+
+    protected final boolean _writeNullValues;
+
     /**
      * Object that is used to resolve types of values dynamically.
      */
@@ -65,6 +67,7 @@ public class JSONWriter
     public JSONWriter(int features, TypeDetector td, TreeCodec tc)
     {
         _features = features;
+        _writeNullValues = Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
         _typeDetector = td;
         _treeCodec = tc;
         _generator = null;
@@ -77,6 +80,7 @@ public class JSONWriter
     protected JSONWriter(JSONWriter base, int features, TypeDetector td, JsonGenerator g)
     {
         _features = features;
+        _writeNullValues = Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
         _typeDetector = td;
         _treeCodec = base._treeCodec;
         _generator = g;
@@ -122,13 +126,14 @@ public class JSONWriter
         return new JSONWriter(this, features,
                 _typeDetector.perOperationInstance(features), g);
     }
+
     /*
     /**********************************************************************
     /* Public entry methods
     /**********************************************************************
      */
 
-    public void writeValue(Object value) throws IOException, JsonProcessingException
+    public void writeValue(Object value) throws IOException
     {
         if (value == null) {
             writeNullValue();
@@ -137,20 +142,21 @@ public class JSONWriter
         _writeValue(value, _typeDetector.findSerializationType(value.getClass()));
     }
 
-    public void writeField(String fieldName, Object value) throws IOException, JsonProcessingException
+    @Deprecated // since 2.8
+    public void writeField(String fieldName, Object value) throws IOException
     {
         if (value == null) {
-            if (Feature.WRITE_NULL_PROPERTIES.isEnabled(_features)) {
+            if (_writeNullValues) {
                 writeNullField(fieldName);
             }
             return;
         }
+        writeField(fieldName, value, _typeDetector.findSerializationType(value.getClass()));
+    }
 
-        int type = _typeDetector.findSerializationType(value.getClass());
+    public void writeField(String fieldName, Object value, int type) throws IOException
+    {
         switch (type) {
-
-        // First, structured types:
-
         // Structured types:
         case SER_MAP:
             writeMapField(fieldName, (Map<?,?>) value);
@@ -413,11 +419,16 @@ public class JSONWriter
         writeIterableValue(v);
     }
     
-    protected void writeListValue(List<?> v) throws IOException
+    protected void writeListValue(List<?> list) throws IOException
     {
         _generator.writeStartArray();
-        for (int i = 0, len = v.size(); i < len; ++i) {
-            writeValue(v.get(i));
+        for (int i = 0, len = list.size(); i < len; ++i) {
+            Object value = list.get(i);
+            if (value == null) {
+                _generator.writeNull();
+                continue;
+            }
+            _writeValue(value, _typeDetector.findSerializationType(value.getClass()));
         }
         _generator.writeEndArray();
     }
@@ -433,7 +444,18 @@ public class JSONWriter
         _generator.writeStartObject();
         if (!v.isEmpty()) {
             for (Map.Entry<?,?> entry : v.entrySet()) {
-                writeField(keyToString(entry.getKey()), entry.getValue());
+                String key = keyToString(entry.getKey());
+                Object value = entry.getValue();
+
+                if (value == null) {
+                    if (_writeNullValues) {
+                        writeNullField(key);
+                    }
+                    continue;
+                }
+                Class<?> cls = value.getClass();
+                int type = _typeDetector.findSerializationType(cls);
+                writeField(key, value, type);
             }
         }
         _generator.writeEndObject();
@@ -606,13 +628,13 @@ public class JSONWriter
     }
 
     protected void writeNullField(String fieldName) throws IOException {
-        if (Feature.WRITE_NULL_PROPERTIES.isEnabled(_features)) {
+        if (_writeNullValues) {
             _generator.writeNullField(fieldName);
         }
     }
 
     protected void writeNullField(SerializedString fieldName) throws IOException {
-        if (Feature.WRITE_NULL_PROPERTIES.isEnabled(_features)) {
+        if (_writeNullValues) {
             _generator.writeFieldName(fieldName);
             _generator.writeNull();
         }
@@ -658,7 +680,9 @@ public class JSONWriter
             SerializedString name = property.name;
             Object value = property.getValueFor(bean);
             if (value == null) {
-                writeNullField(name);
+                if (_writeNullValues) {
+                    writeNullField(name);
+                }
                 continue;
             }
             int typeId = property.typeId;

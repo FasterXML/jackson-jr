@@ -32,6 +32,14 @@ public class TypeDetector
 {
     protected final BeanPropertyWriter[] NO_PROPS_FOR_WRITE = new BeanPropertyWriter[0];
 
+    /**
+     * While we should be able to cache all types in the active working set,
+     * we should also avoid potential unbounded retention, since there is
+     * generally just one big `TypeDetector` instances per JVM (or at least
+     * ClassLoader).
+     */
+    protected final static int MAX_CACHED_READERS = 500;
+
     /*
     /**********************************************************************
     /* Value constants for serialization
@@ -560,6 +568,11 @@ public class TypeDetector
             return vr;
         }
         vr = createReader(null, raw, raw);
+        // 15-Jun-2016, tatu: Let's limit maximum number of readers to prevent
+        //   unbounded memory retention (at least wrt readers)
+        if (_knownReaders.size() >= MAX_CACHED_READERS) {
+            _knownReaders.clear();
+        }
         _knownReaders.putIfAbsent(new ClassKey(raw, _features), vr);
         return vr;
     }

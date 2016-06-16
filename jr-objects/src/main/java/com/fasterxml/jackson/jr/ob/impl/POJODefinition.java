@@ -16,6 +16,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class POJODefinition
 {
+    /**
+     * Since there is just one global cache for type lookups, let's
+     * limit the size to something quite modest: introspection is
+     * not free, but holding onto information can cause issues
+     * for larger systems
+     */
+    private final static int MAX_CACHED = 100;
+    
     private final static Prop[] NO_PROPS = new Prop[0];
 
     protected final static ConcurrentHashMap<Class<?>, POJODefinition> DEFS
@@ -51,8 +59,13 @@ public class POJODefinition
     public static POJODefinition find(Class<?> forType) {
         POJODefinition def = DEFS.get(forType);
         if (def == null) {
-            // !!! TODO: clear if too big
             def = _construct(forType);
+            // Instead of trying to do LRU or just (which gets tricky with concurrent
+            // access), let's just do "flush when full". In practice tends to work
+            // quite well.
+            if (DEFS.size() >= MAX_CACHED) {
+                DEFS.clear();
+            }
             DEFS.putIfAbsent(forType, def);
         }
         return def;
