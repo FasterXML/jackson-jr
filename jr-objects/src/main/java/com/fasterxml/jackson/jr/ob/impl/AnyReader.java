@@ -38,7 +38,7 @@ public class AnyReader extends ValueReader
         case ID_START_OBJECT:
             return readFromObject(r, p, r._mapBuilder);
         case ID_START_ARRAY:
-            if (r._arraysAsLists) {
+            if (r.arraysAsLists()) {
                 return readCollectionFromArray(r, p, r._collectionBuilder);
             }
             return readArrayFromArray(r, p, r._collectionBuilder);

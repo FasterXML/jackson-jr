@@ -131,19 +131,6 @@ public class JSON implements Versioned
        WRITE_NULL_PROPERTIES(false),
 
        /**
-        * Feature that determines whether "read-only" properties of Beans
-        * (properties that only have a getter but no matching setter) are
-        * to be included in Bean serialization or not; if disabled,
-        * only properties have have both setter and getter are serialized.
-        * Note that feature is only used if {@link #HANDLE_JAVA_BEANS}
-        * is also enabled.
-        *<p>
-        * Feature is enabled by default,
-        * so that all Bean properties are serialized.
-        */
-       WRITE_READONLY_BEAN_PROPERTIES(true),
-
-       /**
         * Feature that determines whether Enum values are written using
         * numeric index (true), or String representation from calling
         * {@link Enum#toString()} (false).
@@ -227,6 +214,19 @@ public class JSON implements Versioned
         */
        HANDLE_JAVA_BEANS(true, true),
 
+       /**
+        * Feature that determines whether "read-only" properties of Beans
+        * (properties that only have a getter but no matching setter) are
+        * to be included in Bean serialization or not; if disabled,
+        * only properties have have both setter and getter are serialized.
+        * Note that feature is only used if {@link #HANDLE_JAVA_BEANS}
+        * is also enabled.
+        *<p>
+        * Feature is enabled by default,
+        * so that all Bean properties are serialized.
+        */
+       WRITE_READONLY_BEAN_PROPERTIES(true, true),
+       
        /**
         * Feature that determines whether access to {@link java.lang.reflect.Method}s and
         * {@link java.lang.reflect.Constructor}s that are used with dynamically
@@ -331,8 +331,6 @@ public class JSON implements Versioned
     // Important: has to come before 'std' instance, since it refers to it
     private final static int DEFAULT_FEATURES = Feature.defaults();
 
-    private final static int CACHE_BREAKERS = Feature.cacheBreakers();
-    
     /**
      * Singleton instance with standard, default configuration.
      * May be used with direct references like:
@@ -399,7 +397,7 @@ public class JSON implements Versioned
                 null, null, // reader, writer
                 null);
     }
-    
+
     protected JSON(int features,
             JsonFactory jsonF, TreeCodec trees,
             JSONReader r, JSONWriter w,
@@ -408,20 +406,25 @@ public class JSON implements Versioned
         _features = features;
         _jsonFactory = jsonF;
         _treeCodec = trees;
-        _reader = (r == null) ? _defaultReader(features, trees) : r;
-        _writer = (w == null) ? _defaultWriter(features, trees) : w;
+        TypeDetector td = _defaultTypeDetector(features);
+        _reader = (r == null) ? _defaultReader(features, trees, td) : r;
+        _writer = (w == null) ? _defaultWriter(features, trees, td) : w;
         _prettyPrinter = pp;
     }
 
-    protected JSONReader _defaultReader(int features, TreeCodec tc) {
-        return new JSONReader(features, TypeDetector.forReader(features), tc,
+    protected TypeDetector _defaultTypeDetector(int features) {
+        return TypeDetector.blueprint(features);
+    }
+
+    protected JSONReader _defaultReader(int features, TreeCodec tc, TypeDetector td) {
+        return new JSONReader(features, td, tc,
                 CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
 
-    protected JSONWriter _defaultWriter(int features, TreeCodec tc) {
-        return new JSONWriter(features, TypeDetector.forWriter(features), tc);
+    protected JSONWriter _defaultWriter(int features, TreeCodec tc, TypeDetector td) {
+        return new JSONWriter(features, td, tc);
     }
-    
+
     /*
     /**********************************************************************
     /* Adapting
@@ -590,16 +593,10 @@ public class JSON implements Versioned
         if (_features == features) {
             return this;
         }
-        int diff = features ^ _features;
-        // Does this lead to having to flush all definitions?
-        if ((diff & CACHE_BREAKERS) != 0) {
-            // !!! TBI: flush caches
-        }
         return _with(features, _jsonFactory, _treeCodec,
-                _reader.withFeatures(features), _writer.withFeatures(features),
-                _prettyPrinter);
+                _reader, _writer, _prettyPrinter);
     }
-    
+
     /*
     /**********************************************************************
     /* Methods sub-classes must override
@@ -646,7 +643,7 @@ public class JSON implements Versioned
         SegmentedStringWriter sw = new SegmentedStringWriter(_jsonFactory._getBufferRecycler());
         try {
             _writeAndClose(value, _jsonFactory.createGenerator(sw));
-        } catch (JsonProcessingException e) { // to support [JACKSON-758]
+        } catch (JsonProcessingException e) {
             throw e;
         } catch (IOException e) { // shouldn't really happen, but is declared as possibility so:
             throw JSONObjectException.fromUnexpectedIOE(e);
@@ -659,7 +656,7 @@ public class JSON implements Versioned
         ByteArrayBuilder bb = new ByteArrayBuilder(_jsonFactory._getBufferRecycler());
         try {
             _writeAndClose(value, _jsonFactory.createGenerator(bb, JsonEncoding.UTF8));
-        } catch (JsonProcessingException e) { // to support [JACKSON-758]
+        } catch (JsonProcessingException e) {
             throw e;
         } catch (IOException e) { // shouldn't really happen, but is declared as possibility so:
             throw JSONObjectException.fromUnexpectedIOE(e);
@@ -1029,7 +1026,7 @@ public class JSON implements Versioned
     }
 
     protected JSONWriter _writerForOperation(JsonGenerator gen) {
-        return _writer.perOperationInstance(gen);
+        return _writer.perOperationInstance(_features, gen);
     }
 
     /*
@@ -1039,7 +1036,7 @@ public class JSON implements Versioned
      */
     
     protected JSONReader _readerForOperation(JsonParser p) {
-        return _reader.perOperationInstance(p);
+        return _reader.perOperationInstance(_features, p);
     }
 
     protected JsonParser _parser(Object source) throws IOException, JSONObjectException

@@ -43,10 +43,10 @@ public class TypeResolver implements Serializable
                 new ResolvedType(Double.TYPE)
         };
         for (ResolvedType type : all) {
-            _primitives.put(new ClassKey(type.erasedType()), type);
+            _primitives.put(new ClassKey(type.erasedType(), 0), type);
         }
-        _primitives.put(new ClassKey(Void.TYPE), new ResolvedType(Void.TYPE));
-        _primitives.put(new ClassKey(Object.class), TYPE_OBJECT);
+        _primitives.put(new ClassKey(Void.TYPE, 0), new ResolvedType(Void.TYPE));
+        _primitives.put(new ClassKey(Object.class, 0), TYPE_OBJECT);
     }
 
     // // Caching
@@ -94,7 +94,7 @@ public class TypeResolver implements Serializable
     }
 
     private ResolvedType _fromClass(ClassStack context, Class<?> rawType, TypeBindings typeBindings) {
-        final ClassKey key = new ClassKey(rawType);
+        final ClassKey key = new ClassKey(rawType, 0);
         if (rawType.isPrimitive()) {
             ResolvedType type = _primitives.get(key);
             if (type != null) {

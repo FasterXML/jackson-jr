@@ -74,12 +74,12 @@ public class JSONWriter
     /**
      * Constructor for non-blueprint instances
      */
-    protected JSONWriter(JSONWriter base, JsonGenerator jgen)
+    protected JSONWriter(JSONWriter base, int features, TypeDetector td, JsonGenerator g)
     {
-        _features = base._features;
-        _typeDetector = base._typeDetector.perOperationInstance(_features);
+        _features = features;
+        _typeDetector = td;
         _treeCodec = base._treeCodec;
-        _generator = jgen;
+        _generator = g;
         _timezone = DEFAULT_TIMEZONE;
     }
 
@@ -88,20 +88,6 @@ public class JSONWriter
     /* Mutant factories for blueprint
     /**********************************************************************
      */
-
-    public JSONWriter withFeatures(int features) {
-        if (_features == features) {
-            return this;
-        }
-        return _with(features, _typeDetector, _treeCodec);
-    }
-
-    public JSONWriter with(TypeDetector td) {
-        if (_typeDetector == td) {
-            return this;
-        }
-        return _with(_features, td, _treeCodec);
-    }
 
     public JSONWriter with(TreeCodec tc) {
         if (_treeCodec == tc) {
@@ -128,14 +114,14 @@ public class JSONWriter
     /**********************************************************************
      */
 
-    public JSONWriter perOperationInstance(JsonGenerator jg)
+    public JSONWriter perOperationInstance(int features, JsonGenerator g)
     {
         if (getClass() != JSONWriter.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
-        return new JSONWriter(this, jg);
+        return new JSONWriter(this, features,
+                _typeDetector.perOperationInstance(features), g);
     }
-    
     /*
     /**********************************************************************
     /* Public entry methods

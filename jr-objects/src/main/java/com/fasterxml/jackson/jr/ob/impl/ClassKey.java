@@ -22,6 +22,14 @@ public final class ClassKey
     private Class<?> _class;
 
     /**
+     * Additional discriminator flags that may be used to allow
+     * variations for same class.
+     *
+     * @since 2.8
+     */
+    private int _flags;
+
+    /**
      * Let's cache hash code straight away, since we are
      * almost certain to need it.
      */
@@ -31,21 +39,23 @@ public final class ClassKey
     {
         _class = null;
         _className = null;
-        _hashCode = 0;
+        _flags = _hashCode = 0;
     }
 
-    public ClassKey(Class<?> clz)
+    public ClassKey(Class<?> clz, int flags)
+    {
+        _class = clz;
+        _flags = flags;
+        _className = clz.getName();
+        _hashCode = _className.hashCode() + flags;
+    }
+
+    public ClassKey with(Class<?> clz, int flags)
     {
         _class = clz;
         _className = clz.getName();
-        _hashCode = _className.hashCode();
-    }
-
-    public ClassKey with(Class<?> clz)
-    {
-        _class = clz;
-        _className = clz.getName();
-        _hashCode = _className.hashCode();
+        _hashCode = _className.hashCode() + flags;
+        _flags = flags;
         return this;
     }
 
@@ -67,10 +77,11 @@ public final class ClassKey
          * Let's assume answer is no: if this is wrong, will need to uncomment following functionality
          */
         /*
-        return (other._className.equals(_className))
+        return (other._flags == _flags)
+            && (other._className.equals(_className))
             && (other._class.getClassLoader() == _class.getClassLoader());
         */
-        return other._class == _class;
+        return (other._flags == _flags) && (other._class == _class);
     }
 
     @Override public int hashCode() { return _hashCode; }

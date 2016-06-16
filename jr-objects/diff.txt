@@ -1,0 +1,25 @@
+diff --git a/jr-objects/src/main/java/com/fasterxml/jackson/jr/ob/impl/TypeDetector.java b/jr-objects/src/main/java/com/fasterxml/jackson/jr/ob/impl/TypeDetector.java
+index 49a7c4d..6a0d197 100644
+--- a/jr-objects/src/main/java/com/fasterxml/jackson/jr/ob/impl/TypeDetector.java
++++ b/jr-objects/src/main/java/com/fasterxml/jackson/jr/ob/impl/TypeDetector.java
+@@ -619,8 +619,11 @@ public class TypeDetector
+ 
+         ValueReader vr = _knownReaders.get(k);
+         if (vr != null) {
++System.err.println(" findReader("+raw.getName()+"): cached = "+vr);        
+             return vr;
+         }
++System.err.println(" findReader("+raw.getName()+"): NOT cached yet");        
++
+         vr = createReader(null, raw, raw);
+         _knownReaders.putIfAbsent(new ClassKey(raw), vr);
+         return vr;
+@@ -629,6 +632,8 @@ public class TypeDetector
+     private ValueReader createReader(Class<?> contextType, Class<?> type,
+             Type genericType)
+     {
++System.err.println("createReader: ctxt="+contextType+", generic="+genericType);        
++        
+         if (type == Object.class) {
+             return AnyReader.std;
+         }

@@ -135,6 +135,14 @@ public class TypeDetector
 
     /*
     /**********************************************************************
+    /* Other constants
+    /**********************************************************************
+     */
+
+    protected final static int CACHE_FLAGS = JSON.Feature.cacheBreakers();
+
+    /*
+    /**********************************************************************
     /* Helper objects, serialization
     /**********************************************************************
      */
@@ -181,7 +189,7 @@ public class TypeDetector
     /**
      * Reusable lookup key; only used by per-thread instances.
      */
-    protected ClassKey _key = new ClassKey();
+    protected ClassKey _key;
     
     protected Class<?> _prevClass;
 
@@ -195,29 +203,19 @@ public class TypeDetector
     /**********************************************************************
      */
 
-    // for serialization
-    protected TypeDetector(int features,
-            ConcurrentHashMap<ClassKey, Integer> types,
-            CopyOnWriteArrayList<BeanPropertyWriter[]> writers) {
+    /**
+     * Constructor for the blueprint instance
+     */
+    protected TypeDetector(int features)
+    {
         _features = features;
-        _knownSerTypes = types;
-        _knownWriters = writers;
-        _knownReaders = null;
-        _typeResolver = null;
-        _readerLock = null;
-    }
-
-    // for deserialization
-    protected TypeDetector(int features,
-            ConcurrentHashMap<ClassKey, ValueReader> r) {
-        _features = features;
-        _knownSerTypes = null;
-        _knownWriters = null;
-        _knownReaders = r;
+        _knownSerTypes = new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4);
+        _knownWriters = new CopyOnWriteArrayList<BeanPropertyWriter[]>();
+        _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(50, 0.75f, 4);
         _typeResolver = new TypeResolver();
         _readerLock = new Object();
     }
-    
+
     protected TypeDetector(TypeDetector base, int features) {
         _features = features;
         _knownSerTypes = base._knownSerTypes;
@@ -227,19 +225,12 @@ public class TypeDetector
         _readerLock = base._readerLock;
     }
 
-    public final static TypeDetector forReader(int features) {
-        return new TypeDetector(features,
-                new ConcurrentHashMap<ClassKey, ValueReader>(50, 0.75f, 4));
+    public final static TypeDetector blueprint(int features) {
+        return new TypeDetector(features & CACHE_FLAGS);
     }
 
-    public final static TypeDetector forWriter(int features) {
-        return new TypeDetector(features,
-                new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4),
-                new CopyOnWriteArrayList<BeanPropertyWriter[]>());
-    }
-    
     public TypeDetector perOperationInstance(int features) {
-        return new TypeDetector(this, features);
+        return new TypeDetector(this, features & CACHE_FLAGS);
     }
 
     /*
@@ -400,14 +391,14 @@ public class TypeDetector
         if (raw == _prevClass) {
             return _prevType;
         }
-        ClassKey k = _key.with(raw);
+        ClassKey k = (_key == null) ? new ClassKey(raw, _features) : _key.with(raw, _features);
         int type;
 
         Integer I = _knownSerTypes.get(k);
 
         if (I == null) {
             type = _findPOJOSerializationType(raw);
-            _knownSerTypes.put(new ClassKey(raw), Integer.valueOf(type));
+            _knownSerTypes.put(new ClassKey(raw, _features), Integer.valueOf(type));
         } else {
             type = I.intValue();
         }
@@ -426,7 +417,7 @@ public class TypeDetector
                 // Due to concurrent access, possible that someone might have added it
                 synchronized (_knownWriters) {
                     // Important: do NOT try to reuse shared instance; caller needs it
-                    ClassKey k = new ClassKey(raw);
+                    ClassKey k = new ClassKey(raw, _features);
                     Integer I = _knownSerTypes.get(k);
                     // if it was already concurrently added, we'll just discard this copy, return earlier
                     if (I != null) {
@@ -560,14 +551,13 @@ public class TypeDetector
      */
     public ValueReader findReader(Class<?> raw)
     {
-        ClassKey k = _key.with(raw);
-
+        ClassKey k = (_key == null) ? new ClassKey(raw, _features) : _key.with(raw, _features);
         ValueReader vr = _knownReaders.get(k);
         if (vr != null) {
             return vr;
         }
         vr = createReader(null, raw, raw);
-        _knownReaders.putIfAbsent(new ClassKey(raw), vr);
+        _knownReaders.putIfAbsent(new ClassKey(raw, _features), vr);
         return vr;
     }
     
@@ -602,12 +592,12 @@ public class TypeDetector
             return new SimpleValueReader(typeId, type);
         }
         // Beans!
-        final ClassKey key = new ClassKey(type);
+        final ClassKey key = new ClassKey(type, _features);
         synchronized (_readerLock) {
             if (_incompleteReaders == null) {
                 _incompleteReaders = new HashMap<ClassKey, ValueReader>();
             } else { // perhaps it has already been resolved?
-                ValueReader vr = _incompleteReaders.get(new ClassKey(type));
+                ValueReader vr = _incompleteReaders.get(key);
                 if (vr != null) {
                     return vr;
                 }

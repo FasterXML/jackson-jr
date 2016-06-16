@@ -28,8 +28,6 @@ public class JSONReader
 
     protected final int _features;
 
-    protected final boolean _arraysAsLists;
-
     protected final TreeCodec _treeCodec;
     
     /**
@@ -72,23 +70,20 @@ public class JSONReader
         _treeCodec = treeCodec;
         _collectionBuilder = lb;
         _mapBuilder = mb;
-        _arraysAsLists = Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(features);
         _parser = null;
     }
 
     /**
      * Constructor used for per-operation (non-blueprint) instance.
      */
-    protected JSONReader(JSONReader base, JsonParser jp)
+    protected JSONReader(JSONReader base, int features, TypeDetector td, JsonParser p)
     {
-        int features = base._features;
         _features = features;
-        _typeDetector = base._typeDetector.perOperationInstance(features);
+        _typeDetector = td;
         _treeCodec = base._treeCodec;
         _collectionBuilder = base._collectionBuilder.newBuilder(features);
         _mapBuilder = base._mapBuilder.newBuilder(features);
-        _arraysAsLists = base._arraysAsLists;
-        _parser = jp;
+        _parser = p;
     }
 
     @Override
@@ -146,14 +141,28 @@ public class JSONReader
     /**********************************************************************
      */
 
-    public JSONReader perOperationInstance(JsonParser jp)
+    public JSONReader perOperationInstance(int features, JsonParser p)
     {
         if (getClass() != JSONReader.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
-        return new JSONReader(this, jp);
+        return new JSONReader(this, features,
+                _typeDetector.perOperationInstance(features), p);
     }
 
+    /*
+    /**********************************************************************
+    /* Simple accessors
+    /**********************************************************************
+     */
+
+    /**
+     * @since 2.8
+     */
+    public boolean arraysAsLists() {
+        return Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(_features);
+    }
+    
     /*
     /**********************************************************************
     /* Public entry points for reading Simple objects from JSON
