@@ -32,12 +32,12 @@ Good old [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
 
 Project is composed of multiple Maven sub-modules, each corresponding to a jar:
 
-* [jr-objects](../../tree/master/jr-objects) contains the "core" databinding implementation, and is commonly the only depenedncy to use
+* [jr-objects](../../tree/master/jr-objects) contains the "core" databinding implementation, and is commonly the only dependency to use
     * Depends on `jackson-core` for low-level reading/writing
 * [jr-stree](../../tree/master/jr-stree) contains a simple `TreeCodec` implementation, with which it is possible to read JSON as `TreeNode`s (see more below)
 * [jr-retrofit2](../../tree/master/jr-retrofit2) contains `jackson-jr` - based handlers for [Retrofit 2](http://square.github.io/retrofit/) library
     * Depends on `jackson-jr` and `Retrofit` API jars, and indirectly on `jackson-core`
-* jr-all` creates an "uber-jar" that contains individual modules along with all their dependencies:
+* jr-all creates an "uber-jar" that contains individual modules along with all their dependencies:
     * `jr-objects` classes as-is, without relocating
     * `jr-stree` classes as-is, without relocating
     * Jackson streaming (`jackson-core`) contents *relocated* ("shaded"), for private use by `jackson-jr`
