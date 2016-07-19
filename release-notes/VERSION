@@ -4,6 +4,10 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.8.1 (19-Jul-2016)
+
+No changes since 2.8.0
+
 2.8.0 (04-Jul-2016)
 
 #26: Allow use of public fields for getting/setting values
