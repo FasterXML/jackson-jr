@@ -18,9 +18,9 @@ public final class BeanPropertyWriter
     public final SerializedString name;
     public final int typeId;
 
-    protected final Method _getter;
+    private final Method _getter;
 
-    protected final Field _field;
+    private final Field _field;
 
     public BeanPropertyWriter(int typeId, String n, Field f, Method getter)
     {

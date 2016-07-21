@@ -58,7 +58,7 @@ public final class TypeBindings
         }
         TypeVariable<?>[] vars = erasedType.getTypeParameters();
         String[] names;
-        if (vars == null || vars.length == 0) {
+        if (vars.length == 0) {
             names = NO_STRINGS;
         } else {
             int len = vars.length;

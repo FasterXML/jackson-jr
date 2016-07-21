@@ -655,13 +655,13 @@ public class TypeDetector
         }
 
         final POJODefinition.Prop[] rawProps = pojoDef.properties();
-        Map<String, BeanPropertyReader> propMap = new HashMap<String, BeanPropertyReader>();
         final int len = rawProps.length;
+        final Map<String, BeanPropertyReader> propMap;
         if (len == 0) {
             propMap = Collections.emptyMap();
         } else {
-            final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
             propMap = new HashMap<String, BeanPropertyReader>();
+            final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
             for (int i = 0; i < len; ++i) {
                 POJODefinition.Prop rawProp = rawProps[i];                
                 Method m = rawProp.setter;
@@ -690,8 +690,7 @@ public class TypeDetector
                 propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, f, m));
             }
         }
-        return new BeanReader(raw, propMap,
-                defaultCtor, stringCtor, longCtor);
+        return new BeanReader(raw, propMap, defaultCtor, stringCtor, longCtor);
     }
 
     private TypeBindings bindings(Class<?> ctxt) {

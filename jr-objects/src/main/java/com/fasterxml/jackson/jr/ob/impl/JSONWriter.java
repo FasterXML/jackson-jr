@@ -227,8 +227,8 @@ public class JSONWriter
             writeStringField(fieldName, String.valueOf(value));
             return;
         case SER_CALENDAR:
-            value = ((Calendar) value).getTime();
-            // fall through
+            writeDateField(fieldName, ((Calendar) value).getTime());
+            return;
         case SER_DATE:
             writeDateField(fieldName, (Date) value);
             return;
@@ -343,8 +343,8 @@ public class JSONWriter
             writeStringValue(String.valueOf(value));
             return;
         case SER_CALENDAR:
-            value = ((Calendar) value).getTime();
-            // fall through
+            writeDateValue(((Calendar) value).getTime());
+            return;
         case SER_DATE:
             writeDateValue((Date) value);
             return;

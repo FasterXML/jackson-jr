@@ -12,4 +12,9 @@ public class RecursiveType extends ResolvedType
 
     void setReference(ResolvedType ref) { _referencedType = ref; }
     public ResolvedType selfRefType() { return _referencedType; }
+
+    @Override public boolean equals(Object o) {
+        // shouldn't really ever match, even if resolved to same thing, should it?
+        return (this == o);
+    }
 }

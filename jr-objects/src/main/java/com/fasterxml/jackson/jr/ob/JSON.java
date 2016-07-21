@@ -767,8 +767,7 @@ public class JSON implements Versioned
             _close(p0, null);
             return result;
         } catch (Exception e) {
-            _close(p, e);
-            return null;
+            return _closeWithError(p, e);
         }
     }
 
@@ -791,8 +790,7 @@ public class JSON implements Versioned
             _close(p0, null);
             return result;
         } catch (Exception e) {
-            _close(p, e);
-            return null;
+            return _closeWithError(p, e);
         }
     }
 
@@ -813,8 +811,7 @@ public class JSON implements Versioned
             _close(p0, null);
             return result;
         } catch (Exception e) {
-            _close(p, e);
-            return null;
+            return _closeWithError(p, e);
         }
     }
 
@@ -835,8 +832,7 @@ public class JSON implements Versioned
             _close(p0, null);
             return result;
         } catch (Exception e) {
-            _close(p, e);
-            return null;
+            return _closeWithError(p, e);
         }
     }
 
@@ -858,8 +854,7 @@ public class JSON implements Versioned
             _close(p0, null);
             return (Map<T,Object>) result;
         } catch (Exception e) {
-            _close(p, e);
-            return null;
+            return _closeWithError(p, e);
         }
     }
 
@@ -880,8 +875,7 @@ public class JSON implements Versioned
             _close(p0, null);
             return result;
         } catch (Exception e) {
-            _close(p, e);
-            return null;
+            return _closeWithError(p, e);
         }
     }
     
@@ -1141,6 +1135,26 @@ public class JSON implements Versioned
             }
             throw new IOException(e); // should never occur
         }
+    }
+
+    /**
+     * @since 2.8.2
+     */
+    protected <T> T _closeWithError(Closeable cl, Exception e) throws IOException {
+        if (cl != null) {
+            try {
+                cl.close();
+            } catch (Exception secondaryEx) {
+                // what should we do here, if anything?
+            }
+        }
+        if (e instanceof IOException) {
+            throw (IOException) e;
+        }
+        if (e instanceof RuntimeException) {
+            throw (RuntimeException) e;
+        }
+        throw new IOException(e); // should never occur
     }
 
     protected void _noTreeCodec(String msg) {

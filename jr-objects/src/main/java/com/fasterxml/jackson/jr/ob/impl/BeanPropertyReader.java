@@ -13,22 +13,22 @@ import com.fasterxml.jackson.jr.ob.JSONObjectException;
  */
 public final class BeanPropertyReader
 {
-    protected final String _name;
+    private final String _name;
 
     /**
      * For non-trivial non-bean types
      */
-    protected final ValueReader _valueReader;
+    private final ValueReader _valueReader;
 
     /**
      * Setter method to use, if any; null if none
      */
-    protected final Method _setter;
+    private final Method _setter;
 
     /**
      * Field to assign value to, if no setter method defined; null if none
      */
-    protected final Field _field;
+    private final Field _field;
 
     public BeanPropertyReader(String name, Field f, Method setter) {
         if ((f == null) && (setter == null)) {
