@@ -8,7 +8,10 @@ import java.util.*;
  * matching resolved types, in context of a single class.
  */
 public final class TypeBindings
+    implements java.io.Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     private final static String[] NO_STRINGS = new String[0];
 
     private final static ResolvedType[] NO_TYPES = new ResolvedType[0];

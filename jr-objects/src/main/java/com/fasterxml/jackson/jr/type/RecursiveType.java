@@ -1,6 +1,9 @@
 package com.fasterxml.jackson.jr.type;
 
-public class RecursiveType extends ResolvedType {
+public class RecursiveType extends ResolvedType
+{
+    private static final long serialVersionUID = 1L;
+
     protected ResolvedType _referencedType;
 
     public RecursiveType(Class<?> erased, TypeBindings bindings) {

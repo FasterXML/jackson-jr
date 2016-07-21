@@ -1,9 +1,13 @@
 package com.fasterxml.jackson.jr.type;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class ResolvedType implements java.lang.reflect.Type
+public class ResolvedType implements java.lang.reflect.Type,
+    Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     public final static ResolvedType[] NO_TYPES = new ResolvedType[0];
 
     protected final static int T_ARRAY = 1;

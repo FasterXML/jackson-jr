@@ -17,9 +17,10 @@ import com.fasterxml.jackson.jr.ob.impl.ClassKey;
  * to callers, access to state is fully synchronized so that access from
  * multiple threads is safe.
  */
-@SuppressWarnings("serial")
 public class TypeResolver implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     private final static ResolvedType[] NO_TYPES = new ResolvedType[0];
     
     // // Pre-created instances
@@ -28,7 +29,7 @@ public class TypeResolver implements Serializable
         new ResolvedType(Object.class, /* no super-class*/ null,
                 null, null);
 
-    protected final static HashMap<ClassKey, ResolvedType> _primitives;
+    private final static HashMap<ClassKey, ResolvedType> _primitives;
     static {
         _primitives = new HashMap<ClassKey, ResolvedType>(16);
 
@@ -51,9 +52,17 @@ public class TypeResolver implements Serializable
 
     // // Caching
     
-    protected final Map<ClassKey,ResolvedType> _cache = new HashMap<ClassKey,ResolvedType>(16, 0.8f);
+    protected final transient Map<ClassKey,ResolvedType> _cache = new HashMap<ClassKey,ResolvedType>(16, 0.8f);
 
     public TypeResolver() { }
+
+    // To make sure we have empty but valid TypeResolver do this:
+    protected Object readResolve() {
+        if (_cache == null) {
+            return new TypeResolver();
+        }
+        return this;
+    }
 
     /**
      * Factory method for resolving specified Java {@link java.lang.reflect.Type}, given
