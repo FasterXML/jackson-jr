@@ -4,6 +4,10 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.7.6 (23-Jul-2016)
+
+No changes since 2.7.5.
+
 2.7.5 (11-Jun-2016)
 
 #42: Incorrect `jackson-core` dependency form parent pom leads to inclusion
