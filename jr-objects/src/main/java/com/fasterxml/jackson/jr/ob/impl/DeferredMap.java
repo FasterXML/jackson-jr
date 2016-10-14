@@ -149,10 +149,12 @@ public class DeferredMap extends AbstractMap<Object, Object>
         if (size < 200) {
             return size+size;
         }
+        // note: MUST ensure it's divisible by two (that is, last bit is 0), because
+        // always adding values in pairs, but checking size before add
         if (size < 2000) {
-            return size + (size>>1);
+            return size + ((size>>1) & ~1);
         }
-        return size + (size>>2);
+        return size + ((size>>2) & ~1);
     }
     
     protected Map<Object,Object> _buildMap(int expSize)

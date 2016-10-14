@@ -4,6 +4,11 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.8.4 (not yet released)
+
+#49: ArrayIndexOutOfBoundsException when parsing large Map
+ (reported by Michael J)
+
 2.8.3 (17-Sep-2016)
 2.8.2 (30-Aug-2016)
 2.8.1 (19-Jul-2016)
@@ -15,6 +20,10 @@ No changes since 2.8.0
 #26: Allow use of public fields for getting/setting values
 #43: Add convenience read method for reading trees via `JSON`
 
+2.7.9 (not yet released)
+
+2.7.8 (26-Sep-2016)
+2.7.7 (27-Aug-2016)
 2.7.6 (23-Jul-2016)
 
 No changes since 2.7.5.
