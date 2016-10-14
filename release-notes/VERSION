@@ -4,7 +4,7 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
-2.8.4 (not yet released)
+2.8.4 (14-Oct-2016)
 
 #49: ArrayIndexOutOfBoundsException when parsing large Map
  (reported by Michael J)
