@@ -3,23 +3,24 @@
 Jackson jr is a compact alternative to full [Jackson Databind](../../../jackson-databind) component.
 It implements a subset of functionality, for example for cases where:
 
-1. Size of jar matters (jackson-jr size is about 70kB)
+1. Size of jar matters (jackson-jr size is about 95kB)
 2. Startup time matters (jackson-jr has very low initialization overhead)
 
 In addition to basic datatypes (core JDK types like `List`s, `Map`s, wrapper types),
 package supports reading and writing of standard Java Beans (implementation that mimics standard
 JDK Bean Introspection): that is,
-subset of POJOs that define setters/getters; no field access is used.
+subset of POJOs that define setters/getters (starting with Jackson-jr `2.8`)
+you can alternatively use `public` fields).
 
 Jackson jr also adds  `composer` implementation that can be used to
 construct JSON output with builder-style API, but without necessarily having
 to build an in-memory representation: instead, it can directly use `streaming-api`
-for direct output. It will be, however, also possible to build actual in-memory
+for direct output. It is also possible to build actual in-memory
 JSON `String` or `byte[]` representation, if that is preferable.
 
-Jackson jr artifact itself is currently about 70 kB in size, and only depends on
+Jackson jr artifact itself is currently about 95 kB in size, and only depends on
 [Jackson Streaming API](../../../jackson-core) package.
-Combined size, for "all" jar under 300 kB (streaming API is about 220kB),
+Combined size, for "all" jar, is about 400 kB (of which streaming API is about 300 kB),
 for use cases where a single jar is preferred over more modular approach.
 Finally, use of jar minimizers like [ProGuard](http://proguard.sourceforge.net/) can bring the jar
 size down even further, by renaming and removing debug information.
@@ -164,7 +165,10 @@ To support readability and writability of your own types, your Java objects must
 Note that although getters and setters need to be public (since JDK Bean Introspection does not find any other methods),
 constructors may have any access right, including `private`.
 
-Also note that fields are never used for reading or writing Bean properties.
+Also: starting with version 2.8, `public` fields may also be used (although their
+discovery may be disabled using `JSON.Feature.USE_FIELDS`) as an alternative:
+this is useful when limiting number of otherwise useless "getter" and "setter"
+methods.
 
 ### Customizing behavior with Features
 
@@ -185,7 +189,7 @@ You can use Maven dependency like:
 <dependency>
   <groupId>com.fasterxml.jackson.jr</groupId>
   <artifactId>jackson-jr-objects</artifactId>
-  <version>2.7.4</version>
+  <version>2.8.5</version>
 </dependency>
 ```
 
