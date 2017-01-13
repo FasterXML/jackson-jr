@@ -2,8 +2,8 @@
   <modelVersion>4.0.0</modelVersion> 
   <parent>
     <groupId>com.fasterxml.jackson</groupId>
-    <artifactId>jackson-parent</artifactId>
-    <version>2.9-rc1-SNAPSHOT</version>
+    <artifactId>jackson-bom</artifactId>
+    <version>2.9.0-SNAPSHOT</version>
   </parent>
   <groupId>com.fasterxml.jackson.jr</groupId>
   <artifactId>jackson-jr-parent</artifactId>
@@ -30,7 +30,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <version.jackson>2.9.0-SNAPSHOT</version.jackson>
     <!-- 04-May-2016, tatu: This should still work with 2.8, as jackson-core
         only requires Java 6 (unlike databind and other modules)
       -->
@@ -46,16 +45,6 @@
     <!-- Aggressively minimize jar size; drop 'lines' and 'vars' -->
     <javac.debuglevel>source</javac.debuglevel>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${version.jackson}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
