@@ -87,7 +87,21 @@ Streaming, in a single jar.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>${version.plugin.javadoc}</version>
+	<executions> 
+	  <execution> 
+            <phase>package</phase> 
+            <goals> 
+              <goal>jar</goal> 
+            </goals>
+            <configuration> 
+              <includeDependencySources>true</includeDependencySources> 
+              <dependencySourceIncludes> 
+		<dependencySourceInclude>com.fasterxml.jackson.jr:*</dependencySourceInclude> 
+              </dependencySourceIncludes> 
+              <excludePackageNames>com.fasterxml.jackson.jr.private_.*</excludePackageNames> 
+            </configuration> 
+	  </execution> 
+	</executions> 
       </plugin>
 
     </plugins>
