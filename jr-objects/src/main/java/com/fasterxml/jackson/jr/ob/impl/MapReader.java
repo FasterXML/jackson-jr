@@ -46,19 +46,23 @@ public class MapReader extends ValueReader
             }
             throw _reportProblem(p);
         }
-        b = b.start().put(propName0, value);
-        while (true) {
-            b = b.put(propName, _valueReader.readNext(r, p));
-            propName = p.nextFieldName();
-            if (propName == null) {
-                if (p.hasToken(JsonToken.END_OBJECT)) {
-                    return b.build();
+        try {
+            b = b.start().put(propName0, value);
+            while (true) {
+                b = b.put(propName, _valueReader.readNext(r, p));
+                propName = p.nextFieldName();
+                if (propName == null) {
+                    if (p.hasToken(JsonToken.END_OBJECT)) {
+                        return b.build();
+                    }
+                    throw _reportProblem(p);
                 }
-                throw _reportProblem(p);
             }
+        } catch (IllegalArgumentException e) {
+            throw JSONObjectException.from(p, e.getMessage());
         }
     }
-    
+
     @Override
     public Object read(JSONReader r, JsonParser p) throws IOException {
         MapBuilder b = r._mapBuilder(_mapType);
@@ -77,20 +81,24 @@ public class MapReader extends ValueReader
             }
             throw _reportProblem(p);
         }
-        b = b.start().put(propName0, value);
-        while (true) {
-            b = b.put(propName, _valueReader.readNext(r, p));
-            propName = p.nextFieldName();
-            if (propName == null) {
-                if (p.hasToken(JsonToken.END_OBJECT)) {
-                    return b.build();
+        try {
+            b = b.start().put(propName0, value);
+            while (true) {
+                b = b.put(propName, _valueReader.readNext(r, p));
+                propName = p.nextFieldName();
+                if (propName == null) {
+                    if (p.hasToken(JsonToken.END_OBJECT)) {
+                        return b.build();
+                    }
+                    throw _reportProblem(p);
                 }
-                throw _reportProblem(p);
             }
+        } catch (IllegalArgumentException e) {
+            throw JSONObjectException.from(p, e.getMessage());
         }
     }
 
-    protected IOException _reportProblem(JsonParser p) {
+    protected JSONObjectException _reportProblem(JsonParser p) {
         return JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get FIELD_NAME or END_OBJECT");
     }
 }

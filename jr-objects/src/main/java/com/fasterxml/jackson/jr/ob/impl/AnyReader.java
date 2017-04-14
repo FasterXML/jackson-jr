@@ -100,10 +100,14 @@ public class AnyReader extends ValueReader
         }
 
         // but then it's loop-de-loop
-        b = b.start().put(key, value);
-        do {
-            b = b.put(fromKey(p.getCurrentName()), read(r, p));
-        } while (p.nextValue() != JsonToken.END_OBJECT);
+        try {
+            b = b.start().put(key, value);
+            do {
+                b = b.put(fromKey(p.getCurrentName()), read(r, p));
+            } while (p.nextValue() != JsonToken.END_OBJECT);
+        } catch (IllegalArgumentException e) {
+            throw JSONObjectException.from(p, e.getMessage());
+        }
         return b.build();
     }
 
@@ -117,11 +121,15 @@ public class AnyReader extends ValueReader
         if (p.nextToken() == JsonToken.END_ARRAY) {
             return b.singletonArray(value);
         }
-        b = b.start().add(value);
-        do {
-            b = b.add(read(r, p));
-        } while (p.nextToken() != JsonToken.END_ARRAY);
-        return b.buildArray();
+        try {
+            b = b.start().add(value);
+            do {
+                b = b.add(read(r, p));
+            } while (p.nextToken() != JsonToken.END_ARRAY);
+            return b.buildArray();
+        } catch (IllegalArgumentException e) {
+            throw JSONObjectException.from(p, e.getMessage());
+        }
     }
 
     public Collection<Object> readCollectionFromArray(JSONReader r, JsonParser p, CollectionBuilder b) throws IOException
@@ -133,11 +141,15 @@ public class AnyReader extends ValueReader
         if (p.nextToken() == JsonToken.END_ARRAY) {
             return b.singletonCollection(value);
         }
-        b = b.start().add(value);
-        do {
-            b = b.add(read(r, p));
-        } while (p.nextToken() != JsonToken.END_ARRAY);
-        return b.buildCollection();
+        try {
+            b = b.start().add(value);
+            do {
+                b = b.add(read(r, p));
+            } while (p.nextToken() != JsonToken.END_ARRAY);
+            return b.buildCollection();
+        } catch (IllegalArgumentException e) {
+            throw JSONObjectException.from(p, e.getMessage());
+        }
     }
 
     /*
