@@ -544,7 +544,7 @@ public class JSON implements Versioned
     
     /**
      * Mutant factory for constructing an instance with specified feature
-     * enabled or disabled (depending on <code>state</codec>), and returning
+     * enabled or disabled (depending on <code>state</code>), and returning
      * an instance with that setting; this may either be this instance (if feature
      * already had specified state), or a newly constructed instance.
      */
