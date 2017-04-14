@@ -4,6 +4,11 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.8.9 (not yet released)
+
+#50: Duplicate key detection does not work
+ (reported by inorick@github)
+
 2.8.8 (05-Apr-2017)
 2.8.7 (21-Feb-2017)
 2.8.6 (12-Jan-2017)

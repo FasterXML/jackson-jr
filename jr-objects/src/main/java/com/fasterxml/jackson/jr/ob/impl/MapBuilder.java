@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
+import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 /**
  * Helper class that is used for constructing {@link java.util.Map}s
@@ -18,7 +19,8 @@ import com.fasterxml.jackson.jr.ob.JSON.Feature;
 public abstract class MapBuilder
 {
     protected final int _features;
-
+    protected final boolean _checkDups;
+    
     /**
      * Optional {@link Map} implementation class, used when specific
      * implementation is desired.
@@ -27,6 +29,7 @@ public abstract class MapBuilder
     
     protected MapBuilder(int features, Class<?> type) {
         _features = features;
+        _checkDups = JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS.isEnabled(features);
         _mapType = type;
     }
 
@@ -67,7 +70,7 @@ public abstract class MapBuilder
      *</pre>
      * which assumes that a builder has been constructed with {@link #newBuilder}
      */
-    public Map<Object,Object> emptyMap() {
+    public Map<Object,Object> emptyMap() throws JSONObjectException {
         return start().build();
     }
 
@@ -81,7 +84,7 @@ public abstract class MapBuilder
      *  start().put(key, value).build();
      *</pre>
      */
-    public Map<Object,Object> singletonMap(Object key, Object value) {
+    public Map<Object,Object> singletonMap(Object key, Object value) throws JSONObjectException {
         return start().put(key, value).build();
     }
 
@@ -102,7 +105,7 @@ public abstract class MapBuilder
     public static class Default extends MapBuilder
     {
         protected Map<Object,Object> _current;
-        
+
         protected Default(int features, Class<?> type) {
             super(features, type);
         }
@@ -116,7 +119,7 @@ public abstract class MapBuilder
         public MapBuilder newBuilder(Class<?> mapImpl) {
             return new Default(_features, mapImpl);
         }
-        
+
         @Override
         public MapBuilder start() {
             // If this builder is "busy", create a new one...
@@ -126,7 +129,7 @@ public abstract class MapBuilder
             _current = _map(12);
             return this;
         }
-        
+
         @Override
         public Map<Object,Object> build() {
             Map<Object,Object> result = _current;
@@ -136,10 +139,17 @@ public abstract class MapBuilder
 
         @Override
         public MapBuilder put(Object key, Object value) {
+            if (_checkDups) {
+                if (_current.containsKey(key)) {
+                    // 14-Apr-2017, tatu: Note that choice of `IllegalArgumentException` is arbitrary
+                    //   but not random: caller catches and re-packages it to give context
+                    throw new IllegalArgumentException("Duplicate key (key '"+key+"')");
+                }
+            }
             _current.put(key, value);
             return this;
         }
-        
+
         @Override
         public Map<Object,Object> emptyMap() {
             if ((_mapType == null) && isEnabled(Feature.READ_ONLY)) {

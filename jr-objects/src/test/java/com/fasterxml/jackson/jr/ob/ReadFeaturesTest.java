@@ -32,4 +32,17 @@ public class ReadFeaturesTest extends TestBase
                 .asString(new IsBean());
         assertEquals(aposToQuotes("{'value':42}"), json);
     }
+
+    public void testFailOnDupMapKeys() throws Exception
+    {
+        JSON j = JSON.std.with(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS);
+        assertTrue(j.isEnabled(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS));
+        final String json = "{\"a\":1,\"b\":2,\"b\":3,\"c\":4}";
+        try {
+            /*Map<?,?> map =*/ j.mapFrom(json);
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "Duplicate key");
+        }
+    }
 }

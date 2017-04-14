@@ -326,8 +326,8 @@ public class JSON implements Versioned
        public final boolean isEnabled(int flags) {
            return (flags & _mask) != 0;
        }
-   }
-    
+    }
+
     // Important: has to come before 'std' instance, since it refers to it
     private final static int DEFAULT_FEATURES = Feature.defaults();
 
