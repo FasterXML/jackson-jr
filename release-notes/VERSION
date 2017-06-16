@@ -6,6 +6,11 @@ Project: jackson-jr
 
 2.9.0 (not yet released)
 
+2.8.10 (not yet released)
+
+#53: `java.io.File` is not a valid source for anyFrom()/mapFrom()
+ (reported by CoreyTeffetalor@github)
+
 2.8.9 (12-Jun-2017)
 
 #50: Duplicate key detection does not work
