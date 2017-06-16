@@ -1040,14 +1040,14 @@ public class JSON implements Versioned
         if (type == String.class) {
             return f.createParser((String) source);
         }
+        if (type == byte[].class) {
+            return f.createParser((byte[]) source);
+        }
         if (source instanceof InputStream) {
             return f.createParser((InputStream) source);
         }
         if (source instanceof Reader) {
             return f.createParser((Reader) source);
-        }
-        if (type == byte[].class) {
-            return f.createParser((byte[]) source);
         }
         if (source instanceof URL) {
             return f.createParser((URL) source);
@@ -1055,11 +1055,11 @@ public class JSON implements Versioned
         if (type == char[].class) {
             return f.createParser(new CharArrayReader((char[]) source));
         }
+        if (source instanceof File) {
+            return f.createParser((File) source);
+        }
         if (source instanceof CharSequence) {
             return f.createParser(((CharSequence) source).toString());
-        }
-        if (source instanceof JsonParser) { // should never be called with this
-            throw new IllegalStateException();
         }
         throw new JSONObjectException("Can not use Source of type "+source.getClass().getName()
                 +" as input (use an InputStream, Reader, String, byte[], File or URL");

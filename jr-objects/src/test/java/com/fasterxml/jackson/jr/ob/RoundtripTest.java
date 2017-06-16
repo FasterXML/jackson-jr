@@ -1,15 +1,28 @@
 package com.fasterxml.jackson.jr.ob;
 
+import java.io.*;
+
 public class RoundtripTest extends TestBase
 {
     public void testSimple() throws Exception
     {
         MediaItem input = buildItem();
         String json = JSON.std.asString(input);
-        MediaItem item = JSON.std.beanFrom(MediaItem.class, json);
-        String json2 = JSON.std.asString(item);
 
-        assertEquals(json, json2);
+        // Let's exercise multiple styles of input sources
+        
+        assertEquals(json, _readWrite(json));
+        byte[] b = json.getBytes("UTF-8");
+        assertEquals(json, _readWrite(b));
+        assertEquals(json, _readWrite(new ByteArrayInputStream(b)));
+        assertEquals(json, _readWrite(new StringReader(json)));
+        assertEquals(json, _readWrite(json.toCharArray()));
+    }
+
+    private String _readWrite(Object json) throws Exception
+    {
+        MediaItem item = JSON.std.beanFrom(MediaItem.class, json);
+        return JSON.std.asString(item);
     }
     
     private MediaItem buildItem() {
