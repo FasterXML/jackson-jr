@@ -23,6 +23,7 @@ has no other dependencies, and provides additional builder-style content generat
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
+      <version>${jackson.version.core}</version>
     </dependency>
   </dependencies>
 
