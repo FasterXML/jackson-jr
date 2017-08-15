@@ -7,7 +7,7 @@
   </parent>
   <artifactId>jackson-jr-stree</artifactId>
   <packaging>bundle</packaging>
-  <description>Simple immutable (read-only) tree model that builds directly on `jackson-core` (streaming),
+  <description>Simple immutable (read-only) tree model that builds directly on jackson-core (streaming),
 has no other dependencies.
 </description>
   <url>https://github.com/FasterXML/jackson-jr</url>
