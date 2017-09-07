@@ -10,3 +10,9 @@ branches:
   only:
     - master
     - "2.8"
+
+# to make jdk6 work, as per: https://github.com/travis-ci/travis-ci/issues/8199
+addons:
+  apt:
+    packages:
+      - openjdk-6-jdk
