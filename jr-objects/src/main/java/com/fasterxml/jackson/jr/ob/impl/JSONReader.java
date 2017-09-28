@@ -185,7 +185,7 @@ public class JSONReader
      * JSON Object, {@link JSONObjectException} will be thrown.
      */
     public Map<Object,Object> readMap() throws IOException {
-        JsonToken t = _parser.getCurrentToken();
+        JsonToken t = _parser.currentToken();
         if (t == JsonToken.VALUE_NULL) {
             return null;
         }
@@ -202,7 +202,7 @@ public class JSONReader
      * JSON Array, {@link JSONObjectException} will be thrown.
      */
     public List<Object> readList() throws IOException {
-        JsonToken t = _parser.getCurrentToken();
+        JsonToken t = _parser.currentToken();
         if (t == JsonToken.VALUE_NULL) {
             return null;
         }
@@ -220,7 +220,7 @@ public class JSONReader
      */
     public Object[] readArray() throws IOException
     {
-        JsonToken t = _parser.getCurrentToken();
+        JsonToken t = _parser.currentToken();
         if (t == JsonToken.VALUE_NULL) {
             return null;
         }
@@ -250,7 +250,7 @@ public class JSONReader
 
     @SuppressWarnings("unchecked")
     public <T> T[] readArrayOf(Class<T> type) throws IOException {
-        JsonToken t = _parser.getCurrentToken();
+        JsonToken t = _parser.currentToken();
         if (t == JsonToken.VALUE_NULL) {
             return null;
         }
@@ -269,7 +269,7 @@ public class JSONReader
     @SuppressWarnings("unchecked")
     public <T> List<T> readListOf(Class<T> type) throws IOException
     {
-        JsonToken t = _parser.getCurrentToken();
+        JsonToken t = _parser.currentToken();
         if (t == JsonToken.VALUE_NULL) {
             return null;
         }

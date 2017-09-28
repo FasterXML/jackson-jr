@@ -1071,7 +1071,7 @@ public class JSON implements Versioned
          * This occurs before first read from JsonParser, as well as
          * after clearing of current token.
          */
-        JsonToken t = p.getCurrentToken();
+        JsonToken t = p.currentToken();
         if (t == null) { // and then we must get something...
             t = p.nextToken();
             if (t == null) { // not cool is it?

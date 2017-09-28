@@ -183,12 +183,6 @@ public class JSONAsObjectCodec
         return _jsonFactory;
     }
 
-    @Deprecated
-    @Override
-    public JsonFactory getJsonFactory() {
-        return _jsonFactory;
-    }
-    
     /*
     /**********************************************************************
     /* Internal methods

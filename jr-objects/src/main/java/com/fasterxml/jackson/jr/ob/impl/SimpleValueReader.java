@@ -183,7 +183,7 @@ public class SimpleValueReader extends ValueReader
 
     protected long _fetchLong(JsonParser p) throws IOException
     {
-        JsonToken t = p.getCurrentToken();
+        JsonToken t = p.currentToken();
         if (t == JsonToken.VALUE_NUMBER_INT) {
             return p.getLongValue();
         }

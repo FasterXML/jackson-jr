@@ -97,7 +97,7 @@ public class BeanReader
     @Override
     public Object read(JSONReader r, JsonParser p) throws IOException
     {
-        JsonToken t = p.getCurrentToken();
+        JsonToken t = p.currentToken();
 
         try {
             switch (t) {
@@ -172,6 +172,6 @@ public class BeanReader
     }
 
     protected IOException _reportProblem(JsonParser p) {
-        return JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get FIELD_NAME or END_OBJECT");
+        return JSONObjectException.from(p, "Unexpected token "+p.currentToken()+"; should get FIELD_NAME or END_OBJECT");
     }
 }
