@@ -25,7 +25,8 @@ public class ReadViaJSONTest extends TestBase
          assertEquals(2, node.size());
          // actually, verify with write...
          final StringWriter writer = new StringWriter();
-         final JsonGenerator g = _factory.createGenerator(writer);
+         final JsonGenerator g = _factory.createGenerator(emptyWriteContext(),
+                 writer);
          TREE_CODEC.writeTree(g, node);
          g.close();
          assertEquals(INPUT, writer.toString());

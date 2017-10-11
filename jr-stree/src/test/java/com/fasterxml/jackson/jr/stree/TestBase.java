@@ -8,7 +8,18 @@ import junit.framework.TestCase;
 
 public abstract class TestBase extends TestCase
 {
+    private final static ObjectReadContext _emptyReadContext = new ObjectReadContext.Base();
+    private final static ObjectWriteContext _emptyWriteContext = new ObjectWriteContext.Base();
+
     protected final JsonFactory _factory = new JsonFactory();
+
+    protected ObjectReadContext emptyReadContext() {
+        return _emptyReadContext;
+    }
+
+    protected ObjectWriteContext emptyWriteContext() {
+        return _emptyWriteContext;
+    }
 
     protected void assertToken(JsonToken expToken, JsonToken actToken)
     {

@@ -431,14 +431,18 @@ public class JSON implements Versioned
     /**********************************************************************
      */
 
-    /**
-     * Convenience method for constructing an adapter that uses this
-     * instance as a {@link ObjectCodec}
-     */
-    public ObjectCodec asCodec() {
-        return new JSONAsObjectCodec(this);
+    // // // !!! TODO, maybe?
+
+    /*
+    public ObjectReadContext asObjectReadContext() {
+//        return new JSONAsObjectCodec(this);
     }
-    
+
+    public ObjectWriteContext asObjectWriteContext() {
+//      return new JSONAsObjectCodec(this);
+  }
+  */
+
     /*
     /**********************************************************************
     /* Versioned
@@ -713,15 +717,13 @@ public class JSON implements Versioned
 
     public JSONComposer<String> composeString() throws IOException, JSONObjectException {
         SegmentedStringWriter out = new SegmentedStringWriter(_jsonFactory._getBufferRecycler());
-        JsonGenerator gen = _config(_jsonFactory.createGenerator(out)
-                .setCodec(asCodec()));
+        JsonGenerator gen = _config(_jsonFactory.createGenerator(out));
         return JSONComposer.stringComposer(_features, gen, out);
     }
 
     public JSONComposer<byte[]> composeBytes() throws IOException, JSONObjectException {
         ByteArrayBuilder out = new ByteArrayBuilder(_jsonFactory._getBufferRecycler());
-        JsonGenerator gen = _config(_jsonFactory.createGenerator(out)
-                .setCodec(asCodec()));
+        JsonGenerator gen = _config(_jsonFactory.createGenerator(out));
         return JSONComposer.bytesComposer(_features, gen, out);
     }
 
