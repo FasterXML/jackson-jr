@@ -1,5 +1,6 @@
 package com.fasterxml.jackson.jr.stree;
 
+import com.fasterxml.jackson.core.ObjectReadContext;
 import com.fasterxml.jackson.jr.ob.JSON;
 
 /**
@@ -9,7 +10,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
  */
 public class CreateNodesTest extends TestBase
 {
-     private final JSON treeJSON = JSON.std.with(new JacksonJrsTreeCodec());
+     private final JSON treeJSON = JSON.std.with(new JacksonJrsTreeCodec(ObjectReadContext.empty()));
 
      public void testCreateArrayNode() throws Exception
      {

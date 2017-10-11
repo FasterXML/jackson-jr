@@ -28,11 +28,6 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
      */
 
     /**
-     * Optional codec, to allow chaining.
-     */
-    protected ObjectCodec _objectCodec;
-
-    /**
      * Traversal context within tree
      */
     protected JrsValueCursor _nodeCursor;
@@ -68,12 +63,9 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     /**********************************************************************
      */
 
-    public JrsTreeTraversingParser(JrsValue n) { this(n, null); }
-
-    public JrsTreeTraversingParser(JrsValue n, ObjectCodec codec)
+    public JrsTreeTraversingParser(ObjectReadContext readCtxt, JrsValue n)
     {
-        super(0);
-        _objectCodec = codec;
+        super(readCtxt, 0);
         if (n.isArray()) {
             _nextToken = JsonToken.START_ARRAY;
             _nodeCursor = new JrsValueCursor.ArrayCursor((JrsArray) n, null);
@@ -83,16 +75,6 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
         } else { // value node
             _nodeCursor = new JrsValueCursor.RootCursor(n, null);
         }
-    }
-
-    @Override
-    public void setCodec(ObjectCodec c) {
-        _objectCodec = c;
-    }
-
-    @Override
-    public ObjectCodec getCodec() {
-        return _objectCodec;
     }
 
     @Override
@@ -206,7 +188,7 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
     
     @Override
-    public JsonStreamContext getParsingContext() {
+    public TokenStreamContext getParsingContext() {
         return _nodeCursor;
     }
 

@@ -3,11 +3,7 @@ package com.fasterxml.jackson.jr.stree;
 import java.io.IOException;
 import java.util.Iterator;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.jr.stree.util.JrsTreeTraversingParser;
 
 /**
@@ -39,6 +35,11 @@ public abstract class JrsValue implements TreeNode
     }
 
     @Override
+    public boolean isEmbeddedValue() {
+        return false;
+    }
+    
+    @Override
     public Iterator<String> fieldNames() {
         return null;
     }
@@ -68,13 +69,8 @@ public abstract class JrsValue implements TreeNode
     }
     
     @Override
-    public JsonParser traverse() {
-        return new JrsTreeTraversingParser(this);
-    }
-
-    @Override
-    public JsonParser traverse(ObjectCodec codec) {
-        return new JrsTreeTraversingParser(this, codec);
+    public JsonParser traverse(ObjectReadContext ctxt) {
+        return new JrsTreeTraversingParser(ctxt, this);
     }
 
     /*

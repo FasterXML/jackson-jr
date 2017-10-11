@@ -12,7 +12,7 @@ import com.fasterxml.jackson.jr.stree.JrsValue;
  * of current location within traversed JSON tree.
  */
 abstract class JrsValueCursor
-    extends JsonStreamContext
+    extends TokenStreamContext
 {
     /**
      * Parent cursor of this cursor, if any; null for root
@@ -118,7 +118,7 @@ abstract class JrsValueCursor
         protected boolean _done = false;
 
         public RootCursor(JrsValue n, JrsValueCursor p) {
-            super(JsonStreamContext.TYPE_ROOT, p);
+            super(TokenStreamContext.TYPE_ROOT, p);
             _node = n;
         }
 
@@ -158,7 +158,7 @@ abstract class JrsValueCursor
         protected JrsValue _currentNode;
 
         public ArrayCursor(JrsArray n, JrsValueCursor p) {
-            super(JsonStreamContext.TYPE_ARRAY, p);
+            super(TokenStreamContext.TYPE_ARRAY, p);
             _contents = n.elements();
         }
 
@@ -200,7 +200,7 @@ abstract class JrsValueCursor
         
         public ObjectCursor(JrsValue n, JrsValueCursor p)
         {
-            super(JsonStreamContext.TYPE_OBJECT, p);
+            super(TokenStreamContext.TYPE_OBJECT, p);
             _contents = ((JrsObject) n).fields();
             _needEntry = true;
         }

@@ -30,19 +30,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- 04-May-2016, tatu: This should still work with 2.8, as jackson-core
-        only requires Java 6 (unlike databind and other modules)
+    <!-- 10-Oct-2017, tatu: Let's defautl to Java 8 for 3.x
       -->
-    <javac.src.version>1.6</javac.src.version>
-    <javac.target.version>1.6</javac.target.version>
-
-    <!-- 04-May-2016, tatu: Bundle-plugin 3.x seems to require Java 7, so to
-           build for Java 6 need to downgrade here to last working 2.x version
-          (2.5.4 had some issues wrt shading)
-      -->
-    <version.plugin.bundle>2.5.3</version.plugin.bundle>
-
-    <!-- Aggressively minimize jar size; drop 'lines' and 'vars' -->
     <javac.debuglevel>source</javac.debuglevel>
   </properties>
 

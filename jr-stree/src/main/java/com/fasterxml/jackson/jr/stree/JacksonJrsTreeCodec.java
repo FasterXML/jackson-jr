@@ -14,16 +14,12 @@ public class JacksonJrsTreeCodec extends TreeCodec
 {
     public static JrsMissing MISSING = JrsMissing.instance;
 
-    public static final JacksonJrsTreeCodec SINGLETON = new JacksonJrsTreeCodec();
+    public static final JacksonJrsTreeCodec SINGLETON = new JacksonJrsTreeCodec(ObjectReadContext.empty());
 
-    protected ObjectCodec _objectCodec;
+    protected final ObjectReadContext _readCtxt;
 
-    public JacksonJrsTreeCodec() {
-        this(null);
-    }
-
-    public JacksonJrsTreeCodec(ObjectCodec codec) {
-        _objectCodec = codec;
+    public JacksonJrsTreeCodec(ObjectReadContext readCtxt) {
+        _readCtxt = readCtxt;
     }
     
     @SuppressWarnings("unchecked")
@@ -98,7 +94,7 @@ public class JacksonJrsTreeCodec extends TreeCodec
 
     @Override
     public JsonParser treeAsTokens(TreeNode node) {
-        return ((JrsValue) node).traverse(_objectCodec);
+        return ((JrsValue) node).traverse(_readCtxt);
     }
 
     /*
@@ -111,16 +107,10 @@ public class JacksonJrsTreeCodec extends TreeCodec
         return JrsMissing.instance;
     }
 
-    /**
-     * @since 2.8
-     */
     public JrsBoolean booleanNode(boolean state) {
          return state? JrsBoolean.TRUE : JrsBoolean.FALSE;
     }
 
-    /**
-     * @since 2.8
-     */
     public JrsString stringNode(String text) {
         if (text == null) {
             text = "";
@@ -128,9 +118,6 @@ public class JacksonJrsTreeCodec extends TreeCodec
         return new JrsString(text);
     }
 
-    /**
-     * @since 2.8
-     */
     public JrsNumber numberNode(Number nr) {
         if (nr == null) {
             throw new NullPointerException();
