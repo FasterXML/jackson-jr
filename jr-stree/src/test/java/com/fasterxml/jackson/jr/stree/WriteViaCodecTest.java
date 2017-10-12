@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.ObjectWriteContext;
 import com.fasterxml.jackson.core.TreeCodec;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
@@ -55,7 +56,7 @@ public class WriteViaCodecTest extends TestBase
 
     protected String writeTree(TreeCodec treeCodec, TreeNode treeNode) throws IOException {
          StringWriter writer = new StringWriter();
-         JsonGenerator g = _factory.createGenerator(writer);
+         JsonGenerator g = _factory.createGenerator(ObjectWriteContext.empty(), writer);
          treeCodec.writeTree(g, treeNode);
          g.close();
          return writer.toString();

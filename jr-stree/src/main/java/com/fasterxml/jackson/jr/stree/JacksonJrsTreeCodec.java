@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.tree.ArrayTreeNode;
+import com.fasterxml.jackson.core.tree.ObjectTreeNode;
 
 /**
  * {@link TreeCodec} implementation that can build "simple", immutable
@@ -14,14 +16,11 @@ public class JacksonJrsTreeCodec extends TreeCodec
 {
     public static JrsMissing MISSING = JrsMissing.instance;
 
-    public static final JacksonJrsTreeCodec SINGLETON = new JacksonJrsTreeCodec(ObjectReadContext.empty());
+    public static final JacksonJrsTreeCodec SINGLETON = new JacksonJrsTreeCodec();
 
-    protected final ObjectReadContext _readCtxt;
-
-    public JacksonJrsTreeCodec(ObjectReadContext readCtxt) {
-        _readCtxt = readCtxt;
+    public JacksonJrsTreeCodec() {
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public <T extends TreeNode> T readTree(JsonParser p) throws IOException {
@@ -83,18 +82,18 @@ public class JacksonJrsTreeCodec extends TreeCodec
     }
 
     @Override
-    public TreeNode createArrayNode() {
+    public ArrayTreeNode createArrayNode() {
         return new JrsArray(_list());
     }
 
     @Override
-    public TreeNode createObjectNode() {
+    public ObjectTreeNode createObjectNode() {
         return new JrsObject(_map());
     }
 
     @Override
     public JsonParser treeAsTokens(TreeNode node) {
-        return ((JrsValue) node).traverse(_readCtxt);
+        return ((JrsValue) node).traverse(ObjectReadContext.empty());
     }
 
     /*

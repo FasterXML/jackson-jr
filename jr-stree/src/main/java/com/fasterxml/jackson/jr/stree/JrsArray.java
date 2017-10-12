@@ -7,10 +7,13 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.core.tree.ArrayTreeNode;
 
 import static com.fasterxml.jackson.core.JsonToken.START_ARRAY;
 
-public class JrsArray extends JrsValue
+public class JrsArray
+    extends JrsValue
+    implements ArrayTreeNode
 {
     private final List<JrsValue> _values;
 

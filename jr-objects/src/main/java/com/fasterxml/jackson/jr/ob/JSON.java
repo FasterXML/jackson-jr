@@ -5,7 +5,12 @@ import java.net.URL;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.io.CharacterEscapes;
 import com.fasterxml.jackson.core.io.SegmentedStringWriter;
+import com.fasterxml.jackson.core.tree.ArrayTreeNode;
+import com.fasterxml.jackson.core.tree.ObjectTreeNode;
+import com.fasterxml.jackson.core.type.ResolvedType;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.Instantiatable;
 import com.fasterxml.jackson.jr.ob.comp.CollectionComposer;
@@ -19,7 +24,10 @@ import com.fasterxml.jackson.jr.ob.impl.*;
  * Note that instances are fully immutable, and thereby thread-safe.
  */
 @SuppressWarnings("resource")
-public class JSON implements Versioned
+public class JSON
+    implements
+        ObjectReadContext, ObjectWriteContext, // since 3.0
+        Versioned
 {
     /**
      * Simple on/off (enabled/disabled) features for {@link JSON}; used for simple configuration
@@ -148,8 +156,6 @@ public class JSON implements Versioned
         *<p>
         * Feature is disabled by default, so that date/time values are
         * serialized as text, NOT timestamp.
-        *
-        * @since 2.7
         */
        WRITE_DATES_AS_TIMESTAMP(false),
        
@@ -241,8 +247,6 @@ public class JSON implements Versioned
         * Whether "is-getters" (like <code>public boolean isValuable()</code>) are detected
         * for use or not. Note that in addition to naming, and lack of arguments, return
         * value also has to be <code>boolean</code> or <code>java.lang.Boolean</code>.
-        *
-        * @since 2.5
         */
        USE_IS_GETTERS(true, true),
        
@@ -252,8 +256,6 @@ public class JSON implements Versioned
         *<p>
         * Feature is disabled by default (for backwards compatibility), so fields
         * are not used unless explicitly enabled.
-        *
-        * @since 2.8
         */
        USE_FIELDS(false, true),
        
@@ -270,8 +272,6 @@ public class JSON implements Versioned
        /**
         * Flag for features that affect caching of readers, writers,
         * and changing of which needs to result in flushing.
-        *
-        * @since 2.8
         */
        private final boolean _affectsCaching;
 
@@ -301,8 +301,6 @@ public class JSON implements Versioned
        /**
         * Method for calculating bitset of features that force flushing of
         * POJO handler caches.
-        *
-        * @since 2.8
         */
        public static int cacheBreakers()
        {
@@ -350,7 +348,7 @@ public class JSON implements Versioned
      * Underlying JSON factory used for creating Streaming parsers and
      * generators.
      */
-    protected final JsonFactory _jsonFactory;
+    protected final TokenStreamFactory _jsonFactory;
 
     /**
      * Optional handler for {@link TreeNode} values: if defined, we can
@@ -390,8 +388,15 @@ public class JSON implements Versioned
         this(DEFAULT_FEATURES, new JsonFactory(), null);
     }
 
+    /**
+     * @since 3.0
+     */
+    public JSON(TokenStreamFactory streamFactory) {
+        this(DEFAULT_FEATURES, streamFactory, null);
+    }
+
     protected JSON(int features,
-            JsonFactory jsonF, TreeCodec trees)
+            TokenStreamFactory jsonF, TreeCodec trees)
     {
         this(features, jsonF, trees,
                 null, null, // reader, writer
@@ -399,7 +404,7 @@ public class JSON implements Versioned
     }
 
     protected JSON(int features,
-            JsonFactory jsonF, TreeCodec trees,
+            TokenStreamFactory jsonF, TreeCodec trees,
             JSONReader r, JSONWriter w,
             PrettyPrinter pp)
     {
@@ -460,7 +465,7 @@ public class JSON implements Versioned
     /**********************************************************************
      */
 
-    public JSON with(JsonFactory f)
+    public JSON with(TokenStreamFactory f)
     {
         if (f == _jsonFactory) {
             return this;
@@ -608,7 +613,7 @@ public class JSON implements Versioned
      */
     
     protected final JSON _with(int features,
-            JsonFactory jsonF, TreeCodec trees,
+            TokenStreamFactory jsonF, TreeCodec trees,
             JSONReader reader, JSONWriter writer,
             PrettyPrinter pp)
     {
@@ -628,7 +633,7 @@ public class JSON implements Versioned
         return _treeCodec;
     }
 
-    public JsonFactory getStreamingFactory() {
+    public TokenStreamFactory getStreamingFactory() {
         return _jsonFactory;
     }
 
@@ -646,7 +651,7 @@ public class JSON implements Versioned
     {
         SegmentedStringWriter sw = new SegmentedStringWriter(_jsonFactory._getBufferRecycler());
         try {
-            _writeAndClose(value, _jsonFactory.createGenerator(sw));
+            _writeAndClose(value, _jsonFactory.createGenerator(this, sw));
         } catch (JsonProcessingException e) {
             throw e;
         } catch (IOException e) { // shouldn't really happen, but is declared as possibility so:
@@ -659,7 +664,7 @@ public class JSON implements Versioned
     {
         ByteArrayBuilder bb = new ByteArrayBuilder(_jsonFactory._getBufferRecycler());
         try {
-            _writeAndClose(value, _jsonFactory.createGenerator(bb, JsonEncoding.UTF8));
+            _writeAndClose(value, _jsonFactory.createGenerator(this, bb, JsonEncoding.UTF8));
         } catch (JsonProcessingException e) {
             throw e;
         } catch (IOException e) { // shouldn't really happen, but is declared as possibility so:
@@ -679,15 +684,15 @@ public class JSON implements Versioned
     }
 
     public void write(Object value, OutputStream out) throws IOException, JSONObjectException {
-        _writeAndClose(value, _jsonFactory.createGenerator(out));
+        _writeAndClose(value, _jsonFactory.createGenerator(this, out));
     }
 
     public void write(Object value, Writer w) throws IOException, JSONObjectException {
-        _writeAndClose(value, _jsonFactory.createGenerator(w));
+        _writeAndClose(value, _jsonFactory.createGenerator(this, w));
     }
 
     public void write(Object value, File f) throws IOException, JSONObjectException {
-        _writeAndClose(value, _jsonFactory.createGenerator(f, JsonEncoding.UTF8));
+        _writeAndClose(value, _jsonFactory.createGenerator(this, f, JsonEncoding.UTF8));
     }
 
     /*
@@ -702,28 +707,28 @@ public class JSON implements Versioned
 
     public JSONComposer<OutputStream> composeTo(OutputStream out) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features,
-                _config(_jsonFactory.createGenerator(out)), true);
+                _config(_jsonFactory.createGenerator(this, out)), true);
     }
 
     public JSONComposer<OutputStream> composeTo(Writer w) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features,
-                _config(_jsonFactory.createGenerator(w)), true);
+                _config(_jsonFactory.createGenerator(this, w)), true);
     }
 
     public JSONComposer<OutputStream> composeTo(File f) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features,
-                _config(_jsonFactory.createGenerator(f, JsonEncoding.UTF8)), true);
+                _config(_jsonFactory.createGenerator(this, f, JsonEncoding.UTF8)), true);
     }
 
     public JSONComposer<String> composeString() throws IOException, JSONObjectException {
         SegmentedStringWriter out = new SegmentedStringWriter(_jsonFactory._getBufferRecycler());
-        JsonGenerator gen = _config(_jsonFactory.createGenerator(out));
+        JsonGenerator gen = _config(_jsonFactory.createGenerator(this, out));
         return JSONComposer.stringComposer(_features, gen, out);
     }
 
     public JSONComposer<byte[]> composeBytes() throws IOException, JSONObjectException {
         ByteArrayBuilder out = new ByteArrayBuilder(_jsonFactory._getBufferRecycler());
-        JsonGenerator gen = _config(_jsonFactory.createGenerator(out));
+        JsonGenerator gen = _config(_jsonFactory.createGenerator(this, out));
         return JSONComposer.bytesComposer(_features, gen, out);
     }
 
@@ -924,8 +929,6 @@ public class JSON implements Versioned
     /**
      * Method for reading content as a JSON Tree (of type that configured
      * {@link TreeCodec}, see {@link #with(TreeCodec)}) supports.
-     *
-     * @since 2.8
      */
     @SuppressWarnings("unchecked")
     public <T extends TreeNode> TreeNode treeFrom(Object source)
@@ -953,12 +956,126 @@ public class JSON implements Versioned
             return null;
         }
     }
+    /*
+    /**********************************************************************
+    /* ObjectReadContext: Config access (bogus)
+    /**********************************************************************
+     */
+
+    @Override
+    public int getFormatReadFeatures(int defaults) {
+        return defaults;
+    }
+
+    @Override
+    public TokenStreamFactory getParserFactory() {
+        return _jsonFactory;
+    }
 
     /*
     /**********************************************************************
-    /* API: TreeNode construction
+    /* ObjectReadContext: databind
     /**********************************************************************
      */
+    
+    @Override
+    public <T extends TreeNode> T readTree(JsonParser p) throws IOException {
+        if (_treeCodec == null) {
+            _noTreeCodec("write TreeNode");
+        }
+        return _treeCodec.readTree(p);
+    }
+
+    @Override
+    public <T> T readValue(JsonParser p, Class<T> valueType)
+            throws IOException
+    {
+        // 11-Oct-2017, tatu: Not sure this is sufficient but it's best we got:
+        // !!! TODO: maybe support array types?
+        T result = _readerForOperation(p).readBean(valueType);
+        p.clearCurrentToken();
+        return result;
+    }
+
+    @Override
+    public <T> T readValue(JsonParser p, TypeReference<?> valueTypeRef)
+        throws IOException
+    {
+        // 11-Oct-2017, tatu: Not sure what to do here really
+        throw new UnsupportedOperationException("TypeReference<?> not support by jackson-jr");
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T readValue(JsonParser p, ResolvedType type) throws IOException {
+        return (T) readValue(p, type.getRawClass());
+    }
+
+    /*
+    /**********************************************************************
+    /* ObjectWriteContext: Config access (bogus)
+    /**********************************************************************
+     */
+    
+    @Override
+    public FormatSchema getSchema() {
+        return null;
+    }
+
+    @Override
+    public CharacterEscapes getCharacterEscapes() {
+        return null;
+    }
+
+    @Override
+    public PrettyPrinter getPrettyPrinter() {
+        return null;
+    }
+
+    @Override
+    public SerializableString getRootValueSeparator(SerializableString defaultSeparator) {
+        return defaultSeparator;
+    }
+
+    @Override
+    public int getGeneratorFeatures(int defaults) {
+        return defaults;
+    }
+
+    @Override
+    public int getFormatWriteFeatures(int defaults) {
+        return defaults;
+    }
+
+    @Override
+    public TokenStreamFactory getGeneratorFactory() {
+        return _jsonFactory;
+    }
+
+    /*
+    /**********************************************************************
+    /* ObjectWriteContext: Serialization
+    /**********************************************************************
+     */
+    
+    @Override
+    public void writeValue(JsonGenerator g, Object value) throws IOException {
+        write(value, g);
+    }
+
+    /*
+    /**********************************************************************
+    /* ObjectWriteContext: Tree support
+    /**********************************************************************
+     */
+
+    @Override
+    public void writeTree(JsonGenerator g, TreeNode tree) throws IOException {
+        if (_treeCodec == null) {
+            _noTreeCodec("write TreeNode");
+        }
+        _treeCodec.writeTree(g, tree);
+    }
 
     /**
      * Convenience method, equivalent to:
@@ -967,15 +1084,13 @@ public class JSON implements Versioned
      *</pre>
      * Note that for call to succeed a {@link TreeCodec} must have been
      * configured with this instance using {@link #with(TreeCodec)} method.
-     *
-     * @since 2.8
      */
-    @SuppressWarnings("unchecked")
-    public <T extends TreeNode> T createArrayNode() {
+    @Override
+    public ArrayTreeNode createArrayNode() {
          if (_treeCodec == null) {
               _noTreeCodec("create Object node");
           }
-         return (T) _treeCodec.createArrayNode();
+         return _treeCodec.createArrayNode();
     }
     
     /**
@@ -985,15 +1100,18 @@ public class JSON implements Versioned
      *</pre>
      * Note that for call to succeed a {@link TreeCodec} must have been
      * configured with this instance using {@link #with(TreeCodec)} method.
-     *
-     * @since 2.8
      */
-    @SuppressWarnings("unchecked")
-    public <T extends TreeNode> T createObjectNode() {
+    @Override
+    public ObjectTreeNode createObjectNode() {
          if (_treeCodec == null) {
               _noTreeCodec("create Object node");
           }
-         return (T) _treeCodec.createObjectNode();
+         return _treeCodec.createObjectNode();
+    }
+
+    @Override
+    public int getParserFeatures(int defaults) {
+        return defaults;
     }
 
     /*
@@ -1037,31 +1155,31 @@ public class JSON implements Versioned
 
     protected JsonParser _parser(Object source) throws IOException, JSONObjectException
     {
-        final JsonFactory f = _jsonFactory;
+        final TokenStreamFactory f = _jsonFactory;
         final Class<?> type = source.getClass();
         if (type == String.class) {
-            return f.createParser((String) source);
+            return f.createParser(this, (String) source);
         }
         if (type == byte[].class) {
-            return f.createParser((byte[]) source);
+            return f.createParser(this, (byte[]) source);
         }
         if (source instanceof InputStream) {
-            return f.createParser((InputStream) source);
+            return f.createParser(this, (InputStream) source);
         }
         if (source instanceof Reader) {
-            return f.createParser((Reader) source);
+            return f.createParser(this, (Reader) source);
         }
         if (source instanceof URL) {
-            return f.createParser((URL) source);
+            return f.createParser(this, (URL) source);
         }
         if (type == char[].class) {
-            return f.createParser(new CharArrayReader((char[]) source));
+            return f.createParser(this, new CharArrayReader((char[]) source));
         }
         if (source instanceof File) {
-            return f.createParser((File) source);
+            return f.createParser(this, (File) source);
         }
         if (source instanceof CharSequence) {
-            return f.createParser(((CharSequence) source).toString());
+            return f.createParser(this, ((CharSequence) source).toString());
         }
         throw new JSONObjectException("Can not use Source of type "+source.getClass().getName()
                 +" as input (use an InputStream, Reader, String, byte[], File or URL");
@@ -1139,15 +1257,12 @@ public class JSON implements Versioned
         }
     }
 
-    /**
-     * @since 2.8.2
-     */
     protected <T> T _closeWithError(Closeable cl, Exception e) throws IOException {
         if (cl != null) {
             try {
                 cl.close();
             } catch (Exception secondaryEx) {
-                // what should we do here, if anything?
+                e.addSuppressed(secondaryEx);
             }
         }
         if (e instanceof IOException) {

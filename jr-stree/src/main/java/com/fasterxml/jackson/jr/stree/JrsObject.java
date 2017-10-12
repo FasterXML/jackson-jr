@@ -9,8 +9,11 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.core.tree.ObjectTreeNode;
 
-public class JrsObject extends JrsValue
+public class JrsObject
+    extends JrsValue
+    implements ObjectTreeNode
 {
     private final Map<String, JrsValue> _values;
 

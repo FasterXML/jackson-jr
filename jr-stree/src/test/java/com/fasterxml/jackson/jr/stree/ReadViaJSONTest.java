@@ -40,7 +40,7 @@ public class ReadViaJSONTest extends TestBase
          assertEquals(3, node.size());
          // actually, verify with write...
          final StringWriter writer = new StringWriter();
-         final JsonGenerator g = _factory.createGenerator(writer);
+         final JsonGenerator g = _factory.createGenerator(treeJSON, writer);
          TREE_CODEC.writeTree(g, node);
          g.close();
          assertEquals(INPUT, writer.toString());
@@ -57,7 +57,7 @@ public class ReadViaJSONTest extends TestBase
 
          // actually, verify with write...
          final StringWriter writer = new StringWriter();
-         final JsonGenerator g = _factory.createGenerator(writer);
+         final JsonGenerator g = _factory.createGenerator(treeJSON, writer);
          TREE_CODEC.writeTree(g, node);
          g.close();
          assertEquals(INPUT, writer.toString());

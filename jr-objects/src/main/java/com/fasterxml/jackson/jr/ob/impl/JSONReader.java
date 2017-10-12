@@ -156,9 +156,6 @@ public class JSONReader
     /**********************************************************************
      */
 
-    /**
-     * @since 2.8
-     */
     public boolean arraysAsLists() {
         return Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(_features);
     }
