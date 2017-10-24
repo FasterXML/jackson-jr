@@ -409,8 +409,9 @@ public class JSONWriter
     
     protected void writeListValue(List<?> list) throws IOException
     {
-        _generator.writeStartArray();
-        for (int i = 0, len = list.size(); i < len; ++i) {
+        final int len = list.size();
+        _generator.writeStartArray(list, len);
+        for (int i = 0; i < len; ++i) {
             Object value = list.get(i);
             if (value == null) {
                 _generator.writeNull();
@@ -429,7 +430,7 @@ public class JSONWriter
     
     protected void writeMapValue(Map<?,?> v) throws IOException
     {
-        _generator.writeStartObject();
+        _generator.writeStartObject(v);
         if (!v.isEmpty()) {
             for (Map.Entry<?,?> entry : v.entrySet()) {
                 String key = keyToString(entry.getKey());
@@ -456,8 +457,9 @@ public class JSONWriter
     }
 
     protected void writeObjectArrayValue(Object[] v) throws IOException {
-        _generator.writeStartArray();
-        for (int i = 0, len = v.length; i < len; ++i) {
+        final int len = v.length;
+        _generator.writeStartArray(v, len);
+        for (int i = 0; i < len; ++i) {
             writeValue(v[i]);
         }
         _generator.writeEndArray();
@@ -469,8 +471,9 @@ public class JSONWriter
     }
 
     protected void writeIntArrayValue(int[] v) throws IOException {
-        _generator.writeStartArray();
-        for (int i = 0, len = v.length; i < len; ++i) {
+        final int len = v.length;
+        _generator.writeStartArray(v, len);
+        for (int i = 0; i < len; ++i) {
             _generator.writeNumber(v[i]);
         }
         _generator.writeEndArray();
@@ -482,8 +485,9 @@ public class JSONWriter
     }
     
     protected void writeLongArrayValue(long[] v) throws IOException {
-        _generator.writeStartArray();
-        for (int i = 0, len = v.length; i < len; ++i) {
+        final int len = v.length;
+        _generator.writeStartArray(v, len);
+        for (int i = 0; i < len; ++i) {
             _generator.writeNumber(v[i]);
         }
         _generator.writeEndArray();
@@ -495,8 +499,9 @@ public class JSONWriter
     }
     
     protected void writeBooleanArrayValue(boolean[] v) throws IOException {
-        _generator.writeStartArray();
-        for (int i = 0, len = v.length; i < len; ++i) {
+        final int len = v.length;
+        _generator.writeStartArray(v, len);
+        for (int i = 0; i < len; ++i) {
             _generator.writeBoolean(v[i]);
         }
         _generator.writeEndArray();
@@ -662,7 +667,7 @@ public class JSONWriter
 
     protected void writeBeanValue(BeanPropertyWriter[] props, Object bean) throws IOException
     {
-        _generator.writeStartObject();
+        _generator.writeStartObject(bean);
         for (int i = 0, end = props.length; i < end; ++i) {
             BeanPropertyWriter property = props[i];
             SerializedString name = property.name;
