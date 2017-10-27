@@ -44,52 +44,6 @@ public class BeanReader
         return _propsByName.get(name);
     }
 
-    @Override
-    public Object readNext(JSONReader r, JsonParser p) throws IOException
-    {
-        JsonToken t = p.nextToken();
-        try {
-            switch (t) {
-            case VALUE_NULL:
-                return null;
-            case VALUE_STRING:
-                return create(p.getText());
-            case VALUE_NUMBER_INT:
-                return create(p.getLongValue());
-            case START_OBJECT:
-                {
-                    Object bean = create();
-                    String propName;
-                    
-                    for (; (propName = p.nextFieldName()) != null; ) {
-                        BeanPropertyReader prop = findProperty(propName);
-                        if (prop == null) {
-                            handleUnknown(r, p, propName);
-                            continue;
-                        }
-                        ValueReader vr = prop.getReader();
-                        prop.setValueFor(bean, vr.readNext(r, p));
-                    }
-                    // also verify we are not confused...
-                    if (!p.hasToken(JsonToken.END_OBJECT)) {
-                        throw _reportProblem(p);
-                    }                    
-                    
-                    return bean;
-                }
-            default:
-            }
-        } catch (IOException e) {
-            throw e;
-        } catch (Exception e) {
-            throw JSONObjectException.from(p, "Failed to create an instance of "
-                    +_type.getName()+" due to ("+e.getClass().getName()+"): "+e.getMessage(),
-                    e);
-        }
-        throw JSONObjectException.from(p,
-                "Can not create a "+_type.getName()+" instance out of "+_tokenDesc(p));
-    }
-    
     /**
      * Method used for deserialization; will read an instance of the bean
      * type using given parser.
@@ -97,38 +51,21 @@ public class BeanReader
     @Override
     public Object read(JSONReader r, JsonParser p) throws IOException
     {
-        JsonToken t = p.currentToken();
-
         try {
-            switch (t) {
-            case VALUE_NULL:
-                return null;
-            case VALUE_STRING:
-                return create(p.getText());
-            case VALUE_NUMBER_INT:
-                return create(p.getLongValue());
-            case START_OBJECT:
-                {
-                    Object bean = create();
-                    String propName;
-                    
-                    for (; (propName = p.nextFieldName()) != null; ) {
-                        BeanPropertyReader prop = findProperty(propName);
-                        if (prop == null) {
-                            handleUnknown(r, p, propName);
-                            continue;
-                        }
-                        ValueReader vr = prop.getReader();
-                        prop.setValueFor(bean, vr.readNext(r, p));
-                    }
-                    // also verify we are not confused...
-                    if (!p.hasToken(JsonToken.END_OBJECT)) {
-                        throw _reportProblem(p);
-                    }                    
-                    
-                    return bean;
+            if (p.isExpectedStartObjectToken()) {
+                return _readBean(r, p, create());
+            }
+            JsonToken t = p.currentToken();
+            if (t != null) {
+                switch (t) {
+                case VALUE_NULL:
+                    return null;
+                case VALUE_STRING:
+                    return create(p.getText());
+                case VALUE_NUMBER_INT:
+                    return create(p.getLongValue());
+                default:
                 }
-            default:
             }
         } catch (IOException e) {
             throw e;
@@ -141,6 +78,126 @@ public class BeanReader
                 _type.getName(), _tokenDesc(p));
     }
     
+    @Override
+    public Object readNext(JSONReader r, JsonParser p) throws IOException
+    {
+        try {
+            JsonToken t = p.nextToken();
+            if (t == JsonToken.START_OBJECT) {
+                return _readBean(r, p, create());
+            }
+            if (t != null) {
+                switch (t) {
+                case VALUE_NULL:
+                    return null;
+                case VALUE_STRING:
+                    return create(p.getText());
+                case VALUE_NUMBER_INT:
+                    return create(p.getLongValue());
+                default:
+                }
+            }
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw JSONObjectException.from(p, "Failed to create an instance of "
+                    +_type.getName()+" due to ("+e.getClass().getName()+"): "+e.getMessage(),
+                    e);
+        }
+        throw JSONObjectException.from(p,
+                "Can not create a "+_type.getName()+" instance out of "+_tokenDesc(p));
+    }
+
+    private final Object _readBean(JSONReader r, JsonParser p, final Object bean) throws IOException
+    {
+        String propName;
+        BeanPropertyReader prop;
+
+        // Unroll first 6 rounds (similar to databind)
+        do {
+            // Element 1
+            if ((propName = p.nextFieldName()) == null) { break; }
+            if ((prop = findProperty(propName)) == null) {
+                return _readWithUnknown(r, p, bean, propName);
+            }
+            prop.setValueFor(bean, prop.getReader().readNext(r, p));
+
+            // Element 2
+            if ((propName = p.nextFieldName()) == null) { break; }
+            if ((prop = findProperty(propName)) == null) {
+                return _readWithUnknown(r, p, bean, propName);
+            }
+            prop.setValueFor(bean, prop.getReader().readNext(r, p));
+
+            // Element 3
+            if ((propName = p.nextFieldName()) == null) { break; }
+            if ((prop = findProperty(propName)) == null) {
+                return _readWithUnknown(r, p, bean, propName);
+            }
+            prop.setValueFor(bean, prop.getReader().readNext(r, p));
+
+            // Element 4
+            if ((propName = p.nextFieldName()) == null) { break; }
+            if ((prop = findProperty(propName)) == null) {
+                return _readWithUnknown(r, p, bean, propName);
+            }
+            prop.setValueFor(bean, prop.getReader().readNext(r, p));
+
+            // Element 5
+            if ((propName = p.nextFieldName()) == null) { break; }
+            if ((prop = findProperty(propName)) == null) {
+                return _readWithUnknown(r, p, bean, propName);
+            }
+            prop.setValueFor(bean, prop.getReader().readNext(r, p));
+
+            // Element 6
+            if ((propName = p.nextFieldName()) == null) { break; }
+            if ((prop = findProperty(propName)) == null) {
+                return _readWithUnknown(r, p, bean, propName);
+            }
+            prop.setValueFor(bean, prop.getReader().readNext(r, p));
+
+            // and if more, just loop
+            for (; (propName = p.nextFieldName()) != null; ) {
+                prop = findProperty(propName);
+                if (prop == null) {
+                    handleUnknown(r, p, propName);
+                    continue;
+                }
+                prop.setValueFor(bean, prop.getReader().readNext(r, p));
+            }
+        } while (false);
+        // also verify we are not confused...
+        if (!p.hasToken(JsonToken.END_OBJECT)) {
+            throw _reportProblem(p);
+        }                    
+        
+        return bean;
+    }
+
+    private final Object _readWithUnknown(JSONReader r, JsonParser p,
+            final Object bean, String propName)
+        throws IOException
+    {
+        // first, skip current property
+        handleUnknown(r, p, propName);
+        // then do the rest with looping
+        for (; (propName = p.nextFieldName()) != null; ) {
+            BeanPropertyReader prop = findProperty(propName);
+            if (prop == null) {
+                handleUnknown(r, p, propName);
+                continue;
+            }
+            ValueReader vr = prop.getReader();
+            prop.setValueFor(bean, vr.readNext(r, p));
+        }
+        if (!p.hasToken(JsonToken.END_OBJECT)) {
+            throw _reportProblem(p);
+        }                    
+        
+        return bean;
+    }
+
     protected Object create() throws Exception {
         if (_defaultCtor == null) {
             throw new IllegalStateException("Class "+_type.getName()+" does not have default constructor to use");

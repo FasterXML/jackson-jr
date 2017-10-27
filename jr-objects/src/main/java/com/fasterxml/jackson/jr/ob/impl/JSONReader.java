@@ -121,7 +121,7 @@ public class JSONReader
         if (_collectionBuilder == lb) return this;
         return _with(_features, _typeDetector, _treeCodec, lb, _mapBuilder);
     }
-    
+
     /**
      * Overridable method that all mutant factories call if a new instance
      * is to be constructed
@@ -159,7 +159,7 @@ public class JSONReader
     public boolean arraysAsLists() {
         return Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(_features);
     }
-    
+
     /*
     /**********************************************************************
     /* Public entry points for reading Simple objects from JSON
@@ -182,34 +182,32 @@ public class JSONReader
      * JSON Object, {@link JSONObjectException} will be thrown.
      */
     public Map<Object,Object> readMap() throws IOException {
-        JsonToken t = _parser.currentToken();
-        if (t == JsonToken.VALUE_NULL) {
+        if (_parser.isExpectedStartObjectToken()) {
+            return AnyReader.std.readFromObject(this, _parser, _mapBuilder);
+        }
+        if (_parser.hasToken(JsonToken.VALUE_NULL)) {
             return null;
         }
-        if (t != JsonToken.START_OBJECT) {
-            throw JSONObjectException.from(_parser,
-                    "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+_tokenDesc(_parser));
-        }
-        return AnyReader.std.readFromObject(this, _parser, _mapBuilder);
+        throw JSONObjectException.from(_parser,
+                "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+_tokenDesc(_parser));
     }
-    
+
     /**
      * Method for reading a JSON Array from input and building a {@link java.util.List}
      * out of it. Note that if input does NOT contain a
      * JSON Array, {@link JSONObjectException} will be thrown.
      */
     public List<Object> readList() throws IOException {
-        JsonToken t = _parser.currentToken();
-        if (t == JsonToken.VALUE_NULL) {
+        if (_parser.isExpectedStartArrayToken()) {
+            return (List<Object>) AnyReader.std.readCollectionFromArray(this, _parser, _collectionBuilder);
+        }
+        if (_parser.hasToken(JsonToken.VALUE_NULL)) {
             return null;
         }
-        if (t != JsonToken.START_ARRAY) {
-            throw JSONObjectException.from(_parser,
-                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
-        }
-        return (List<Object>) AnyReader.std.readCollectionFromArray(this, _parser, _collectionBuilder);
+        throw JSONObjectException.from(_parser,
+                "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
     }
-    
+
     /**
      * Method for reading a JSON Array from input and building a <code>Object[]</code>
      * out of it. Note that if input does NOT contain a
@@ -217,15 +215,14 @@ public class JSONReader
      */
     public Object[] readArray() throws IOException
     {
-        JsonToken t = _parser.currentToken();
-        if (t == JsonToken.VALUE_NULL) {
+        if (_parser.isExpectedStartArrayToken()) {
+            return AnyReader.std.readArrayFromArray(this, _parser, _collectionBuilder);
+        }
+        if (_parser.hasToken(JsonToken.VALUE_NULL)) {
             return null;
         }
-        if (t != JsonToken.START_ARRAY) {
-            throw JSONObjectException.from(_parser,
-                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
-        }
-        return AnyReader.std.readArrayFromArray(this, _parser, _collectionBuilder);
+        throw JSONObjectException.from(_parser,
+                "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
     }
 
     /*
@@ -233,7 +230,7 @@ public class JSONReader
     /* Public entry points for reading (more) typed types
     /**********************************************************************
      */
-    
+
     /**
      * Method for reading a JSON Object from input and building a Bean of
      * specified type out of it; Bean has to conform to standard Java Bean
@@ -247,15 +244,14 @@ public class JSONReader
 
     @SuppressWarnings("unchecked")
     public <T> T[] readArrayOf(Class<T> type) throws IOException {
-        JsonToken t = _parser.currentToken();
-        if (t == JsonToken.VALUE_NULL) {
+        if (_parser.isExpectedStartArrayToken()) {
+            return (T[]) new ArrayReader(type, _typeDetector.findReader(type)).read(this, _parser);
+        }
+        if (_parser.hasToken(JsonToken.VALUE_NULL)) {
             return null;
         }
-        if (t != JsonToken.START_ARRAY) {
-            throw JSONObjectException.from(_parser,
-                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
-        }
-        return (T[]) new ArrayReader(type, _typeDetector.findReader(type)).read(this, _parser);
+        throw JSONObjectException.from(_parser,
+                "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
     }
 
     /**
@@ -266,17 +262,16 @@ public class JSONReader
     @SuppressWarnings("unchecked")
     public <T> List<T> readListOf(Class<T> type) throws IOException
     {
-        JsonToken t = _parser.currentToken();
-        if (t == JsonToken.VALUE_NULL) {
+        if (_parser.isExpectedStartArrayToken()) {
+            return (List<T>) new CollectionReader(List.class, _typeDetector.findReader(type)).read(this, _parser);
+        }
+        if (_parser.hasToken(JsonToken.VALUE_NULL)) {
             return null;
         }
-        if (t != JsonToken.START_ARRAY) {
-            throw JSONObjectException.from(_parser,
-                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
-        }
-        return (List<T>) new CollectionReader(List.class, _typeDetector.findReader(type)).read(this, _parser);
+        throw JSONObjectException.from(_parser,
+                "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
     }
-    
+
     /*
     /**********************************************************************
     /* Internal methods; overridable for custom coercions
