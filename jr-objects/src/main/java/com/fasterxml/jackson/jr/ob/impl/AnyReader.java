@@ -23,16 +23,66 @@ public class AnyReader extends ValueReader
     @Override
     public Object readNext(JSONReader r, JsonParser p) throws IOException
     {
-        p.nextToken();
-        return read(r, p);
+        JsonToken t = p.nextToken();
+        if (t != null) {
+            switch (t.id()) {
+            case ID_NULL:
+                return null;
+            case ID_START_OBJECT:
+                return readFromObject(r, p, r._mapBuilder);
+            case ID_START_ARRAY:
+                if (r.arraysAsLists()) {
+                    return readCollectionFromArray(r, p, r._collectionBuilder);
+                }
+                return readArrayFromArray(r, p, r._collectionBuilder);
+            case ID_STRING:
+                return fromString(p.getText());
+            case ID_NUMBER_INT:
+                {
+                    NumberType n = p.getNumberType();
+                    if (n == NumberType.INT) {
+                        return Integer.valueOf(p.getIntValue());
+                    }
+                    if (n == NumberType.LONG) {
+                        return Long.valueOf(p.getLongValue());
+                    }
+                    return p.getBigIntegerValue();
+                }
+            case ID_NUMBER_FLOAT:
+                if (!JSON.Feature.USE_BIG_DECIMAL_FOR_FLOATS.isEnabled(r._features)) {
+                    NumberType n = p.getNumberType();
+                    if (n == NumberType.FLOAT) {
+                        return Float.valueOf(p.getFloatValue());
+                    }
+                    if (n == NumberType.DOUBLE) {
+                        return Double.valueOf(p.getDoubleValue());
+                    }
+                }
+                return p.getDecimalValue();
+            case ID_TRUE:
+                return fromBoolean(true);
+            case ID_FALSE:
+                return fromBoolean(false);
+            case ID_EMBEDDED_OBJECT:
+                return fromEmbedded(p.getEmbeddedObject());
+    
+                // Others are error cases...
+                /*
+            default:
+            case END_ARRAY:
+            case END_OBJECT:
+            case FIELD_NAME:
+            case NOT_AVAILABLE:
+            */
+            }
+        }
+        throw JSONObjectException.from(p, "Unexpected value token: "+_tokenDesc(p));
     }
     
     @Override
     public Object read(JSONReader r, JsonParser p) throws IOException
     {
-        JsonToken t = p.currentToken();
-        int id = (t == null) ? ID_NO_TOKEN : t.id();
-        switch (id) {
+        switch (p.currentTokenId()) {
         case ID_NULL:
             return null;
         case ID_START_OBJECT:
@@ -88,25 +138,38 @@ public class AnyReader extends ValueReader
     public Map<Object,Object> readFromObject(JSONReader r, JsonParser p, MapBuilder b) throws IOException
     {
         // First, a minor optimization for empty Maps
-        if (p.nextValue() == JsonToken.END_OBJECT) {
+        String k;
+        if ((k = p.nextFieldName()) == null) {
+            if (!p.hasToken(JsonToken.END_OBJECT)) {
+                _reportNotEndObject(p);
+            }
             return b.emptyMap();
         }
         // and another for singletons...
-        Object key = fromKey(p.getCurrentName());
-        Object value = read(r, p);
+        Object key = fromKey(k);
+        Object value = readNext(r, p);
 
-        if (p.nextValue() == JsonToken.END_OBJECT) {
+        if ((k = p.nextFieldName()) == null) {
+            if (!p.hasToken(JsonToken.END_OBJECT)) {
+                _reportNotEndObject(p);
+            }
             return b.singletonMap(key, value);
         }
+        b = b.start().put(key, value);
+        key = fromKey(k);
+        value = readNext(r, p);
 
         // but then it's loop-de-loop
         try {
-            b = b.start().put(key, value);
-            do {
-                b = b.put(fromKey(p.getCurrentName()), read(r, p));
-            } while (p.nextValue() != JsonToken.END_OBJECT);
+            b = b.put(key, value);
+            while ((k = p.nextFieldName()) != null) {
+                b = b.put(fromKey(k), readNext(r, p));
+            }
         } catch (IllegalArgumentException e) {
             throw JSONObjectException.from(p, e.getMessage());
+        }
+        if (!p.hasToken(JsonToken.END_OBJECT)) {
+            _reportNotEndObject(p);
         }
         return b.build();
     }
@@ -150,6 +213,10 @@ public class AnyReader extends ValueReader
         } catch (IllegalArgumentException e) {
             throw JSONObjectException.from(p, e.getMessage());
         }
+    }
+
+    private final void _reportNotEndObject(JsonParser p) throws IOException {
+        throw JSONObjectException.from(p, "Unexpected token: "+_tokenDesc(p)+" (should get FIELD_NAME or END_OBJECT)");
     }
 
     /*
