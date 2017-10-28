@@ -61,76 +61,81 @@ public class TypeDetector
      * Type not yet resolved
      */
     public final static int SER_UNKNOWN = 0;
+
+    /**
+     * Marker for null value
+     */
+    public final static int SER_NULL = 1;
     
     /**
      * All kinds of {@link java.util.Map}s.
      */
-    public final static int SER_MAP = 1;
+    public final static int SER_MAP = 2;
 
     /**
      * All kinds of {@link java.util.List}s.
      */
-    public final static int SER_LIST = 2;
+    public final static int SER_LIST = 3;
 
     /**
      * All kinds of {@link java.util.Collection}s other than {@link java.util.List}s
      */
-    public final static int SER_COLLECTION = 3;
+    public final static int SER_COLLECTION = 4;
 
     /**
      * Arrays of non-primitive types
      */
-    public final static int SER_OBJECT_ARRAY = 4;
+    public final static int SER_OBJECT_ARRAY = 5;
 
-    public final static int SER_INT_ARRAY = 5;
-    public final static int SER_LONG_ARRAY = 6;
-    public final static int SER_BOOLEAN_ARRAY = 7;
+    public final static int SER_INT_ARRAY = 6;
+    public final static int SER_LONG_ARRAY = 7;
+    public final static int SER_BOOLEAN_ARRAY = 8;
     
     /**
      * An implementation of {@link com.fasterxml.jackson.core.TreeNode}
      */
-    public final static int SER_TREE_NODE = 8;
+    public final static int SER_TREE_NODE = 9;
     
     // // // String(-like) types
 
-    public final static int SER_STRING = 9;
-    public final static int SER_CHARACTER_SEQUENCE = 10;
-    public final static int SER_CHAR_ARRAY = 11;
-    public final static int SER_BYTE_ARRAY = 12;
+    public final static int SER_STRING = 10;
+    public final static int SER_CHARACTER_SEQUENCE = 11;
+    public final static int SER_CHAR_ARRAY = 12;
+    public final static int SER_BYTE_ARRAY = 13;
 
     // // // Numbers
     
-    public final static int SER_NUMBER_BYTE = 13;
+    public final static int SER_NUMBER_BYTE = 14;
 
-    public final static int SER_NUMBER_SHORT = 14;
-    
-    public final static int SER_NUMBER_INTEGER = 15;
+    public final static int SER_NUMBER_SHORT = 15;
 
-    public final static int SER_NUMBER_LONG = 16;
+    public final static int SER_NUMBER_INTEGER = 16;
 
-    public final static int SER_NUMBER_FLOAT = 17;
+    public final static int SER_NUMBER_LONG = 17;
 
-    public final static int SER_NUMBER_DOUBLE = 18;
+    public final static int SER_NUMBER_FLOAT = 18;
 
-    public final static int SER_NUMBER_BIG_INTEGER = 19;
+    public final static int SER_NUMBER_DOUBLE = 19;
 
-    public final static int SER_NUMBER_BIG_DECIMAL = 20;
+    public final static int SER_NUMBER_BIG_INTEGER = 20;
+
+    public final static int SER_NUMBER_BIG_DECIMAL = 21;
 
     // // // Other specific scalar types
 
-    public final static int SER_BOOLEAN = 21;
-    public final static int SER_CHAR = 22;
+    public final static int SER_BOOLEAN = 22;
+    public final static int SER_CHAR = 23;
 
-    public final static int SER_ENUM = 23;
+    public final static int SER_ENUM = 24;
 
-    public final static int SER_DATE = 24;
-    public final static int SER_CALENDAR = 25;
+    public final static int SER_DATE = 25;
+    public final static int SER_CALENDAR = 26;
 
-    public final static int SER_CLASS = 26;
-    public final static int SER_FILE = 27;
-    public final static int SER_UUID = 28;
-    public final static int SER_URL = 29;
-    public final static int SER_URI = 30;
+    public final static int SER_CLASS = 27;
+    public final static int SER_FILE = 28;
+    public final static int SER_UUID = 29;
+    public final static int SER_URL = 30;
+    public final static int SER_URI = 31;
 
 
     // // // Iterate-able types
@@ -139,7 +144,7 @@ public class TypeDetector
      * Anything that implements {@link java.lang.Iterable}, but not
      * {@link java.util.Collection}.
      */
-    public final static int SER_ITERABLE = 31;
+    public final static int SER_ITERABLE = 32;
 
     /*
     /**********************************************************************

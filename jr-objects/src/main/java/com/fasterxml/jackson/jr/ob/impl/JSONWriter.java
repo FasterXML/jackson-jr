@@ -145,6 +145,11 @@ public class JSONWriter
     public void writeField(String fieldName, Object value, int type) throws IOException
     {
         switch (type) {
+        case SER_NULL:
+            if (_writeNullValues) {
+                writeNullField(fieldName);
+            }
+            return;
         // Structured types:
         case SER_MAP:
             writeMapField(fieldName, (Map<?,?>) value);
@@ -435,15 +440,13 @@ public class JSONWriter
             for (Map.Entry<?,?> entry : v.entrySet()) {
                 String key = keyToString(entry.getKey());
                 Object value = entry.getValue();
-
+                int type;
                 if (value == null) {
-                    if (_writeNullValues) {
-                        writeNullField(key);
-                    }
-                    continue;
+                    type = SER_NULL;
+                } else {
+                    Class<?> cls = value.getClass();
+                    type = _typeDetector.findSerializationType(cls);
                 }
-                Class<?> cls = value.getClass();
-                int type = _typeDetector.findSerializationType(cls);
                 writeField(key, value, type);
             }
         }
@@ -459,8 +462,26 @@ public class JSONWriter
     protected void writeObjectArrayValue(Object[] v) throws IOException {
         final int len = v.length;
         _generator.writeStartArray(v, len);
-        for (int i = 0; i < len; ++i) {
-            writeValue(v[i]);
+        int i = 0;
+        int left = v.length;
+
+        if (left > 3) {
+            do {
+                writeValue(v[i]);
+                writeValue(v[i+1]);
+                writeValue(v[i+2]);
+                writeValue(v[i+3]);
+                i += 4;
+                left -= 4;
+            } while (left > 3);
+        }
+        switch (left) {
+        case 3:
+            writeValue(v[i++]);
+        case 2:
+            writeValue(v[i++]);
+        case 1:
+            writeValue(v[i++]);
         }
         _generator.writeEndArray();
     }
@@ -672,115 +693,106 @@ public class JSONWriter
         int left = props.length;
 
         if (left > 3) {
+            int typeId;
             do {
                 BeanPropertyWriter property = props[i];
                 Object value = property.getValueFor(bean);
                 if (value == null) {
-                    if (_writeNullValues) {
-                        writeNullField(property.name);
-                    }
+                    typeId = SER_NULL;
                 } else {
-                    int typeId = property.typeId;
+                    typeId = property.typeId;
                     if (typeId == 0) {
                         typeId = _typeDetector.findSerializationType(value.getClass());
                     }
-                    _generator.writeFieldName(property.name);
-                    _writeValue(value, typeId);
                 }
+                _generator.writeFieldName(property.name);
+                _writeValue(value, typeId);
+
                 property = props[i+1];
                 value = property.getValueFor(bean);
                 if (value == null) {
-                    if (_writeNullValues) {
-                        writeNullField(property.name);
-                    }
+                    typeId = SER_NULL;
                 } else {
-                    int typeId = property.typeId;
+                    typeId = property.typeId;
                     if (typeId == 0) {
                         typeId = _typeDetector.findSerializationType(value.getClass());
                     }
-                    _generator.writeFieldName(property.name);
-                    _writeValue(value, typeId);
                 }
+                _generator.writeFieldName(property.name);
+                _writeValue(value, typeId);
+
                 property = props[i+2];
                 value = property.getValueFor(bean);
                 if (value == null) {
-                    if (_writeNullValues) {
-                        writeNullField(property.name);
-                    }
+                    typeId = SER_NULL;
                 } else {
-                    int typeId = property.typeId;
+                    typeId = property.typeId;
                     if (typeId == 0) {
                         typeId = _typeDetector.findSerializationType(value.getClass());
                     }
-                    _generator.writeFieldName(property.name);
-                    _writeValue(value, typeId);
                 }
+                _generator.writeFieldName(property.name);
+                _writeValue(value, typeId);
+
                 property = props[i+3];
                 value = property.getValueFor(bean);
                 if (value == null) {
-                    if (_writeNullValues) {
-                        writeNullField(property.name);
-                    }
+                    typeId = SER_NULL;
                 } else {
-                    int typeId = property.typeId;
+                    typeId = property.typeId;
                     if (typeId == 0) {
                         typeId = _typeDetector.findSerializationType(value.getClass());
                     }
-                    _generator.writeFieldName(property.name);
-                    _writeValue(value, typeId);
                 }
+                _generator.writeFieldName(property.name);
+                _writeValue(value, typeId);
                 left -= 4;
                 i += 4;
             } while (left > 3);
         }
         BeanPropertyWriter property;
         Object value;
+        int typeId;
         switch (left) {
         case 3:
             property = props[i++];
             value = property.getValueFor(bean);
             if (value == null) {
-                if (_writeNullValues) {
-                    writeNullField(property.name);
-                }
+                typeId = SER_NULL;
             } else {
-                int typeId = property.typeId;
+                typeId = property.typeId;
                 if (typeId == 0) {
                     typeId = _typeDetector.findSerializationType(value.getClass());
                 }
-                _generator.writeFieldName(property.name);
-                _writeValue(value, typeId);
             }
+            _generator.writeFieldName(property.name);
+            _writeValue(value, typeId);
         case 2:
             property = props[i++];
             value = property.getValueFor(bean);
             if (value == null) {
-                if (_writeNullValues) {
-                    writeNullField(property.name);
-                }
+                typeId = SER_NULL;
             } else {
-                int typeId = property.typeId;
+                typeId = property.typeId;
                 if (typeId == 0) {
                     typeId = _typeDetector.findSerializationType(value.getClass());
                 }
-                _generator.writeFieldName(property.name);
-                _writeValue(value, typeId);
             }
+            _generator.writeFieldName(property.name);
+            _writeValue(value, typeId);
         case 1:
             property = props[i++];
             value = property.getValueFor(bean);
             if (value == null) {
-                if (_writeNullValues) {
-                    writeNullField(property.name);
-                }
+                typeId = SER_NULL;
             } else {
-                int typeId = property.typeId;
+                typeId = property.typeId;
                 if (typeId == 0) {
                     typeId = _typeDetector.findSerializationType(value.getClass());
                 }
-                _generator.writeFieldName(property.name);
-                _writeValue(value, typeId);
             }
+            _generator.writeFieldName(property.name);
+            _writeValue(value, typeId);
         }
         _generator.writeEndObject();
     }
@@ -818,9 +830,6 @@ public class JSONWriter
         return String.valueOf(rawKey);
     }
 
-    /**
-     * @since 2.7
-     */
     protected String dateToString(Date v) {
         if (v == null) {
             return "";
