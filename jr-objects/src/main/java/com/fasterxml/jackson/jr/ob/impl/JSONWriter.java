@@ -668,22 +668,119 @@ public class JSONWriter
     protected void writeBeanValue(BeanPropertyWriter[] props, Object bean) throws IOException
     {
         _generator.writeStartObject(bean);
-        for (int i = 0, end = props.length; i < end; ++i) {
-            BeanPropertyWriter property = props[i];
-            SerializedString name = property.name;
-            Object value = property.getValueFor(bean);
+        int i = 0;
+        int left = props.length;
+
+        if (left > 3) {
+            do {
+                BeanPropertyWriter property = props[i];
+                Object value = property.getValueFor(bean);
+                if (value == null) {
+                    if (_writeNullValues) {
+                        writeNullField(property.name);
+                    }
+                } else {
+                    int typeId = property.typeId;
+                    if (typeId == 0) {
+                        typeId = _typeDetector.findSerializationType(value.getClass());
+                    }
+                    _generator.writeFieldName(property.name);
+                    _writeValue(value, typeId);
+                }
+                property = props[i+1];
+                value = property.getValueFor(bean);
+                if (value == null) {
+                    if (_writeNullValues) {
+                        writeNullField(property.name);
+                    }
+                } else {
+                    int typeId = property.typeId;
+                    if (typeId == 0) {
+                        typeId = _typeDetector.findSerializationType(value.getClass());
+                    }
+                    _generator.writeFieldName(property.name);
+                    _writeValue(value, typeId);
+                }
+                property = props[i+2];
+                value = property.getValueFor(bean);
+                if (value == null) {
+                    if (_writeNullValues) {
+                        writeNullField(property.name);
+                    }
+                } else {
+                    int typeId = property.typeId;
+                    if (typeId == 0) {
+                        typeId = _typeDetector.findSerializationType(value.getClass());
+                    }
+                    _generator.writeFieldName(property.name);
+                    _writeValue(value, typeId);
+                }
+                property = props[i+3];
+                value = property.getValueFor(bean);
+                if (value == null) {
+                    if (_writeNullValues) {
+                        writeNullField(property.name);
+                    }
+                } else {
+                    int typeId = property.typeId;
+                    if (typeId == 0) {
+                        typeId = _typeDetector.findSerializationType(value.getClass());
+                    }
+                    _generator.writeFieldName(property.name);
+                    _writeValue(value, typeId);
+                }
+                left -= 4;
+                i += 4;
+            } while (left > 3);
+        }
+        BeanPropertyWriter property;
+        Object value;
+        switch (left) {
+        case 3:
+            property = props[i++];
+            value = property.getValueFor(bean);
             if (value == null) {
                 if (_writeNullValues) {
-                    writeNullField(name);
+                    writeNullField(property.name);
                 }
-                continue;
+            } else {
+                int typeId = property.typeId;
+                if (typeId == 0) {
+                    typeId = _typeDetector.findSerializationType(value.getClass());
+                }
+                _generator.writeFieldName(property.name);
+                _writeValue(value, typeId);
             }
-            int typeId = property.typeId;
-            if (typeId == 0) {
-                typeId = _typeDetector.findSerializationType(value.getClass());
+        case 2:
+            property = props[i++];
+            value = property.getValueFor(bean);
+            if (value == null) {
+                if (_writeNullValues) {
+                    writeNullField(property.name);
+                }
+            } else {
+                int typeId = property.typeId;
+                if (typeId == 0) {
+                    typeId = _typeDetector.findSerializationType(value.getClass());
+                }
+                _generator.writeFieldName(property.name);
+                _writeValue(value, typeId);
             }
-            _generator.writeFieldName(name);
-            _writeValue(value, typeId);
+        case 1:
+            property = props[i++];
+            value = property.getValueFor(bean);
+            if (value == null) {
+                if (_writeNullValues) {
+                    writeNullField(property.name);
+                }
+            } else {
+                int typeId = property.typeId;
+                if (typeId == 0) {
+                    typeId = _typeDetector.findSerializationType(value.getClass());
+                }
+                _generator.writeFieldName(property.name);
+                _writeValue(value, typeId);
+            }
         }
         _generator.writeEndObject();
     }
