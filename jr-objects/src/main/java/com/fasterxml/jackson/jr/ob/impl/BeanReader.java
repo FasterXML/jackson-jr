@@ -113,6 +113,8 @@ public class BeanReader
         String propName;
         BeanPropertyReader prop;
 
+        // 29-Oct-2017, tatu: Performance here seems to vary in... mysterious
+        //   ways. This setup appears best commonly, although not reliably.
         // Unroll first 6 rounds (similar to databind)
         do {
             // Element 1
@@ -188,8 +190,7 @@ public class BeanReader
                 handleUnknown(r, p, propName);
                 continue;
             }
-            ValueReader vr = prop.getReader();
-            prop.setValueFor(bean, vr.readNext(r, p));
+            prop.setValueFor(bean, prop.getReader().readNext(r, p));
         }
         if (!p.hasToken(JsonToken.END_OBJECT)) {
             throw _reportProblem(p);

@@ -8,11 +8,11 @@ import java.lang.reflect.Type;
 
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
-/**
- * @since 2.8 (formerly part of `BeanDefinition`)
- */
 public final class BeanPropertyReader
 {
+    /**
+     * Logical name of the property being handled.
+     */
     private final String _name;
 
     /**
