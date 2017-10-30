@@ -120,11 +120,8 @@ public class ObjectComposer<PARENT extends ComposerBase>
 
     /**
      * Method used to put a Java Object ("POJO") value into Object being
-     * composed: this <b>requires</b> that the underlying {@link JsonGenerator}
-     * has a properly configured {@link com.fasterxml.jackson.core.ObjectCodec}
-     * to use for serializer object.
-     * 
-     * @since 2.6
+     * composed:
+     * has to be of type that jackson-jr package knows how to serialize.
      */
     public ObjectComposer<PARENT> putObject(String fieldName, Object value)
         throws IOException, JsonProcessingException

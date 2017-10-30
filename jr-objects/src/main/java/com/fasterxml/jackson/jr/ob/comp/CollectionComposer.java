@@ -2,8 +2,6 @@ package com.fasterxml.jackson.jr.ob.comp;
 
 import java.util.*;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-
 public class CollectionComposer<PARENT extends ComposerBase,
     C extends Collection<Object>>
     extends ComposerBase
@@ -142,9 +140,7 @@ public class CollectionComposer<PARENT extends ComposerBase,
     
     /**
      * Method used to add Java Object ("POJO") into sequence being
-     * composed: this <b>requires</b> that the underlying {@link JsonGenerator}
-     * has a properly configured {@link com.fasterxml.jackson.core.ObjectCodec}
-     * to use for serializer object.
+     * composed, via standard serializers available.
      */
     public CollectionComposer<PARENT,C> addObject(Object pojo)
     {
