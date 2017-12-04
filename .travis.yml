@@ -4,7 +4,6 @@ language: java
 #   only Java 8 and beyond work
 jdk:
   - openjdk8
-  - oraclejdk9
 
 # whitelist
 branches:
