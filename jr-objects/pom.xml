@@ -23,7 +23,6 @@ has no other dependencies, and provides additional builder-style content generat
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>${jackson.version.core}</version>
     </dependency>
   </dependencies>
 
@@ -32,7 +31,6 @@ has no other dependencies, and provides additional builder-style content generat
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>${version.plugin.javadoc}</version>
         <configuration>
           <links>
             <link>http://docs.oracle.com/javase/7/docs/api/</link>

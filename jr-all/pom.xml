@@ -37,7 +37,6 @@ Streaming, in a single jar.
       <plugin>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-shade-plugin</artifactId>
-      <version>${version.plugin.shade}</version>
       <configuration>
         <createDependencyReducedPom>true</createDependencyReducedPom>
         <filters>

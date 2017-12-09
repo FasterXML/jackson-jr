@@ -30,7 +30,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- 10-Oct-2017, tatu: Let's defautl to Java 8 for 3.x
+    <!-- 10-Oct-2017, tatu: Let's default to Java 8 for 3.x
       -->
     <javac.debuglevel>source</javac.debuglevel>
   </properties>
