@@ -31,10 +31,10 @@ public class BeanReader
     // // 13-Dec-2017, tatu: NOTE! These will be constructed right after construction, but
     // //    not during it (due to need to resolve possible cyclic deps). So they are
     // //    non-final due to this but never `null` before use.
-    
+
     protected FieldNameMatcher _fieldMatcher;
     protected BeanPropertyReader[] _fieldReaders;
-    
+
     /**
      * Constructors used for deserialization use case
      */
@@ -63,6 +63,10 @@ public class BeanReader
             names.add(Named.fromString(entry.getKey()));
             _fieldReaders[ix++] = entry.getValue();
         }
+        // 13-Dec-2017, tatu: We could relatively easily support case-insensitive matching,
+        //    except for one problem: when we cache readers we cache matcher... so would
+        //    need to figure out what to do with that -- can not support dynamic change
+        //    easily.
         /*
         if (_caseInsensitive) {
             _fieldMatcher = streamFactory.constructCIFieldNameMatcher(names, true);
@@ -95,12 +99,18 @@ public class BeanReader
     @Override
     public Object read(JSONReader r, JsonParser p) throws IOException
     {
-        try {
-            if (p.isExpectedStartObjectToken()) {
-                return _readBean(r, p, create());
+        if (p.isExpectedStartObjectToken()) {
+            Object bean;
+            try {
+                bean = create();
+            } catch (Exception e) {
+                return _reportFailureToCreate(p, e);
             }
-            JsonToken t = p.currentToken();
-            if (t != null) {
+            return _readBean(r, p, bean);
+        }
+        JsonToken t = p.currentToken();
+        if (t != null) {
+            try {
                 switch (t) {
                 case VALUE_NULL:
                     return null;
@@ -110,27 +120,29 @@ public class BeanReader
                     return create(p.getLongValue());
                 default:
                 }
+            } catch (Exception e) {
+                return _reportFailureToCreate(p, e);
             }
-        } catch (IOException e) {
-            throw e;
-        } catch (Exception e) {
-            throw JSONObjectException.from(p, e,
-                    "Failed to create an instance of %s due to (%s): %s",
-                    _type.getName(), e.getClass().getName(), e.getMessage());
         }
         throw JSONObjectException.from(p, "Can not create a %s instance out of %s",
                 _type.getName(), _tokenDesc(p));
     }
-    
+
     @Override
     public Object readNext(JSONReader r, JsonParser p) throws IOException
     {
-        try {
-            JsonToken t = p.nextToken();
-            if (t == JsonToken.START_OBJECT) {
-                return _readBean(r, p, create());
+        JsonToken t = p.nextToken();
+        if (t == JsonToken.START_OBJECT) {
+            Object bean;
+            try {
+                bean = create();
+            } catch (Exception e) {
+                return _reportFailureToCreate(p, e);
             }
-            if (t != null) {
+            return _readBean(r, p, bean);
+        }
+        if (t != null) {
+            try {
                 switch (t) {
                 case VALUE_NULL:
                     return null;
@@ -140,12 +152,9 @@ public class BeanReader
                     return create(p.getLongValue());
                 default:
                 }
+            } catch (Exception e) {
+                return _reportFailureToCreate(p, e);
             }
-        } catch (IOException e) {
-            throw e;
-        } catch (Exception e) {
-            throw JSONObjectException.from(p, "Failed to create an instance of %s due to (%s): %s",
-                    _type.getName(), e.getClass().getName(), e.getMessage());
         }
         throw JSONObjectException.from(p,"Can not create a %s instance out of %s",
                 _type.getName(), _tokenDesc(p));
@@ -287,14 +296,25 @@ public class BeanReader
 
     protected void handleUnknown(JSONReader reader, JsonParser parser, String fieldName) throws IOException {
         if (JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY.isEnabled(reader._features)) {
-            throw JSONObjectException.from(parser, "Unrecognized JSON property '"
-                    +fieldName+"' for Bean type "+_type.getName());
+            throw JSONObjectException.from(parser, "Unrecognized JSON property '%s' for Bean type %s", 
+                    fieldName, _type.getName());
         }
         parser.nextToken();
         parser.skipChildren();
     }
 
+    protected Object _reportFailureToCreate(JsonParser p, Exception e) throws IOException
+    {
+        if (e instanceof IOException) {
+            throw (IOException) e;
+        }
+        throw JSONObjectException.from(p, e,
+                "Failed to create an instance of %s due to (%s): %s",
+                _type.getName(), e.getClass().getName(), e.getMessage());
+    }
+
     protected IOException _reportProblem(JsonParser p) {
-        return JSONObjectException.from(p, "Unexpected token "+p.currentToken()+"; should get FIELD_NAME or END_OBJECT");
+        return JSONObjectException.from(p, "Unexpected token %s; should get FIELD_NAME or END_OBJECT",
+                p.currentToken());
     }
 }
