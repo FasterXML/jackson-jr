@@ -348,7 +348,7 @@ public class JSON
      * Underlying JSON factory used for creating Streaming parsers and
      * generators.
      */
-    protected final TokenStreamFactory _jsonFactory;
+    protected final TokenStreamFactory _streamFactory;
 
     /**
      * Optional handler for {@link TreeNode} values: if defined, we can
@@ -385,40 +385,38 @@ public class JSON
      */
 
     public JSON() {
-        this(DEFAULT_FEATURES, new JsonFactory(), null);
+        this(new JsonFactory(), null, DEFAULT_FEATURES);
     }
 
     /**
      * @since 3.0
      */
     public JSON(TokenStreamFactory streamFactory) {
-        this(DEFAULT_FEATURES, streamFactory, null);
+        this(streamFactory, null, DEFAULT_FEATURES);
     }
 
-    protected JSON(int features,
-            TokenStreamFactory jsonF, TreeCodec trees)
+    protected JSON(TokenStreamFactory jsonF, TreeCodec trees, int features)
     {
-        this(features, jsonF, trees,
+        this(jsonF, trees, features,
                 null, null, // reader, writer
                 null);
     }
 
-    protected JSON(int features,
-            TokenStreamFactory jsonF, TreeCodec trees,
+    protected JSON(TokenStreamFactory streamF, TreeCodec trees, int features,
             JSONReader r, JSONWriter w,
             PrettyPrinter pp)
     {
         _features = features;
-        _jsonFactory = jsonF;
+        _streamFactory = streamF;
         _treeCodec = trees;
-        TypeDetector td = _defaultTypeDetector(features);
+        TypeDetector td = _defaultTypeDetector(streamF, features);
         _reader = (r == null) ? _defaultReader(features, trees, td) : r;
         _writer = (w == null) ? _defaultWriter(features, trees, td) : w;
         _prettyPrinter = pp;
     }
 
-    protected TypeDetector _defaultTypeDetector(int features) {
-        return TypeDetector.blueprint(features);
+    protected TypeDetector _defaultTypeDetector(TokenStreamFactory streamF, int features) {
+        return TypeDetector.blueprint(streamF, features);
     }
 
     protected JSONReader _defaultReader(int features, TreeCodec tc, TypeDetector td) {
@@ -467,7 +465,7 @@ public class JSON
 
     public JSON with(TokenStreamFactory f)
     {
-        if (f == _jsonFactory) {
+        if (f == _streamFactory) {
             return this;
         }
         return _with(_features, f, _treeCodec, _reader, _writer, _prettyPrinter);
@@ -482,7 +480,7 @@ public class JSON
         if (c == _treeCodec) {
             return this;
         }
-        return _with(_features, _jsonFactory, c,
+        return _with(_features, _streamFactory, c,
                 _reader, _writer.with(c), _prettyPrinter);
     }
 
@@ -495,7 +493,7 @@ public class JSON
         if (r == _reader) {
             return this;
         }
-        return _with(_features, _jsonFactory, _treeCodec,
+        return _with(_features, _streamFactory, _treeCodec,
                 r, _writer, _prettyPrinter);
     }
 
@@ -508,7 +506,7 @@ public class JSON
         if (w == _writer) {
             return this;
         }
-        return _with( _features, _jsonFactory, _treeCodec,
+        return _with( _features, _streamFactory, _treeCodec,
                 _reader, w, _prettyPrinter);
     }
 
@@ -521,7 +519,7 @@ public class JSON
         if (_prettyPrinter == pp) {
             return this;
         }
-        return _with(_features, _jsonFactory, _treeCodec,
+        return _with(_features, _streamFactory, _treeCodec,
                 _reader, _writer, pp);
     }
 
@@ -534,7 +532,7 @@ public class JSON
         if (r == _reader) {
             return this;
         }
-        return _with(_features, _jsonFactory, _treeCodec,
+        return _with(_features, _streamFactory, _treeCodec,
                 r, _writer, _prettyPrinter);
     }
 
@@ -547,7 +545,7 @@ public class JSON
         if (r == _reader) {
             return this;
         }
-        return _with(_features, _jsonFactory, _treeCodec,
+        return _with(_features, _streamFactory, _treeCodec,
                 r, _writer, _prettyPrinter);
     }
     
@@ -602,7 +600,7 @@ public class JSON
         if (_features == features) {
             return this;
         }
-        return _with(features, _jsonFactory, _treeCodec,
+        return _with(features, _streamFactory, _treeCodec,
                 _reader, _writer, _prettyPrinter);
     }
 
@@ -620,9 +618,9 @@ public class JSON
         if (getClass() != JSON.class) {
             throw new IllegalStateException("Sub-classes MUST override _with(...)");
         }
-        return new JSON(features, jsonF, trees, reader, writer, pp);
+        return new JSON(jsonF, trees, features, reader, writer, pp);
     }
-    
+
     /*
     /**********************************************************************
     /* Simple accessors
@@ -634,7 +632,7 @@ public class JSON
     }
 
     public TokenStreamFactory getStreamingFactory() {
-        return _jsonFactory;
+        return _streamFactory;
     }
 
     public final boolean isEnabled(Feature f) {
@@ -649,9 +647,9 @@ public class JSON
 
     public String asString(Object value) throws IOException, JSONObjectException
     {
-        SegmentedStringWriter sw = new SegmentedStringWriter(_jsonFactory._getBufferRecycler());
+        SegmentedStringWriter sw = new SegmentedStringWriter(_streamFactory._getBufferRecycler());
         try {
-            _writeAndClose(value, _jsonFactory.createGenerator(this, sw));
+            _writeAndClose(value, _streamFactory.createGenerator(this, sw));
         } catch (JsonProcessingException e) {
             throw e;
         } catch (IOException e) { // shouldn't really happen, but is declared as possibility so:
@@ -662,9 +660,9 @@ public class JSON
 
     public byte[] asBytes(Object value) throws IOException, JSONObjectException
     {
-        ByteArrayBuilder bb = new ByteArrayBuilder(_jsonFactory._getBufferRecycler());
+        ByteArrayBuilder bb = new ByteArrayBuilder(_streamFactory._getBufferRecycler());
         try {
-            _writeAndClose(value, _jsonFactory.createGenerator(this, bb, JsonEncoding.UTF8));
+            _writeAndClose(value, _streamFactory.createGenerator(this, bb, JsonEncoding.UTF8));
         } catch (JsonProcessingException e) {
             throw e;
         } catch (IOException e) { // shouldn't really happen, but is declared as possibility so:
@@ -684,15 +682,15 @@ public class JSON
     }
 
     public void write(Object value, OutputStream out) throws IOException, JSONObjectException {
-        _writeAndClose(value, _jsonFactory.createGenerator(this, out));
+        _writeAndClose(value, _streamFactory.createGenerator(this, out));
     }
 
     public void write(Object value, Writer w) throws IOException, JSONObjectException {
-        _writeAndClose(value, _jsonFactory.createGenerator(this, w));
+        _writeAndClose(value, _streamFactory.createGenerator(this, w));
     }
 
     public void write(Object value, File f) throws IOException, JSONObjectException {
-        _writeAndClose(value, _jsonFactory.createGenerator(this, f, JsonEncoding.UTF8));
+        _writeAndClose(value, _streamFactory.createGenerator(this, f, JsonEncoding.UTF8));
     }
 
     /*
@@ -707,28 +705,28 @@ public class JSON
 
     public JSONComposer<OutputStream> composeTo(OutputStream out) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features,
-                _config(_jsonFactory.createGenerator(this, out)), true);
+                _config(_streamFactory.createGenerator(this, out)), true);
     }
 
     public JSONComposer<OutputStream> composeTo(Writer w) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features,
-                _config(_jsonFactory.createGenerator(this, w)), true);
+                _config(_streamFactory.createGenerator(this, w)), true);
     }
 
     public JSONComposer<OutputStream> composeTo(File f) throws IOException, JSONObjectException {
         return JSONComposer.streamComposer(_features,
-                _config(_jsonFactory.createGenerator(this, f, JsonEncoding.UTF8)), true);
+                _config(_streamFactory.createGenerator(this, f, JsonEncoding.UTF8)), true);
     }
 
     public JSONComposer<String> composeString() throws IOException, JSONObjectException {
-        SegmentedStringWriter out = new SegmentedStringWriter(_jsonFactory._getBufferRecycler());
-        JsonGenerator gen = _config(_jsonFactory.createGenerator(this, out));
+        SegmentedStringWriter out = new SegmentedStringWriter(_streamFactory._getBufferRecycler());
+        JsonGenerator gen = _config(_streamFactory.createGenerator(this, out));
         return JSONComposer.stringComposer(_features, gen, out);
     }
 
     public JSONComposer<byte[]> composeBytes() throws IOException, JSONObjectException {
-        ByteArrayBuilder out = new ByteArrayBuilder(_jsonFactory._getBufferRecycler());
-        JsonGenerator gen = _config(_jsonFactory.createGenerator(this, out));
+        ByteArrayBuilder out = new ByteArrayBuilder(_streamFactory._getBufferRecycler());
+        JsonGenerator gen = _config(_streamFactory.createGenerator(this, out));
         return JSONComposer.bytesComposer(_features, gen, out);
     }
 
@@ -969,7 +967,7 @@ public class JSON
 
     @Override
     public TokenStreamFactory getParserFactory() {
-        return _jsonFactory;
+        return _streamFactory;
     }
 
     /*
@@ -1049,7 +1047,7 @@ public class JSON
 
     @Override
     public TokenStreamFactory getGeneratorFactory() {
-        return _jsonFactory;
+        return _streamFactory;
     }
 
     /*
@@ -1155,7 +1153,7 @@ public class JSON
 
     protected JsonParser _parser(Object source) throws IOException, JSONObjectException
     {
-        final TokenStreamFactory f = _jsonFactory;
+        final TokenStreamFactory f = _streamFactory;
         final Class<?> type = source.getClass();
         if (type == String.class) {
             return f.createParser(this, (String) source);

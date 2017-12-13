@@ -43,7 +43,8 @@ public class TypeDetectorTest extends TestBase
      */
 
     public void testBasicTypeDetectionForSer() {
-        TypeDetector td = TypeDetector.blueprint(JSON.Feature.defaults());
+        TypeDetector td = TypeDetector.blueprint(JSON.std.getStreamingFactory(),
+                JSON.Feature.defaults());
         assertEquals(TypeDetector.SER_STRING, td.findSerializationType(String.class));
         assertEquals(TypeDetector.SER_CHAR_ARRAY, td.findSerializationType(char[].class));
         assertEquals(TypeDetector.SER_INT_ARRAY, td.findSerializationType(int[].class));

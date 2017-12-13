@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.fasterxml.jackson.core.TokenStreamFactory;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.type.ResolvedType;
@@ -175,6 +176,14 @@ public class TypeDetector
      */
 
     /**
+     * We need stream factory for constructing {@link FieldNameMatcher}s for
+     * POJO deserializer.
+     *
+     * @since 3.0
+     */
+    protected TokenStreamFactory _streamFactory;
+
+    /**
      * For generic containers (Collections, Maps, arrays), we may need
      * this guy.
      */
@@ -219,8 +228,9 @@ public class TypeDetector
     /**
      * Constructor for the blueprint instance
      */
-    protected TypeDetector(int features)
+    protected TypeDetector(TokenStreamFactory streamF, int features)
     {
+        _streamFactory = streamF;
         _features = features;
         _knownSerTypes = new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4);
         _knownWriters = new CopyOnWriteArrayList<BeanPropertyWriter[]>();
@@ -231,6 +241,7 @@ public class TypeDetector
 
     protected TypeDetector(TypeDetector base, int features) {
         _features = features;
+        _streamFactory = base._streamFactory;
         _knownSerTypes = base._knownSerTypes;
         _knownWriters = base._knownWriters;
         _knownReaders = base._knownReaders;
@@ -238,8 +249,8 @@ public class TypeDetector
         _readerLock = base._readerLock;
     }
 
-    public final static TypeDetector blueprint(int features) {
-        return new TypeDetector(features & CACHE_FLAGS);
+    public final static TypeDetector blueprint(TokenStreamFactory streamF, int features) {
+        return new TypeDetector(streamF, features & CACHE_FLAGS);
     }
 
     public TypeDetector perOperationInstance(int features) {
@@ -631,6 +642,7 @@ public class TypeDetector
                     entry.setValue(prop.withReader(createReader(contextType,
                             prop.rawSetterType(), prop.genericSetterType())));
                 }
+                def.initFieldMatcher(_streamFactory);
             } finally {
                 _incompleteReaders.remove(key);
             }
@@ -695,7 +707,7 @@ public class TypeDetector
                 propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, f, m));
             }
         }
-        return new BeanReader(raw, propMap, defaultCtor, stringCtor, longCtor);
+        return BeanReader.construct(raw, propMap, defaultCtor, stringCtor, longCtor);
     }
 
     private TypeBindings bindings(Class<?> ctxt) {

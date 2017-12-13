@@ -2,10 +2,13 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.Map;
+import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.TokenStreamFactory;
+import com.fasterxml.jackson.core.sym.FieldNameMatcher;
+import com.fasterxml.jackson.core.util.Named;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
@@ -25,22 +28,63 @@ public class BeanReader
     protected final Constructor<?> _stringCtor;
     protected final Constructor<?> _longCtor;
 
+    // // 13-Dec-2017, tatu: NOTE! These will be constructed right after construction, but
+    // //    not during it (due to need to resolve possible cyclic deps). So they are
+    // //    non-final due to this but never `null` before use.
+    
+    protected FieldNameMatcher _fieldMatcher;
+    protected BeanPropertyReader[] _fieldReaders;
+    
     /**
      * Constructors used for deserialization use case
      */
-    public BeanReader(Class<?> type, Map<String, BeanPropertyReader> props,
+    private BeanReader(Class<?> type, Map<String,BeanPropertyReader> propsByName,
             Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor)
     {
         _type = type;
-        _propsByName = props;
+        _propsByName = propsByName;
         _defaultCtor = defaultCtor;
         _stringCtor = stringCtor;
         _longCtor = longCtor;
     }
 
+    /**
+     * Initialization method called after construction and resolution of all property
+     * readers: separate since caller needs to handle resolution of cyclic dependencies.
+     */
+    protected void initFieldMatcher(TokenStreamFactory streamFactory)
+    {
+        Map<String,BeanPropertyReader> byName = _propsByName;
+        final int size = byName.size();
+        List<Named> names = new ArrayList<>(size);
+        _fieldReaders = new BeanPropertyReader[size];
+        int ix = 0;
+        for (Map.Entry<String, BeanPropertyReader> entry : byName.entrySet()) {
+            names.add(Named.fromString(entry.getKey()));
+            _fieldReaders[ix++] = entry.getValue();
+        }
+        /*
+        if (_caseInsensitive) {
+            _fieldMatcher = streamFactory.constructCIFieldNameMatcher(names, true);
+        } else {
+            _fieldMatcher = streamFactory.constructFieldNameMatcher(names, true);
+        }
+        */
+        _fieldMatcher = streamFactory.constructFieldNameMatcher(names, true);
+    }
+
+    /**
+     * @since 3.0
+     */
+    public static BeanReader construct(Class<?> type, Map<String, BeanPropertyReader> props,
+            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor)
+    {
+        return new BeanReader(type, props, defaultCtor, stringCtor, longCtor);
+    }
+
     public Map<String,BeanPropertyReader> propertiesByName() { return _propsByName; }
 
-    public BeanPropertyReader findProperty(String name) {
+    protected BeanPropertyReader findProperty(String name) {
         return _propsByName.get(name);
     }
 
@@ -100,14 +144,34 @@ public class BeanReader
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
-            throw JSONObjectException.from(p, "Failed to create an instance of "
-                    +_type.getName()+" due to ("+e.getClass().getName()+"): "+e.getMessage(),
-                    e);
+            throw JSONObjectException.from(p, "Failed to create an instance of %s due to (%s): %s",
+                    _type.getName(), e.getClass().getName(), e.getMessage());
         }
-        throw JSONObjectException.from(p,
-                "Can not create a "+_type.getName()+" instance out of "+_tokenDesc(p));
+        throw JSONObjectException.from(p,"Can not create a %s instance out of %s",
+                _type.getName(), _tokenDesc(p));
     }
 
+    private final Object _readBean(JSONReader r, JsonParser p, final Object bean) throws IOException
+    {
+        p.setCurrentValue(bean);
+
+        int ix = p.nextFieldName(_fieldMatcher);
+        while (ix >= 0) {
+            BeanPropertyReader prop = _fieldReaders[ix];
+            prop.setValueFor(bean, prop.getReader().readNext(r, p));
+            ix = p.nextFieldName(_fieldMatcher);
+        }
+
+        if (ix != FieldNameMatcher.MATCH_END_OBJECT) {
+            if (ix == FieldNameMatcher.MATCH_UNKNOWN_NAME) {
+                return _readWithUnknown(r, p, bean, p.currentName());
+            }
+            throw _reportProblem(p);
+        }
+        return bean;
+    }
+
+    /*
     private final Object _readBean(JSONReader r, JsonParser p, final Object bean) throws IOException
     {
         String propName;
@@ -176,6 +240,7 @@ public class BeanReader
         
         return bean;
     }
+    */
 
     private final Object _readWithUnknown(JSONReader r, JsonParser p,
             final Object bean, String propName)
