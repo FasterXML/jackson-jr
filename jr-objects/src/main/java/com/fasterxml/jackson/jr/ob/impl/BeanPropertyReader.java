@@ -70,19 +70,18 @@ public final class BeanPropertyReader
 
     public void setValueFor(Object bean, Object value) throws IOException
     {
-        try {
-            if (_setter == null) {
+        if (_setter == null) {
+            try {
                 _field.set(bean, value);
-            } else {
-                _setter.invoke(bean, value);
+            } catch (Exception e) {
+                _reportProblem(e);
             }
+            return;
+        }
+        try {
+            _setter.invoke(bean, value);
         } catch (Exception e) {
-            Throwable t = e;
-            if (t instanceof InvocationTargetException) {
-                t = t.getCause();
-            }
-            throw new JSONObjectException("Failed to set property '"+_name+"'; exception "+e.getClass().getName()+"): "
-                    +t.getMessage(), t);
+            _reportProblem(e);
         }
     }
 
@@ -96,5 +95,15 @@ public final class BeanPropertyReader
     @Override
     public String toString() {
         return _name;
+    }
+
+    private void _reportProblem(Exception e) throws IOException
+    {
+        Throwable t = e;
+        if (t instanceof InvocationTargetException) {
+            t = t.getCause();
+        }
+        throw new JSONObjectException("Failed to set property '"+_name+"'; exception "+e.getClass().getName()+"): "
+                +t.getMessage(), t);
     }
 }

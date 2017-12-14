@@ -6,6 +6,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.core.TokenStreamFactory;
 import com.fasterxml.jackson.core.sym.FieldNameMatcher;
 import com.fasterxml.jackson.core.util.Named;
@@ -100,29 +101,27 @@ public class BeanReader
     public Object read(JSONReader r, JsonParser p) throws IOException
     {
         if (p.isExpectedStartObjectToken()) {
-            Object bean;
+            final Object bean;
             try {
                 bean = create();
             } catch (Exception e) {
                 return _reportFailureToCreate(p, e);
             }
+            p.setCurrentValue(bean);
             return _readBean(r, p, bean);
         }
-        JsonToken t = p.currentToken();
-        if (t != null) {
-            try {
-                switch (t) {
-                case VALUE_NULL:
-                    return null;
-                case VALUE_STRING:
-                    return create(p.getText());
-                case VALUE_NUMBER_INT:
-                    return create(p.getLongValue());
-                default:
-                }
-            } catch (Exception e) {
-                return _reportFailureToCreate(p, e);
+        try {
+            switch (p.currentTokenId()) {
+            case JsonTokenId.ID_NULL:
+                return null;
+            case JsonTokenId.ID_STRING:
+                return create(p.getText());
+            case JsonTokenId.ID_NUMBER_INT:
+                return create(p.getLongValue());
+            default:
             }
+        } catch (Exception e) {
+            return _reportFailureToCreate(p, e);
         }
         throw JSONObjectException.from(p, "Can not create a %s instance out of %s",
                 _type.getName(), _tokenDesc(p));
@@ -133,12 +132,13 @@ public class BeanReader
     {
         JsonToken t = p.nextToken();
         if (t == JsonToken.START_OBJECT) {
-            Object bean;
+            final Object bean;
             try {
                 bean = create();
             } catch (Exception e) {
                 return _reportFailureToCreate(p, e);
             }
+            p.setCurrentValue(bean);
             return _readBean(r, p, bean);
         }
         if (t != null) {
@@ -162,12 +162,53 @@ public class BeanReader
 
     private final Object _readBean(JSONReader r, JsonParser p, final Object bean) throws IOException
     {
-        p.setCurrentValue(bean);
-
+        // 13-Dec-2017, tatu: Unrolling is unpredictable business, and 
+        //     performance does not seem linear. In fact, choices of 2 or 8 unrolls
+        //     seem to have about same performance for our test (but in between less... :) )
         int ix = p.nextFieldName(_fieldMatcher);
+        final BeanPropertyReader[] readers = _fieldReaders;
         while (ix >= 0) {
-            BeanPropertyReader prop = _fieldReaders[ix];
-            prop.setValueFor(bean, prop.getReader().readNext(r, p));
+            BeanPropertyReader prop = readers[ix]; // elem #1
+            Object value = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, value);
+
+            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            prop = readers[ix]; // elem #2
+            value = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, value);
+
+/*
+            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            prop = readers[ix]; // elem #3
+            value = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, value);
+
+            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            prop = readers[ix]; // elem #4
+            value = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, value);
+
+            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            prop = readers[ix]; // elem #5
+            value = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, value);
+
+            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            prop = readers[ix]; // elem #6
+            value = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, value);
+
+            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            prop = readers[ix]; // elem #7
+            value = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, value);
+
+            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            prop = readers[ix]; // elem #8
+            value = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, value);
+*/
+            // and then for next loop
             ix = p.nextFieldName(_fieldMatcher);
         }
 
