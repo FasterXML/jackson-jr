@@ -853,7 +853,7 @@ public class JSONWriter
                     "Internal error: missing BeanDefinition for id %d (class %s)",
                     type, value.getClass().getName()));
         }
-        throw new IllegalStateException(String.format(
-                "Unsupported type: %s (%s)", type, value.getClass().getName()));
+        String typeDesc = (value == null) ? "NULL" : value.getClass().getName();
+        throw new IllegalStateException(String.format("Unsupported type: %s (%s)", type, typeDesc));
     }
 }
