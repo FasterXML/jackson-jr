@@ -19,12 +19,19 @@ public class RoundtripTest extends TestBase
         assertEquals(json, _readWrite(json.toCharArray()));
     }
 
+    public void testWithNull() throws Exception
+    {
+        MediaItem input = new MediaItem(null);
+        String json = JSON.std.asString(input);
+        assertEquals(json, _readWrite(json));
+    }
+
     private String _readWrite(Object json) throws Exception
     {
         MediaItem item = JSON.std.beanFrom(MediaItem.class, json);
         return JSON.std.asString(item);
     }
-    
+
     private MediaItem buildItem() {
         MediaItem.Content content = new MediaItem.Content();
         content.setUri("http://javaone.com/keynote.mpg");

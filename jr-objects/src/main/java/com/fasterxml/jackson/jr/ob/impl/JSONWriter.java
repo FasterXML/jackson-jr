@@ -265,6 +265,9 @@ public class JSONWriter
     protected void _writeValue(Object value, int type) throws IOException
     {
         switch (type) {
+        case SER_NULL:
+            writeNullValue();
+            return;
 
         // Structured types:
         case SER_MAP:
