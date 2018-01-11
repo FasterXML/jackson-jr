@@ -13,6 +13,8 @@ import com.fasterxml.jackson.jr.ob.JSON;
 public class ReadViaJSONTest extends TestBase
 {
      private final TreeCodec TREE_CODEC = new JacksonJrsTreeCodec();
+     private final static ObjectWriteContext EMPTY_WRITE_CONTEXT = new ObjectWriteContext.Base();
+
      private final JSON treeJSON = JSON.std.with(TREE_CODEC);
 
      public void testSimpleList() throws Exception
@@ -25,7 +27,7 @@ public class ReadViaJSONTest extends TestBase
          assertEquals(2, node.size());
          // actually, verify with write...
          final StringWriter writer = new StringWriter();
-         final JsonGenerator g = _factory.createGenerator(emptyWriteContext(),
+         final JsonGenerator g = _factory.createGenerator(EMPTY_WRITE_CONTEXT,
                  writer);
          TREE_CODEC.writeTree(g, node);
          g.close();

@@ -3,23 +3,13 @@ package com.fasterxml.jackson.jr.stree;
 import java.util.Arrays;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.json.JsonFactory;
 
 import junit.framework.TestCase;
 
 public abstract class TestBase extends TestCase
 {
-    private final static ObjectReadContext _emptyReadContext = new ObjectReadContext.Base();
-    private final static ObjectWriteContext _emptyWriteContext = new ObjectWriteContext.Base();
-
-    protected final JsonFactory _factory = new JsonFactory();
-
-    protected ObjectReadContext emptyReadContext() {
-        return _emptyReadContext;
-    }
-
-    protected ObjectWriteContext emptyWriteContext() {
-        return _emptyWriteContext;
-    }
+    protected final TokenStreamFactory _factory = new JsonFactory();
 
     protected void assertToken(JsonToken expToken, JsonToken actToken)
     {

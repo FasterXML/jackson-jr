@@ -7,12 +7,14 @@ public class SimpleTraverseTest extends TestBase
 {
     private final TreeCodec TREE_CODEC = new JacksonJrsTreeCodec();
 
+  private final static ObjectReadContext EMPTY_READ_CONTEXT = new ObjectReadContext.Base();
+    
     public void testSimpleObject() throws Exception
     {
         final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":-2}";
-        TreeNode node = TREE_CODEC.readTree(_factory.createParser(emptyReadContext(),
+        TreeNode node = TREE_CODEC.readTree(_factory.createParser(EMPTY_READ_CONTEXT,
                 INPUT));
-        JsonParser p = node.traverse(emptyReadContext());
+        JsonParser p = node.traverse(EMPTY_READ_CONTEXT);
 
         assertToken(JsonToken.START_OBJECT, p.nextToken());
         assertToken(JsonToken.FIELD_NAME, p.nextToken());
