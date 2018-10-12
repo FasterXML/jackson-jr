@@ -28,6 +28,11 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
      */
 
     /**
+     * Value node that this parser exposes as a token stream.
+     */
+    protected final JrsValue _source;
+
+    /**
      * Traversal context within tree
      */
     protected JrsValueCursor _nodeCursor;
@@ -66,6 +71,7 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     public JrsTreeTraversingParser(ObjectReadContext readCtxt, JrsValue n)
     {
         super(readCtxt, 0);
+        _source = n;
         if (n.isArray()) {
             _nextToken = JsonToken.START_ARRAY;
             _nodeCursor = new JrsValueCursor.ArrayCursor((JrsArray) n, null);
@@ -75,6 +81,11 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
         } else { // value node
             _nodeCursor = new JrsValueCursor.RootCursor(n, null);
         }
+    }
+
+    @Override
+    public Object getInputSource() {
+        return _source;
     }
 
     @Override
