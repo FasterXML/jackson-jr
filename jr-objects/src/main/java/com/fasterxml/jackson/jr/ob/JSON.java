@@ -1037,7 +1037,7 @@ public class JSON
     }
 
     @Override
-    public int getGeneratorFeatures(int defaults) {
+    public int getStreamWriteFeatures(int defaults) {
         return defaults;
     }
 
@@ -1109,7 +1109,7 @@ public class JSON
     }
 
     @Override
-    public int getParserFeatures(int defaults) {
+    public int getStreamReadFeatures(int defaults) {
         return defaults;
     }
 
