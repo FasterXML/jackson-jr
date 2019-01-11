@@ -57,16 +57,16 @@ public class JSONAsObjectCodec
     
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T readValue(JsonParser jp, Class<T> valueType)
+    public <T> T readValue(JsonParser p, Class<T> valueType)
             throws IOException, JsonProcessingException
     {
-        Object ob = _json.anyFrom(jp);
+        Object ob = _json.anyFrom(p);
         _checkResultType(valueType, ob);
         return (T) ob;
     }
     
     @Override
-    public <T> T readValue(JsonParser jp, TypeReference<?> valueTypeRef)
+    public <T> T readValue(JsonParser p, TypeReference<T> valueTypeRef)
             throws IOException, JsonProcessingException
     {
         throw _noTypeReference();
@@ -74,30 +74,30 @@ public class JSONAsObjectCodec
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T readValue(JsonParser jp, ResolvedType valueType)
+    public <T> T readValue(JsonParser p, ResolvedType valueType)
             throws IOException, JsonProcessingException {
-        return (T) readValue(jp, valueType.getRawClass());
+        return (T) readValue(p, valueType.getRawClass());
     }
 
     @Override
-    public <T> Iterator<T> readValues(JsonParser jp, Class<T> valueType)
+    public <T> Iterator<T> readValues(JsonParser p, Class<T> valueType)
             throws IOException, JsonProcessingException {
         // May be able to support in future but...
         throw new JSONObjectException("Simple JSON does not support 'readValues()' methods");
     }
 
     @Override
-    public <T> Iterator<T> readValues(JsonParser jp,
-        TypeReference<?> valueTypeRef) throws IOException, JsonProcessingException
+    public <T> Iterator<T> readValues(JsonParser p,
+        TypeReference<T> valueTypeRef) throws IOException, JsonProcessingException
     {
         throw _noTypeReference();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> Iterator<T> readValues(JsonParser jp, ResolvedType valueType)
+    public <T> Iterator<T> readValues(JsonParser p, ResolvedType valueType)
             throws IOException, JsonProcessingException {
-        return (Iterator<T>) readValues(jp, valueType.getRawClass());
+        return (Iterator<T>) readValues(p, valueType.getRawClass());
     }
     
     protected JSONObjectException _noTypeReference() {
@@ -161,9 +161,9 @@ public class JSONAsObjectCodec
          */
         try {
             String json = _json.asString(n);
-            JsonParser jp = _jsonFactory.createParser(json);
-            T result = readValue(jp, valueType);
-            jp.close();
+            JsonParser p = _jsonFactory.createParser(json);
+            T result = readValue(p, valueType);
+            p.close();
             return result;
         } catch (JsonProcessingException e) { // to support [JACKSON-758]
             throw e;
