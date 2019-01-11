@@ -997,11 +997,11 @@ public class JSON
     }
 
     @Override
-    public <T> T readValue(JsonParser p, TypeReference<?> valueTypeRef)
+    public <T> T readValue(JsonParser p, TypeReference<T> valueTypeRef)
         throws IOException
     {
         // 11-Oct-2017, tatu: Not sure what to do here really
-        throw new UnsupportedOperationException("TypeReference<?> not support by jackson-jr");
+        throw new UnsupportedOperationException("`TypeReference<T>` not support by jackson-jr");
     }
 
     @SuppressWarnings("unchecked")
