@@ -48,7 +48,7 @@ public final class TypeBindings
 
     public static TypeBindings create(Class<?> erasedType, List<ResolvedType> typeList) {
         ResolvedType[] types = (typeList == null || typeList.isEmpty()) ?
-                NO_TYPES : typeList.toArray(new ResolvedType[typeList.size()]);
+                NO_TYPES : typeList.toArray(new ResolvedType[0]);
         return create(erasedType, types);
     }
         

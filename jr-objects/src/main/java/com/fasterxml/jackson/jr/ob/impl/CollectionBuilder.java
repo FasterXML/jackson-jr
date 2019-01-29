@@ -86,7 +86,7 @@ public abstract class CollectionBuilder
     public Object[] buildArray() {
         // sub-optimal, but defined for convenience
         Collection<Object> l = buildCollection();
-        return l.toArray(new Object[l.size()]);
+        return l.toArray(new Object[0]);
     }
 
     @SuppressWarnings("unchecked")

@@ -505,7 +505,7 @@ public class TypeDetector
         }
         int plen = props.size();
         BeanPropertyWriter[] propArray = (plen == 0) ? NO_PROPS_FOR_WRITE
-                : props.toArray(new BeanPropertyWriter[plen]);
+                : props.toArray(new BeanPropertyWriter[0]);
         return propArray;
     }
 
