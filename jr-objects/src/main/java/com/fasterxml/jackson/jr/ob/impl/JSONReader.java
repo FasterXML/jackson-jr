@@ -8,17 +8,18 @@ import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
 /**
- * Object that handles construction of simple Objects from JSON.
+ * Root-level helper object that handles initial delegation to actual
+ * readers (which are {@link ValueReader}s), but does not handle
+ * any of reading itself (despite name).
  *<p>
  * Life-cycle is such that initial instance (called blueprint)
  * is constructed first (including possible configuration 
  * using mutant factory methods). This blueprint object
- * acts as a factory, and is never used for direct writing;
+ * acts as a factory, and is never used for direct reading;
  * instead, per-call instance is created by calling
  * {@link #perOperationInstance}.
  */
 public class JSONReader
-    extends ValueReader // just to get convenience methods
 {
     /*
     /**********************************************************************
@@ -86,18 +87,6 @@ public class JSONReader
         _parser = p;
     }
 
-    @Override
-    public Object read(JSONReader reader, JsonParser p) throws IOException {
-        // never to be called for this instance
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Object readNext(JSONReader reader, JsonParser p) throws IOException {
-        // never to be called for this instance
-        throw new UnsupportedOperationException();
-    }
-    
     /*
     /**********************************************************************
     /* Mutant factories for blueprint
@@ -191,7 +180,7 @@ public class JSONReader
         }
         if (t != JsonToken.START_OBJECT) {
             throw JSONObjectException.from(_parser,
-                    "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+_tokenDesc(_parser));
+                    "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+ValueReader._tokenDesc(_parser));
         }
         return AnyReader.std.readFromObject(this, _parser, _mapBuilder);
     }
@@ -208,7 +197,7 @@ public class JSONReader
         }
         if (t != JsonToken.START_ARRAY) {
             throw JSONObjectException.from(_parser,
-                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
         }
         return (List<Object>) AnyReader.std.readCollectionFromArray(this, _parser, _collectionBuilder);
     }
@@ -226,7 +215,7 @@ public class JSONReader
         }
         if (t != JsonToken.START_ARRAY) {
             throw JSONObjectException.from(_parser,
-                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
         }
         return AnyReader.std.readArrayFromArray(this, _parser, _collectionBuilder);
     }
@@ -236,7 +225,7 @@ public class JSONReader
     /* Public entry points for reading (more) typed types
     /**********************************************************************
      */
-    
+
     /**
      * Method for reading a JSON Object from input and building a Bean of
      * specified type out of it; Bean has to conform to standard Java Bean
@@ -244,7 +233,7 @@ public class JSONReader
      */
     @SuppressWarnings("unchecked")
     public <T> T readBean(Class<T> type) throws IOException {
-        ValueReader vr = _typeDetector.findReader(type);
+        ValueReader vr = _typeDetector.findReader(this, type);
         return (T) vr.read(this, _parser);
     }
 
@@ -256,9 +245,9 @@ public class JSONReader
         }
         if (t != JsonToken.START_ARRAY) {
             throw JSONObjectException.from(_parser,
-                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+                    "Can not read an array: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
         }
-        return (T[]) new ArrayReader(type, _typeDetector.findReader(type)).read(this, _parser);
+        return (T[]) new ArrayReader(type, _typeDetector.findReader(this, type)).read(this, _parser);
     }
 
     /**
@@ -275,9 +264,9 @@ public class JSONReader
         }
         if (t != JsonToken.START_ARRAY) {
             throw JSONObjectException.from(_parser,
-                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+                    "Can not read a List: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
         }
-        return (List<T>) new CollectionReader(List.class, _typeDetector.findReader(type)).read(this, _parser);
+        return (List<T>) new CollectionReader(List.class, _typeDetector.findReader(this, type)).read(this, _parser);
     }
     
     /*

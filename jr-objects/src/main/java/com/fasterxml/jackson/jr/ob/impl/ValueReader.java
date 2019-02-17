@@ -6,12 +6,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
 /**
- * Helper class used when reading values of complex types other
- * than Beans.
- *<p>
- * Note that ugly "chameleon" style operation here is used to avoid
- * creating multiple separate classes, which in turn is done to minimize
- * size of resulting jars.
+ * Base class for all "deserializer" implementations used to actually read
+ * values of Java types from (json) input.
  */
 public abstract class ValueReader
 {
@@ -21,8 +17,26 @@ public abstract class ValueReader
     /**********************************************************************
      */
 
+    /**
+     * Method called to deserialize value of type supported by this reader, using
+     * given parser. Parser is already positioned to the (first) token
+     * of the value to read.
+     *
+     * @param reader Context object that allows calling other read methods for contained
+     *     values of different types (for example for collection readers).
+     * @param p Underlying parser used for reading decoded token stream
+     */
     public abstract Object read(JSONReader reader, JsonParser p) throws IOException;
 
+    /**
+     * Method called to deserialize value of type supported by this reader, using
+     * given parser. Parser is not yet positioned to the (first) token
+     * of the value to read and needs to be advanced.
+     *
+     * @param reader Context object that allows calling other read methods for contained
+     *     values of different types (for example for collection readers).
+     * @param p Underlying parser used for reading decoded token stream
+     */
     public abstract Object readNext(JSONReader reader, JsonParser p) throws IOException;
 
     /*
@@ -31,11 +45,12 @@ public abstract class ValueReader
     /**********************************************************************
      */
 
-    protected String _tokenDesc(JsonParser p) throws IOException {
-        return _tokenDesc(p, p.getCurrentToken());
+    static String _tokenDesc(JsonParser p) throws IOException {
+        return _tokenDesc(p, p.currentToken());
     }
-    
-    protected static String _tokenDesc(JsonParser p, JsonToken t) throws IOException {
+
+    // just to give access to JSONReader
+    static String _tokenDesc(JsonParser p, JsonToken t) throws IOException {
         if (t == null) {
             return "NULL";
         }

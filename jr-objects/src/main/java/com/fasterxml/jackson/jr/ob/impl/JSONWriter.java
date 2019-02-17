@@ -13,8 +13,10 @@ import com.fasterxml.jackson.jr.ob.JSON.Feature;
 import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;
 
 /**
- * Object that handles serialization of simple Objects into
- * JSON.
+ * Object that handles serialization of simple Objects into underlying
+ * data format (usually JSON).
+ * Unlike {@link JSONReader}, writer does actually implement write methods itself
+ * and uses delegation for only some special cases.
  *<p>
  * Life-cycle is such that initial instance (called blueprint)
  * is constructed first (including possible configuration 
@@ -133,6 +135,10 @@ public class JSONWriter
     /**********************************************************************
      */
 
+    /**
+     * Main entry point for non-blueprint instances: called for the root value to
+     * write it out.
+     */
     public void writeValue(Object value) throws IOException
     {
         if (value == null) {

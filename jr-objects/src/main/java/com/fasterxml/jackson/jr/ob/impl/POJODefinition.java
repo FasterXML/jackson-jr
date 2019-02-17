@@ -111,7 +111,7 @@ public class POJODefinition
         if (propsByName.isEmpty()) {
             props = NO_PROPS;
         } else {
-            props = propsByName.values().toArray(new Prop[propsByName.size()]);
+            props = propsByName.values().toArray(new Prop[0]);
         }
         return new POJODefinition(beanType, props, defaultCtor, stringCtor, longCtor);
     }

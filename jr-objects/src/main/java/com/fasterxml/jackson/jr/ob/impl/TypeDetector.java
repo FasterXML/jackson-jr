@@ -389,7 +389,7 @@ public class TypeDetector
         }
         return _knownWriters.get(index);
     }
-    
+
     /**
      * The main lookup method used to find type identifier for
      * given raw class; including Bean types (if allowed).
@@ -489,7 +489,7 @@ public class TypeDetector
         }
         int plen = props.size();
         BeanPropertyWriter[] propArray = (plen == 0) ? NO_PROPS_FOR_WRITE
-                : props.toArray(new BeanPropertyWriter[plen]);
+                : props.toArray(new BeanPropertyWriter[0]);
         return propArray;
     }
 
@@ -560,7 +560,7 @@ public class TypeDetector
      * Method used during deserialization to find handler for given
      * non-generic type.
      */
-    public ValueReader findReader(Class<?> raw)
+    public ValueReader findReader(JSONReader context, Class<?> raw)
     {
         ClassKey k = (_key == null) ? new ClassKey(raw, _features) : _key.with(raw, _features);
         ValueReader vr = _knownReaders.get(k);
