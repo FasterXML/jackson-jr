@@ -10,7 +10,7 @@ import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;
+import static com.fasterxml.jackson.jr.ob.impl.WriteTypeDetector.*;
 
 /**
  * Object that handles serialization of simple Objects into underlying
@@ -42,7 +42,7 @@ public class JSONWriter
     /**
      * Object that is used to resolve types of values dynamically.
      */
-    protected final TypeDetector _typeDetector;
+    protected final WriteTypeDetector _typeDetector;
 
     protected final TreeCodec _treeCodec;
 
@@ -66,7 +66,7 @@ public class JSONWriter
      * Constructor used for creating differently configured blueprint
      * instances
      */
-    public JSONWriter(int features, TypeDetector td, TreeCodec tc)
+    public JSONWriter(int features, WriteTypeDetector td, TreeCodec tc)
     {
         _features = features;
         _writeNullValues = Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
@@ -79,7 +79,7 @@ public class JSONWriter
     /**
      * Constructor for non-blueprint instances
      */
-    protected JSONWriter(JSONWriter base, int features, TypeDetector td, JsonGenerator g)
+    protected JSONWriter(JSONWriter base, int features, WriteTypeDetector td, JsonGenerator g)
     {
         _features = features;
         _writeNullValues = Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
@@ -106,7 +106,7 @@ public class JSONWriter
      * Overridable method that all mutant factories call if a new instance
      * is to be constructed
      */
-    protected JSONWriter _with(int features, TypeDetector td, TreeCodec tc)
+    protected JSONWriter _with(int features, WriteTypeDetector td, TreeCodec tc)
     {
         if (getClass() != JSONWriter.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override _with(...)");

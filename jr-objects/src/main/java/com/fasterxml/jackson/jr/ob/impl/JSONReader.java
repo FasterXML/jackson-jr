@@ -34,7 +34,7 @@ public class JSONReader
     /**
      * Object that is used to resolve types of values dynamically.
      */
-    protected final TypeDetector _typeDetector;
+    protected final ReadTypeDetector _typeDetector;
     
     /**
      * Handler that takes care of constructing {@link java.util.Map}s as needed
@@ -63,7 +63,7 @@ public class JSONReader
     /**
      * Constructor used for creating the blueprint instances.
      */
-    public JSONReader(int features, TypeDetector td, TreeCodec treeCodec,
+    public JSONReader(int features, ReadTypeDetector td, TreeCodec treeCodec,
             CollectionBuilder lb, MapBuilder mb)
     {
         _features = features;
@@ -77,7 +77,7 @@ public class JSONReader
     /**
      * Constructor used for per-operation (non-blueprint) instance.
      */
-    protected JSONReader(JSONReader base, int features, TypeDetector td, JsonParser p)
+    protected JSONReader(JSONReader base, int features, ReadTypeDetector td, JsonParser p)
     {
         _features = features;
         _typeDetector = td;
@@ -116,7 +116,7 @@ public class JSONReader
      * is to be constructed
      */
     protected JSONReader _with(int features,
-            TypeDetector td, TreeCodec tc, CollectionBuilder lb, MapBuilder mb)
+            ReadTypeDetector td, TreeCodec tc, CollectionBuilder lb, MapBuilder mb)
     {
         if (getClass() != JSONReader.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override _with(...)");

@@ -406,22 +406,25 @@ public class JSON implements Versioned
         _features = features;
         _jsonFactory = jsonF;
         _treeCodec = trees;
-        TypeDetector td = _defaultTypeDetector(features);
-        _reader = (r == null) ? _defaultReader(features, trees, td) : r;
-        _writer = (w == null) ? _defaultWriter(features, trees, td) : w;
+        _reader = (r == null) ? _defaultReader(features, trees, _defaultReadTypeDetector(features)) : r;
+        _writer = (w == null) ? _defaultWriter(features, trees, _defaultTypeDetector(features)) : w;
         _prettyPrinter = pp;
     }
 
-    protected TypeDetector _defaultTypeDetector(int features) {
-        return TypeDetector.blueprint(features);
+    protected WriteTypeDetector _defaultTypeDetector(int features) {
+        return WriteTypeDetector.blueprint(features);
     }
 
-    protected JSONReader _defaultReader(int features, TreeCodec tc, TypeDetector td) {
+    protected ReadTypeDetector _defaultReadTypeDetector(int features) {
+        return ReadTypeDetector.blueprint(features);
+    }
+    
+    protected JSONReader _defaultReader(int features, TreeCodec tc, ReadTypeDetector td) {
         return new JSONReader(features, td, tc,
                 CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
 
-    protected JSONWriter _defaultWriter(int features, TreeCodec tc, TypeDetector td) {
+    protected JSONWriter _defaultWriter(int features, TreeCodec tc, WriteTypeDetector td) {
         return new JSONWriter(features, td, tc);
     }
 

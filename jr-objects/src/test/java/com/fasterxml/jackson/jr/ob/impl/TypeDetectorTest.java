@@ -4,7 +4,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.TestBase;
-import com.fasterxml.jackson.jr.ob.impl.TypeDetector;
+import com.fasterxml.jackson.jr.ob.impl.WriteTypeDetector;
 
 public class TypeDetectorTest extends TestBase
 {
@@ -43,24 +43,24 @@ public class TypeDetectorTest extends TestBase
      */
 
     public void testBasicTypeDetectionForSer() {
-        TypeDetector td = TypeDetector.blueprint(JSON.Feature.defaults());
-        assertEquals(TypeDetector.SER_STRING, td.findSerializationType(String.class));
-        assertEquals(TypeDetector.SER_CHAR_ARRAY, td.findSerializationType(char[].class));
-        assertEquals(TypeDetector.SER_INT_ARRAY, td.findSerializationType(int[].class));
-        assertEquals(TypeDetector.SER_LONG_ARRAY, td.findSerializationType(long[].class));
-        assertEquals(TypeDetector.SER_BOOLEAN_ARRAY, td.findSerializationType(boolean[].class));
-        assertEquals(TypeDetector.SER_OBJECT_ARRAY, td.findSerializationType(Object[].class));
-        assertEquals(TypeDetector.SER_CHARACTER_SEQUENCE, td.findSerializationType(StringBuffer.class));
-        assertEquals(TypeDetector.SER_COLLECTION, td.findSerializationType(LinkedHashSet.class));
-        assertEquals(TypeDetector.SER_LIST, td.findSerializationType(ArrayList.class));
+        WriteTypeDetector td = WriteTypeDetector.blueprint(JSON.Feature.defaults());
+        assertEquals(WriteTypeDetector.SER_STRING, td.findSerializationType(String.class));
+        assertEquals(WriteTypeDetector.SER_CHAR_ARRAY, td.findSerializationType(char[].class));
+        assertEquals(WriteTypeDetector.SER_INT_ARRAY, td.findSerializationType(int[].class));
+        assertEquals(WriteTypeDetector.SER_LONG_ARRAY, td.findSerializationType(long[].class));
+        assertEquals(WriteTypeDetector.SER_BOOLEAN_ARRAY, td.findSerializationType(boolean[].class));
+        assertEquals(WriteTypeDetector.SER_OBJECT_ARRAY, td.findSerializationType(Object[].class));
+        assertEquals(WriteTypeDetector.SER_CHARACTER_SEQUENCE, td.findSerializationType(StringBuffer.class));
+        assertEquals(WriteTypeDetector.SER_COLLECTION, td.findSerializationType(LinkedHashSet.class));
+        assertEquals(WriteTypeDetector.SER_LIST, td.findSerializationType(ArrayList.class));
 
-        assertEquals(TypeDetector.SER_NUMBER_INTEGER, td.findSerializationType(Integer.class));
-        assertEquals(TypeDetector.SER_NUMBER_INTEGER, td.findSerializationType(Integer.TYPE));
+        assertEquals(WriteTypeDetector.SER_NUMBER_INTEGER, td.findSerializationType(Integer.class));
+        assertEquals(WriteTypeDetector.SER_NUMBER_INTEGER, td.findSerializationType(Integer.TYPE));
         
         // more specific types
-        assertEquals(TypeDetector.SER_CALENDAR, td.findSerializationType(Calendar.class));
-        assertEquals(TypeDetector.SER_CALENDAR, td.findSerializationType(GregorianCalendar.class));
-        assertEquals(TypeDetector.SER_DATE, td.findSerializationType(new GregorianCalendar().getTime().getClass()));
-        assertEquals(TypeDetector.SER_UUID, td.findSerializationType(UUID.class));
+        assertEquals(WriteTypeDetector.SER_CALENDAR, td.findSerializationType(Calendar.class));
+        assertEquals(WriteTypeDetector.SER_CALENDAR, td.findSerializationType(GregorianCalendar.class));
+        assertEquals(WriteTypeDetector.SER_DATE, td.findSerializationType(new GregorianCalendar().getTime().getClass()));
+        assertEquals(WriteTypeDetector.SER_UUID, td.findSerializationType(UUID.class));
     }
 }

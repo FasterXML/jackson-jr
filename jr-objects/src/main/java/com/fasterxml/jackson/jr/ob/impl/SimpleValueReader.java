@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;
+import static com.fasterxml.jackson.jr.ob.impl.WriteTypeDetector.*;
 
 import java.io.File;
 import java.io.IOException;
