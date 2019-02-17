@@ -187,13 +187,25 @@ public class TypeDetector
     protected Map<ClassKey, ValueReader> _incompleteReaders;
 
     protected final Object _readerLock;
-    
+
     /*
     /**********************************************************************
-    /* Instance state
+    /* Instance configuration
     /**********************************************************************
      */
 
+    protected final int _features;
+
+    protected final JSONReader _readContext;
+
+    protected final JSONWriter _writeContext;
+
+    /*
+    /**********************************************************************
+    /* Instance state, caching
+    /**********************************************************************
+     */
+    
     /**
      * Reusable lookup key; only used by per-thread instances.
      */
@@ -203,8 +215,6 @@ public class TypeDetector
 
     protected int _prevType;
 
-    protected int _features;
-    
     /*
     /**********************************************************************
     /* Construction
@@ -222,10 +232,15 @@ public class TypeDetector
         _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(50, 0.75f, 4);
         _typeResolver = new TypeResolver();
         _readerLock = new Object();
+        _writeContext = null;
+        _readContext = null;
     }
 
-    protected TypeDetector(TypeDetector base, int features) {
+    protected TypeDetector(TypeDetector base, int features,
+            JSONReader r, JSONWriter w) {
         _features = features;
+        _readContext = r;
+        _writeContext = w;
         _knownSerTypes = base._knownSerTypes;
         _knownWriters = base._knownWriters;
         _knownReaders = base._knownReaders;
@@ -237,8 +252,12 @@ public class TypeDetector
         return new TypeDetector(features & CACHE_FLAGS);
     }
 
-    public TypeDetector perOperationInstance(int features) {
-        return new TypeDetector(this, features & CACHE_FLAGS);
+    public TypeDetector perOperationInstance(JSONReader r, int features) {
+        return new TypeDetector(this, features & CACHE_FLAGS, r, null);
+    }
+
+    public TypeDetector perOperationInstance(JSONWriter w, int features) {
+        return new TypeDetector(this, features & CACHE_FLAGS, null, w);
     }
 
     /*
@@ -560,7 +579,7 @@ public class TypeDetector
      * Method used during deserialization to find handler for given
      * non-generic type.
      */
-    public ValueReader findReader(JSONReader context, Class<?> raw)
+    public ValueReader findReader(Class<?> raw)
     {
         ClassKey k = (_key == null) ? new ClassKey(raw, _features) : _key.with(raw, _features);
         ValueReader vr = _knownReaders.get(k);
@@ -577,8 +596,7 @@ public class TypeDetector
         return vr;
     }
     
-    protected ValueReader createReader(Class<?> contextType, Class<?> type,
-            Type genericType)
+    protected ValueReader createReader(Class<?> contextType, Class<?> type, Type genericType)
     {
         if (type == Object.class) {
             return AnyReader.std;
@@ -623,8 +641,7 @@ public class TypeDetector
                 _incompleteReaders.put(key, def);
                 for (Map.Entry<String, BeanPropertyReader> entry : def.propertiesByName().entrySet()) {
                     BeanPropertyReader prop = entry.getValue();
-                    entry.setValue(prop.withReader(createReader(contextType,
-                            prop.rawSetterType(), prop.genericSetterType())));
+                    entry.setValue(prop.withReader(createReader(contextType, prop.rawSetterType(), prop.genericSetterType())));
                 }
             } finally {
                 _incompleteReaders.remove(key);

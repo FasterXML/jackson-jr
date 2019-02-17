@@ -31,6 +31,12 @@ public class ReadFeaturesTest extends TestBase
                 .without(JSON.Feature.USE_IS_GETTERS)
                 .asString(new IsBean());
         assertEquals(aposToQuotes("{'value':42}"), json);
+
+        // and go back as well
+        json = JSON.std
+                .with(JSON.Feature.USE_IS_GETTERS)
+                .asString(new IsBean());
+        assertEquals(aposToQuotes("{'enabled':true,'value':42}"), json);
     }
 
     public void testFailOnDupMapKeys() throws Exception

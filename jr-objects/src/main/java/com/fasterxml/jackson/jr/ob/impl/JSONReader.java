@@ -136,7 +136,7 @@ public class JSONReader
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
         return new JSONReader(this, features,
-                _typeDetector.perOperationInstance(features), p);
+                _typeDetector.perOperationInstance(this, features), p);
     }
 
     /*
@@ -233,7 +233,7 @@ public class JSONReader
      */
     @SuppressWarnings("unchecked")
     public <T> T readBean(Class<T> type) throws IOException {
-        ValueReader vr = _typeDetector.findReader(this, type);
+        ValueReader vr = _typeDetector.findReader(type);
         return (T) vr.read(this, _parser);
     }
 
@@ -247,7 +247,7 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read an array: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
         }
-        return (T[]) new ArrayReader(type, _typeDetector.findReader(this, type)).read(this, _parser);
+        return (T[]) new ArrayReader(type, _typeDetector.findReader(type)).read(this, _parser);
     }
 
     /**
@@ -266,7 +266,7 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read a List: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
         }
-        return (List<T>) new CollectionReader(List.class, _typeDetector.findReader(this, type)).read(this, _parser);
+        return (List<T>) new CollectionReader(List.class, _typeDetector.findReader(type)).read(this, _parser);
     }
     
     /*

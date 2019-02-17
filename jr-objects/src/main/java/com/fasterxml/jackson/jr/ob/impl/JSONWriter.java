@@ -126,7 +126,7 @@ public class JSONWriter
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
         return new JSONWriter(this, features,
-                _typeDetector.perOperationInstance(features), g);
+                _typeDetector.perOperationInstance(this, features), g);
     }
 
     /*
