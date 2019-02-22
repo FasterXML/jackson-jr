@@ -27,7 +27,7 @@ public class MapReader extends ValueReader
             if (p.hasToken(JsonToken.VALUE_NULL)) {
                 return null;
             }
-            return JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get START_OBJECT");
+            throw JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get START_OBJECT");
         }
         
         MapBuilder b = r._mapBuilder(_mapType);

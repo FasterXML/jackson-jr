@@ -517,16 +517,18 @@ public class TypeDetector
 
     protected ValueReader collectionReader(Class<?> collectionType, ResolvedType valueType)
     {
-        Class<?> raw = valueType.erasedType();
-        if (Collection.class.isAssignableFrom(raw)) {
+        final Class<?> rawValueType = valueType.erasedType();
+        final ValueReader valueReader;
+        if (Collection.class.isAssignableFrom(rawValueType)) {
             List<ResolvedType> params = valueType.typeParametersFor(Collection.class);
-            return collectionReader(raw, params.get(0));
-        }
-        if (Map.class.isAssignableFrom(raw)) {
+            valueReader = collectionReader(rawValueType, params.get(0));
+        } else if (Map.class.isAssignableFrom(rawValueType)) {
             List<ResolvedType> params = valueType.typeParametersFor(Map.class);
-            return mapReader(raw, params.get(1));
+            valueReader = mapReader(rawValueType, params.get(1));
+        } else {
+            valueReader = createReader(null, rawValueType, rawValueType);
         }
-        return new CollectionReader(collectionType, createReader(null, raw, raw));
+        return new CollectionReader(collectionType, valueReader);
     }
 
     protected ValueReader mapReader(Class<?> contextType, Type mapType)
@@ -535,19 +537,21 @@ public class TypeDetector
         List<ResolvedType> params = t.typeParametersFor(Map.class);
         return mapReader(t.erasedType(), params.get(1));
     }
-    
+
     protected ValueReader mapReader(Class<?> mapType, ResolvedType valueType)
     {
-        Class<?> raw = valueType.erasedType();
-        if (Collection.class.isAssignableFrom(raw)) {
+        final Class<?> rawValueType = valueType.erasedType();
+        final ValueReader valueReader;
+        if (Collection.class.isAssignableFrom(rawValueType)) {
             List<ResolvedType> params = valueType.typeParametersFor(Collection.class);
-            return collectionReader(raw, params.get(0));
-        }
-        if (Map.class.isAssignableFrom(raw)) {
+            valueReader = collectionReader(rawValueType, params.get(0));
+        } else if (Map.class.isAssignableFrom(rawValueType)) {
             List<ResolvedType> params = valueType.typeParametersFor(Map.class);
-            return mapReader(raw, params.get(1));
+            valueReader = mapReader(rawValueType, params.get(1));
+        } else {
+            valueReader = createReader(null, rawValueType, rawValueType);
         }
-        return new MapReader(mapType, createReader(null, raw, raw));
+        return new MapReader(mapType, valueReader);
     }
 
     /*

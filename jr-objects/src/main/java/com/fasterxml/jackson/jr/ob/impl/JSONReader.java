@@ -245,7 +245,8 @@ public class JSONReader
     @SuppressWarnings("unchecked")
     public <T> T readBean(Class<T> type) throws IOException {
         ValueReader vr = _typeDetector.findReader(type);
-        return (T) vr.read(this, _parser);
+        final Object ob = vr.read(this, _parser);
+        return (T) ob;
     }
 
     @SuppressWarnings("unchecked")

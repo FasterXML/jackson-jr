@@ -81,8 +81,11 @@ public final class BeanPropertyReader
             if (t instanceof InvocationTargetException) {
                 t = t.getCause();
             }
-            throw new JSONObjectException("Failed to set property '"+_name+"'; exception "+e.getClass().getName()+"): "
-                    +t.getMessage(), t);
+            final String valueTypeDesc = (value == null) ? "NULL" : value.getClass().getName();
+            throw new JSONObjectException(String.format(
+                    "Failed to set property '%s' (raw type %s) to value of type %s; exception (%s): %s",
+                _name, _rawType().getName(), valueTypeDesc, e.getClass().getName(), t.getMessage()),
+                t);
         }
     }
 
@@ -91,6 +94,13 @@ public final class BeanPropertyReader
             return _setter.getDeclaringClass().getName();
         }
         return _field.getDeclaringClass().getName();
+    }
+
+    protected Class<?> _rawType() {
+        if (_setter != null) {
+            return _setter.getParameterTypes()[0];
+        }
+        return _field.getType();
     }
 
     @Override

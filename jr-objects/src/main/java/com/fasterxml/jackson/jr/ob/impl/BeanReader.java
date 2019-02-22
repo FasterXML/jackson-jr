@@ -118,8 +118,8 @@ public class BeanReader
                             handleUnknown(r, p, propName);
                             continue;
                         }
-                        ValueReader vr = prop.getReader();
-                        prop.setValueFor(bean, vr.readNext(r, p));
+                        final Object value = prop.getReader().readNext(r, p);
+                        prop.setValueFor(bean, value);
                     }
                     // also verify we are not confused...
                     if (!p.hasToken(JsonToken.END_OBJECT)) {
