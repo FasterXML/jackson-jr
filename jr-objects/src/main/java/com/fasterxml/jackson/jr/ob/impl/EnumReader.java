@@ -6,7 +6,7 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
-import com.fasterxml.jackson.jr.ob.ValueReader;
+import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 /**
  * Reader for Enum values: needed because we need a simple {@link java.util.Map}

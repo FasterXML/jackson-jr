@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.jr.ob.impl;
+package com.fasterxml.jackson.jr.ob.api;
 
 import java.lang.reflect.Array;
 import java.util.*;

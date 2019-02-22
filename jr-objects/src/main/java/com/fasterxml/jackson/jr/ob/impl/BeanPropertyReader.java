@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
-import com.fasterxml.jackson.jr.ob.ValueReader;
+import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 /**
  * @since 2.8 (formerly part of `BeanDefinition`)

@@ -8,6 +8,8 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.Instantiatable;
+import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
+import com.fasterxml.jackson.jr.ob.api.MapBuilder;
 import com.fasterxml.jackson.jr.ob.comp.CollectionComposer;
 import com.fasterxml.jackson.jr.ob.comp.ComposerBase;
 import com.fasterxml.jackson.jr.ob.comp.MapComposer;
