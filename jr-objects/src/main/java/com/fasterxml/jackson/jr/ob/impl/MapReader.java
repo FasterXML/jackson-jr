@@ -6,6 +6,7 @@ import java.util.*;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.ValueReader;
 
 /**
  * Reader for typed {@link java.util.Map} values.
@@ -27,7 +28,7 @@ public class MapReader extends ValueReader
             if (p.hasToken(JsonToken.VALUE_NULL)) {
                 return null;
             }
-            return JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get START_OBJECT");
+            throw JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get START_OBJECT");
         }
         
         MapBuilder b = r._mapBuilder(_mapType);

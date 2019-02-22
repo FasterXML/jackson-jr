@@ -7,8 +7,8 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.SerializedString;
+import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
-import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
 import static com.fasterxml.jackson.jr.ob.impl.WriteTypeDetector.*;
 
@@ -69,7 +69,7 @@ public class JSONWriter
     public JSONWriter(int features, WriteTypeDetector td, TreeCodec tc)
     {
         _features = features;
-        _writeNullValues = Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
+        _writeNullValues = JSON.Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
         _typeDetector = td;
         _treeCodec = tc;
         _generator = null;
@@ -82,7 +82,7 @@ public class JSONWriter
     protected JSONWriter(JSONWriter base, int features, WriteTypeDetector td, JsonGenerator g)
     {
         _features = features;
-        _writeNullValues = Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
+        _writeNullValues = JSON.Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
         _typeDetector = td;
         _treeCodec = base._treeCodec;
         _generator = g;
@@ -647,7 +647,7 @@ public class JSONWriter
     }
 
     protected void writeDateValue(Date v) throws IOException {
-        if (Feature.WRITE_DATES_AS_TIMESTAMP.isEnabled(_features)) {
+        if (JSON.Feature.WRITE_DATES_AS_TIMESTAMP.isEnabled(_features)) {
             writeLongValue(v.getTime());
         } else {
             writeStringValue(dateToString(v));
@@ -655,7 +655,7 @@ public class JSONWriter
     }
 
     protected void writeDateField(String fieldName, Date v) throws IOException {
-        if (Feature.WRITE_DATES_AS_TIMESTAMP.isEnabled(_features)) {
+        if (JSON.Feature.WRITE_DATES_AS_TIMESTAMP.isEnabled(_features)) {
             writeLongField(fieldName, v.getTime());
         } else {
             writeStringField(fieldName, dateToString(v));
@@ -663,7 +663,7 @@ public class JSONWriter
     }
 
     protected void writeEnumValue(Enum<?> v) throws IOException {
-        if (Feature.WRITE_ENUMS_USING_INDEX.isEnabled(_features)) {
+        if (JSON.Feature.WRITE_ENUMS_USING_INDEX.isEnabled(_features)) {
             writeIntValue(v.ordinal());
         } else {
             writeStringValue(v.toString());
@@ -671,7 +671,7 @@ public class JSONWriter
     }
 
     protected void writeEnumField(String fieldName, Enum<?> v) throws IOException {
-        if (Feature.WRITE_ENUMS_USING_INDEX.isEnabled(_features)) {
+        if (JSON.Feature.WRITE_ENUMS_USING_INDEX.isEnabled(_features)) {
             writeIntField(fieldName, v.ordinal());
         } else {
             writeStringField(fieldName, v.toString());
@@ -713,9 +713,9 @@ public class JSONWriter
 
     protected void _checkUnknown(Object value) throws IOException
     {
-        if (Feature.FAIL_ON_UNKNOWN_TYPE_WRITE.isEnabled(_features)) {
+        if (JSON.Feature.FAIL_ON_UNKNOWN_TYPE_WRITE.isEnabled(_features)) {
             throw new JSONObjectException("Unrecognized type ("+value.getClass().getName()
-                    +"), don't know how to write (disable "+Feature.FAIL_ON_UNKNOWN_TYPE_WRITE
+                    +"), don't know how to write (disable "+JSON.Feature.FAIL_ON_UNKNOWN_TYPE_WRITE
                     +" to avoid exception)");
         }
     }

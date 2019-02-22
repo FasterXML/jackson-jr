@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.ValueReader;
 import com.fasterxml.jackson.jr.type.ResolvedType;
 import com.fasterxml.jackson.jr.type.TypeBindings;
 import com.fasterxml.jackson.jr.type.TypeResolver;
@@ -136,16 +137,18 @@ public class ReadTypeDetector
 
     protected ValueReader collectionReader(Class<?> collectionType, ResolvedType valueType)
     {
-        Class<?> raw = valueType.erasedType();
-        if (Collection.class.isAssignableFrom(raw)) {
+        final Class<?> rawValueType = valueType.erasedType();
+        final ValueReader valueReader;
+        if (Collection.class.isAssignableFrom(rawValueType)) {
             List<ResolvedType> params = valueType.typeParametersFor(Collection.class);
-            return collectionReader(raw, params.get(0));
-        }
-        if (Map.class.isAssignableFrom(raw)) {
+            valueReader = collectionReader(rawValueType, params.get(0));
+        } else if (Map.class.isAssignableFrom(rawValueType)) {
             List<ResolvedType> params = valueType.typeParametersFor(Map.class);
-            return mapReader(raw, params.get(1));
+            valueReader = mapReader(rawValueType, params.get(1));
+        } else {
+            valueReader = createReader(null, rawValueType, rawValueType);
         }
-        return new CollectionReader(collectionType, createReader(null, raw, raw));
+        return new CollectionReader(collectionType, valueReader);
     }
 
     protected ValueReader mapReader(Class<?> contextType, Type mapType)
@@ -157,16 +160,18 @@ public class ReadTypeDetector
     
     protected ValueReader mapReader(Class<?> mapType, ResolvedType valueType)
     {
-        Class<?> raw = valueType.erasedType();
-        if (Collection.class.isAssignableFrom(raw)) {
+        final Class<?> rawValueType = valueType.erasedType();
+        final ValueReader valueReader;
+        if (Collection.class.isAssignableFrom(rawValueType)) {
             List<ResolvedType> params = valueType.typeParametersFor(Collection.class);
-            return collectionReader(raw, params.get(0));
-        }
-        if (Map.class.isAssignableFrom(raw)) {
+            valueReader = collectionReader(rawValueType, params.get(0));
+        } else if (Map.class.isAssignableFrom(rawValueType)) {
             List<ResolvedType> params = valueType.typeParametersFor(Map.class);
-            return mapReader(raw, params.get(1));
+            valueReader = mapReader(rawValueType, params.get(1));
+        } else {
+            valueReader = createReader(null, rawValueType, rawValueType);
         }
-        return new MapReader(mapType, createReader(null, raw, raw));
+        return new MapReader(mapType, valueReader);
     }
 
     /*

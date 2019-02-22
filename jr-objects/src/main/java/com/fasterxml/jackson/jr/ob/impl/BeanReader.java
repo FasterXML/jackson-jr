@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.ValueReader;
 
 /**
  * Class that contains information about dynamically introspected
@@ -118,8 +119,8 @@ public class BeanReader
                             handleUnknown(r, p, propName);
                             continue;
                         }
-                        ValueReader vr = prop.getReader();
-                        prop.setValueFor(bean, vr.readNext(r, p));
+                        final Object value = prop.getReader().readNext(r, p);
+                        prop.setValueFor(bean, value);
                     }
                     // also verify we are not confused...
                     if (!p.hasToken(JsonToken.END_OBJECT)) {

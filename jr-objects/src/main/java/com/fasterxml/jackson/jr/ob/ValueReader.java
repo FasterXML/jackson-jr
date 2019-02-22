@@ -1,12 +1,13 @@
-package com.fasterxml.jackson.jr.ob.impl;
+package com.fasterxml.jackson.jr.ob;
 
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 
 /**
- * Base class for all "deserializer" implementations used to actually read
+ * API and base class for all "deserializer" implementations used to actually read
  * values of Java types from (json) input.
  */
 public abstract class ValueReader
@@ -45,12 +46,19 @@ public abstract class ValueReader
     /**********************************************************************
      */
 
-    static String _tokenDesc(JsonParser p) throws IOException {
+    /**
+     * Helper method for getting description of the token parser currently points to,
+     * for use in descriptions and exception messages.
+     */
+    public static String _tokenDesc(JsonParser p) throws IOException {
         return _tokenDesc(p, p.currentToken());
     }
 
-    // just to give access to JSONReader
-    static String _tokenDesc(JsonParser p, JsonToken t) throws IOException {
+    /**
+     * Helper method for getting description of given token
+     * for use in descriptions and exception messages.
+     */
+    public static String _tokenDesc(JsonParser p, JsonToken t) throws IOException {
         if (t == null) {
             return "NULL";
         }
@@ -62,7 +70,7 @@ public abstract class ValueReader
         case START_OBJECT:
             return "JSON Object";
         case VALUE_FALSE:
-            return "'false'";
+            return "`false`";
         case VALUE_NULL:
             return "'null'";
         case VALUE_NUMBER_FLOAT:
@@ -71,7 +79,15 @@ public abstract class ValueReader
         case VALUE_STRING:
             return "JSON String";
         case VALUE_TRUE:
-            return "'true'";
+            return "`true`";
+        case VALUE_EMBEDDED_OBJECT:
+            {
+                final Object value = p.getEmbeddedObject();
+                if (value == null) {
+                    return "EMBEDDED_OBJECT `null`";
+                }
+                return "EMBEDDED_OBJECT of type "+p.getClass().getName();
+            }
         default:
             return t.toString();
         }

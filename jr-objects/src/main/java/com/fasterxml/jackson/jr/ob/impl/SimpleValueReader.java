@@ -11,9 +11,12 @@ import java.util.*;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.ValueReader;
 
 /**
- * {@link ValueReader} used for simple scalar types and related.
+ * Default {@link ValueReader} used for simple scalar types and related,
+ * not including POJO-, {@link java.util.Map} and {@link java.util.Collection}
+ * types.
  */
 public class SimpleValueReader extends ValueReader
 {

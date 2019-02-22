@@ -8,6 +8,10 @@ Project: jackson-jr
 
 No changes since 2.9
 
+2.9.9 (not yet released)
+
+- Fix an issue with Maps-of-Lists, Lists-of-Maps
+
 2.9.8 (15-Dec-2018)
 2.9.7 (19-Sep-2018)
 2.9.6 (12-Jun-2018)

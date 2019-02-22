@@ -5,6 +5,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.ValueReader;
 
 /**
  * Reader for typed {@link java.util.Collection} values.
@@ -34,7 +35,7 @@ public class CollectionReader extends ValueReader
             if (p.hasToken(JsonToken.VALUE_NULL)) {
                 return null;
             }
-            return JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get START_ARRAY");
+            throw JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get START_ARRAY");
         }
         CollectionBuilder b = r._collectionBuilder(_collectionType);
         if (p.nextToken() == JsonToken.END_ARRAY) {

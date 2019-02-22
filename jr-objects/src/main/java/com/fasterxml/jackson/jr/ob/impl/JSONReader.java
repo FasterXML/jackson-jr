@@ -4,8 +4,9 @@ import java.io.*;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
-import com.fasterxml.jackson.jr.ob.JSON.Feature;
+import com.fasterxml.jackson.jr.ob.ValueReader;
 
 /**
  * Root-level helper object that handles initial delegation to actual
@@ -149,7 +150,7 @@ public class JSONReader
      * @since 2.8
      */
     public boolean arraysAsLists() {
-        return Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(_features);
+        return JSON.Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(_features);
     }
     
     /*
@@ -234,7 +235,8 @@ public class JSONReader
     @SuppressWarnings("unchecked")
     public <T> T readBean(Class<T> type) throws IOException {
         ValueReader vr = _typeDetector.findReader(type);
-        return (T) vr.read(this, _parser);
+        final Object ob = vr.read(this, _parser);
+        return (T) ob;
     }
 
     @SuppressWarnings("unchecked")
