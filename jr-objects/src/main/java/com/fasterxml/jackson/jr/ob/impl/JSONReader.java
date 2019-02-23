@@ -4,24 +4,25 @@ import java.io.*;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
-import com.fasterxml.jackson.jr.ob.JSON.Feature;
 import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
 import com.fasterxml.jackson.jr.ob.api.MapBuilder;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 /**
- * Object that handles construction of simple Objects from JSON.
+ * Root-level helper object that handles initial delegation to actual
+ * readers (which are {@link ValueReader}s), but does not handle
+ * any of reading itself (despite name).
  *<p>
  * Life-cycle is such that initial instance (called blueprint)
  * is constructed first (including possible configuration 
  * using mutant factory methods). This blueprint object
- * acts as a factory, and is never used for direct writing;
+ * acts as a factory, and is never used for direct reading;
  * instead, per-call instance is created by calling
  * {@link #perOperationInstance}.
  */
 public class JSONReader
-    extends ValueReader // just to get convenience methods
 {
     /*
     /**********************************************************************
@@ -34,10 +35,10 @@ public class JSONReader
     protected final TreeCodec _treeCodec;
     
     /**
-     * Object that is used to resolve types of values dynamically.
+     * Object that is used to find value readers dynamically.
      */
-    protected final TypeDetector _readerLocator;
-    
+    protected final ValueReaderLocator _readerLocator;
+
     /**
      * Handler that takes care of constructing {@link java.util.Map}s as needed
      */
@@ -65,7 +66,7 @@ public class JSONReader
     /**
      * Constructor used for creating the blueprint instances.
      */
-    public JSONReader(int features, TypeDetector td, TreeCodec treeCodec,
+    public JSONReader(int features, ValueReaderLocator td, TreeCodec treeCodec,
             CollectionBuilder lb, MapBuilder mb)
     {
         _features = features;
@@ -79,7 +80,7 @@ public class JSONReader
     /**
      * Constructor used for per-operation (non-blueprint) instance.
      */
-    protected JSONReader(JSONReader base, int features, TypeDetector td, JsonParser p)
+    protected JSONReader(JSONReader base, int features, ValueReaderLocator td, JsonParser p)
     {
         _features = features;
         _readerLocator = td;
@@ -89,18 +90,6 @@ public class JSONReader
         _parser = p;
     }
 
-    @Override
-    public Object read(JSONReader reader, JsonParser p) throws IOException {
-        // never to be called for this instance
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Object readNext(JSONReader reader, JsonParser p) throws IOException {
-        // never to be called for this instance
-        throw new UnsupportedOperationException();
-    }
-    
     /*
     /**********************************************************************
     /* Mutant factories for blueprint
@@ -130,7 +119,7 @@ public class JSONReader
      * is to be constructed
      */
     protected JSONReader _with(int features,
-            TypeDetector td, TreeCodec tc, CollectionBuilder lb, MapBuilder mb)
+            ValueReaderLocator td, TreeCodec tc, CollectionBuilder lb, MapBuilder mb)
     {
         if (getClass() != JSONReader.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override _with(...)");
@@ -150,7 +139,7 @@ public class JSONReader
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
         return new JSONReader(this, features,
-                _readerLocator.perOperationInstance(features), p);
+                _readerLocator.perOperationInstance(this, features), p);
     }
 
     /*
@@ -160,7 +149,7 @@ public class JSONReader
      */
 
     public boolean arraysAsLists() {
-        return Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(_features);
+        return JSON.Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(_features);
     }
 
     /*
@@ -192,7 +181,7 @@ public class JSONReader
             return null;
         }
         throw JSONObjectException.from(_parser,
-                "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+_tokenDesc(_parser));
+                "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+ValueReader._tokenDesc(_parser));
     }
 
     /**
@@ -208,7 +197,7 @@ public class JSONReader
             return null;
         }
         throw JSONObjectException.from(_parser,
-                "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+                "Can not read a List: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
     }
 
     /**
@@ -225,7 +214,7 @@ public class JSONReader
             return null;
         }
         throw JSONObjectException.from(_parser,
-                "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+                "Can not read an array: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
     }
 
     /*
@@ -254,7 +243,7 @@ public class JSONReader
             return null;
         }
         throw JSONObjectException.from(_parser,
-                "Can not read an array: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+                "Can not read an array: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
     }
 
     /**
@@ -272,7 +261,7 @@ public class JSONReader
             return null;
         }
         throw JSONObjectException.from(_parser,
-                "Can not read a List: expect to see START_ARRAY ('['), instead got: "+_tokenDesc(_parser));
+                "Can not read a List: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
     }
 
     /*

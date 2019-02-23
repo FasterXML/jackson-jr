@@ -93,6 +93,13 @@ public final class BeanPropertyReader
         return _field.getDeclaringClass().getName();
     }
 
+    protected Class<?> _rawType() {
+        if (_setter != null) {
+            return _setter.getParameterTypes()[0];
+        }
+        return _field.getType();
+    }
+
     @Override
     public String toString() {
         return _name;

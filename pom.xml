@@ -30,7 +30,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- 10-Oct-2017, tatu: Let's default to Java 8 for 3.x
+    <!-- 23-Feb-2019, tatu: Removing debug info makes jr-objects jar 20% smaller...
+            but loses line numbers from stack traces. So bit of a difficult choice.
       -->
     <javac.debuglevel>source</javac.debuglevel>
   </properties>

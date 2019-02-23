@@ -7,14 +7,16 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.SerializedString;
+import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
-import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;
+import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
 
 /**
- * Object that handles serialization of simple Objects into
- * JSON.
+ * Object that handles serialization of simple Objects into underlying
+ * data format (usually JSON).
+ * Unlike {@link JSONReader}, writer does actually implement write methods itself
+ * and uses delegation for only some special cases.
  *<p>
  * Life-cycle is such that initial instance (called blueprint)
  * is constructed first (including possible configuration 
@@ -38,9 +40,9 @@ public class JSONWriter
     protected final boolean _writeNullValues;
 
     /**
-     * Object that is used to resolve types of values dynamically.
+     * Object that is used to dynamically find Bean (and custom type) value writers
      */
-    protected final TypeDetector _writerLocator;
+    protected final ValueWriterLocator _writerLocator;
 
     protected final TreeCodec _treeCodec;
 
@@ -64,10 +66,10 @@ public class JSONWriter
      * Constructor used for creating differently configured blueprint
      * instances
      */
-    public JSONWriter(int features, TypeDetector td, TreeCodec tc)
+    public JSONWriter(int features, ValueWriterLocator td, TreeCodec tc)
     {
         _features = features;
-        _writeNullValues = Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
+        _writeNullValues = JSON.Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
         _writerLocator = td;
         _treeCodec = tc;
         _generator = null;
@@ -77,10 +79,10 @@ public class JSONWriter
     /**
      * Constructor for non-blueprint instances
      */
-    protected JSONWriter(JSONWriter base, int features, TypeDetector td, JsonGenerator g)
+    protected JSONWriter(JSONWriter base, int features, ValueWriterLocator td, JsonGenerator g)
     {
         _features = features;
-        _writeNullValues = Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
+        _writeNullValues = JSON.Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
         _writerLocator = td;
         _treeCodec = base._treeCodec;
         _generator = g;
@@ -104,7 +106,7 @@ public class JSONWriter
      * Overridable method that all mutant factories call if a new instance
      * is to be constructed
      */
-    protected JSONWriter _with(int features, TypeDetector td, TreeCodec tc)
+    protected JSONWriter _with(int features, ValueWriterLocator td, TreeCodec tc)
     {
         if (getClass() != JSONWriter.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override _with(...)");
@@ -124,7 +126,7 @@ public class JSONWriter
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
         return new JSONWriter(this, features,
-                _writerLocator.perOperationInstance(features), g);
+                _writerLocator.perOperationInstance(this, features), g);
     }
 
     /*
@@ -133,6 +135,10 @@ public class JSONWriter
     /**********************************************************************
      */
 
+    /**
+     * Main entry point for non-blueprint instances: called for the root value to
+     * write it out.
+     */
     public void writeValue(Object value) throws IOException
     {
         if (value == null) {
@@ -658,7 +664,7 @@ public class JSONWriter
     }
 
     protected void writeDateValue(Date v) throws IOException {
-        if (Feature.WRITE_DATES_AS_TIMESTAMP.isEnabled(_features)) {
+        if (JSON.Feature.WRITE_DATES_AS_TIMESTAMP.isEnabled(_features)) {
             writeLongValue(v.getTime());
         } else {
             writeStringValue(dateToString(v));
@@ -666,7 +672,7 @@ public class JSONWriter
     }
 
     protected void writeDateField(String fieldName, Date v) throws IOException {
-        if (Feature.WRITE_DATES_AS_TIMESTAMP.isEnabled(_features)) {
+        if (JSON.Feature.WRITE_DATES_AS_TIMESTAMP.isEnabled(_features)) {
             writeLongField(fieldName, v.getTime());
         } else {
             writeStringField(fieldName, dateToString(v));
@@ -674,7 +680,7 @@ public class JSONWriter
     }
 
     protected void writeEnumValue(Enum<?> v) throws IOException {
-        if (Feature.WRITE_ENUMS_USING_INDEX.isEnabled(_features)) {
+        if (JSON.Feature.WRITE_ENUMS_USING_INDEX.isEnabled(_features)) {
             writeIntValue(v.ordinal());
         } else {
             writeStringValue(v.toString());
@@ -682,7 +688,7 @@ public class JSONWriter
     }
 
     protected void writeEnumField(String fieldName, Enum<?> v) throws IOException {
-        if (Feature.WRITE_ENUMS_USING_INDEX.isEnabled(_features)) {
+        if (JSON.Feature.WRITE_ENUMS_USING_INDEX.isEnabled(_features)) {
             writeIntField(fieldName, v.ordinal());
         } else {
             writeStringField(fieldName, v.toString());
@@ -812,9 +818,9 @@ public class JSONWriter
 
     protected void _checkUnknown(Object value) throws IOException
     {
-        if (Feature.FAIL_ON_UNKNOWN_TYPE_WRITE.isEnabled(_features)) {
+        if (JSON.Feature.FAIL_ON_UNKNOWN_TYPE_WRITE.isEnabled(_features)) {
             throw new JSONObjectException("Unrecognized type ("+value.getClass().getName()
-                    +"), don't know how to write (disable "+Feature.FAIL_ON_UNKNOWN_TYPE_WRITE
+                    +"), don't know how to write (disable "+JSON.Feature.FAIL_ON_UNKNOWN_TYPE_WRITE
                     +" to avoid exception)");
         }
     }

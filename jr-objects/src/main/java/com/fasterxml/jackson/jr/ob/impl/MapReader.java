@@ -29,7 +29,8 @@ public class MapReader extends ValueReader
             if (p.hasToken(JsonToken.VALUE_NULL)) {
                 return null;
             }
-            return JSONObjectException.from(p, "Unexpected token "+p.currentToken()+"; should get START_OBJECT");
+            throw JSONObjectException.from(p, "Unexpected token %s; should get START_OBJECT",
+                    p.currentToken());
         }
         
         MapBuilder b = r._mapBuilder(_mapType);
@@ -38,7 +39,7 @@ public class MapReader extends ValueReader
             if (p.hasToken(JsonToken.END_OBJECT)) {
                 return b.emptyMap();
             }
-            throw _reportProblem(p);
+            throw _reportWrongToken(p);
         }
         Object value = _valueReader.readNext(r, p);
         String propName = p.nextFieldName();
@@ -46,7 +47,7 @@ public class MapReader extends ValueReader
             if (p.hasToken(JsonToken.END_OBJECT)) {
                 return b.singletonMap(propName0, value);
             }
-            throw _reportProblem(p);
+            throw _reportWrongToken(p);
         }
         try {
             b = b.start().put(propName0, value);
@@ -57,7 +58,7 @@ public class MapReader extends ValueReader
                     if (p.hasToken(JsonToken.END_OBJECT)) {
                         return b.build();
                     }
-                    throw _reportProblem(p);
+                    throw _reportWrongToken(p);
                 }
             }
         } catch (IllegalArgumentException e) {
@@ -73,7 +74,7 @@ public class MapReader extends ValueReader
             if (p.hasToken(JsonToken.END_OBJECT)) {
                 return b.emptyMap();
             }
-            throw _reportProblem(p);
+            throw _reportWrongToken(p);
         }
         Object value = _valueReader.readNext(r, p);
         String propName = p.nextFieldName();
@@ -81,7 +82,7 @@ public class MapReader extends ValueReader
             if (p.hasToken(JsonToken.END_OBJECT)) {
                 return b.singletonMap(propName0, value);
             }
-            throw _reportProblem(p);
+            throw _reportWrongToken(p);
         }
         try {
             b = b.start().put(propName0, value);
@@ -92,7 +93,7 @@ public class MapReader extends ValueReader
                     if (p.hasToken(JsonToken.END_OBJECT)) {
                         return b.build();
                     }
-                    throw _reportProblem(p);
+                    throw _reportWrongToken(p);
                 }
             }
         } catch (IllegalArgumentException e) {
@@ -100,7 +101,8 @@ public class MapReader extends ValueReader
         }
     }
 
-    protected JSONObjectException _reportProblem(JsonParser p) {
-        return JSONObjectException.from(p, "Unexpected token "+p.currentToken()+"; should get FIELD_NAME or END_OBJECT");
+    protected JSONObjectException _reportWrongToken(JsonParser p) {
+        return JSONObjectException.from(p, "Unexpected token %s; should get FIELD_NAME or END_OBJECT",
+                p.currentToken());
     }
 }

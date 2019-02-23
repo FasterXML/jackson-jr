@@ -219,7 +219,8 @@ public class AnyReader extends ValueReader
     }
 
     private final void _reportNotEndObject(JsonParser p) throws IOException {
-        throw JSONObjectException.from(p, "Unexpected token: "+_tokenDesc(p)+" (should get FIELD_NAME or END_OBJECT)");
+        throw JSONObjectException.from(p, "Unexpected token: %s (should get FIELD_NAME or END_OBJECT)",
+                _tokenDesc(p));
     }
 
     /*

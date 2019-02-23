@@ -55,8 +55,19 @@ public class POJODefinition
     /* Public API
     /**********************************************************************
      */
+
+    public static POJODefinition find(Class<?> forType)
+    {
+        try {
+            return _find(forType);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(String.format
+                    ("Failed to introspect ClassDefinition for type '%s': %s",
+                            forType.getName(), e.getMessage()), e);
+        }
+    }
     
-    public static POJODefinition find(Class<?> forType) {
+    public static POJODefinition _find(Class<?> forType) {
         POJODefinition def = DEFS.get(forType);
         if (def == null) {
             def = _construct(forType);
@@ -111,7 +122,7 @@ public class POJODefinition
         if (propsByName.isEmpty()) {
             props = NO_PROPS;
         } else {
-            props = propsByName.values().toArray(new Prop[propsByName.size()]);
+            props = propsByName.values().toArray(new Prop[0]);
         }
         return new POJODefinition(beanType, props, defaultCtor, stringCtor, longCtor);
     }

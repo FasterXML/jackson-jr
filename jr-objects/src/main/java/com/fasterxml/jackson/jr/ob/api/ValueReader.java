@@ -32,7 +32,7 @@ public abstract class ValueReader
     /**********************************************************************
      */
 
-    protected String _tokenDesc(JsonParser p) throws IOException {
+    public static String _tokenDesc(JsonParser p) throws IOException {
         return _tokenDesc(p, p.currentToken());
     }
     

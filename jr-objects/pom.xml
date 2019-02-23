@@ -33,7 +33,7 @@ has no other dependencies, and provides additional builder-style content generat
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
           <links>
-            <link>http://docs.oracle.com/javase/7/docs/api/</link>
+            <link>https://docs.oracle.com/javase/8/docs/api/</link>
             <link>http://fasterxml.github.com/jackson-core/javadoc/2.7</link>
           </links>
         </configuration>

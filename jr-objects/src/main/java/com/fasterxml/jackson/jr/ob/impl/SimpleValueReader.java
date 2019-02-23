@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import static com.fasterxml.jackson.jr.ob.impl.TypeDetector.*;
+import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,9 @@ import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 /**
- * {@link ValueReader} used for simple scalar types and related.
+ * Default {@link ValueReader} used for simple scalar types and related,
+ * not including POJO-, {@link java.util.Map} and {@link java.util.Collection}
+ * types.
  */
 public class SimpleValueReader extends ValueReader
 {

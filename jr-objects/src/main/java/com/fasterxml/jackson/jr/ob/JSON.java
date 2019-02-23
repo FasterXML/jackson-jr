@@ -250,6 +250,8 @@ public class JSON
         * Whether "is-getters" (like <code>public boolean isValuable()</code>) are detected
         * for use or not. Note that in addition to naming, and lack of arguments, return
         * value also has to be <code>boolean</code> or <code>java.lang.Boolean</code>.
+        *<p>
+        * Feature is enabled by default.
         */
        USE_IS_GETTERS(true, true),
        
@@ -257,14 +259,13 @@ public class JSON
         * Feature that enables use of public fields instead of setters and getters,
         * in cases where no setter/getter is available.
         *<p>
-        * Feature is disabled by default (for backwards compatibility), so fields
-        * are not used unless explicitly enabled.
+        * Feature is <b>enabled</c> by default, so public fields are discovered by default.
         */
        USE_FIELDS(false, true),
        
        ;
 
-       /*
+        /*
        /**********************************************************************
        /* Enum impl
        /**********************************************************************
@@ -412,22 +413,28 @@ public class JSON
         _features = features;
         _streamFactory = streamF;
         _treeCodec = trees;
-        TypeDetector td = _defaultTypeDetector(streamF, features);
-        _reader = (r == null) ? _defaultReader(features, trees, td) : r;
-        _writer = (w == null) ? _defaultWriter(features, trees, td) : w;
+        _reader = (r == null) ? _defaultReader(features, trees,
+                _defaultReaderLocator(streamF, features)) : r;
+        _writer = (w == null) ? _defaultWriter(features, trees,
+                _defaultWriterLocator(features)) : w;
         _prettyPrinter = pp;
     }
 
-    protected TypeDetector _defaultTypeDetector(TokenStreamFactory streamF, int features) {
-        return TypeDetector.blueprint(streamF, features);
+    protected ValueWriterLocator _defaultWriterLocator(int features) {
+        return ValueWriterLocator.blueprint(features);
     }
 
-    protected JSONReader _defaultReader(int features, TreeCodec tc, TypeDetector td) {
+    protected ValueReaderLocator _defaultReaderLocator(TokenStreamFactory streamF,
+            int features) {
+        return ValueReaderLocator.blueprint(streamF, features);
+    }
+
+    protected JSONReader _defaultReader(int features, TreeCodec tc, ValueReaderLocator td) {
         return new JSONReader(features, td, tc,
                 CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
 
-    protected JSONWriter _defaultWriter(int features, TreeCodec tc, TypeDetector td) {
+    protected JSONWriter _defaultWriter(int features, TreeCodec tc, ValueWriterLocator td) {
         return new JSONWriter(features, td, tc);
     }
 
