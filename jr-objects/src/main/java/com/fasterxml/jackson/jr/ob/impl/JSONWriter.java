@@ -10,7 +10,7 @@ import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
-import static com.fasterxml.jackson.jr.ob.impl.WriteTypeDetector.*;
+import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
 
 /**
  * Object that handles serialization of simple Objects into underlying
@@ -40,9 +40,9 @@ public class JSONWriter
     protected final boolean _writeNullValues;
 
     /**
-     * Object that is used to resolve types of values dynamically.
+     * Object that is used to dynamically find Bean (and custom type) value writers
      */
-    protected final WriteTypeDetector _typeDetector;
+    protected final ValueWriterLocator _writerLocator;
 
     protected final TreeCodec _treeCodec;
 
@@ -66,11 +66,11 @@ public class JSONWriter
      * Constructor used for creating differently configured blueprint
      * instances
      */
-    public JSONWriter(int features, WriteTypeDetector td, TreeCodec tc)
+    public JSONWriter(int features, ValueWriterLocator td, TreeCodec tc)
     {
         _features = features;
         _writeNullValues = JSON.Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
-        _typeDetector = td;
+        _writerLocator = td;
         _treeCodec = tc;
         _generator = null;
         _timezone = DEFAULT_TIMEZONE;
@@ -79,11 +79,11 @@ public class JSONWriter
     /**
      * Constructor for non-blueprint instances
      */
-    protected JSONWriter(JSONWriter base, int features, WriteTypeDetector td, JsonGenerator g)
+    protected JSONWriter(JSONWriter base, int features, ValueWriterLocator td, JsonGenerator g)
     {
         _features = features;
         _writeNullValues = JSON.Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
-        _typeDetector = td;
+        _writerLocator = td;
         _treeCodec = base._treeCodec;
         _generator = g;
         _timezone = DEFAULT_TIMEZONE;
@@ -99,14 +99,14 @@ public class JSONWriter
         if (_treeCodec == tc) {
             return this;
         }
-        return _with(_features, _typeDetector, tc);
+        return _with(_features, _writerLocator, tc);
     }
 
     /**
      * Overridable method that all mutant factories call if a new instance
      * is to be constructed
      */
-    protected JSONWriter _with(int features, WriteTypeDetector td, TreeCodec tc)
+    protected JSONWriter _with(int features, ValueWriterLocator td, TreeCodec tc)
     {
         if (getClass() != JSONWriter.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override _with(...)");
@@ -126,7 +126,7 @@ public class JSONWriter
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
         return new JSONWriter(this, features,
-                _typeDetector.perOperationInstance(this, features), g);
+                _writerLocator.perOperationInstance(this, features), g);
     }
 
     /*
@@ -145,7 +145,7 @@ public class JSONWriter
             writeNullValue();
             return;
         }
-        _writeValue(value, _typeDetector.findSerializationType(value.getClass()));
+        _writeValue(value, _writerLocator.findSerializationType(value.getClass()));
     }
 
     @Deprecated // since 2.8
@@ -157,7 +157,7 @@ public class JSONWriter
             }
             return;
         }
-        writeField(fieldName, value, _typeDetector.findSerializationType(value.getClass()));
+        writeField(fieldName, value, _writerLocator.findSerializationType(value.getClass()));
     }
 
     public void writeField(String fieldName, Object value, int type) throws IOException
@@ -265,7 +265,7 @@ public class JSONWriter
         }
 
         if (type < 0) { // Bean type!
-            BeanPropertyWriter[] props = _typeDetector.getPropertyWriters(type);
+            BeanPropertyWriter[] props = _writerLocator.getPropertyWriters(type);
             if (props != null) { // sanity check
                 _generator.writeFieldName(fieldName);
                 writeBeanValue(props, value);
@@ -380,7 +380,7 @@ public class JSONWriter
         }
 
         if (type < 0) { // Bean type!
-            BeanPropertyWriter[] props = _typeDetector.getPropertyWriters(type);
+            BeanPropertyWriter[] props = _writerLocator.getPropertyWriters(type);
             if (props != null) { // sanity check
                 writeBeanValue(props, value);
                 return;
@@ -434,7 +434,7 @@ public class JSONWriter
                 _generator.writeNull();
                 continue;
             }
-            _writeValue(value, _typeDetector.findSerializationType(value.getClass()));
+            _writeValue(value, _writerLocator.findSerializationType(value.getClass()));
         }
         _generator.writeEndArray();
     }
@@ -460,7 +460,7 @@ public class JSONWriter
                     continue;
                 }
                 Class<?> cls = value.getClass();
-                int type = _typeDetector.findSerializationType(cls);
+                int type = _writerLocator.findSerializationType(cls);
                 writeField(key, value, type);
             }
         }
@@ -693,7 +693,7 @@ public class JSONWriter
             }
             int typeId = property.typeId;
             if (typeId == 0) {
-                typeId = _typeDetector.findSerializationType(value.getClass());
+                typeId = _writerLocator.findSerializationType(value.getClass());
             }
             _generator.writeFieldName(name);
             _writeValue(value, typeId);

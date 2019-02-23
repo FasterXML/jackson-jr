@@ -35,9 +35,9 @@ public class JSONReader
     protected final TreeCodec _treeCodec;
     
     /**
-     * Object that is used to resolve types of values dynamically.
+     * Object that is used to find value readers dynamically.
      */
-    protected final ReadTypeDetector _typeDetector;
+    protected final ValueReaderLocator _readerLocator;
     
     /**
      * Handler that takes care of constructing {@link java.util.Map}s as needed
@@ -66,11 +66,11 @@ public class JSONReader
     /**
      * Constructor used for creating the blueprint instances.
      */
-    public JSONReader(int features, ReadTypeDetector td, TreeCodec treeCodec,
+    public JSONReader(int features, ValueReaderLocator td, TreeCodec treeCodec,
             CollectionBuilder lb, MapBuilder mb)
     {
         _features = features;
-        _typeDetector = td;
+        _readerLocator = td;
         _treeCodec = treeCodec;
         _collectionBuilder = lb;
         _mapBuilder = mb;
@@ -80,10 +80,10 @@ public class JSONReader
     /**
      * Constructor used for per-operation (non-blueprint) instance.
      */
-    protected JSONReader(JSONReader base, int features, ReadTypeDetector td, JsonParser p)
+    protected JSONReader(JSONReader base, int features, ValueReaderLocator td, JsonParser p)
     {
         _features = features;
-        _typeDetector = td;
+        _readerLocator = td;
         _treeCodec = base._treeCodec;
         _collectionBuilder = base._collectionBuilder.newBuilder(features);
         _mapBuilder = base._mapBuilder.newBuilder(features);
@@ -101,17 +101,17 @@ public class JSONReader
         if (_features == features) {
             return this;
         }
-        return _with(features, _typeDetector, _treeCodec, _collectionBuilder, _mapBuilder);
+        return _with(features, _readerLocator, _treeCodec, _collectionBuilder, _mapBuilder);
     }
 
     public JSONReader with(MapBuilder mb) {
         if (_mapBuilder == mb) return this;
-        return _with(_features, _typeDetector, _treeCodec, _collectionBuilder, mb);
+        return _with(_features, _readerLocator, _treeCodec, _collectionBuilder, mb);
     }
 
     public JSONReader with(CollectionBuilder lb) {
         if (_collectionBuilder == lb) return this;
-        return _with(_features, _typeDetector, _treeCodec, lb, _mapBuilder);
+        return _with(_features, _readerLocator, _treeCodec, lb, _mapBuilder);
     }
     
     /**
@@ -119,7 +119,7 @@ public class JSONReader
      * is to be constructed
      */
     protected JSONReader _with(int features,
-            ReadTypeDetector td, TreeCodec tc, CollectionBuilder lb, MapBuilder mb)
+            ValueReaderLocator td, TreeCodec tc, CollectionBuilder lb, MapBuilder mb)
     {
         if (getClass() != JSONReader.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override _with(...)");
@@ -139,7 +139,7 @@ public class JSONReader
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
         return new JSONReader(this, features,
-                _typeDetector.perOperationInstance(this, features), p);
+                _readerLocator.perOperationInstance(this, features), p);
     }
 
     /*
@@ -236,7 +236,7 @@ public class JSONReader
      */
     @SuppressWarnings("unchecked")
     public <T> T readBean(Class<T> type) throws IOException {
-        ValueReader vr = _typeDetector.findReader(type);
+        ValueReader vr = _readerLocator.findReader(type);
         final Object ob = vr.read(this, _parser);
         return (T) ob;
     }
@@ -251,7 +251,7 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read an array: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
         }
-        return (T[]) new ArrayReader(type, _typeDetector.findReader(type)).read(this, _parser);
+        return (T[]) new ArrayReader(type, _readerLocator.findReader(type)).read(this, _parser);
     }
 
     /**
@@ -270,7 +270,7 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read a List: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
         }
-        return (List<T>) new CollectionReader(List.class, _typeDetector.findReader(type)).read(this, _parser);
+        return (List<T>) new CollectionReader(List.class, _readerLocator.findReader(type)).read(this, _parser);
     }
     
     /*

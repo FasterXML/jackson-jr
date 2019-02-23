@@ -22,14 +22,13 @@ import com.fasterxml.jackson.jr.type.TypeResolver;
  * use simple caching to handle the common case of repeating types
  * within JSON Arrays.
  */
-public class ReadTypeDetector
-    extends TypeDetectorBase
+public class ValueReaderLocator
+    extends ValueLocatorBase
 {
     /**
      * While we should be able to cache all types in the active working set,
      * we should also avoid potential unbounded retention, since there is
-     * generally just one big `TypeDetector` instances per JVM (or at least
-     * ClassLoader).
+     * often just one big instance per JVM (or at least ClassLoader).
      */
     protected final static int MAX_CACHED_READERS = 500;
 
@@ -88,7 +87,7 @@ public class ReadTypeDetector
     /**
      * Constructor for the blueprint instance
      */
-    protected ReadTypeDetector(int features)
+    protected ValueReaderLocator(int features)
     {
         _features = features;
         _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(50, 0.75f, 4);
@@ -97,7 +96,7 @@ public class ReadTypeDetector
         _readContext = null;
     }
 
-    protected ReadTypeDetector(ReadTypeDetector base, int features, JSONReader r) {
+    protected ValueReaderLocator(ValueReaderLocator base, int features, JSONReader r) {
         _features = features;
         _readContext = r;
         _knownReaders = base._knownReaders;
@@ -105,17 +104,44 @@ public class ReadTypeDetector
         _readerLock = base._readerLock;
     }
 
-    public final static ReadTypeDetector blueprint(int features) {
-        return new ReadTypeDetector(features & CACHE_FLAGS);
+    public final static ValueReaderLocator blueprint(int features) {
+        return new ValueReaderLocator(features & CACHE_FLAGS);
     }
 
-    public ReadTypeDetector perOperationInstance(JSONReader r, int features) {
-        return new ReadTypeDetector(this, features & CACHE_FLAGS, r);
+    public ValueReaderLocator perOperationInstance(JSONReader r, int features) {
+        return new ValueReaderLocator(this, features & CACHE_FLAGS, r);
     }
 
     /*
     /**********************************************************************
-    /* Factory methods for simpler readers
+    /* Public API
+    /**********************************************************************
+     */
+    
+    /**
+     * Method used during deserialization to find handler for given
+     * non-generic type.
+     */
+    public ValueReader findReader(Class<?> raw)
+    {
+        ClassKey k = (_key == null) ? new ClassKey(raw, _features) : _key.with(raw, _features);
+        ValueReader vr = _knownReaders.get(k);
+        if (vr != null) {
+            return vr;
+        }
+        vr = createReader(null, raw, raw);
+        // 15-Jun-2016, tatu: Let's limit maximum number of readers to prevent
+        //   unbounded memory retention (at least wrt readers)
+        if (_knownReaders.size() >= MAX_CACHED_READERS) {
+            _knownReaders.clear();
+        }
+        _knownReaders.putIfAbsent(new ClassKey(raw, _features), vr);
+        return vr;
+    }
+    
+    /*
+    /**********************************************************************
+    /* Factory methods for non-Bean readers
     /**********************************************************************
      */
 
@@ -130,7 +156,7 @@ public class ReadTypeDetector
 
     protected ValueReader collectionReader(Class<?> contextType, Type collectionType)
     {
-        ResolvedType t = _typeResolver.resolve(bindings(contextType), collectionType);
+        ResolvedType t = _typeResolver.resolve(_bindings(contextType), collectionType);
         List<ResolvedType> params = t.typeParametersFor(Collection.class);
         return collectionReader(t.erasedType(), params.get(0));
     }
@@ -153,7 +179,7 @@ public class ReadTypeDetector
 
     protected ValueReader mapReader(Class<?> contextType, Type mapType)
     {
-        ResolvedType t = _typeResolver.resolve(bindings(contextType), mapType);
+        ResolvedType t = _typeResolver.resolve(_bindings(contextType), mapType);
         List<ResolvedType> params = t.typeParametersFor(Map.class);
         return mapReader(t.erasedType(), params.get(1));
     }
@@ -176,31 +202,10 @@ public class ReadTypeDetector
 
     /*
     /**********************************************************************
-    /* Methods for deserialization; other
+    /* Factory method(s) for Beans:
     /**********************************************************************
      */
 
-    /**
-     * Method used during deserialization to find handler for given
-     * non-generic type.
-     */
-    public ValueReader findReader(Class<?> raw)
-    {
-        ClassKey k = (_key == null) ? new ClassKey(raw, _features) : _key.with(raw, _features);
-        ValueReader vr = _knownReaders.get(k);
-        if (vr != null) {
-            return vr;
-        }
-        vr = createReader(null, raw, raw);
-        // 15-Jun-2016, tatu: Let's limit maximum number of readers to prevent
-        //   unbounded memory retention (at least wrt readers)
-        if (_knownReaders.size() >= MAX_CACHED_READERS) {
-            _knownReaders.clear();
-        }
-        _knownReaders.putIfAbsent(new ClassKey(raw, _features), vr);
-        return vr;
-    }
-    
     protected ValueReader createReader(Class<?> contextType, Class<?> type, Type genericType)
     {
         if (type == Object.class) {
@@ -255,9 +260,15 @@ public class ReadTypeDetector
         }
     }
 
+    /*
+    /**********************************************************************
+    /* Internal methods
+    /**********************************************************************
+     */
+
     protected BeanReader _resolveBeanForDeser(Class<?> raw)
     {
-        final POJODefinition pojoDef = resolvePOJODefinition(raw);
+        final POJODefinition pojoDef = _resolveBeanDef(raw);
 
         Constructor<?> defaultCtor = pojoDef.defaultCtor;
         Constructor<?> stringCtor = pojoDef.stringCtor;
@@ -315,7 +326,7 @@ public class ReadTypeDetector
         return new BeanReader(raw, propMap, defaultCtor, stringCtor, longCtor);
     }
 
-    private TypeBindings bindings(Class<?> ctxt) {
+    private TypeBindings _bindings(Class<?> ctxt) {
         if (ctxt == null) {
             return TypeBindings.emptyBindings();
         }

@@ -74,7 +74,7 @@ public class JSON implements Versioned
        /**
         * This feature can be used to indicate that the reader should preserve
         * order of the properties same as what input document has.
-        * Note that it is up to {@link com.fasterxml.jackson.jr.ob.impl.MapBuilder}
+        * Note that it is up to {@link com.fasterxml.jackson.jr.ob.api.MapBuilder}
         * to support this feature; custom implementations may ignore the setting.
         *<p>
         * Default setting is <code>true</code>, meaning that reader is expected to try to
@@ -408,25 +408,25 @@ public class JSON implements Versioned
         _features = features;
         _jsonFactory = jsonF;
         _treeCodec = trees;
-        _reader = (r == null) ? _defaultReader(features, trees, _defaultReadTypeDetector(features)) : r;
-        _writer = (w == null) ? _defaultWriter(features, trees, _defaultTypeDetector(features)) : w;
+        _reader = (r == null) ? _defaultReader(features, trees, _defaultReaderLocator(features)) : r;
+        _writer = (w == null) ? _defaultWriter(features, trees, _defaultWriterLocator(features)) : w;
         _prettyPrinter = pp;
     }
 
-    protected WriteTypeDetector _defaultTypeDetector(int features) {
-        return WriteTypeDetector.blueprint(features);
+    protected ValueWriterLocator _defaultWriterLocator(int features) {
+        return ValueWriterLocator.blueprint(features);
     }
 
-    protected ReadTypeDetector _defaultReadTypeDetector(int features) {
-        return ReadTypeDetector.blueprint(features);
+    protected ValueReaderLocator _defaultReaderLocator(int features) {
+        return ValueReaderLocator.blueprint(features);
     }
     
-    protected JSONReader _defaultReader(int features, TreeCodec tc, ReadTypeDetector td) {
+    protected JSONReader _defaultReader(int features, TreeCodec tc, ValueReaderLocator td) {
         return new JSONReader(features, td, tc,
                 CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
 
-    protected JSONWriter _defaultWriter(int features, TreeCodec tc, WriteTypeDetector td) {
+    protected JSONWriter _defaultWriter(int features, TreeCodec tc, ValueWriterLocator td) {
         return new JSONWriter(features, td, tc);
     }
 

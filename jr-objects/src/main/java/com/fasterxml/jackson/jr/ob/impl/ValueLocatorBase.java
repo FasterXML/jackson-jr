@@ -10,7 +10,7 @@ import java.util.*;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.jr.ob.JSON;
 
-abstract class TypeDetectorBase
+abstract class ValueLocatorBase
 {
     /*
     /**********************************************************************
@@ -123,18 +123,12 @@ abstract class TypeDetectorBase
 
     /*
     /**********************************************************************
-    /* Methods for ser and deser
+    /* Methods for sub-classes
     /**********************************************************************
      */
-    protected POJODefinition resolvePOJODefinition(Class<?> raw)
-    {
-        try {
-            return POJODefinition.find(raw);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(String.format
-                    ("Failed to introspect ClassDefinition for type '%s': %s",
-                    raw.getName(), e.getMessage()), e);
-        }
+
+    protected POJODefinition _resolveBeanDef(Class<?> raw) {
+        return POJODefinition.find(raw);
     }
 
     protected int _findSimpleType(Class<?> raw, boolean forSer)

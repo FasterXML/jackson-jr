@@ -19,7 +19,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
  * use simple caching to handle the common case of repeating types
  * within JSON Arrays.
  */
-public class WriteTypeDetector extends TypeDetectorBase
+public class ValueWriterLocator extends ValueLocatorBase
 {
     protected final BeanPropertyWriter[] NO_PROPS_FOR_WRITE = new BeanPropertyWriter[0];
 
@@ -71,7 +71,7 @@ public class WriteTypeDetector extends TypeDetectorBase
     /**
      * Constructor for the blueprint instance
      */
-    protected WriteTypeDetector(int features)
+    protected ValueWriterLocator(int features)
     {
         _features = features;
         _knownSerTypes = new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4);
@@ -79,24 +79,24 @@ public class WriteTypeDetector extends TypeDetectorBase
         _writeContext = null;
     }
 
-    protected WriteTypeDetector(WriteTypeDetector base, int features, JSONWriter w) {
+    protected ValueWriterLocator(ValueWriterLocator base, int features, JSONWriter w) {
         _features = features;
         _writeContext = w;
         _knownSerTypes = base._knownSerTypes;
         _knownWriters = base._knownWriters;
     }
 
-    public final static WriteTypeDetector blueprint(int features) {
-        return new WriteTypeDetector(features & CACHE_FLAGS);
+    public final static ValueWriterLocator blueprint(int features) {
+        return new ValueWriterLocator(features & CACHE_FLAGS);
     }
 
-    public WriteTypeDetector perOperationInstance(JSONWriter w, int features) {
-        return new WriteTypeDetector(this, features & CACHE_FLAGS, w);
+    public ValueWriterLocator perOperationInstance(JSONWriter w, int features) {
+        return new ValueWriterLocator(this, features & CACHE_FLAGS, w);
     }
 
     /*
     /**********************************************************************
-    /* Writer lookup methods
+    /* Public API: writer lookup
     /**********************************************************************
      */
     
@@ -136,12 +136,18 @@ public class WriteTypeDetector extends TypeDetectorBase
         return type;
     }
 
+    /*
+    /**********************************************************************
+    /* Internal methods
+    /**********************************************************************
+     */
+    
     protected int _findPOJOSerializationType(Class<?> raw)
     {
         int type = _findSimpleType(raw, true);
         if (type == SER_UNKNOWN) {
             if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
-                POJODefinition cd = resolvePOJODefinition(raw);
+                POJODefinition cd = _resolveBeanDef(raw);
                 BeanPropertyWriter[] props = resolveBeanForSer(raw, cd);
                 // Due to concurrent access, possible that someone might have added it
                 synchronized (_knownWriters) {
