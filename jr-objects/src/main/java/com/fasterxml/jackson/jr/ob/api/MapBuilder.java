@@ -1,9 +1,10 @@
-package com.fasterxml.jackson.jr.ob.impl;
+package com.fasterxml.jackson.jr.ob.api;
 
 import java.util.*;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
+import com.fasterxml.jackson.jr.ob.impl.DeferredMap;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 /**

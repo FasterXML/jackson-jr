@@ -6,6 +6,9 @@ import java.util.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
+import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
+import com.fasterxml.jackson.jr.ob.api.MapBuilder;
+import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 /**
  * Object that handles construction of simple Objects from JSON.
@@ -33,7 +36,7 @@ public class JSONReader
     /**
      * Object that is used to resolve types of values dynamically.
      */
-    protected final TypeDetector _typeDetector;
+    protected final TypeDetector _readerLocator;
     
     /**
      * Handler that takes care of constructing {@link java.util.Map}s as needed
@@ -66,7 +69,7 @@ public class JSONReader
             CollectionBuilder lb, MapBuilder mb)
     {
         _features = features;
-        _typeDetector = td;
+        _readerLocator = td;
         _treeCodec = treeCodec;
         _collectionBuilder = lb;
         _mapBuilder = mb;
@@ -79,7 +82,7 @@ public class JSONReader
     protected JSONReader(JSONReader base, int features, TypeDetector td, JsonParser p)
     {
         _features = features;
-        _typeDetector = td;
+        _readerLocator = td;
         _treeCodec = base._treeCodec;
         _collectionBuilder = base._collectionBuilder.newBuilder(features);
         _mapBuilder = base._mapBuilder.newBuilder(features);
@@ -109,17 +112,17 @@ public class JSONReader
         if (_features == features) {
             return this;
         }
-        return _with(features, _typeDetector, _treeCodec, _collectionBuilder, _mapBuilder);
+        return _with(features, _readerLocator, _treeCodec, _collectionBuilder, _mapBuilder);
     }
 
     public JSONReader with(MapBuilder mb) {
         if (_mapBuilder == mb) return this;
-        return _with(_features, _typeDetector, _treeCodec, _collectionBuilder, mb);
+        return _with(_features, _readerLocator, _treeCodec, _collectionBuilder, mb);
     }
 
     public JSONReader with(CollectionBuilder lb) {
         if (_collectionBuilder == lb) return this;
-        return _with(_features, _typeDetector, _treeCodec, lb, _mapBuilder);
+        return _with(_features, _readerLocator, _treeCodec, lb, _mapBuilder);
     }
 
     /**
@@ -147,7 +150,7 @@ public class JSONReader
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
         return new JSONReader(this, features,
-                _typeDetector.perOperationInstance(features), p);
+                _readerLocator.perOperationInstance(features), p);
     }
 
     /*
@@ -238,14 +241,14 @@ public class JSONReader
      */
     @SuppressWarnings("unchecked")
     public <T> T readBean(Class<T> type) throws IOException {
-        ValueReader vr = _typeDetector.findReader(type);
+        ValueReader vr = _readerLocator.findReader(type);
         return (T) vr.read(this, _parser);
     }
 
     @SuppressWarnings("unchecked")
     public <T> T[] readArrayOf(Class<T> type) throws IOException {
         if (_parser.isExpectedStartArrayToken()) {
-            return (T[]) new ArrayReader(type, _typeDetector.findReader(type)).read(this, _parser);
+            return (T[]) new ArrayReader(type, _readerLocator.findReader(type)).read(this, _parser);
         }
         if (_parser.hasToken(JsonToken.VALUE_NULL)) {
             return null;
@@ -263,7 +266,7 @@ public class JSONReader
     public <T> List<T> readListOf(Class<T> type) throws IOException
     {
         if (_parser.isExpectedStartArrayToken()) {
-            return (List<T>) new CollectionReader(List.class, _typeDetector.findReader(type)).read(this, _parser);
+            return (List<T>) new CollectionReader(List.class, _readerLocator.findReader(type)).read(this, _parser);
         }
         if (_parser.hasToken(JsonToken.VALUE_NULL)) {
             return null;

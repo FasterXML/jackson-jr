@@ -1,9 +1,10 @@
-package com.fasterxml.jackson.jr.ob.impl;
+package com.fasterxml.jackson.jr.ob.api;
 
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 
 /**
  * Helper class used when reading values of complex types other

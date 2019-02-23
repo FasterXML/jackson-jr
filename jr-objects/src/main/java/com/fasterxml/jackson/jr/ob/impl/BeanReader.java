@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.sym.FieldNameMatcher;
 import com.fasterxml.jackson.core.util.Named;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 /**
  * Class that contains information about dynamically introspected

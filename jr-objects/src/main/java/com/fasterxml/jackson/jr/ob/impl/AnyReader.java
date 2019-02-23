@@ -10,6 +10,9 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
 
 import com.fasterxml.jackson.jr.ob.*;
+import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
+import com.fasterxml.jackson.jr.ob.api.MapBuilder;
+import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 /**
  * {@link ValueReader} used for "untyped" values; ones that are bound

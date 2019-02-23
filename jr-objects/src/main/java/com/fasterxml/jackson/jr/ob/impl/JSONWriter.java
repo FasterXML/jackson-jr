@@ -40,7 +40,7 @@ public class JSONWriter
     /**
      * Object that is used to resolve types of values dynamically.
      */
-    protected final TypeDetector _typeDetector;
+    protected final TypeDetector _writerLocator;
 
     protected final TreeCodec _treeCodec;
 
@@ -68,7 +68,7 @@ public class JSONWriter
     {
         _features = features;
         _writeNullValues = Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
-        _typeDetector = td;
+        _writerLocator = td;
         _treeCodec = tc;
         _generator = null;
         _timezone = DEFAULT_TIMEZONE;
@@ -81,7 +81,7 @@ public class JSONWriter
     {
         _features = features;
         _writeNullValues = Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
-        _typeDetector = td;
+        _writerLocator = td;
         _treeCodec = base._treeCodec;
         _generator = g;
         _timezone = DEFAULT_TIMEZONE;
@@ -97,7 +97,7 @@ public class JSONWriter
         if (_treeCodec == tc) {
             return this;
         }
-        return _with(_features, _typeDetector, tc);
+        return _with(_features, _writerLocator, tc);
     }
 
     /**
@@ -124,7 +124,7 @@ public class JSONWriter
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
         return new JSONWriter(this, features,
-                _typeDetector.perOperationInstance(features), g);
+                _writerLocator.perOperationInstance(features), g);
     }
 
     /*
@@ -139,7 +139,7 @@ public class JSONWriter
             writeNullValue();
             return;
         }
-        _writeValue(value, _typeDetector.findSerializationType(value.getClass()));
+        _writeValue(value, _writerLocator.findSerializationType(value.getClass()));
     }
 
     public void writeField(String fieldName, Object value, int type) throws IOException
@@ -252,7 +252,7 @@ public class JSONWriter
         }
 
         if (type < 0) { // Bean type!
-            BeanPropertyWriter[] props = _typeDetector.getPropertyWriters(type);
+            BeanPropertyWriter[] props = _writerLocator.getPropertyWriters(type);
             if (props != null) { // sanity check
                 _generator.writeFieldName(fieldName);
                 writeBeanValue(props, value);
@@ -370,7 +370,7 @@ public class JSONWriter
         }
 
         if (type < 0) { // Bean type!
-            BeanPropertyWriter[] props = _typeDetector.getPropertyWriters(type);
+            BeanPropertyWriter[] props = _writerLocator.getPropertyWriters(type);
             if (props != null) { // sanity check
                 writeBeanValue(props, value);
                 return;
@@ -425,7 +425,7 @@ public class JSONWriter
                 _generator.writeNull();
                 continue;
             }
-            _writeValue(value, _typeDetector.findSerializationType(value.getClass()));
+            _writeValue(value, _writerLocator.findSerializationType(value.getClass()));
         }
         _generator.writeEndArray();
     }
@@ -448,7 +448,7 @@ public class JSONWriter
                     type = SER_NULL;
                 } else {
                     Class<?> cls = value.getClass();
-                    type = _typeDetector.findSerializationType(cls);
+                    type = _writerLocator.findSerializationType(cls);
                 }
                 writeField(key, value, type);
             }
@@ -705,7 +705,7 @@ public class JSONWriter
                 } else {
                     typeId = property.typeId;
                     if (typeId == 0) {
-                        typeId = _typeDetector.findSerializationType(value.getClass());
+                        typeId = _writerLocator.findSerializationType(value.getClass());
                     }
                 }
                 _generator.writeFieldName(property.name);
@@ -718,7 +718,7 @@ public class JSONWriter
                 } else {
                     typeId = property.typeId;
                     if (typeId == 0) {
-                        typeId = _typeDetector.findSerializationType(value.getClass());
+                        typeId = _writerLocator.findSerializationType(value.getClass());
                     }
                 }
                 _generator.writeFieldName(property.name);
@@ -731,7 +731,7 @@ public class JSONWriter
                 } else {
                     typeId = property.typeId;
                     if (typeId == 0) {
-                        typeId = _typeDetector.findSerializationType(value.getClass());
+                        typeId = _writerLocator.findSerializationType(value.getClass());
                     }
                 }
                 _generator.writeFieldName(property.name);
@@ -744,7 +744,7 @@ public class JSONWriter
                 } else {
                     typeId = property.typeId;
                     if (typeId == 0) {
-                        typeId = _typeDetector.findSerializationType(value.getClass());
+                        typeId = _writerLocator.findSerializationType(value.getClass());
                     }
                 }
                 _generator.writeFieldName(property.name);
@@ -765,7 +765,7 @@ public class JSONWriter
             } else {
                 typeId = property.typeId;
                 if (typeId == 0) {
-                    typeId = _typeDetector.findSerializationType(value.getClass());
+                    typeId = _writerLocator.findSerializationType(value.getClass());
                 }
             }
             _generator.writeFieldName(property.name);
@@ -778,7 +778,7 @@ public class JSONWriter
             } else {
                 typeId = property.typeId;
                 if (typeId == 0) {
-                    typeId = _typeDetector.findSerializationType(value.getClass());
+                    typeId = _writerLocator.findSerializationType(value.getClass());
                 }
             }
             _generator.writeFieldName(property.name);
@@ -791,7 +791,7 @@ public class JSONWriter
             } else {
                 typeId = property.typeId;
                 if (typeId == 0) {
-                    typeId = _typeDetector.findSerializationType(value.getClass());
+                    typeId = _writerLocator.findSerializationType(value.getClass());
                 }
             }
             _generator.writeFieldName(property.name);

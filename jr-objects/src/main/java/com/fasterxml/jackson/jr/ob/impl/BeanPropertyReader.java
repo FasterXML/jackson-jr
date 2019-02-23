@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 public final class BeanPropertyReader
 {

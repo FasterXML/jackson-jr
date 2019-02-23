@@ -11,6 +11,7 @@ import java.util.*;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 /**
  * {@link ValueReader} used for simple scalar types and related.

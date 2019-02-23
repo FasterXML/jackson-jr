@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
+import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 /**
  * Reader for typed Array values.

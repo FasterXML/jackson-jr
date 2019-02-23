@@ -13,6 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import com.fasterxml.jackson.core.TokenStreamFactory;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.api.ValueReader;
 import com.fasterxml.jackson.jr.type.ResolvedType;
 import com.fasterxml.jackson.jr.type.TypeBindings;
 import com.fasterxml.jackson.jr.type.TypeResolver;

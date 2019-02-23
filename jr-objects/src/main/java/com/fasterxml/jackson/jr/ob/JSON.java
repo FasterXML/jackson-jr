@@ -14,6 +14,8 @@ import com.fasterxml.jackson.core.type.ResolvedType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.Instantiatable;
+import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
+import com.fasterxml.jackson.jr.ob.api.MapBuilder;
 import com.fasterxml.jackson.jr.ob.comp.CollectionComposer;
 import com.fasterxml.jackson.jr.ob.comp.ComposerBase;
 import com.fasterxml.jackson.jr.ob.comp.MapComposer;
@@ -81,7 +83,7 @@ public class JSON
        /**
         * This feature can be used to indicate that the reader should preserve
         * order of the properties same as what input document has.
-        * Note that it is up to {@link com.fasterxml.jackson.jr.ob.impl.MapBuilder}
+        * Note that it is up to {@link com.fasterxml.jackson.jr.ob.api.MapBuilder}
         * to support this feature; custom implementations may ignore the setting.
         *<p>
         * Default setting is <code>true</code>, meaning that reader is expected to try to
