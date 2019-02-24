@@ -26,7 +26,8 @@ public class ArrayReader extends ValueReader
             if (p.hasToken(JsonToken.VALUE_NULL)) {
                 return null;
             }
-            throw JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get START_ARRAY");
+            throw JSONObjectException.from(p, "Unexpected token %s; should get START_ARRAY",
+                    p.getCurrentToken());
         }
         
         CollectionBuilder b = r._collectionBuilder(null);

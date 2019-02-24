@@ -18,8 +18,16 @@ public class SimpleFieldTest extends TestBase
         public void setY(int value) { y = value; }
     }
 
-    public void testDefaulSettings() {
-        assertFalse(JSON.std.isEnabled(JSON.Feature.USE_FIELDS));
+    public void testDefaultSettings() {
+        // Changed in 2.10
+        assertTrue(JSON.std.isEnabled(JSON.Feature.USE_FIELDS));
+    }
+
+    public void testSerializeWithoutField() throws Exception
+    {
+        String json = JSON.std.without(JSON.Feature.USE_FIELDS)
+                .asString(new XY(1, 2));
+        assertEquals(aposToQuotes("{'y':2}"), json);
     }
 
     public void testSerializeWithField() throws Exception

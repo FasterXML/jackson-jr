@@ -257,8 +257,7 @@ public class JSON implements Versioned
         *
         * @since 2.8 (enabled by default since 2.10)
         */
-       USE_FIELDS(false, true),
-       
+       USE_FIELDS(true, true),
        ;
 
        /*

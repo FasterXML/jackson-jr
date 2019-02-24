@@ -6,7 +6,7 @@ Project: jackson-jr
 
 2.10.0 (not yet released)
 
-No changes since 2.9
+#63: Change default for `JSON.Feature.USE_FIELDS` to `true` (from false) in 2.10
 
 2.9.9 (not yet released)
 
