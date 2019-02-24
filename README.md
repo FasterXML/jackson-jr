@@ -50,7 +50,7 @@ If you are not sure which package to use, the answer is usually `jr-objects`, an
 
 [![Build Status](https://travis-ci.org/FasterXML/jackson-jr.svg)](https://travis-ci.org/FasterXML/jackson-jr)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.fasterxml.jackson.jr/jackson-jr-objects/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.fasterxml.jackson.jr/jackson-jr-objects/)
-[![Javadoc](https://javadoc-emblem.rhcloud.com/doc/com.fasterxml.jackson.jr/jackson-jr-objects/badge.svg)](http://www.javadoc.io/doc/com.fasterxml.jackson.jr/jackson-jr-objects)
+[![Javadoc](https://javadoc.io/badge/com.fasterxml.jackson.jr/jackson-jr-objects.svg)](http://www.javadoc.io/doc/com.fasterxml.jackson.jr/jackson-jr-objects)
 
 ## Usage
 
