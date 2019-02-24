@@ -213,7 +213,7 @@ public class ValueWriterLocator extends ValueLocatorBase
         }
         int plen = props.size();
         BeanPropertyWriter[] propArray = (plen == 0) ? NO_PROPS_FOR_WRITE
-                : props.toArray(new BeanPropertyWriter[0]);
+                : props.toArray(NO_PROPS_FOR_WRITE);
         return propArray;
     }
 }

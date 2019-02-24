@@ -22,14 +22,14 @@ public class WriteBeansTest extends TestBase
     }
 
     static class BeanBase {
-        public int _value;
+        int _value;
 
         public int getValue() { return _value; }
         public void setValue(int v) { _value = v; }
     }
 
     static class BaseImpl extends BeanBase {
-        public int _extra;
+        int _extra;
 
         protected BaseImpl() { }
         public BaseImpl(int v, int x) {

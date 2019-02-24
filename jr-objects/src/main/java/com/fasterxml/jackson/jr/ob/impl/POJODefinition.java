@@ -23,7 +23,7 @@ public class POJODefinition
      * for larger systems
      */
     private final static int MAX_CACHED = 100;
-    
+
     private final static Prop[] NO_PROPS = new Prop[0];
 
     protected final static ConcurrentHashMap<Class<?>, POJODefinition> DEFS
@@ -122,7 +122,7 @@ public class POJODefinition
         if (propsByName.isEmpty()) {
             props = NO_PROPS;
         } else {
-            props = propsByName.values().toArray(new Prop[0]);
+            props = propsByName.values().toArray(NO_PROPS);
         }
         return new POJODefinition(beanType, props, defaultCtor, stringCtor, longCtor);
     }

@@ -183,7 +183,7 @@ public class ValueReaderLocator
             List<ResolvedType> params = valueType.typeParametersFor(Map.class);
             valueReader = mapReader(rawValueType, params.get(1));
         } else {
-            valueReader = createReader(null, rawValueType, rawValueType);
+            valueReader = findReader(rawValueType);
         }
         return new CollectionReader(collectionType, valueReader);
     }
@@ -206,7 +206,7 @@ public class ValueReaderLocator
             List<ResolvedType> params = valueType.typeParametersFor(Map.class);
             valueReader = mapReader(rawValueType, params.get(1));
         } else {
-            valueReader = createReader(null, rawValueType, rawValueType);
+            valueReader = findReader(rawValueType);
         }
         return new MapReader(mapType, valueReader);
     }

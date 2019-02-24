@@ -261,8 +261,7 @@ public class JSON
         *<p>
         * Feature is <b>enabled</c> by default, so public fields are discovered by default.
         */
-       USE_FIELDS(false, true),
-       
+       USE_FIELDS(true, true),
        ;
 
         /*
