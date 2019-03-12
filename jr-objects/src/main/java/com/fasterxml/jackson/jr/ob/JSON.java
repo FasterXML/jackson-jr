@@ -252,7 +252,7 @@ public class JSON implements Versioned
         * Feature that enables use of public fields instead of setters and getters,
         * in cases where no setter/getter is available.
         *<p>
-        * Feature is <b>enabled</c> by default since 2.10 (but was <b>disabled</b> for
+        * Feature is <b>enabled</b> by default since 2.10 (but was <b>disabled</b> for
         * 2.8 and 2.9), so public fields are discovered by default.
         *
         * @since 2.8 (enabled by default since 2.10)
