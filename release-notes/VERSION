@@ -4,7 +4,7 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
-2.9.9 (not yet released)
+2.9.9 (16-May-2019)
 
 - Fix an issue with Maps-of-Lists, Lists-of-Maps
 
