@@ -202,14 +202,18 @@ public class POJODefinition
     
     private static String decap(String name) {
         char c = name.charAt(0);
-        if (name.length() > 1
-                && Character.isUpperCase(name.charAt(1))
-                && Character.isUpperCase(c)){
-            return name;
+        char lowerC = Character.toLowerCase(c);
+
+        if (c != lowerC) {
+            // First: do NOT lower case if more than one leading upper case letters:
+            if ((name.length() == 1)
+                    || !Character.isUpperCase(name.charAt(1))) {
+                char chars[] = name.toCharArray();
+                chars[0] = lowerC;
+                return new String(chars);
+            }
         }
-        char chars[] = name.toCharArray();
-        chars[0] = Character.toLowerCase(c);
-        return new String(chars);
+        return name;
     }
 
     /*

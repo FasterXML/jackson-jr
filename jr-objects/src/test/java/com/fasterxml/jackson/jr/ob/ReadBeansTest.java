@@ -54,6 +54,12 @@ public class ReadBeansTest extends TestBase
         }
     }
 
+    static class URLBean {
+        String url;
+
+        public void setURL(String s) { url = s; } 
+    }
+
     /*
     /**********************************************************************
     /* Test methdods
@@ -212,5 +218,14 @@ public class ReadBeansTest extends TestBase
         assertNotNull(result);
         assertEquals(1, result.length);
         assertEquals(3L, result[0].value.longValue());
+    }
+
+    public void testNameWithLeadingUppers() throws Exception
+    {
+        final String expURL = "http://foo";
+        URLBean bean = JSON.std
+                .with(JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY)
+                .beanFrom(URLBean.class, aposToQuotes("{'URL':'"+expURL+"'}"));
+        assertEquals(expURL, bean.url);
     }
 }
