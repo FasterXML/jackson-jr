@@ -9,7 +9,7 @@ Project: jackson-jr
 #63: Change default for `JSON.Feature.USE_FIELDS` to `true` (from false) in 2.10
 - Add JDK9+ `module-info.class` using Moditect
 
-2.9.9 (not yet released)
+2.9.9 (16-May-2019)
 
 - Fix an issue with Maps-of-Lists, Lists-of-Maps
 
