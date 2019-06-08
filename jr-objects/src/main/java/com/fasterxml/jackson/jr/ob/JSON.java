@@ -548,7 +548,7 @@ public class JSON implements Versioned
     public JSON with(ReaderWriterProvider rwp) {
         JSONReader r = _reader.with(rwp);
         JSONWriter w = _writer.with(rwp);
-        if ((r == _reader) || (w == _writer))  {
+        if ((r == _reader) && (w == _writer))  {
             return this;
         }
         return _with(_features, _jsonFactory, _treeCodec,

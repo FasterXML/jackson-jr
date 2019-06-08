@@ -17,9 +17,10 @@ public class MapReader extends ValueReader
     protected final Class<?> _mapType;
     protected final ValueReader _valueReader;
 
-    public MapReader(Class<?> t, ValueReader vr) {
+    public MapReader(Class<?> mapType, ValueReader vr) {
+        super(mapType);
         // Some caveats: drop type if it's generic enough (aka "don't care")
-        _mapType = (t == Map.class) ? null : t;
+        _mapType = (mapType == Map.class) ? null : mapType;
         _valueReader = vr;
     }
 

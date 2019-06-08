@@ -242,8 +242,8 @@ public class JSONReader
      */
     @SuppressWarnings("unchecked")
     public <T> T readBean(Class<T> type) throws IOException {
-        ValueReader vr = _readerLocator.findReader(type);
-        final Object ob = vr.read(this, _parser);
+        final Object ob = _readerLocator.findReader(type)
+            .read(this, _parser);
         return (T) ob;
     }
 
@@ -257,7 +257,10 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read an array: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
         }
-        return (T[]) new ArrayReader(type, _readerLocator.findReader(type)).read(this, _parser);
+        // NOTE: "array type" we give is incorrect, but should usually not matter
+        // -- to fix would need to instantiate 0-element array, get that type
+        return (T[]) new ArrayReader(type, type, _readerLocator.findReader(type))
+                .read(this, _parser);
     }
 
     /**
@@ -276,7 +279,8 @@ public class JSONReader
             throw JSONObjectException.from(_parser,
                     "Can not read a List: expect to see START_ARRAY ('['), instead got: "+ValueReader._tokenDesc(_parser));
         }
-        return (List<T>) new CollectionReader(List.class, _readerLocator.findReader(type)).read(this, _parser);
+        return (List<T>) new CollectionReader(List.class, _readerLocator.findReader(type))
+                .read(this, _parser);
     }
     
     /*

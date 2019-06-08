@@ -18,8 +18,6 @@ import com.fasterxml.jackson.jr.ob.api.ValueReader;
 public class BeanReader
     extends ValueReader // so we can chain calls for Collections, arrays
 {
-    protected final Class<?> _type;
-
     protected final Map<String,BeanPropertyReader> _propsByName; // for deserialization
 
     protected final Constructor<?> _defaultCtor;
@@ -32,7 +30,7 @@ public class BeanReader
     public BeanReader(Class<?> type, Map<String, BeanPropertyReader> props,
             Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor)
     {
-        _type = type;
+        super(type);
         _propsByName = props;
         _defaultCtor = defaultCtor;
         _stringCtor = stringCtor;
@@ -84,11 +82,11 @@ public class BeanReader
             throw e;
         } catch (Exception e) {
             throw JSONObjectException.from(p, "Failed to create an instance of "
-                    +_type.getName()+" due to ("+e.getClass().getName()+"): "+e.getMessage(),
+                    +_valueType.getName()+" due to ("+e.getClass().getName()+"): "+e.getMessage(),
                     e);
         }
         throw JSONObjectException.from(p,
-                "Can not create a "+_type.getName()+" instance out of "+_tokenDesc(p));
+                "Can not create a "+_valueType.getName()+" instance out of "+_tokenDesc(p));
     }
     
     /**
@@ -136,29 +134,29 @@ public class BeanReader
         } catch (Exception e) {
             throw JSONObjectException.from(p, e,
                     "Failed to create an instance of %s due to (%s): %s",
-                    _type.getName(), e.getClass().getName(), e.getMessage());
+                    _valueType.getName(), e.getClass().getName(), e.getMessage());
         }
         throw JSONObjectException.from(p, "Can not create a %s instance out of %s",
-                _type.getName(), _tokenDesc(p));
+                _valueType.getName(), _tokenDesc(p));
     }
     
     protected Object create() throws Exception {
         if (_defaultCtor == null) {
-            throw new IllegalStateException("Class "+_type.getName()+" does not have default constructor to use");
+            throw new IllegalStateException("Class "+_valueType.getName()+" does not have default constructor to use");
         }
         return _defaultCtor.newInstance();
     }
     
     protected Object create(String str) throws Exception {
         if (_stringCtor == null) {
-            throw new IllegalStateException("Class "+_type.getName()+" does not have single-String constructor to use");
+            throw new IllegalStateException("Class "+_valueType.getName()+" does not have single-String constructor to use");
         }
         return _stringCtor.newInstance(str);
     }
 
     protected Object create(long l) throws Exception {
         if (_longCtor == null) {
-            throw new IllegalStateException("Class "+_type.getName()+" does not have single-long constructor to use");
+            throw new IllegalStateException("Class "+_valueType.getName()+" does not have single-long constructor to use");
         }
         return _longCtor.newInstance(l);
     }
@@ -166,7 +164,7 @@ public class BeanReader
     protected void handleUnknown(JSONReader reader, JsonParser parser, String fieldName) throws IOException {
         if (JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY.isEnabled(reader._features)) {
             throw JSONObjectException.from(parser, "Unrecognized JSON property '"
-                    +fieldName+"' for Bean type "+_type.getName());
+                    +fieldName+"' for Bean type "+_valueType.getName());
         }
         parser.nextToken();
         parser.skipChildren();

@@ -15,8 +15,9 @@ public class ArrayReader extends ValueReader
     protected final Class<?> _elementType;
     protected final ValueReader _valueReader;
 
-    public ArrayReader(Class<?> t, ValueReader vr) {
-        _elementType = t;
+    public ArrayReader(Class<?> arrayType, Class<?> elementType, ValueReader vr) {
+        super(arrayType);
+        _elementType = elementType;
         _valueReader = vr;
     }
 

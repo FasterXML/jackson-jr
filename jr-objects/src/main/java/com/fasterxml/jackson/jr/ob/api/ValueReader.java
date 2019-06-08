@@ -12,9 +12,20 @@ import com.fasterxml.jackson.jr.ob.impl.JSONReader;
  */
 public abstract class ValueReader
 {
+    /**
+     * Type of values this reader will read
+     *
+     * @since 2.10
+     */
+    protected final Class<?> _valueType;
+
+    protected ValueReader(Class<?> valueType) {
+        _valueType = valueType;
+    }
+
     /*
     /**********************************************************************
-    /* Basic API
+    /* Basic API to implement for actual read operations
     /**********************************************************************
      */
 
@@ -39,6 +50,22 @@ public abstract class ValueReader
      * @param p Underlying parser used for reading decoded token stream
      */
     public abstract Object readNext(JSONReader reader, JsonParser p) throws IOException;
+
+    /*
+    /**********************************************************************
+    /* Minimal metadata
+    /**********************************************************************
+     */
+
+    /**
+     * Accessor for non-generic (type-erased) type of values this reader
+     * produces from input.
+     *
+     * @since 2.10
+     */
+    public Class<?> valueType() {
+        return _valueType;
+    }
 
     /*
     /**********************************************************************

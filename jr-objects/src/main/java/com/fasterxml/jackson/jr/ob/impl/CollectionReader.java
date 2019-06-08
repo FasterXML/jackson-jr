@@ -17,6 +17,7 @@ public class CollectionReader extends ValueReader
     protected final ValueReader _valueReader;
 
     public CollectionReader(Class<?> t, ValueReader vr) {
+        super(t);
         // some cleanup will be needed....
         if (t == Collection.class || t == List.class) { // since we default to ArrayList
             _collectionType = null;

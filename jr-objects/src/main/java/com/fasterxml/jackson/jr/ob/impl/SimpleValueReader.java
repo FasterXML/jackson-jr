@@ -21,11 +21,10 @@ import com.fasterxml.jackson.jr.ob.api.ValueReader;
 public class SimpleValueReader extends ValueReader
 {
     protected final int _typeId;
-    protected final Class<?> _rawType;
 
-    public SimpleValueReader(int typeId, Class<?> raw) {
+    public SimpleValueReader(Class<?> raw, int typeId) {
+        super(raw);
         _typeId = typeId;
-        _rawType = raw;
     }
     
     @Override
@@ -165,7 +164,7 @@ public class SimpleValueReader extends ValueReader
         }
         
         throw JSONObjectException.from(p,
-                "Can not create a "+_rawType.getName()+" instance out of "+_tokenDesc(p));
+                "Can not create a "+_valueType.getName()+" instance out of "+_tokenDesc(p));
     }    
 
     /*
@@ -191,7 +190,7 @@ public class SimpleValueReader extends ValueReader
             return p.getLongValue();
         }
         throw JSONObjectException.from(p, "Can not get long numeric value from JSON (to construct "
-                +_rawType.getName()+") from "+_tokenDesc(p, t));
+                +_valueType.getName()+") from "+_tokenDesc(p, t));
     }
 
     private final String _nextString(JsonParser p) throws IOException {
