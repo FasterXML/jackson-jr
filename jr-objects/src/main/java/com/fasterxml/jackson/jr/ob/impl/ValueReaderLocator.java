@@ -130,12 +130,12 @@ public class ValueReaderLocator
     }
 
     protected ValueReaderLocator(ValueReaderLocator base, ReaderWriterProvider rwp) {
-        // create new cache as there may be custom writers:
-        _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(10, 0.75f, 2);
-
+        _streamFactory = base._streamFactory;
         _features = base._features;
         _readContext = base._readContext;
         _readerProvider = rwp;
+        // create new cache as there may be custom writers:
+        _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(10, 0.75f, 2);
         _typeResolver = base._typeResolver;
         _readerLock = base._readerLock;
     }
