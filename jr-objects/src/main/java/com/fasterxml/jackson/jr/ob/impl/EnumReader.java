@@ -21,7 +21,9 @@ public class EnumReader extends ValueReader
     protected final Object[] _byIndex;
     protected final Map<String,Object> _byName;
 
-    public EnumReader(Object[] byIndex, Map<String,Object> byName) {
+    public EnumReader(Class<?> enumType,
+            Object[] byIndex, Map<String,Object> byName) {
+        super(enumType);
         _byIndex = byIndex;
         _byName = byName;
     }

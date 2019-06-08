@@ -236,14 +236,17 @@ public class JSONReader
      */
     @SuppressWarnings("unchecked")
     public <T> T readBean(Class<T> type) throws IOException {
-        ValueReader vr = _readerLocator.findReader(type);
-        return (T) vr.read(this, _parser);
+        return (T) _readerLocator.findReader(type).read(this, _parser);
     }
 
     @SuppressWarnings("unchecked")
     public <T> T[] readArrayOf(Class<T> type) throws IOException {
         if (_parser.isExpectedStartArrayToken()) {
-            return (T[]) new ArrayReader(type, _readerLocator.findReader(type)).read(this, _parser);
+            // NOTE: "array type" we give is incorrect, but should usually not matter
+            // -- to fix would need to instantiate 0-element array, get that type
+            return (T[]) new ArrayReader(type, type,
+                _readerLocator.findReader(type))
+                    .read(this, _parser);
         }
         if (_parser.hasToken(JsonToken.VALUE_NULL)) {
             return null;
@@ -261,7 +264,8 @@ public class JSONReader
     public <T> List<T> readListOf(Class<T> type) throws IOException
     {
         if (_parser.isExpectedStartArrayToken()) {
-            return (List<T>) new CollectionReader(List.class, _readerLocator.findReader(type)).read(this, _parser);
+            return (List<T>) new CollectionReader(List.class, _readerLocator.findReader(type))
+                    .read(this, _parser);
         }
         if (_parser.hasToken(JsonToken.VALUE_NULL)) {
             return null;

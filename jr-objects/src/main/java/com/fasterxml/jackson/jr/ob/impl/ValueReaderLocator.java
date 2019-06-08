@@ -113,7 +113,7 @@ public class ValueReaderLocator
         _streamFactory = streamF;
         _features = features;
         _readerProvider = rwp;
-        _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(50, 0.75f, 4);
+        _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(10, 0.75f, 2);
         _typeResolver = new TypeResolver();
         _readerLock = new Object();
         _readContext = null;
@@ -130,10 +130,12 @@ public class ValueReaderLocator
     }
 
     protected ValueReaderLocator(ValueReaderLocator base, ReaderWriterProvider rwp) {
+        // create new cache as there may be custom writers:
+        _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(10, 0.75f, 2);
+
         _features = base._features;
         _readContext = base._readContext;
         _readerProvider = rwp;
-        _knownReaders = base._knownReaders;
         _typeResolver = base._typeResolver;
         _readerLock = base._readerLock;
     }
@@ -180,20 +182,67 @@ public class ValueReaderLocator
         _knownReaders.putIfAbsent(new ClassKey(raw, _features), vr);
         return vr;
     }
-    
+
+    /**
+     * Factory method for creating standard readers of any declared type
+     */
+    protected ValueReader createReader(Class<?> contextType, Class<?> type, Type genericType)
+    {
+        if (type == Object.class) {
+            return AnyReader.std;
+        }
+        if (type.isArray()) {
+            return arrayReader(contextType, type);
+        }
+        if (type.isEnum()) {
+            return enumReader(type);
+        }
+        if (Collection.class.isAssignableFrom(type)) {
+            return collectionReader(contextType, genericType);
+        }
+        if (Map.class.isAssignableFrom(type)) {
+            return mapReader(contextType, genericType);
+        }
+        int typeId = _findSimpleType(type, false);
+        if (typeId > 0) {
+            return new SimpleValueReader(type, typeId);
+        }
+        return beanReader(type);
+    }
+
     /*
     /**********************************************************************
     /* Factory methods for non-Bean readers
     /**********************************************************************
      */
 
-    public ValueReader enumReader(Class<?> enumType) {
+    protected ValueReader arrayReader(Class<?> contextType, Class<?> arrayType) {
+        // TODO: maybe allow custom array readers?
+        Class<?> elemType = arrayType.getComponentType();
+        if (!elemType.isPrimitive()) {
+            return new ArrayReader(arrayType, elemType,
+                    createReader(contextType, elemType, elemType));
+        }
+        int typeId = _findSimpleType(arrayType, false);
+        if (typeId > 0) {
+            return new SimpleValueReader(arrayType, typeId);
+        }
+        throw new IllegalArgumentException("Deserialization of "+arrayType.getName()+" not (yet) supported");
+    }
+
+    protected ValueReader enumReader(Class<?> enumType) {
+        if (_readerProvider != null) {
+            ValueReader r = _readerProvider.findEnumReader(_readContext, enumType);
+            if (r != null) {
+                return r;
+            }
+        }
         Object[] enums = enumType.getEnumConstants();
         Map<String,Object> byName = new HashMap<String,Object>();
         for (Object e : enums) {
             byName.put(e.toString(), e);
         }
-        return new EnumReader(enums, byName);
+        return new EnumReader(enumType, enums, byName);
     }
 
     protected ValueReader collectionReader(Class<?> contextType, Type collectionType)
@@ -216,6 +265,14 @@ public class ValueReaderLocator
         } else {
             valueReader = findReader(rawValueType);
         }
+        if (_readerProvider != null) {
+            ValueReader r = _readerProvider.findCollectionReader(_readContext,
+                    collectionType, valueType, valueReader);
+            if (r != null) {
+                return r;
+            }
+        }
+
         return new CollectionReader(collectionType, valueReader);
     }
 
@@ -225,7 +282,7 @@ public class ValueReaderLocator
         List<ResolvedType> params = t.typeParametersFor(Map.class);
         return mapReader(t.erasedType(), params.get(1));
     }
-    
+
     protected ValueReader mapReader(Class<?> mapType, ResolvedType valueType)
     {
         final Class<?> rawValueType = valueType.erasedType();
@@ -239,45 +296,25 @@ public class ValueReaderLocator
         } else {
             valueReader = findReader(rawValueType);
         }
+        if (_readerProvider != null) {
+            ValueReader r = _readerProvider.findMapReader(_readContext,
+                    mapType, valueType, valueReader);
+            if (r != null) {
+                return r;
+            }
+        }
         return new MapReader(mapType, valueReader);
     }
 
-    /*
-    /**********************************************************************
-    /* Factory method(s) for Beans:
-    /**********************************************************************
-     */
-
-    protected ValueReader createReader(Class<?> contextType, Class<?> type, Type genericType)
+    protected ValueReader beanReader(Class<?> type)
     {
-        if (type == Object.class) {
-            return AnyReader.std;
-        }
-        if (type.isArray()) {
-            Class<?> elemType = type.getComponentType();
-            if (!elemType.isPrimitive()) {
-                return new ArrayReader(elemType, createReader(contextType, elemType, elemType));
+        if (_readerProvider != null) {
+            ValueReader r = _readerProvider.findBeanReader(_readContext, type);
+            if (r != null) {
+                return r;
             }
-            int typeId = _findSimpleType(type, false);
-            if (typeId > 0) {
-                return new SimpleValueReader(typeId, type);
-            }
-            throw new IllegalArgumentException("Deserialization of "+type.getName()+" not (yet) supported");
         }
-        if (type.isEnum()) {
-            return enumReader(type);
-        }
-        if (Collection.class.isAssignableFrom(type)) {
-            return collectionReader(contextType, genericType);
-        }
-        if (Map.class.isAssignableFrom(type)) {
-            return mapReader(contextType, genericType);
-        }
-        int typeId = _findSimpleType(type, false);
-        if (typeId > 0) {
-            return new SimpleValueReader(typeId, type);
-        }
-        // Beans!
+
         final ClassKey key = new ClassKey(type, _features);
         synchronized (_readerLock) {
             if (_incompleteReaders == null) {
@@ -293,7 +330,7 @@ public class ValueReaderLocator
                 _incompleteReaders.put(key, def);
                 for (Map.Entry<String, BeanPropertyReader> entry : def.propertiesByName().entrySet()) {
                     BeanPropertyReader prop = entry.getValue();
-                    entry.setValue(prop.withReader(createReader(contextType,
+                    entry.setValue(prop.withReader(createReader(type,
                             prop.rawSetterType(), prop.genericSetterType())));
                 }
                 def.initFieldMatcher(_streamFactory);

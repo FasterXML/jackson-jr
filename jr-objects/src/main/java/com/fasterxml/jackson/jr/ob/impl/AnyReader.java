@@ -23,6 +23,8 @@ public class AnyReader extends ValueReader
 {
     public final static AnyReader std = new AnyReader();
 
+    public AnyReader() { super(Object.class); }
+    
     @Override
     public Object readNext(JSONReader r, JsonParser p) throws IOException
     {
