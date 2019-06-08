@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.Instantiatable;
 import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
 import com.fasterxml.jackson.jr.ob.api.MapBuilder;
+import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.comp.CollectionComposer;
 import com.fasterxml.jackson.jr.ob.comp.ComposerBase;
 import com.fasterxml.jackson.jr.ob.comp.MapComposer;
@@ -332,6 +333,8 @@ public class JSON
     // Important: has to come before 'std' instance, since it refers to it
     private final static int DEFAULT_FEATURES = Feature.defaults();
 
+    public final static int CACHE_FLAGS = Feature.cacheBreakers();
+
     /**
      * Singleton instance with standard, default configuration.
      * May be used with direct references like:
@@ -366,11 +369,11 @@ public class JSON
     protected final JSONReader _reader;
 
     /**
-     * Blueprint isntance of the writer to use for writing JSON given
+     * Blueprint instance of the writer to use for writing JSON given
      * simple Objects.
      */
     protected final JSONWriter _writer;
-    
+
     /*
     /**********************************************************************
     /* Configuration, simple settings
@@ -412,29 +415,20 @@ public class JSON
         _features = features;
         _streamFactory = streamF;
         _treeCodec = trees;
-        _reader = (r == null) ? _defaultReader(features, trees,
-                _defaultReaderLocator(streamF, features)) : r;
-        _writer = (w == null) ? _defaultWriter(features, trees,
-                _defaultWriterLocator(features)) : w;
+        _reader = (r != null) ? r : _defaultReader(streamF, features, trees, null);
+        _writer = (w != null) ? w : _defaultWriter(features, trees, null);
         _prettyPrinter = pp;
     }
 
-    protected ValueWriterLocator _defaultWriterLocator(int features) {
-        return ValueWriterLocator.blueprint(features);
-    }
 
-    protected ValueReaderLocator _defaultReaderLocator(TokenStreamFactory streamF,
-            int features) {
-        return ValueReaderLocator.blueprint(streamF, features);
-    }
-
-    protected JSONReader _defaultReader(int features, TreeCodec tc, ValueReaderLocator td) {
-        return new JSONReader(features, td, tc,
+    protected JSONReader _defaultReader(TokenStreamFactory streamF,
+            int features, TreeCodec tc, ReaderWriterProvider rwp) {
+        return new JSONReader(features, ValueReaderLocator.blueprint(streamF, features, rwp), tc,
                 CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
 
-    protected JSONWriter _defaultWriter(int features, TreeCodec tc, ValueWriterLocator td) {
-        return new JSONWriter(features, td, tc);
+    protected JSONWriter _defaultWriter(int features, TreeCodec tc, ReaderWriterProvider rwp) {
+        return new JSONWriter(features, ValueWriterLocator.blueprint(features, rwp), tc);
     }
 
     /*
@@ -557,6 +551,22 @@ public class JSON
         return _with(_features, _streamFactory, _treeCodec,
                 r, _writer, _prettyPrinter);
     }
+
+    /**
+     * Mutant factory for constructing an instance with specified {@link ReaderWriterProvider},
+     * and returning new instance (or, if there would be no change, this instance).
+     *
+     * @since 2.10
+     */
+    public JSON with(ReaderWriterProvider rwp) {
+        JSONReader r = _reader.with(rwp);
+        JSONWriter w = _writer.with(rwp);
+        if ((r == _reader) || (w == _writer))  {
+            return this;
+        }
+        return _with(_features, _streamFactory, _treeCodec,
+                r, w, _prettyPrinter);
+    }
     
     /**
      * Mutant factory for constructing an instance with specified feature
@@ -609,8 +619,13 @@ public class JSON
         if (_features == features) {
             return this;
         }
+        // 07-Jun-2019, tatu: May need to force clearing of state if cache-afflicted
+        //    changes
+        JSONReader r = _reader.withCacheCheck(features);
+        JSONWriter w = _writer.withCacheCheck(features);
+        
         return _with(features, _streamFactory, _treeCodec,
-                _reader, _writer, _prettyPrinter);
+                r, w, _prettyPrinter);
     }
 
     /*
@@ -618,8 +633,8 @@ public class JSON
     /* Methods sub-classes must override
     /**********************************************************************
      */
-    
-    protected final JSON _with(int features,
+
+    protected JSON _with(int features,
             TokenStreamFactory jsonF, TreeCodec trees,
             JSONReader reader, JSONWriter writer,
             PrettyPrinter pp)

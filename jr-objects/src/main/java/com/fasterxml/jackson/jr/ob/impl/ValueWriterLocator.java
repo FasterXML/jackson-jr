@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 
 /**
  * Helper object used for efficient detection of type information
@@ -86,8 +87,14 @@ public class ValueWriterLocator extends ValueLocatorBase
         _knownWriters = base._knownWriters;
     }
 
-    public final static ValueWriterLocator blueprint(int features) {
+    public final static ValueWriterLocator blueprint(int features,
+            ReaderWriterProvider rwp) {
         return new ValueWriterLocator(features & CACHE_FLAGS);
+    }
+
+    public ValueWriterLocator with(ReaderWriterProvider rwp) {
+        // !!! TODO
+        return this;
     }
 
     public ValueWriterLocator perOperationInstance(JSONWriter w, int features) {

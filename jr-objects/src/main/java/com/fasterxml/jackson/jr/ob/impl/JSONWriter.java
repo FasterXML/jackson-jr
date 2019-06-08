@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 
 import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
 
@@ -95,11 +96,25 @@ public class JSONWriter
     /**********************************************************************
      */
 
+    public JSONWriter withCacheCheck(int features) {
+//        int diff = (features ^ _features);
+
+        return this;
+    }
+
     public JSONWriter with(TreeCodec tc) {
         if (_treeCodec == tc) {
             return this;
         }
         return _with(_features, _writerLocator, tc);
+    }
+
+    public JSONWriter with(ReaderWriterProvider rwp) {
+        ValueWriterLocator l = _writerLocator.with(rwp);
+        if (_writerLocator == l) {
+            return this;
+        }
+        return _with(_features, l, _treeCodec);
     }
 
     /**

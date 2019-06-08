@@ -66,7 +66,7 @@ public class POJODefinition
                             forType.getName(), e.getMessage()), e);
         }
     }
-    
+
     public static POJODefinition _find(Class<?> forType) {
         POJODefinition def = DEFS.get(forType);
         if (def == null) {
