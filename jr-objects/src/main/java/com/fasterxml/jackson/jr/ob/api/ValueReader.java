@@ -44,12 +44,20 @@ public abstract class ValueReader
      * Method called to deserialize value of type supported by this reader, using
      * given parser. Parser is not yet positioned to the (first) token
      * of the value to read and needs to be advanced.
+     *<p>
+     * Default implementation simply calls `p.nextToken()` first, then calls
+     * {#link {@link #read(JSONReader, JsonParser)}, but some implementations
+     * may decide to implement this differently to use (slightly) more efficient
+     * accessor in {@link JsonParser}, like {@link JsonParser#nextIntValue(int)}.
      *
      * @param reader Context object that allows calling other read methods for contained
      *     values of different types (for example for collection readers).
      * @param p Underlying parser used for reading decoded token stream
      */
-    public abstract Object readNext(JSONReader reader, JsonParser p) throws IOException;
+    public Object readNext(JSONReader reader, JsonParser p) throws IOException {
+        p.nextToken();
+        return read(reader, p);
+    }
 
     /*
     /**********************************************************************
