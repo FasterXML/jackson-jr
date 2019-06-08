@@ -8,6 +8,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
 import com.fasterxml.jackson.jr.ob.api.MapBuilder;
+import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 /**
@@ -96,12 +97,9 @@ public class JSONReader
     /**********************************************************************
      */
 
-    public JSONReader withFeatures(int features)
-    {
-        if (_features == features) {
-            return this;
-        }
-        return _with(features, _readerLocator, _treeCodec, _collectionBuilder, _mapBuilder);
+    public JSONReader withCacheCheck(int features) {
+        // 07-Jun-2019, tatu: No cache-dependant clearing needed... yet.
+        return this;
     }
 
     public JSONReader with(MapBuilder mb) {
@@ -113,7 +111,15 @@ public class JSONReader
         if (_collectionBuilder == lb) return this;
         return _with(_features, _readerLocator, _treeCodec, lb, _mapBuilder);
     }
-    
+
+    public JSONReader with(ReaderWriterProvider rwp) {
+        ValueReaderLocator l = _readerLocator.with(rwp);
+        if (_readerLocator == l) {
+            return this;
+        }
+        return _with(_features, l, _treeCodec, _collectionBuilder, _mapBuilder);
+    }
+
     /**
      * Overridable method that all mutant factories call if a new instance
      * is to be constructed

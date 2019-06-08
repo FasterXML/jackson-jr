@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
 import com.fasterxml.jackson.jr.type.ResolvedType;
 import com.fasterxml.jackson.jr.type.TypeBindings;
@@ -43,6 +44,13 @@ public class ValueReaderLocator
      * this guy.
      */
     protected final TypeResolver _typeResolver;
+
+    /**
+     * Provider for custom readers, if any; may be null.
+     *
+     * @since 2.10
+     */
+    protected final ReaderWriterProvider _readerProvider;
     
     /**
      * Set of {@link ValueReader}s that we have resolved
@@ -63,6 +71,9 @@ public class ValueReaderLocator
     /**********************************************************************
      */
 
+    /**
+     * Feature flags that are enabled
+     */
     protected final int _features;
 
     protected final JSONReader _readContext;
@@ -87,25 +98,44 @@ public class ValueReaderLocator
     /**
      * Constructor for the blueprint instance
      */
-    protected ValueReaderLocator(int features)
+    protected ValueReaderLocator(int features, ReaderWriterProvider rwp)
     {
         _features = features;
+        _readerProvider = rwp;
         _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(50, 0.75f, 4);
         _typeResolver = new TypeResolver();
         _readerLock = new Object();
         _readContext = null;
     }
 
-    protected ValueReaderLocator(ValueReaderLocator base, int features, JSONReader r) {
+    protected ValueReaderLocator(ValueReaderLocator base, int features,
+            JSONReader r) {
         _features = features;
         _readContext = r;
+        _readerProvider = base._readerProvider;
         _knownReaders = base._knownReaders;
         _typeResolver = base._typeResolver;
         _readerLock = base._readerLock;
     }
 
-    public final static ValueReaderLocator blueprint(int features) {
-        return new ValueReaderLocator(features & CACHE_FLAGS);
+    protected ValueReaderLocator(ValueReaderLocator base, ReaderWriterProvider rwp) {
+        _features = base._features;
+        _readContext = base._readContext;
+        _readerProvider = rwp;
+        _knownReaders = base._knownReaders;
+        _typeResolver = base._typeResolver;
+        _readerLock = base._readerLock;
+    }
+    
+    public final static ValueReaderLocator blueprint(int features, ReaderWriterProvider rwp) {
+        return new ValueReaderLocator(features & CACHE_FLAGS, rwp);
+    }
+
+    public ValueReaderLocator with(ReaderWriterProvider rwp) {
+        if (rwp == _readerProvider) {
+            return this;
+        }
+        return new ValueReaderLocator(this, rwp);
     }
 
     public ValueReaderLocator perOperationInstance(JSONReader r, int features) {

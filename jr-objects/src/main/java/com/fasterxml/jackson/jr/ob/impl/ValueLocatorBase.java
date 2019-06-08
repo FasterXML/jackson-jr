@@ -119,7 +119,7 @@ abstract class ValueLocatorBase
     /**********************************************************************
      */
 
-    protected final static int CACHE_FLAGS = JSON.Feature.cacheBreakers();
+    protected final static int CACHE_FLAGS = JSON.CACHE_FLAGS;
 
     /*
     /**********************************************************************
