@@ -30,6 +30,10 @@ public class CustomValueHandlersTest extends TestBase
         }
     }
 
+    enum ABC {
+        A, B, C, DEF;
+    }
+    
     static class CustomValueReader extends ValueReader {
         private final int delta;
 
@@ -66,7 +70,18 @@ public class CustomValueHandlersTest extends TestBase
             return ABC.valueOf(str);
         }
     }
-    
+
+    static class CapStringReader extends ValueReader {
+        public CapStringReader() {
+            super(String.class);
+        }
+
+        @Override
+        public Object read(JSONReader reader, JsonParser p) throws IOException {
+            return p.getText().toUpperCase();
+        }
+    }
+
     static class CustomReaders extends ReaderWriterProvider {
         final int delta;
 
@@ -91,10 +106,16 @@ public class CustomValueHandlersTest extends TestBase
         }
     }
 
-    enum ABC {
-        A, B, C, DEF;
+    static class StringReaderProvider extends ReaderWriterProvider {
+        @Override
+        public ValueReader findBeanReader(JSONReader readContext, Class<?> type) {
+            if (type.equals(String.class)) {
+                return new CapStringReader();
+            }
+            return null;
+        }
     }
-    
+
     /*
     /**********************************************************************
     /* Test methdods
@@ -153,5 +174,14 @@ public class CustomValueHandlersTest extends TestBase
         } catch (JSONObjectException e) {
             verifyException(e, "Failed to find Enum of type");
         }
+    }
+
+    // Even more fun, override default String deserializer!
+    public void testCustomStringReader() throws Exception
+    {
+        String allCaps = JSON.std
+                .with(new StringReaderProvider())
+                .beanFrom(String.class, quote("Some text"));
+        assertEquals("SOME TEXT", allCaps);
     }
 }

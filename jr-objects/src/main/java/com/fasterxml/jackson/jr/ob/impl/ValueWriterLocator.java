@@ -38,6 +38,13 @@ public class ValueWriterLocator extends ValueLocatorBase
 
     protected final CopyOnWriteArrayList<BeanPropertyWriter[]> _knownWriters;
 
+    /**
+     * Provider for custom writers, if any; may be null.
+     *
+     * @since 2.10
+     */
+    protected final ReaderWriterProvider _writerProvider;
+
     /*
     /**********************************************************************
     /* Instance configuration
@@ -72,29 +79,36 @@ public class ValueWriterLocator extends ValueLocatorBase
     /**
      * Constructor for the blueprint instance
      */
-    protected ValueWriterLocator(int features)
+    protected ValueWriterLocator(int features, ReaderWriterProvider rwp)
     {
         _features = features;
-        _knownSerTypes = new ConcurrentHashMap<ClassKey, Integer>(50, 0.75f, 4);
+        _knownSerTypes = new ConcurrentHashMap<ClassKey, Integer>(20, 0.75f, 2);
         _knownWriters = new CopyOnWriteArrayList<BeanPropertyWriter[]>();
         _writeContext = null;
+        _writerProvider = rwp;
     }
 
-    protected ValueWriterLocator(ValueWriterLocator base, int features, JSONWriter w) {
+    // for per-call instances
+    protected ValueWriterLocator(ValueWriterLocator base,
+            int features, JSONWriter w) {
         _features = features;
         _writeContext = w;
         _knownSerTypes = base._knownSerTypes;
         _knownWriters = base._knownWriters;
+        _writerProvider = base._writerProvider;
     }
 
     public final static ValueWriterLocator blueprint(int features,
             ReaderWriterProvider rwp) {
-        return new ValueWriterLocator(features & CACHE_FLAGS);
+        return new ValueWriterLocator(features & CACHE_FLAGS, rwp);
     }
 
     public ValueWriterLocator with(ReaderWriterProvider rwp) {
-        // !!! TODO
-        return this;
+        if (rwp == _writerProvider) {
+            return this;
+        }
+        // nothing much to reuse if so, use blueprint ctor
+        return new ValueWriterLocator(_features, rwp);
     }
 
     public ValueWriterLocator perOperationInstance(JSONWriter w, int features) {
