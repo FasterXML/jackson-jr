@@ -193,7 +193,7 @@ public class JSONReader
         }
         return AnyReader.std.readFromObject(this, _parser, _mapBuilder);
     }
-    
+
     /**
      * Method for reading a JSON Array from input and building a {@link java.util.List}
      * out of it. Note that if input does NOT contain a

@@ -51,6 +51,12 @@ public class ValueReaderLocator
      * @since 2.10
      */
     protected final ReaderWriterProvider _readerProvider;
+
+    /*
+    /**********************************************************************
+    /* Caching
+    /**********************************************************************
+     */
     
     /**
      * Set of {@link ValueReader}s that we have resolved
@@ -63,6 +69,10 @@ public class ValueReaderLocator
      */
     protected Map<ClassKey, ValueReader> _incompleteReaders;
 
+    /**
+     * Object used for mutex during construction of a Bean deserializer: necessary
+     * to avoid race conditions during handling of cyclic dependencies.
+     */
     protected final Object _readerLock;
 
     /*
@@ -183,13 +193,27 @@ public class ValueReaderLocator
             return arrayReader(contextType, type);
         }
         if (type.isEnum()) {
-            return enumReader(type);
+            if (_readerProvider != null) {
+                ValueReader r = _readerProvider.findEnumReader(_readContext, type);
+                if (r != null) {
+                    return r;
+                }
+            }
+           return enumReader(type);
         }
         if (Collection.class.isAssignableFrom(type)) {
             return collectionReader(contextType, genericType);
         }
         if (Map.class.isAssignableFrom(type)) {
             return mapReader(contextType, genericType);
+        }
+        // Unlike with other types, check custom handler here before
+        // simple type check, to allow overriding handling of `String` etc
+        if (_readerProvider != null) {
+            ValueReader r = _readerProvider.findBeanReader(_readContext, type);
+            if (r != null) {
+                return r;
+            }
         }
         int typeId = _findSimpleType(type, false);
         if (typeId > 0) {
@@ -219,12 +243,6 @@ public class ValueReaderLocator
     }
 
     protected ValueReader enumReader(Class<?> enumType) {
-        if (_readerProvider != null) {
-            ValueReader r = _readerProvider.findEnumReader(_readContext, enumType);
-            if (r != null) {
-                return r;
-            }
-        }
         Object[] enums = enumType.getEnumConstants();
         Map<String,Object> byName = new HashMap<String,Object>();
         for (Object e : enums) {
@@ -296,12 +314,7 @@ public class ValueReaderLocator
 
     protected ValueReader beanReader(Class<?> type)
     {
-        if (_readerProvider != null) {
-            ValueReader r = _readerProvider.findBeanReader(_readContext, type);
-            if (r != null) {
-                return r;
-            }
-        }
+        // NOTE: caller (must) handles custom reader lookup earlier, not done here
 
         final ClassKey key = new ClassKey(type, _features);
         synchronized (_readerLock) {
