@@ -120,7 +120,7 @@ public class ValueWriterLocator extends ValueLocatorBase
     /* Public API: writer lookup
     /**********************************************************************
      */
-    
+
     public BeanPropertyWriter[] getPropertyWriters(int index) {
         // for simplicity, let's allow caller to pass negative id as is
         if (index < 0) {

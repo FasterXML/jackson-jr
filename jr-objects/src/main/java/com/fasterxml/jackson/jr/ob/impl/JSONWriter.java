@@ -163,18 +163,6 @@ public class JSONWriter
         _writeValue(value, _writerLocator.findSerializationType(value.getClass()));
     }
 
-    @Deprecated // since 2.8
-    public void writeField(String fieldName, Object value) throws IOException
-    {
-        if (value == null) {
-            if (_writeNullValues) {
-                writeNullField(fieldName);
-            }
-            return;
-        }
-        writeField(fieldName, value, _writerLocator.findSerializationType(value.getClass()));
-    }
-
     public void writeField(String fieldName, Object value, int type) throws IOException
     {
         switch (type) {
@@ -693,7 +681,7 @@ public class JSONWriter
         }
     }
 
-    protected void writeBeanValue(BeanPropertyWriter[] props, Object bean) throws IOException
+    public void writeBeanValue(BeanPropertyWriter[] props, Object bean) throws IOException
     {
         _generator.writeStartObject();
         for (int i = 0, end = props.length; i < end; ++i) {

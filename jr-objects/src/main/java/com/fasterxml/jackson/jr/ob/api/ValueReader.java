@@ -8,7 +8,7 @@ import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 
 /**
  * API and base class for all "deserializer" implementations used to actually read
- * values of Java types from (json) input.
+ * values of Java types from (JSON) input.
  */
 public abstract class ValueReader
 {
