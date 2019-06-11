@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
+import com.fasterxml.jackson.jr.ob.api.ValueWriter;
 
 import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
 
@@ -273,10 +274,10 @@ public class JSONWriter
         }
 
         if (type < 0) { // Bean type!
-            BeanPropertyWriter[] props = _writerLocator.getPropertyWriters(type);
-            if (props != null) { // sanity check
+            ValueWriter writer = _writerLocator.getValueWriter(type);
+            if (writer != null) { // sanity check
                 _generator.writeFieldName(fieldName);
-                writeBeanValue(props, value);
+                writer.writeValue(this, _generator, value);
                 return;
             }
         }
@@ -390,10 +391,10 @@ public class JSONWriter
             return;
         }
 
-        if (type < 0) { // Bean type!
-            BeanPropertyWriter[] props = _writerLocator.getPropertyWriters(type);
-            if (props != null) { // sanity check
-                writeBeanValue(props, value);
+        if (type < 0) { // explicit ValueWriter
+            ValueWriter writer = _writerLocator.getValueWriter(type);
+            if (writer != null) { // sanity check
+                writer.writeValue(this, _generator, value);
                 return;
             }
         }
@@ -710,7 +711,7 @@ public class JSONWriter
         }
     }
 
-    protected void writeBeanValue(BeanPropertyWriter[] props, Object bean) throws IOException
+    public void writeBeanValue(BeanPropertyWriter[] props, Object bean) throws IOException
     {
         _generator.writeStartObject(bean);
         int i = 0;

@@ -7,12 +7,8 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 
 /**
- * Helper class used when reading values of complex types other
- * than Beans.
- *<p>
- * Note that ugly "chameleon" style operation here is used to avoid
- * creating multiple separate classes, which in turn is done to minimize
- * size of resulting jars.
+ * API and base class for all "deserializer" implementations used to actually read
+ * values of Java types from (JSON) input.
  */
 public abstract class ValueReader
 {
