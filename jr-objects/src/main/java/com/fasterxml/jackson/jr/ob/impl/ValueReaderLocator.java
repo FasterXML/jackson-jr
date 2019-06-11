@@ -206,7 +206,7 @@ public class ValueReaderLocator
         }
         if (type.isEnum()) {
             if (_readerProvider != null) {
-                ValueReader r = _readerProvider.findEnumReader(_readContext, type);
+                ValueReader r = _readerProvider.findValueReader(_readContext, type);
                 if (r != null) {
                     return r;
                 }
@@ -222,7 +222,7 @@ public class ValueReaderLocator
         // Unlike with other types, check custom handler here before
         // simple type check, to allow overriding handling of `String` etc
         if (_readerProvider != null) {
-            ValueReader r = _readerProvider.findBeanReader(_readContext, type);
+            ValueReader r = _readerProvider.findValueReader(_readContext, type);
             if (r != null) {
                 return r;
             }

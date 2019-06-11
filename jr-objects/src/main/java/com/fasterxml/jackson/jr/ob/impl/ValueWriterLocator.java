@@ -166,31 +166,43 @@ public class ValueWriterLocator extends ValueLocatorBase
     
     protected int _findPOJOSerializationType(Class<?> raw)
     {
+        // possible custom type?
+        if (_writerProvider != null) {
+            ValueWriter w = _writerProvider.findValueWriter(_writeContext, raw);
+            if (w != null) {
+                return _registerWriter(raw, w);
+            }
+        }
+        
         int type = _findSimpleType(raw, true);
         if (type == SER_UNKNOWN) {
             if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
                 POJODefinition cd = _resolveBeanDef(raw);
                 BeanPropertyWriter[] props = resolveBeanForSer(raw, cd);
-                // Due to concurrent access, possible that someone might have added it
-                synchronized (_knownWriters) {
-                    // Important: do NOT try to reuse shared instance; caller needs it
-                    ClassKey k = new ClassKey(raw, _features);
-                    Integer I = _knownSerTypes.get(k);
-                    // if it was already concurrently added, we'll just discard this copy, return earlier
-                    if (I != null) {
-                        return I.intValue();
-                    }
-                    // otherwise add at the end, use -(index+1) as id
-                    _knownWriters.add(new BeanWriter(raw, props));
-                    int typeId = -_knownWriters.size();
-                    _knownSerTypes.put(k, Integer.valueOf(typeId));
-                    return typeId;
-                }
+                return _registerWriter(raw, new BeanWriter(raw, props));
             }
         }
         return type;
     }
 
+    private int _registerWriter(Class<?> rawType, ValueWriter valueWriter) {
+        // Due to concurrent access, possible that someone might have added it
+        synchronized (_knownWriters) {
+            // Important: do NOT try to reuse shared instance; caller needs it
+            ClassKey k = new ClassKey(rawType, _features);
+            Integer I = _knownSerTypes.get(k);
+            // if it was already concurrently added, we'll just discard this copy, return earlier
+            if (I != null) {
+                return I.intValue();
+            }
+            // otherwise add at the end, use -(index+1) as id
+            _knownWriters.add(valueWriter);
+            int typeId = -_knownWriters.size();
+            _knownSerTypes.put(k, Integer.valueOf(typeId));
+            return typeId;
+        }
+    }
+    
     protected BeanPropertyWriter[] resolveBeanForSer(Class<?> raw, POJODefinition classDef)
     {
         POJODefinition.Prop[] rawProps = classDef.properties();

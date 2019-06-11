@@ -9,7 +9,7 @@ import com.fasterxml.jackson.jr.ob.TestBase;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
-public class CustomValueHandlersTest extends TestBase
+public class CustomValueReadersTest extends TestBase
 {
     static class CustomValue {
         public int value;
@@ -90,16 +90,10 @@ public class CustomValueHandlersTest extends TestBase
         }
 
         @Override
-        public ValueReader findBeanReader(JSONReader readContext, Class<?> type) {
+        public ValueReader findValueReader(JSONReader readContext, Class<?> type) {
             if (type.equals(CustomValue.class)) {
                 return new CustomValueReader(delta);
-            }
-            return null;
-        }
-
-        @Override
-        public ValueReader findEnumReader(JSONReader readContext, Class<?> type) {
-            if (type.equals(ABC.class)) {
+            } else if (type.equals(ABC.class)) {
                 return new ABCValueReader();
             }
             return null;
@@ -108,7 +102,7 @@ public class CustomValueHandlersTest extends TestBase
 
     static class StringReaderProvider extends ReaderWriterProvider {
         @Override
-        public ValueReader findBeanReader(JSONReader readContext, Class<?> type) {
+        public ValueReader findValueReader(JSONReader readContext, Class<?> type) {
             if (type.equals(String.class)) {
                 return new CapStringReader();
             }
