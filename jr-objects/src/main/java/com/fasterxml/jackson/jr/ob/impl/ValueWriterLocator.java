@@ -7,6 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
+import com.fasterxml.jackson.jr.ob.api.ValueWriter;
 
 /**
  * Helper object used for efficient detection of type information
@@ -36,7 +37,7 @@ public class ValueWriterLocator extends ValueLocatorBase
      */
     protected final ConcurrentHashMap<ClassKey, Integer> _knownSerTypes;
 
-    protected final CopyOnWriteArrayList<BeanPropertyWriter[]> _knownWriters;
+    protected final CopyOnWriteArrayList<ValueWriter> _knownWriters;
 
     /**
      * Provider for custom writers, if any; may be null.
@@ -83,7 +84,7 @@ public class ValueWriterLocator extends ValueLocatorBase
     {
         _features = features;
         _knownSerTypes = new ConcurrentHashMap<ClassKey, Integer>(20, 0.75f, 2);
-        _knownWriters = new CopyOnWriteArrayList<BeanPropertyWriter[]>();
+        _knownWriters = new CopyOnWriteArrayList<ValueWriter>();
         _writeContext = null;
         _writerProvider = rwp;
     }
@@ -121,7 +122,7 @@ public class ValueWriterLocator extends ValueLocatorBase
     /**********************************************************************
      */
 
-    public BeanPropertyWriter[] getPropertyWriters(int index) {
+    public ValueWriter getValueWriter(int index) {
         // for simplicity, let's allow caller to pass negative id as is
         if (index < 0) {
             index = -(index+1);
@@ -180,7 +181,7 @@ public class ValueWriterLocator extends ValueLocatorBase
                         return I.intValue();
                     }
                     // otherwise add at the end, use -(index+1) as id
-                    _knownWriters.add(props);
+                    _knownWriters.add(new BeanWriter(raw, props));
                     int typeId = -_knownWriters.size();
                     _knownSerTypes.put(k, Integer.valueOf(typeId));
                     return typeId;

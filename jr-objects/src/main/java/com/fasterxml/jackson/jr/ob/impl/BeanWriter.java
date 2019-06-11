@@ -10,7 +10,10 @@ public class BeanWriter
 {
     protected final BeanPropertyWriter[] _properties;
 
-    public BeanWriter(BeanPropertyWriter[] props) {
+    protected final Class<?> _valueType;
+    
+    public BeanWriter(Class<?> type, BeanPropertyWriter[] props) {
+        _valueType = type;
         _properties = props;
     }
     
@@ -21,4 +24,8 @@ public class BeanWriter
         context.writeBeanValue(_properties, value);
     }
 
+    @Override
+    public Class<?> valueType() {
+        return _valueType;
+    }
 }

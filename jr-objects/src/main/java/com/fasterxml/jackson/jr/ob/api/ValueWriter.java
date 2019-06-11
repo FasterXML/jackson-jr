@@ -12,4 +12,18 @@ import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 public interface ValueWriter {
     public void writeValue(JSONWriter context, JsonGenerator g, Object value)
         throws IOException;
+
+    /*
+    /**********************************************************************
+    /* Minimal metadata
+    /**********************************************************************
+     */
+
+    /**
+     * Accessor for non-generic (type-erased) type of values this reader
+     * produces from input.
+     *
+     * @since 2.10
+     */
+    public Class<?> valueType();
 }
