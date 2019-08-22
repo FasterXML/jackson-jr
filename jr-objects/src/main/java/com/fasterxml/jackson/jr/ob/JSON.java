@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.tree.ObjectTreeNode;
 import com.fasterxml.jackson.core.type.ResolvedType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.core.util.Instantiatable;
 import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
 import com.fasterxml.jackson.jr.ob.api.MapBuilder;
@@ -23,9 +24,23 @@ import com.fasterxml.jackson.jr.ob.comp.MapComposer;
 import com.fasterxml.jackson.jr.ob.impl.*;
 
 /**
- * Main entry point for functionality.
+ * Main entry point for functionality for reading and writing JSON
+ * and configuring details of reading and writing.
  *<p>
  * Note that instances are fully immutable, and thereby thread-safe.
+ *<p>
+ * Note on source types: source to read is declared as {@link java.lang.Object}
+ * but covers following types:
+ *<ul>
+ * <li>{@link InputStream}</li>
+ * <li>{@link Reader}</li>
+ * <li>{@code byte[]}</li>
+ * <li>{@code char[]}</li>
+ * <li>{@link String}/{@link CharSequence}</li>
+ * <li>{@link URL}</li>
+ * <li>{@link File}</li>
+ * </ul>
+ * 
  */
 @SuppressWarnings("resource")
 public class JSON
@@ -34,8 +49,8 @@ public class JSON
         Versioned
 {
     /**
-     * Simple on/off (enabled/disabled) features for {@link JSON}; used for simple configuration
-     * aspects.
+     * Simple on/off (enabled/disabled) features for {@link JSON}; used for simple
+     * configuration aspects.
      */
     public enum Feature
     {
@@ -665,6 +680,34 @@ public class JSON
     
     /*
     /**********************************************************************
+    /* Public factory methods for parsers, generators
+    /**********************************************************************
+     */
+
+    /**
+     * Factory method for opening a {@link JsonParser} to read content from one of
+     * following supported sources
+     *<ul>
+     * <li>{@link InputStream}</li>
+     * <li>{@link Reader}</li>
+     * <li>{@code byte[]}</li>
+     * <li>{@code char[]}</li>
+     * <li>{@link String}/{@link CharSequence}</li>
+     * <li>{@link URL}</li>
+     * <li>{@link File}</li>
+     * </ul>
+     *<p>
+     * Rules regarding closing of the underlying source follow rules
+     * that {@link JsonFactory} has for its {@code createParser} method.
+     *
+     * @since 2.10
+     */
+    public JsonParser createParser(Object source) throws IOException, JSONObjectException {
+        return _parser(source);
+    }
+
+    /*
+    /**********************************************************************
     /* API: writing Simple objects as JSON
     /**********************************************************************
      */
@@ -978,6 +1021,61 @@ public class JSON
             return null;
         }
     }
+
+    /*
+    /**********************************************************************
+    /* API: reading sequence of JSON values (LD-JSON and like)
+    /**********************************************************************
+     */
+
+    /**
+     * Method for creating {@link ValueIterator} for reading
+     * <a href="https://en.wikipedia.org/wiki/JSON_streaming">streaming JSON</a>
+     * content (specifically line-delimited and concatenated variants);
+     * individual values are bound to specific Bean (POJO) type.
+     *
+     * @since 2.10
+     */
+    public <T> ValueIterator<T> beanSequenceFrom(Class<T> type, Object source)
+            throws IOException, JSONObjectException
+    {
+        JsonParser p;
+        final boolean managed = !(source instanceof JsonParser);
+
+        if (managed) {
+            p = _parser(source);
+        } else {
+            p = (JsonParser) source;
+        }
+        p = _initForReading(_config(p));
+        JSONReader reader = _readerForOperation(p);
+        return new ValueIterator<T>(ValueIterator.MODE_BEAN, type, p, reader, managed);
+    }
+
+    /**
+     * Method for creating {@link ValueIterator} for reading
+     * <a href="https://en.wikipedia.org/wiki/JSON_streaming">streaming JSON</a>
+     * content (specifically line-delimited and concatenated variants);
+     * individual values are bound as "Any" type: {@link java.util.Map},
+     * {@link java.util.List}, {@link String}, {@link Number} or {@link Boolean}.
+     *
+     * @since 2.10
+     */
+    public ValueIterator<Object> anySequenceFrom(Object source) throws IOException
+    {
+        JsonParser p;
+        final boolean managed = !(source instanceof JsonParser);
+
+        if (managed) {
+            p = _parser(source);
+        } else {
+            p = (JsonParser) source;
+        }
+        p = _initForReading(_config(p));
+        JSONReader reader = _readerForOperation(p);
+        return new ValueIterator<Object>(ValueIterator.MODE_ANY, Object.class, p, reader, managed);
+    }
+
     /*
     /**********************************************************************
     /* ObjectReadContext: Config access (bogus)
@@ -993,10 +1091,10 @@ public class JSON
     public TokenStreamFactory getParserFactory() {
         return _streamFactory;
     }
-
+    
     /*
     /**********************************************************************
-    /* ObjectReadContext: databind
+    /* ObjectReadContext: TreeNode construction
     /**********************************************************************
      */
     
@@ -1051,6 +1149,16 @@ public class JSON
 
     @Override
     public PrettyPrinter getPrettyPrinter() {
+        PrettyPrinter pp = _prettyPrinter;
+        if (pp != null) {
+            if (pp instanceof Instantiatable<?>) {
+                pp = (PrettyPrinter) ((Instantiatable<?>) pp).createInstance();
+            }
+            return pp;
+        }
+        if (isEnabled(Feature.PRETTY_PRINT_OUTPUT)) {
+            return new DefaultPrettyPrinter();
+        }
         return null;
     }
 
@@ -1229,24 +1337,16 @@ public class JSON
     /**********************************************************************
      */
 
-    protected JsonGenerator _config(JsonGenerator g)
-    {
-        // First, possible pretty printing
-        PrettyPrinter pp = _prettyPrinter;
-        if (pp != null) {
-            if (pp instanceof Instantiatable<?>) {
-                pp = (PrettyPrinter) ((Instantiatable<?>) pp).createInstance();
-            }
-            g.setPrettyPrinter(pp);
-        } else if (isEnabled(Feature.PRETTY_PRINT_OUTPUT)) {
-            g.useDefaultPrettyPrinter();
-        }
+    protected final JsonGenerator _config(JsonGenerator g) {
+        // 21-Aug-2019, tatu: With 3.0, nothing to configure here, handled via
+        //    ObjectWriteContext
         return g;
     }
 
-    protected JsonParser _config(JsonParser p)
+    protected final JsonParser _config(JsonParser p)
     {
-        // nothing to do, yet
+        // 21-Aug-2019, tatu: With 3.0, nothing to configure here, handled via
+        //    ObjectWriteContext
         return p;
     }
 
