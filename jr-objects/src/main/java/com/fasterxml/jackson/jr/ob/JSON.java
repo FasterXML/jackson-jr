@@ -17,16 +17,30 @@ import com.fasterxml.jackson.jr.ob.comp.MapComposer;
 import com.fasterxml.jackson.jr.ob.impl.*;
 
 /**
- * Main entry point for functionality.
+ * Main entry point for functionality for reading and writing JSON
+ * and configuring details of reading and writing.
  *<p>
  * Note that instances are fully immutable, and thereby thread-safe.
+ *<p>
+ * Note on source types: source to read is declared as {@link java.lang.Object}
+ * but covers following types:
+ *<ul>
+ * <li>{@link InputStream}</li>
+ * <li>{@link Reader}</li>
+ * <li>{@code byte[]}</li>
+ * <li>{@code char[]}</li>
+ * <li>{@link String}/{@link CharSequence}</li>
+ * <li>{@link URL}</li>
+ * <li>{@link File}</li>
+ * </ul>
+ * 
  */
 @SuppressWarnings("resource")
 public class JSON implements Versioned
 {
     /**
-     * Simple on/off (enabled/disabled) features for {@link JSON}; used for simple configuration
-     * aspects.
+     * Simple on/off (enabled/disabled) features for {@link JSON}; used for simple
+     * configuration aspects.
      */
     public enum Feature
     {
@@ -653,6 +667,34 @@ public class JSON implements Versioned
     
     /*
     /**********************************************************************
+    /* Public factory methods for parsers, generators
+    /**********************************************************************
+     */
+
+    /**
+     * Factory method for opening a {@link JsonParser} to read content from one of
+     * following supported sources
+     *<ul>
+     * <li>{@link InputStream}</li>
+     * <li>{@link Reader}</li>
+     * <li>{@code byte[]}</li>
+     * <li>{@code char[]}</li>
+     * <li>{@link String}/{@link CharSequence}</li>
+     * <li>{@link URL}</li>
+     * <li>{@link File}</li>
+     * </ul>
+     *<p>
+     * Rules regarding closing of the underlying source follow rules
+     * that {@link JsonFactory} has for its {@code createParser} method.
+     *
+     * @since 2.10
+     */
+    public JsonParser createParser(Object source) throws IOException, JSONObjectException {
+        return _parser(source);
+    }
+
+    /*
+    /**********************************************************************
     /* API: writing Simple objects as JSON
     /**********************************************************************
      */
@@ -971,6 +1013,60 @@ public class JSON implements Versioned
         }
     }
 
+    /*
+    /**********************************************************************
+    /* API: reading sequence of JSON values (LD-JSON and like)
+    /**********************************************************************
+     */
+
+    /**
+     * Method for creating {@link ValueIterator} for reading
+     * <a href="https://en.wikipedia.org/wiki/JSON_streaming">streaming JSON</a>
+     * content (specifically line-delimited and concatenated variants);
+     * individual values are bound to specific Bean (POJO) type.
+     *
+     * @since 2.10
+     */
+    public <T> ValueIterator<T> beanSequenceFrom(Class<T> type, Object source)
+            throws IOException, JSONObjectException
+    {
+        JsonParser p;
+        final boolean managed = !(source instanceof JsonParser);
+
+        if (managed) {
+            p = _parser(source);
+        } else {
+            p = (JsonParser) source;
+        }
+        p = _initForReading(_config(p));
+        JSONReader reader = _readerForOperation(p);
+        return new ValueIterator<T>(ValueIterator.MODE_BEAN, type, p, reader, managed);
+    }
+
+    /**
+     * Method for creating {@link ValueIterator} for reading
+     * <a href="https://en.wikipedia.org/wiki/JSON_streaming">streaming JSON</a>
+     * content (specifically line-delimited and concatenated variants);
+     * individual values are bound as "Any" type: {@link java.util.Map},
+     * {@link java.util.List}, {@link String}, {@link Number} or {@link Boolean}.
+     *
+     * @since 2.10
+     */
+    public ValueIterator<Object> anySequenceFrom(Object source) throws IOException
+    {
+        JsonParser p;
+        final boolean managed = !(source instanceof JsonParser);
+
+        if (managed) {
+            p = _parser(source);
+        } else {
+            p = (JsonParser) source;
+        }
+        p = _initForReading(_config(p));
+        JSONReader reader = _readerForOperation(p);
+        return new ValueIterator<Object>(ValueIterator.MODE_ANY, Object.class, p, reader, managed);
+    }
+    
     /*
     /**********************************************************************
     /* API: TreeNode construction
