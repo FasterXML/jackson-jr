@@ -8,7 +8,6 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.TreeNode;
 
 public class JrsObject extends JrsValue
 {
@@ -54,7 +53,7 @@ public class JrsObject extends JrsValue
     }
 
     @Override
-    public TreeNode get(int i) {
+    public JrsValue get(int i) {
         return null;
     }
     
@@ -64,7 +63,7 @@ public class JrsObject extends JrsValue
     }
 
     @Override
-    public TreeNode path(int i) {
+    public JrsValue path(int i) {
         return JrsMissing.instance();
     }
 
