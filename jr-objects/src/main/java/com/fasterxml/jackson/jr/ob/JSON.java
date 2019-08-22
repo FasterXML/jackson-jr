@@ -909,22 +909,22 @@ public class JSON
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Map<T,Object> mapFrom(Object source) throws IOException, JSONObjectException
+    public Map<String,Object> mapFrom(Object source) throws IOException, JSONObjectException
     {
         if (source instanceof JsonParser) {
             JsonParser p = _initForReading((JsonParser) source);
-            Map<Object,Object> result = _readerForOperation(p).readMap();
+            Map<?,?> result = _readerForOperation(p).readMap();
             p.clearCurrentToken();
-            return (Map<T,Object>) result;
+            return (Map<String,Object>) result;
         }
         JsonParser p = _parser(source);
         try {
             _initForReading(_config(p));
-            Map<Object,Object> result = _readerForOperation(p).readMap();
+            Map<?,?> result = _readerForOperation(p).readMap();
             JsonParser p0 = p;
             p = null;
             _close(p0, null);
-            return (Map<T,Object>) result;
+            return (Map<String,Object>) result;
         } catch (Exception e) {
             return _closeWithError(p, e);
         }
@@ -996,7 +996,7 @@ public class JSON
      * {@link TreeCodec}, see {@link #with(TreeCodec)}) supports.
      */
     @SuppressWarnings("unchecked")
-    public <T extends TreeNode> TreeNode treeFrom(Object source)
+    public <T extends TreeNode> T treeFrom(Object source)
             throws IOException, JSONObjectException
     {
         if (_treeCodec == null) {
@@ -1037,7 +1037,7 @@ public class JSON
      * @since 2.10
      */
     public <T> ValueIterator<T> beanSequenceFrom(Class<T> type, Object source)
-            throws IOException, JSONObjectException
+        throws IOException, JSONObjectException
     {
         JsonParser p;
         final boolean managed = !(source instanceof JsonParser);
@@ -1049,19 +1049,21 @@ public class JSON
         }
         p = _initForReading(_config(p));
         JSONReader reader = _readerForOperation(p);
-        return new ValueIterator<T>(ValueIterator.MODE_BEAN, type, p, reader, managed);
+        return new ValueIterator<T>(ValueIterator.MODE_BEAN, type,
+                p, reader, _treeCodec, managed);
     }
 
     /**
      * Method for creating {@link ValueIterator} for reading
      * <a href="https://en.wikipedia.org/wiki/JSON_streaming">streaming JSON</a>
      * content (specifically line-delimited and concatenated variants);
-     * individual values are bound as "Any" type: {@link java.util.Map},
+     * individual values are bound as "Simple" type: {@link java.util.Map},
      * {@link java.util.List}, {@link String}, {@link Number} or {@link Boolean}.
      *
      * @since 2.10
      */
-    public ValueIterator<Object> anySequenceFrom(Object source) throws IOException
+    public ValueIterator<Object> anySequenceFrom(Object source)
+        throws IOException, JSONObjectException
     {
         JsonParser p;
         final boolean managed = !(source instanceof JsonParser);
@@ -1073,7 +1075,36 @@ public class JSON
         }
         p = _initForReading(_config(p));
         JSONReader reader = _readerForOperation(p);
-        return new ValueIterator<Object>(ValueIterator.MODE_ANY, Object.class, p, reader, managed);
+        return new ValueIterator<Object>(ValueIterator.MODE_ANY, Object.class,
+                p, reader, _treeCodec, managed);
+    }
+
+    /**
+     * Method for creating {@link ValueIterator} for reading
+     * <a href="https://en.wikipedia.org/wiki/JSON_streaming">streaming JSON</a>
+     * content (specifically line-delimited and concatenated variants);
+     * individual values are bound as JSON Trees(of type that configured
+     * {@link TreeCodec}, see {@link #with(TreeCodec)}) supports.
+     */
+    public <T extends TreeNode> ValueIterator<T> treeSequenceFrom(Object source)
+        throws IOException, JSONObjectException
+    {
+        if (_treeCodec == null) {
+             _noTreeCodec("read TreeNode");
+        }
+
+        JsonParser p;
+        final boolean managed = !(source instanceof JsonParser);
+
+        if (managed) {
+            p = _parser(source);
+        } else {
+            p = (JsonParser) source;
+        }
+        p = _initForReading(_config(p));
+        JSONReader reader = _readerForOperation(p);
+        return new ValueIterator<T>(ValueIterator.MODE_TREE, TreeNode.class,
+                p, reader, _treeCodec, managed);
     }
 
     /*

@@ -5,7 +5,6 @@ import java.io.IOException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.TreeNode;
 
 /**
  * Virtual node used instead of `null`, when an operation does not match an
@@ -51,22 +50,22 @@ public final class JrsMissing extends JrsValue
     }
 
     @Override
-    public TreeNode get(String s) {
+    public JrsValue get(String s) {
         return null;
     }
 
     @Override
-    public TreeNode get(int i) {
+    public JrsValue get(int i) {
         return null;
     }
 
     @Override
-    public TreeNode path(String s) {
+    public JrsValue path(String s) {
         return this;
     }
 
     @Override
-    public TreeNode path(int i) {
+    public JrsValue path(int i) {
         return this;
     }
     

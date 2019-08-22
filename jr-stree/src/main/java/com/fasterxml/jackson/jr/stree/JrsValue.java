@@ -102,6 +102,18 @@ public abstract class JrsValue implements TreeNode
     /**********************************************************************
      */
 
+    @Override
+    public abstract JrsValue get(String s);
+
+    @Override
+    public abstract JrsValue get(int i);
+
+    @Override
+    public abstract JrsValue path(String s);
+
+    @Override
+    public abstract JrsValue path(int i);
+
     protected abstract JrsValue _at(JsonPointer ptr);
 
     protected abstract void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws IOException;
@@ -134,22 +146,22 @@ public abstract class JrsValue implements TreeNode
         }
 
         @Override
-        public TreeNode get(String s) {
+        public JrsValue get(String s) {
             return null;
         }
 
         @Override
-        public TreeNode get(int i) {
+        public JrsValue get(int i) {
             return null;
         }
 
         @Override
-        public TreeNode path(String s) {
+        public JrsValue path(String s) {
             return JrsMissing.instance();
         }
 
         @Override
-        public TreeNode path(int i) {
+        public JrsValue path(int i) {
             return JrsMissing.instance();
         }
         

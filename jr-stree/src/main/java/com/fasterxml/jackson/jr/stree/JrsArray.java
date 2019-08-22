@@ -6,7 +6,6 @@ import java.util.*;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.core.tree.ArrayTreeNode;
 
 import static com.fasterxml.jackson.core.JsonToken.START_ARRAY;
@@ -56,7 +55,7 @@ public class JrsArray
     }
 
     @Override
-    public TreeNode get(String s) {
+    public JrsValue get(String s) {
         return null;
     }
 
@@ -66,7 +65,7 @@ public class JrsArray
     }
 
     @Override
-    public TreeNode path(String s) {
+    public JrsValue path(String s) {
         return JrsMissing.instance();
     }
 

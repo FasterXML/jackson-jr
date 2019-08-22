@@ -29,8 +29,14 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
      */
     protected final static int MODE_ANY = 2;
 
+    /**
+     * Mode in which values are read as "Tree" values, as bound
+     * by registered {@link TreeCodec}.
+     */
+    protected final static int MODE_TREE = 3;
+    
     protected final static ValueIterator<?> EMPTY_ITERATOR =
-            new ValueIterator<Object>(MODE_BEAN, null, null, null, false);
+            new ValueIterator<Object>(MODE_BEAN, null, null, null, null, false);
     
     /*
     /**********************************************************************
@@ -82,6 +88,11 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
     protected final JSONReader _reader;
 
     /**
+     * If "Tree" values are read, codec we need to use for binding
+     */
+    protected final TreeCodec _treeCodec;
+    
+    /**
      * Underlying parser used for reading content to bind. Initialized
      * as not <code>null</code> but set as <code>null</code> when
      * iterator is closed, to denote closing.
@@ -125,12 +136,13 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
      *   closed by iterator.
      */
     protected ValueIterator(int mode, Class<?> type, JsonParser p, JSONReader reader,
-            boolean managedParser)
+            TreeCodec treeCodec, boolean managedParser)
     {
         _mode = mode;
         _type = type;
         _parser = p;
         _reader = reader;
+        _treeCodec = treeCodec;
         _closeParser = managedParser;
 
         /* Ok: one more thing; we may have to skip START_ARRAY, assuming
@@ -279,6 +291,9 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
                 break;
             case MODE_ANY:
                 value = _reader.readValue();
+                break;
+            case MODE_TREE:
+                value = _treeCodec.readTree(_parser);
                 break;
             default:
                 throw new IllegalStateException("Invalid mode: "+_mode);
