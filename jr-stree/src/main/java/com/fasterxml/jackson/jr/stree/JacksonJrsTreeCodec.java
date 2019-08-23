@@ -12,19 +12,18 @@ import com.fasterxml.jackson.core.tree.ObjectTreeNode;
  * (read-only) trees out of JSON: these are represented as subtypes
  * of {@link JrsValue} ("Jrs" from "jackson JR Simple").
  */
-public class JacksonJrsTreeCodec extends TreeCodec
+public class JacksonJrsTreeCodec implements TreeCodec
 {
     public static JrsMissing MISSING = JrsMissing.instance;
 
     public static final JacksonJrsTreeCodec SINGLETON = new JacksonJrsTreeCodec();
 
-    public JacksonJrsTreeCodec() {
-    }
+    public JacksonJrsTreeCodec() { }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends TreeNode> T readTree(JsonParser p) throws IOException {
-        return (T) nodeFrom(p);
+    public JrsValue readTree(JsonParser p) throws IOException {
+        return nodeFrom(p);
     }
 
     private JrsValue nodeFrom(JsonParser p) throws IOException
@@ -96,26 +95,35 @@ public class JacksonJrsTreeCodec extends TreeCodec
         return ((JrsValue) node).traverse(ObjectReadContext.empty());
     }
 
-    /*
-    /**********************************************************************
-    /* Extended API
-    /**********************************************************************
-     */
-
+    @Override
     public TreeNode missingNode() {
         return JrsMissing.instance;
     }
 
+    @Override
+    public TreeNode nullNode() {
+        // !!! TODO: add `NullNode`?
+        return missingNode();
+    }
+    
+    @Override
     public JrsBoolean booleanNode(boolean state) {
          return state? JrsBoolean.TRUE : JrsBoolean.FALSE;
     }
 
+    @Override
     public JrsString stringNode(String text) {
         if (text == null) {
             text = "";
         }
         return new JrsString(text);
     }
+
+    /*
+    /**********************************************************************
+    /* Extended API
+    /**********************************************************************
+     */
 
     public JrsNumber numberNode(Number nr) {
         if (nr == null) {

@@ -35,6 +35,11 @@ public abstract class JrsValue implements TreeNode
     }
 
     @Override
+    public boolean isNull() {
+        return false;
+    }
+    
+    @Override
     public boolean isEmbeddedValue() {
         return false;
     }
