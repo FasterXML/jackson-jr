@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.core.tree.ArrayTreeNode;
-import com.fasterxml.jackson.core.tree.ObjectTreeNode;
 
 /**
  * {@link TreeCodec} implementation that can build "simple", immutable
@@ -64,8 +62,7 @@ public class JacksonJrsTreeCodec implements TreeCodec
             return new JrsEmbeddedObject(p.getEmbeddedObject());
 
         case JsonTokenId.ID_NULL:
-            // 07-Jan-2016, tatu: ... or should we have NullNode too?
-            return null;
+            return JrsNull.instance;
         default:
         }
         throw new UnsupportedOperationException("Unsupported token id "+tokenId+" ("+p.currentToken()+")");
@@ -81,13 +78,23 @@ public class JacksonJrsTreeCodec implements TreeCodec
     }
 
     @Override
-    public ArrayTreeNode createArrayNode() {
+    public JrsArray createArrayNode() {
         return new JrsArray(_list());
     }
 
     @Override
-    public ObjectTreeNode createObjectNode() {
+    public JrsObject createObjectNode() {
         return new JrsObject(_map());
+    }
+
+    @Override
+    public JrsValue missingNode() {
+        return JrsMissing.instance();
+    }
+
+    @Override
+    public JrsValue nullNode() {
+        return JrsNull.instance();
     }
 
     @Override
@@ -95,17 +102,6 @@ public class JacksonJrsTreeCodec implements TreeCodec
         return ((JrsValue) node).traverse(ObjectReadContext.empty());
     }
 
-    @Override
-    public TreeNode missingNode() {
-        return JrsMissing.instance;
-    }
-
-    @Override
-    public TreeNode nullNode() {
-        // !!! TODO: add `NullNode`?
-        return missingNode();
-    }
-    
     @Override
     public JrsBoolean booleanNode(boolean state) {
          return state? JrsBoolean.TRUE : JrsBoolean.FALSE;
