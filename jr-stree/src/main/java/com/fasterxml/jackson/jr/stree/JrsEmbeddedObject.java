@@ -19,6 +19,11 @@ public class JrsEmbeddedObject extends JrsValue.Scalar
     }
 
     @Override
+    public boolean isEmbeddedValue() {
+        return true;
+    }
+
+    @Override
     public JsonToken asToken() {
         return JsonToken.VALUE_EMBEDDED_OBJECT;
     }

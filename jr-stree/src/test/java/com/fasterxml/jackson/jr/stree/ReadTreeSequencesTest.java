@@ -49,7 +49,8 @@ public class ReadTreeSequencesTest extends TestBase
         assertEquals(NumberType.INT, tree.get(2).numberType());
 
         assertTrue(it.hasNext());
-        assertNull(it.nextValue());
+        tree = it.nextValue();
+        assertTrue(tree.isNull());
 
         assertFalse(it.hasNext());
     }

@@ -9,7 +9,7 @@ public class SimpleTraverseTest extends TestBase
 
     public void testSimpleObject() throws Exception
     {
-        final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":-2}";
+        final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":-2,\"d\":null}";
         TreeNode node = TREE_CODEC.readTree(_factory.createParser(INPUT));
         JsonParser p = node.traverse();
 
@@ -39,6 +39,10 @@ public class SimpleTraverseTest extends TestBase
         assertToken(JsonToken.VALUE_NUMBER_INT, p.nextToken());
         assertEquals(-2, p.getIntValue());
 
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("d", p.getCurrentName());
+        assertToken(JsonToken.VALUE_NULL, p.nextToken());
+        
         assertToken(JsonToken.END_OBJECT, p.nextToken());
 
         p.close();

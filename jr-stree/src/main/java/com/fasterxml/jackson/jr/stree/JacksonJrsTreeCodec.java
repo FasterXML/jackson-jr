@@ -71,8 +71,7 @@ public class JacksonJrsTreeCodec extends TreeCodec
             return new JrsEmbeddedObject(p.getEmbeddedObject());
 
         case JsonTokenId.ID_NULL:
-            // 07-Jan-2016, tatu: ... or should we have NullNode too?
-            return null;
+            return JrsNull.instance;
         default:
         }
         throw new UnsupportedOperationException("Unsupported token id "+tokenId+" ("+p.getCurrentToken()+")");
@@ -88,13 +87,23 @@ public class JacksonJrsTreeCodec extends TreeCodec
     }
 
     @Override
-    public TreeNode createArrayNode() {
+    public JrsValue createArrayNode() {
         return new JrsArray(_list());
     }
 
     @Override
-    public TreeNode createObjectNode() {
+    public JrsValue createObjectNode() {
         return new JrsObject(_map());
+    }
+
+//    @Override
+    public JrsValue missingNode() {
+        return JrsMissing.instance();
+    }
+
+//  @Override
+    public JrsValue nullNode() {
+        return JrsNull.instance();
     }
 
     @Override
@@ -107,10 +116,6 @@ public class JacksonJrsTreeCodec extends TreeCodec
     /* Extended API
     /**********************************************************************
      */
-
-    public TreeNode missingNode() {
-        return JrsMissing.instance;
-    }
 
     /**
      * @since 2.8

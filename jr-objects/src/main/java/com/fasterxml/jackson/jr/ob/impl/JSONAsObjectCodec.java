@@ -132,6 +132,16 @@ public class JSONAsObjectCodec
         return _checkTreeCodec().createArrayNode();
     }
 
+    //  @Override
+    public TreeNode missingNode() {
+        return _checkTreeCodec().missingNode();
+    }
+
+    //@Override
+    public TreeNode nullNode() {
+        return _checkTreeCodec().nullNode();
+    }
+
     @Override
     public <T extends TreeNode> T readTree(JsonParser jp) throws IOException, JsonProcessingException
     {

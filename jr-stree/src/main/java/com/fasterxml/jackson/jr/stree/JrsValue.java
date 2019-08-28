@@ -38,6 +38,16 @@ public abstract class JrsValue implements TreeNode
         return false;
     }
 
+    // Will be added in Jackson 3.0
+    public boolean isNull() {
+        return false;
+    }
+
+    // Will be added in Jackson 3.0
+    public boolean isEmbeddedValue() {
+        return false;
+    }
+
     @Override
     public Iterator<String> fieldNames() {
         return null;
