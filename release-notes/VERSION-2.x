@@ -4,7 +4,7 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
-2.10.0 (not yet released)
+2.10.0.pr2 (31-Aug-2019)
 
 #60: Add support for reading "root value" streams (linefeed separated/concatenated)
 #63: Change default for `JSON.Feature.USE_FIELDS` to `true` (from false) in 2.10
