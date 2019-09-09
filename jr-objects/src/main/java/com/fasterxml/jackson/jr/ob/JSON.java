@@ -930,6 +930,33 @@ public class JSON
         }
     }
 
+    /**
+     * Read method for reading a {@link Map} of {@code type} (usually POJO) values.
+     *
+     * @since 2.10
+     */
+    @SuppressWarnings("unchecked")
+    public <T> Map<String,T> mapOfFrom(Class<T> type, Object source) throws IOException, JSONObjectException
+    {
+        if (source instanceof JsonParser) {
+            JsonParser p = _initForReading((JsonParser) source);
+            Map<?,?> result = _readerForOperation(p).readMapOf(type);
+            p.clearCurrentToken();
+            return (Map<String,T>) result;
+        }
+        JsonParser p = _parser(source);
+        try {
+            _initForReading(_config(p));
+            Map<?,?> result = _readerForOperation(p).readMapOf(type);
+            JsonParser p0 = p;
+            p = null;
+            _close(p0, null);
+            return (Map<String,T>) result;
+        } catch (Exception e) {
+            return _closeWithError(p, e);
+        }
+    }
+
     public <T> T beanFrom(Class<T> type, Object source) throws IOException, JSONObjectException
     {
         if (source instanceof JsonParser) {

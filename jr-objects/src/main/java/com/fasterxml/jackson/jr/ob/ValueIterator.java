@@ -131,7 +131,7 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
     
     /**
      * @param managedParser Whether we "own" the {@link JsonParser} passed or not:
-     *   if true, it was created by {@link ObjectReader} and code here needs to
+     *   if true, it was created by {@code Json} and code here needs to
      *   close it; if false, it was passed by calling code and should not be
      *   closed by iterator.
      */

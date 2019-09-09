@@ -37,9 +37,6 @@ public class POJODefinition
     public final Constructor<?> stringCtor;
     public final Constructor<?> longCtor;
 
-    /**
-     * Constructors used for serialization use case
-     */
     public POJODefinition(Class<?> type, Prop[] props,
             Constructor<?> defaultCtor0, Constructor<?> stringCtor0, Constructor<?> longCtor0)
     {

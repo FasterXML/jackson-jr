@@ -119,6 +119,15 @@ public class JacksonJrsTreeCodec implements TreeCodec
     /**********************************************************************
     /* Extended API
     /**********************************************************************
+
+    /**
+     * Factory method for constructing node to represent String values.
+     *
+     * @param nr Numeric value for constructed node to contain
+     *
+     * @return Node instance for given numeric value
+     *
+     * @since 2.8
      */
 
     public JrsNumber numberNode(Number nr) {
