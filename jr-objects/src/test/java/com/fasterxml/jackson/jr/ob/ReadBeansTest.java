@@ -122,7 +122,7 @@ public class ReadBeansTest extends TestBase
         assertEquals(2, map.stuff.size());
         assertEquals(Integer.valueOf(4), map.stuff.get("b"));
     }
-    
+
     public void testSimpleBeanCollections() throws Exception
     {
         final String INPUT = aposToQuotes("["
@@ -151,6 +151,23 @@ public class ReadBeansTest extends TestBase
         assertEquals(-145, beans2.get(1).x);
         assertEquals("Billy", beans2.get(1).name.first);
         assertEquals("Bacon", beans2.get(1).name.last);
+    }
+
+    // @since 2.10
+    public void testSimpleBeanMaps() throws Exception
+    {
+        final String INPUT = aposToQuotes("{ 'first':"
+                +"{'name':{'first':'Bob','last':'Burger'},'x':13}"
+                +", 'second':{'x':-145,'name':{'first':'Billy','last':'Bacon'}}"
+                +"}");
+        Map<String, TestBean> stuff = JSON.std.mapOfFrom(TestBean.class, INPUT);
+        assertEquals(2, stuff.size());
+        assertNotNull(stuff.get("first"));
+        TestBean bean2 = stuff.get("second");
+        assertNotNull(bean2);
+        assertEquals(-145, bean2.x);
+        assertEquals("Billy", bean2.name.first);
+        assertEquals("Bacon", bean2.name.last);
     }
 
     public void testJvmSerializersPOJO() throws Exception

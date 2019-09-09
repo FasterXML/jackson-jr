@@ -118,6 +118,12 @@ public class JacksonJrsTreeCodec extends TreeCodec
      */
 
     /**
+     * Factory method for constructing node to represent Boolean values.
+     *
+     * @param state Whether to create {@code Boolean.TRUE} or {@code Boolean.FALSE} node
+     *
+     * @return Node instance for given boolean value
+     *
      * @since 2.8
      */
     public JrsBoolean booleanNode(boolean state) {
@@ -125,6 +131,12 @@ public class JacksonJrsTreeCodec extends TreeCodec
     }
 
     /**
+     * Factory method for constructing node to represent String values.
+     *
+     * @param text String value for constructed node to contain
+     *
+     * @return Node instance for given text value
+     *
      * @since 2.8
      */
     public JrsString stringNode(String text) {
@@ -135,6 +147,12 @@ public class JacksonJrsTreeCodec extends TreeCodec
     }
 
     /**
+     * Factory method for constructing node to represent String values.
+     *
+     * @param nr Numeric value for constructed node to contain
+     *
+     * @return Node instance for given numeric value
+     *
      * @since 2.8
      */
     public JrsNumber numberNode(Number nr) {

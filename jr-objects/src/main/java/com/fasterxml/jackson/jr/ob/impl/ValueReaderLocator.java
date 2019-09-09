@@ -162,7 +162,13 @@ public class ValueReaderLocator
     
     /**
      * Method used during deserialization to find handler for given
-     * non-generic type.
+     * non-generic type: will first check for already resolved (and cached) readers
+     * -- and return if one found -- and then if no cached reader found, create
+     * one, cache, return.
+     *
+     * @param raw Type-erased type of value to find reader for
+     *
+     * @return ValueReader to use for given type
      */
     public ValueReader findReader(Class<?> raw)
     {
@@ -182,7 +188,12 @@ public class ValueReaderLocator
     }
 
     /**
-     * Factory method for creating standard readers of any declared type
+     * Factory method for creating standard readers of any declared type.
+     *
+     * @param contextType Context for resolving generic type parameters
+     * @param type Type-erased type of value to construct reader for
+     * @param genericType Full (possibly) generic type of value to construct reader for (important
+     *   for {@link java.util.Map}, {@link java.util.Collection}).
      */
     protected ValueReader createReader(Class<?> contextType, Class<?> type, Type genericType)
     {

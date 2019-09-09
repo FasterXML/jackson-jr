@@ -265,8 +265,8 @@ public class JSONReader
 
     /**
      * Method for reading a JSON Array from input and building a {@link java.util.List}
-     * out of it. Note that if input does NOT contain a
-     * JSON Array, {@link JSONObjectException} will be thrown.
+     * out of it, binding values into specified {@code type}.
+     * Note that if input does NOT contain a JSON Array, {@link JSONObjectException} will be thrown.
      */
     @SuppressWarnings("unchecked")
     public <T> List<T> readListOf(Class<T> type) throws IOException
@@ -282,7 +282,29 @@ public class JSONReader
         return (List<T>) new CollectionReader(List.class, _readerLocator.findReader(type))
                 .read(this, _parser);
     }
-    
+
+    /**
+     * Method for reading a JSON Object from input and building a {@link java.util.Map}
+     * out of it, binding values into specified {@code type}.
+     * Note that if input does NOT contain a JSON Object, {@link JSONObjectException} will be thrown.
+     *
+     * @since 2.10
+     */
+    @SuppressWarnings("unchecked")
+    public <T> Map<String, T> readMapOf(Class<T> type) throws IOException
+    {
+        JsonToken t = _parser.getCurrentToken();
+        if (t == JsonToken.VALUE_NULL) {
+            return null;
+        }
+        if (t != JsonToken.START_OBJECT) {
+            throw JSONObjectException.from(_parser,
+                    "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+ValueReader._tokenDesc(_parser));
+        }
+        return (Map<String, T>) new MapReader(Map.class, _readerLocator.findReader(type))
+                .read(this, _parser);
+    }
+
     /*
     /**********************************************************************
     /* Internal methods; overridable for custom coercions

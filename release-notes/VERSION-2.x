@@ -9,6 +9,8 @@ Project: jackson-jr
 #60: Add support for reading "root value" streams (linefeed separated/concatenated)
 #63: Change default for `JSON.Feature.USE_FIELDS` to `true` (from false) in 2.10
 #65: Allow registration of custom readers, writers (to support 3rd party, custom types)
+#66: Add `Json.mapOfFrom(Class)` to support binding POJO-valued maps
+ (suggested by ocind@github)
 - Add `JrsNull` node type for `jr-stree` package
 - Add JDK9+ `module-info.class` using Moditect
 - Update Retrofit2 version (2.0.0 -> 2.5.0)
