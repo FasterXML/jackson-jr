@@ -4,6 +4,7 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+<<<<<<< HEAD:release-notes/VERSION-2.x
 2.10.0.pr3 (17-Sep-2019)
 
 No changes since pr2
@@ -18,6 +19,10 @@ No changes since pr2
 - Add `JrsNull` node type for `jr-stree` package
 - Add JDK9+ `module-info.class` using Moditect
 - Update Retrofit2 version (2.0.0 -> 2.5.0)
+
+2.9.10 (21-Sep-2019)
+
+No changes since 2.9.9
 
 2.9.9 (16-May-2019)
 
