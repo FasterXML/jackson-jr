@@ -4,11 +4,7 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
-2.10.0.pr3 (17-Sep-2019)
-
-No changes since pr2
-
-2.10.0.pr2 (31-Aug-2019)
+2.10.0 (26-Sep-2019)
 
 #60: Add support for reading "root value" streams (linefeed separated/concatenated)
 #63: Change default for `JSON.Feature.USE_FIELDS` to `true` (from false) in 2.10
@@ -18,6 +14,10 @@ No changes since pr2
 - Add `JrsNull` node type for `jr-stree` package
 - Add JDK9+ `module-info.class` using Moditect
 - Update Retrofit2 version (2.0.0 -> 2.5.0)
+
+2.9.10 (21-Sep-2019)
+
+No changes since 2.9.9
 
 2.9.9 (16-May-2019)
 
