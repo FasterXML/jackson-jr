@@ -93,6 +93,13 @@ List<MyType> beans = JSON.std.listOfFrom(MyType.class, INPUT);
 
 (writing of `List`s and arrays works without addition effort: just pass List/array as-is)
 
+### Reading "streaming JSON" (LD-JSON)
+
+Version 2.10 added ability to read [Streaming JSON](https://en.wikipedia.org/wiki/JSON_streaming) content.
+See ["Jackson 2.10 features"](https://medium.com/@cowtowncoder/jackson-2-10-features-cd880674d8a2) for an example.
+
+[TO BE WRITTEN]
+
 ### Writing with composers
 
 An alternative method exists for writing: "fluent" style output can be used as follows:
@@ -180,6 +187,19 @@ String json = JSON.std
   .without(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS)
   .asString(...);
 ```
+
+### Adding custom value readers, writers
+
+Version 2.10 added ability to add custom `ValueReader`s and `ValueWriter`s, to
+allow pluggable support for types beyond basic JDK types and Beans.
+
+You can check this unit test
+
+   jr-objects/src/test/java/com/fasterxml/jackson/jr/ob/impl/CustomValueReadersTest.java
+
+for an example.
+
+[TO BE COMPLETED]
 
 ## Get it!
 
