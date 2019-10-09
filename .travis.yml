@@ -4,9 +4,10 @@ language: java
 #   only Java 8 and beyond work
 jdk:
   - openjdk8
+  - openjdk11
 
 # whitelist
 branches:
   only:
     - master
-    - "2.9"
+    - "3.0"
