@@ -4,6 +4,10 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.11.0 (not yet released)
+
+-
+
 2.10.1 (not yet released)
 
 -
