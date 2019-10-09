@@ -4,6 +4,10 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.10.1 (not yet released)
+
+-
+
 2.10.0 (26-Sep-2019)
 
 #60: Add support for reading "root value" streams (linefeed separated/concatenated)
