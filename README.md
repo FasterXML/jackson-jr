@@ -166,7 +166,7 @@ and in future other tree models may be offered as part of jackson-jr, or via oth
 
 To support readability and writability of your own types, your Java objects must either:
 
-* Implement Bean style accesors (getters for accessing data to write and/or setter for binding JSON data into objects), and define no-argument (default) constructor, OR
+* Implement Bean style accessors (getters for accessing data to write and/or setter for binding JSON data into objects), and define no-argument (default) constructor, OR
 * Define single-argument constructor if binding from JSON String (single-String argument) or JSON integer number (single-`long` or `Long` argument)
 
 Note that although getters and setters need to be public (since JDK Bean Introspection does not find any other methods),
