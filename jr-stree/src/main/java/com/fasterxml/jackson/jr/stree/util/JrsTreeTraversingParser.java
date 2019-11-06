@@ -180,9 +180,9 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
 
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Public API, token accessors
-    /**********************************************************
+    /**********************************************************************
      */
 
     @Override
@@ -191,18 +191,13 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
 
     @Override
-    public void overrideCurrentName(String name)
-    {
-        if (_nodeCursor != null) {
-            _nodeCursor.overrideCurrentName(name);
-        }
-    }
-    
-    @Override
     public TokenStreamContext getParsingContext() {
         return _nodeCursor;
     }
 
+    @Override public void setCurrentValue(Object v) { _nodeCursor.setCurrentValue(v); }
+    @Override public Object getCurrentValue() { return _nodeCursor.getCurrentValue(); }
+    
     @Override
     public JsonLocation getTokenLocation() {
         return JsonLocation.NA;
@@ -214,9 +209,9 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
 
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Public API, access to textual content
-    /**********************************************************
+    /**********************************************************************
      */
 
     @Override
@@ -262,9 +257,9 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
     
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Public API, typed non-text access
-    /**********************************************************
+    /**********************************************************************
      */
 
     //public byte getByteValue() throws IOException
@@ -318,9 +313,9 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
 
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Public API, typed binary (base64) access
-    /**********************************************************
+    /**********************************************************************
      */
 
     @Override
@@ -337,9 +332,9 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
 
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Internal methods
-    /**********************************************************
+    /**********************************************************************
      */
 
     protected JrsValue currentNode() {

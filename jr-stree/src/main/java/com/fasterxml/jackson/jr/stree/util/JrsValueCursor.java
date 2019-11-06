@@ -53,10 +53,6 @@ abstract class JrsValueCursor
         return _currentName;
     }
 
-    public void overrideCurrentName(String name) {
-        _currentName = name;
-    }
-
     @Override
     public java.lang.Object getCurrentValue() {
         return _currentValue;
@@ -119,11 +115,6 @@ abstract class JrsValueCursor
             _node = n;
         }
 
-        @Override
-        public void overrideCurrentName(String name) {
-            
-        }
-        
         @Override
         public JsonToken nextToken() {
             if (!_done) {
