@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.jr.ob.JSON;
@@ -110,6 +111,36 @@ public class CustomValueReadersTest extends TestBase
         }
     }
 
+    static class Point {
+        public int _x, _y;
+
+        public Point(int x, int y) {
+            _x = x;
+            _y = y;
+        }
+    }
+
+    static class PointReader extends ValueReader {
+        public PointReader() { super(Point.class); }
+
+        @Override
+        public Object read(JSONReader reader, JsonParser p) throws IOException {
+            Map<Object, Object> map = reader.readMap();
+            return new Point((Integer) map.get("x"), (Integer) map.get("y"));
+        }
+        
+    }
+
+    static class PointReaderProvider extends ReaderWriterProvider {
+        @Override
+        public ValueReader findValueReader(JSONReader readContext, Class<?> type) {
+            if (type == Point.class) {
+                return new PointReader();
+            }
+            return null;
+        }
+    }
+
     /*
     /**********************************************************************
     /* Test methdods
@@ -177,5 +208,26 @@ public class CustomValueReadersTest extends TestBase
                 .with(new StringReaderProvider())
                 .beanFrom(String.class, quote("Some text"));
         assertEquals("SOME TEXT", allCaps);
+    }
+
+    // But also can use methods from "JSONReader" for convenience
+    public void testCustomDelegatingReader() throws Exception
+    {
+        // First: without handler, will fail to map
+        final String doc = "{\"y\" : 3, \"x\": 2 }";
+        try {
+            JSON.std.beanFrom(Point.class, doc);
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "$Point");
+            verifyException(e, "constructor to use");
+        }
+
+        // then with custom, should be fine
+        JSON json = JSON.std
+                .with(new PointReaderProvider());
+        Point v = json.beanFrom(Point.class, doc);
+        assertEquals(2, v._x);
+        assertEquals(3, v._y);
     }
 }
