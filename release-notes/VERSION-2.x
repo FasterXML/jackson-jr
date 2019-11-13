@@ -8,9 +8,9 @@ Project: jackson-jr
 
 -
 
-2.10.1 (not yet released)
+2.10.1 (09-Nov-2019)
 
--
+No changes since 2.10.0
 
 2.10.0 (26-Sep-2019)
 
