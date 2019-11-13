@@ -140,7 +140,7 @@ public class AnyReader extends ValueReader
         throw JSONObjectException.from(p, "Unexpected value token: "+_tokenDesc(p));
     }
 
-    public Map<Object,Object> readFromObject(JSONReader r, JsonParser p, MapBuilder b) throws IOException
+    public Map<?, Object> readFromObject(JSONReader r, JsonParser p, MapBuilder b) throws IOException
     {
         // First, a minor optimization for empty Maps
         String k;

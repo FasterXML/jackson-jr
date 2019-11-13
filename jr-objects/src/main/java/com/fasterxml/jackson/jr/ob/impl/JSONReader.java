@@ -179,9 +179,9 @@ public class JSONReader
      * out of it. Note that if input does NOT contain a
      * JSON Object, {@link JSONObjectException} will be thrown.
      */
-    public Map<Object,Object> readMap() throws IOException {
+    public Map<String,Object> readMap() throws IOException {
         if (_parser.isExpectedStartObjectToken()) {
-            return AnyReader.std.readFromObject(this, _parser, _mapBuilder);
+            return (Map<String,Object>) AnyReader.std.readFromObject(this, _parser, _mapBuilder);
         }
         if (_parser.hasToken(JsonToken.VALUE_NULL)) {
             return null;
