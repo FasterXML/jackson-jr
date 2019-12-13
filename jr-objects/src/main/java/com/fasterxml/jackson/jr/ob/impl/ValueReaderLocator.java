@@ -337,7 +337,7 @@ public class ValueReaderLocator
                     return vr;
                 }
             }
-            BeanReader def = _resolveBeanForDeser(type);
+            final BeanReader def = _resolveBeanForDeser(type, _resolveBeanDef(type));
             try {
                 _incompleteReaders.put(key, def);
                 for (Map.Entry<String, BeanPropertyReader> entry : def.propertiesByName().entrySet()) {
@@ -357,13 +357,11 @@ public class ValueReaderLocator
     /**********************************************************************
      */
 
-    protected BeanReader _resolveBeanForDeser(Class<?> raw)
+    protected BeanReader _resolveBeanForDeser(Class<?> raw, POJODefinition beanDef)
     {
-        final POJODefinition pojoDef = _resolveBeanDef(raw);
-
-        Constructor<?> defaultCtor = pojoDef.defaultCtor;
-        Constructor<?> stringCtor = pojoDef.stringCtor;
-        Constructor<?> longCtor = pojoDef.longCtor;
+        Constructor<?> defaultCtor = beanDef.defaultCtor;
+        Constructor<?> stringCtor = beanDef.stringCtor;
+        Constructor<?> longCtor = beanDef.longCtor;
 
         final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
         if (forceAccess) {
@@ -378,7 +376,7 @@ public class ValueReaderLocator
             }
         }
 
-        final POJODefinition.Prop[] rawProps = pojoDef.properties();
+        final POJODefinition.Prop[] rawProps = beanDef.properties();
         final int len = rawProps.length;
         final Map<String, BeanPropertyReader> propMap;
         if (len == 0) {

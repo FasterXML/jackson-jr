@@ -177,8 +177,8 @@ public class ValueWriterLocator extends ValueLocatorBase
         int type = _findSimpleType(raw, true);
         if (type == SER_UNKNOWN) {
             if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
-                POJODefinition cd = _resolveBeanDef(raw);
-                BeanPropertyWriter[] props = resolveBeanForSer(raw, cd);
+                final BeanPropertyWriter[] props = _resolveBeanForSer(raw,
+                        _resolveBeanDef(raw));
                 return _registerWriter(raw, new BeanWriter(raw, props));
             }
         }
@@ -203,9 +203,9 @@ public class ValueWriterLocator extends ValueLocatorBase
         }
     }
     
-    protected BeanPropertyWriter[] resolveBeanForSer(Class<?> raw, POJODefinition classDef)
+    protected BeanPropertyWriter[] _resolveBeanForSer(Class<?> raw, POJODefinition beanDef)
     {
-        POJODefinition.Prop[] rawProps = classDef.properties();
+        POJODefinition.Prop[] rawProps = beanDef.properties();
         final int len = rawProps.length;
         List<BeanPropertyWriter> props = new ArrayList<BeanPropertyWriter>(len);
         final boolean includeReadOnly = JSON.Feature.WRITE_READONLY_BEAN_PROPERTIES.isEnabled(_features);
