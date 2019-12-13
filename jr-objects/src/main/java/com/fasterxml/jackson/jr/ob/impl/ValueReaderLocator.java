@@ -12,9 +12,8 @@ import com.fasterxml.jackson.jr.type.TypeBindings;
 import com.fasterxml.jackson.jr.type.TypeResolver;
 
 /**
- * Helper object used for efficient detection of type information
- * relevant to our conversion needs when writing out Java Objects
- * as JSON.
+ * Helper object used for efficient detection of type information relevant
+ * to our conversion needs when writing out Java Objects as JSON.
  *<p>
  * Note that usage pattern is such that a single "root" instance is kept
  * by each {@link com.fasterxml.jackson.jr.ob.JSON} instance; and
