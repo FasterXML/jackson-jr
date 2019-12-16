@@ -163,7 +163,20 @@ public class ValueWriterLocator extends ValueLocatorBase
     /* Internal methods
     /**********************************************************************
      */
-    
+
+    /**
+     * Method called to locate a serializer for given type and return numeric id.
+     * Serializer can be found using one of follow methods (in order of lookups):
+     *<ol>
+     * <li>Custom serializer via {@link ReaderWriterProvider}
+     *  </li>
+     * <li>Simple type supported out-of-the-box, for types like {@link String},
+     *   {@link Boolean}, {@link Number} and a small number of other JDK types
+     *  </li>
+     * <li>Bean-style POJOs with accessors (getters, public fields)
+     *  </li>
+     *</ol>
+     */
     protected int _findPOJOSerializationType(Class<?> raw)
     {
         // possible custom type?
