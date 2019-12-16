@@ -10,8 +10,8 @@ import com.fasterxml.jackson.jr.type.ResolvedType;
  *
  * @since 2.10
  */
-public abstract class ReaderWriterProvider {
-
+public abstract class ReaderWriterProvider
+{
     // // Reader access
 
     /**
