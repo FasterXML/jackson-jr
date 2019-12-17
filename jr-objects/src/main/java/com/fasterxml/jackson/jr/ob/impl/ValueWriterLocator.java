@@ -158,7 +158,7 @@ public class ValueWriterLocator extends ValueLocatorBase
         if (raw == _prevClass) {
             return _prevType;
         }
-        if (raw == String.class) {
+        if (raw == String.class && (_writerModifier == null)) {
             return SER_STRING;
         }
         ClassKey k = (_key == null) ? new ClassKey(raw, _features) : _key.with(raw, _features);
@@ -202,21 +202,38 @@ public class ValueWriterLocator extends ValueLocatorBase
         if (_writerProvider != null) {
             ValueWriter w = _writerProvider.findValueWriter(_writeContext, raw);
             if (w != null) {
-                return _registerWriter(raw, w);
+                return _modifyAndRegisterWriter(raw, w);
             }
         }
-        
+
         int type = _findSimpleType(raw, true);
         if (type == SER_UNKNOWN) {
             if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
                 final BeanPropertyWriter[] props = _resolveBeanForSer(raw,
                         _resolveBeanDef(raw));
-                return _registerWriter(raw, new BeanWriter(raw, props));
+                return _modifyAndRegisterWriter(raw, new BeanWriter(raw, props));
+            }
+        } else {
+            if (_writerModifier != null) {
+                ValueWriter w = _writerModifier.overrideStandardValueWriter(_writeContext, raw, type);
+                if (w != null) {
+                    return _registerWriter(raw, w);
+                }
             }
         }
         return type;
     }
 
+    private int _modifyAndRegisterWriter(Class<?> rawType, ValueWriter w) {
+        if (_writerModifier != null) {
+            w = _writerModifier.modifyValueWriter(_writeContext, rawType, w);
+            if (w == null) { // sanity check
+                throw new IllegalArgumentException("ReaderWriterModifier.modifyValueWriter() returned null");
+            }
+        }
+        return _registerWriter(rawType, w);
+    }
+    
     private int _registerWriter(Class<?> rawType, ValueWriter valueWriter) {
         // Due to concurrent access, possible that someone might have added it
         synchronized (_knownWriters) {
