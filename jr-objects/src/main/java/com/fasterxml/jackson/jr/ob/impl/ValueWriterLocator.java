@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.api.ValueWriter;
 
@@ -46,6 +47,13 @@ public class ValueWriterLocator extends ValueLocatorBase
      */
     protected final ReaderWriterProvider _writerProvider;
 
+    /**
+     * Provider for reader customizer, if any; may be null.
+     *
+     * @since 2.11
+     */
+    protected final ReaderWriterModifier _writerModifier;
+
     /*
     /**********************************************************************
     /* Instance configuration
@@ -80,13 +88,15 @@ public class ValueWriterLocator extends ValueLocatorBase
     /**
      * Constructor for the blueprint instance
      */
-    protected ValueWriterLocator(int features, ReaderWriterProvider rwp)
+    protected ValueWriterLocator(int features,
+            ReaderWriterProvider rwp, ReaderWriterModifier rwm)
     {
         _features = features;
         _knownSerTypes = new ConcurrentHashMap<ClassKey, Integer>(20, 0.75f, 2);
         _knownWriters = new CopyOnWriteArrayList<ValueWriter>();
         _writeContext = null;
         _writerProvider = rwp;
+        _writerModifier = rwm;
     }
 
     // for per-call instances
@@ -97,11 +107,12 @@ public class ValueWriterLocator extends ValueLocatorBase
         _knownSerTypes = base._knownSerTypes;
         _knownWriters = base._knownWriters;
         _writerProvider = base._writerProvider;
+        _writerModifier = base._writerModifier;
     }
 
     public final static ValueWriterLocator blueprint(int features,
-            ReaderWriterProvider rwp) {
-        return new ValueWriterLocator(features & CACHE_FLAGS, rwp);
+            ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
+        return new ValueWriterLocator(features & CACHE_FLAGS, rwp, rwm);
     }
 
     public ValueWriterLocator with(ReaderWriterProvider rwp) {
@@ -109,7 +120,15 @@ public class ValueWriterLocator extends ValueLocatorBase
             return this;
         }
         // nothing much to reuse if so, use blueprint ctor
-        return new ValueWriterLocator(_features, rwp);
+        return new ValueWriterLocator(_features, rwp, _writerModifier);
+    }
+
+    public ValueWriterLocator with(ReaderWriterModifier rwm) {
+        if (rwm == _writerModifier) {
+            return this;
+        }
+        // nothing much to reuse if so, use blueprint ctor
+        return new ValueWriterLocator(_features, _writerProvider, rwm);
     }
 
     public ValueWriterLocator perOperationInstance(JSONWriter w, int features) {
@@ -163,7 +182,20 @@ public class ValueWriterLocator extends ValueLocatorBase
     /* Internal methods
     /**********************************************************************
      */
-    
+
+    /**
+     * Method called to locate a serializer for given type and return numeric id.
+     * Serializer can be found using one of follow methods (in order of lookups):
+     *<ol>
+     * <li>Custom serializer via {@link ReaderWriterProvider}
+     *  </li>
+     * <li>Simple type supported out-of-the-box, for types like {@link String},
+     *   {@link Boolean}, {@link Number} and a small number of other JDK types
+     *  </li>
+     * <li>Bean-style POJOs with accessors (getters, public fields)
+     *  </li>
+     *</ol>
+     */
     protected int _findPOJOSerializationType(Class<?> raw)
     {
         // possible custom type?
@@ -177,8 +209,8 @@ public class ValueWriterLocator extends ValueLocatorBase
         int type = _findSimpleType(raw, true);
         if (type == SER_UNKNOWN) {
             if (JSON.Feature.HANDLE_JAVA_BEANS.isEnabled(_features)) {
-                POJODefinition cd = _resolveBeanDef(raw);
-                BeanPropertyWriter[] props = resolveBeanForSer(raw, cd);
+                final BeanPropertyWriter[] props = _resolveBeanForSer(raw,
+                        _resolveBeanDef(raw));
                 return _registerWriter(raw, new BeanWriter(raw, props));
             }
         }
@@ -203,9 +235,9 @@ public class ValueWriterLocator extends ValueLocatorBase
         }
     }
     
-    protected BeanPropertyWriter[] resolveBeanForSer(Class<?> raw, POJODefinition classDef)
+    protected BeanPropertyWriter[] _resolveBeanForSer(Class<?> raw, POJODefinition beanDef)
     {
-        POJODefinition.Prop[] rawProps = classDef.properties();
+        POJODefinition.Prop[] rawProps = beanDef.properties();
         final int len = rawProps.length;
         List<BeanPropertyWriter> props = new ArrayList<BeanPropertyWriter>(len);
         final boolean includeReadOnly = JSON.Feature.WRITE_READONLY_BEAN_PROPERTIES.isEnabled(_features);
