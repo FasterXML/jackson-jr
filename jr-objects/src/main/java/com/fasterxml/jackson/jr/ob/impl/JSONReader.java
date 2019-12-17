@@ -8,6 +8,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
 import com.fasterxml.jackson.jr.ob.api.MapBuilder;
+import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
@@ -114,6 +115,15 @@ public class JSONReader
 
     public JSONReader with(ReaderWriterProvider rwp) {
         ValueReaderLocator l = _readerLocator.with(rwp);
+        if (_readerLocator == l) {
+            return this;
+        }
+        return _with(_features, l, _treeCodec, _collectionBuilder, _mapBuilder);
+    }
+
+    // @since 2.11
+    public JSONReader with(ReaderWriterModifier rwm) {
+        ValueReaderLocator l = _readerLocator.with(rwm);
         if (_readerLocator == l) {
             return this;
         }

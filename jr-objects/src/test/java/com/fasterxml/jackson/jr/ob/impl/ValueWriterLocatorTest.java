@@ -43,7 +43,7 @@ public class ValueWriterLocatorTest extends TestBase
      */
 
     public void testBasicTypeDetectionForSer() {
-        ValueWriterLocator td = ValueWriterLocator.blueprint(JSON.Feature.defaults(), null);
+        ValueWriterLocator td = ValueWriterLocator.blueprint(JSON.Feature.defaults(), null, null);
         assertEquals(ValueWriterLocator.SER_STRING, td.findSerializationType(String.class));
         assertEquals(ValueWriterLocator.SER_CHAR_ARRAY, td.findSerializationType(char[].class));
         assertEquals(ValueWriterLocator.SER_INT_ARRAY, td.findSerializationType(int[].class));

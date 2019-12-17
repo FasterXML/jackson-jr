@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.api.ValueWriter;
 
@@ -46,6 +47,13 @@ public class ValueWriterLocator extends ValueLocatorBase
      */
     protected final ReaderWriterProvider _writerProvider;
 
+    /**
+     * Provider for reader customizer, if any; may be null.
+     *
+     * @since 2.11
+     */
+    protected final ReaderWriterModifier _writerModifier;
+
     /*
     /**********************************************************************
     /* Instance configuration
@@ -80,13 +88,15 @@ public class ValueWriterLocator extends ValueLocatorBase
     /**
      * Constructor for the blueprint instance
      */
-    protected ValueWriterLocator(int features, ReaderWriterProvider rwp)
+    protected ValueWriterLocator(int features,
+            ReaderWriterProvider rwp, ReaderWriterModifier rwm)
     {
         _features = features;
         _knownSerTypes = new ConcurrentHashMap<ClassKey, Integer>(20, 0.75f, 2);
         _knownWriters = new CopyOnWriteArrayList<ValueWriter>();
         _writeContext = null;
         _writerProvider = rwp;
+        _writerModifier = rwm;
     }
 
     // for per-call instances
@@ -97,11 +107,12 @@ public class ValueWriterLocator extends ValueLocatorBase
         _knownSerTypes = base._knownSerTypes;
         _knownWriters = base._knownWriters;
         _writerProvider = base._writerProvider;
+        _writerModifier = base._writerModifier;
     }
 
     public final static ValueWriterLocator blueprint(int features,
-            ReaderWriterProvider rwp) {
-        return new ValueWriterLocator(features & CACHE_FLAGS, rwp);
+            ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
+        return new ValueWriterLocator(features & CACHE_FLAGS, rwp, rwm);
     }
 
     public ValueWriterLocator with(ReaderWriterProvider rwp) {
@@ -109,7 +120,15 @@ public class ValueWriterLocator extends ValueLocatorBase
             return this;
         }
         // nothing much to reuse if so, use blueprint ctor
-        return new ValueWriterLocator(_features, rwp);
+        return new ValueWriterLocator(_features, rwp, _writerModifier);
+    }
+
+    public ValueWriterLocator with(ReaderWriterModifier rwm) {
+        if (rwm == _writerModifier) {
+            return this;
+        }
+        // nothing much to reuse if so, use blueprint ctor
+        return new ValueWriterLocator(_features, _writerProvider, rwm);
     }
 
     public ValueWriterLocator perOperationInstance(JSONWriter w, int features) {

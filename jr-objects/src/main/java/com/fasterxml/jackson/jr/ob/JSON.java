@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.Instantiatable;
 import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
 import com.fasterxml.jackson.jr.ob.api.MapBuilder;
+import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.comp.CollectionComposer;
 import com.fasterxml.jackson.jr.ob.comp.ComposerBase;
@@ -212,7 +213,7 @@ public class JSON implements Versioned
 
        /*
        /**********************************************************************
-       /* Features that affect introspection
+       /* Features that affect introspection and thereby affect caching
        /**********************************************************************
         */
 
@@ -422,18 +423,20 @@ public class JSON implements Versioned
         _features = features;
         _jsonFactory = jsonF;
         _treeCodec = trees;
-        _reader = (r != null) ? r : _defaultReader(features, trees, null);
-        _writer = (w != null) ? w : _defaultWriter(features, trees, null);
+        _reader = (r != null) ? r : _defaultReader(features, trees, null, null);
+        _writer = (w != null) ? w : _defaultWriter(features, trees, null, null);
         _prettyPrinter = pp;
     }
 
-    protected JSONReader _defaultReader(int features, TreeCodec tc, ReaderWriterProvider rwp) {
-        return new JSONReader(features, ValueReaderLocator.blueprint(features, rwp), tc,
+    protected JSONReader _defaultReader(int features, TreeCodec tc,
+            ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
+        return new JSONReader(features, ValueReaderLocator.blueprint(features, rwp, rwm), tc,
                 CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
 
-    protected JSONWriter _defaultWriter(int features, TreeCodec tc, ReaderWriterProvider rwp) {
-        return new JSONWriter(features, ValueWriterLocator.blueprint(features, rwp), tc);
+    protected JSONWriter _defaultWriter(int features, TreeCodec tc,
+            ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
+        return new JSONWriter(features, ValueWriterLocator.blueprint(features, rwp, rwm), tc);
     }
 
     /*
@@ -562,6 +565,22 @@ public class JSON implements Versioned
     public JSON with(ReaderWriterProvider rwp) {
         JSONReader r = _reader.with(rwp);
         JSONWriter w = _writer.with(rwp);
+        if ((r == _reader) && (w == _writer))  {
+            return this;
+        }
+        return _with(_features, _jsonFactory, _treeCodec,
+                r, w, _prettyPrinter);
+    }
+
+    /**
+     * Mutant factory for constructing an instance with specified {@link ReaderWriterModifier},
+     * and returning new instance (or, if there would be no change, this instance).
+     *
+     * @since 2.11
+     */
+    public JSON with(ReaderWriterModifier rwm) {
+        JSONReader r = _reader.with(rwm);
+        JSONWriter w = _writer.with(rwm);
         if ((r == _reader) && (w == _writer))  {
             return this;
         }
