@@ -368,7 +368,7 @@ public class ValueReaderLocator
 
     protected ValueReader beanReader(Class<?> type)
     {
-        // NOTE: caller (must) handles custom reader lookup earlier, not done here
+        // NOTE: caller (must) handle custom reader lookup earlier, not done here
 
         final ClassKey key = new ClassKey(type, _features);
         synchronized (_readerLock) {
