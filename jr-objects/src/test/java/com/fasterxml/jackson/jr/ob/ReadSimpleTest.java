@@ -7,8 +7,6 @@ import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
 public class ReadSimpleTest extends TestBase
 {
-    enum ABC { A, B, C; }
-
     /*
     /**********************************************************************
     /* Tests for Lists/Collections
