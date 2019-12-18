@@ -6,6 +6,24 @@ import junit.framework.TestCase;
 
 public abstract class TestBase extends TestCase
 {
+    protected enum ABC { A, B, C; }
+
+    protected static class NameBean {
+        protected String first, last;
+
+        public NameBean() { }
+        public NameBean(String f, String l) {
+            first = f;
+            last = l;
+        }
+
+        public String getFirst() { return first; }
+        public String getLast() { return last; }
+
+        public void setFirst(String n) { first = n; }
+        public void setLast(String n) { last = n; }
+    }
+    
     protected void verifyException(Throwable e, String... matches)
     {
         String msg = e.getMessage();

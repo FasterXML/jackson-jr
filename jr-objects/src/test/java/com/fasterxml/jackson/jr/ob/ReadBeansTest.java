@@ -17,16 +17,6 @@ public class ReadBeansTest extends TestBase
         public NameBean getName() { return name; }
     }
 
-    static class NameBean {
-        protected String first, last;
-        
-        public String getFirst() { return first; }
-        public String getLast() { return last; }
-
-        public void setFirst(String n) { first = n; }
-        public void setLast(String n) { last = n; }
-    }
-
     static class MapBean {
         protected Map<String,Integer> stuff;
         

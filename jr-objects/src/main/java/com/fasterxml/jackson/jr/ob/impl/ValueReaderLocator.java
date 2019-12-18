@@ -228,6 +228,18 @@ public class ValueReaderLocator
      */
     protected ValueReader createReader(Class<?> contextType, Class<?> type, Type genericType)
     {
+        ValueReader r = _createReader(contextType, type, genericType);
+        if (_readerModifier != null) {
+            r = _readerModifier.modifyValueReader(_readContext, type, r);
+            if (r == null) { // sanity check
+                throw new IllegalArgumentException("ReaderWriterModifier.modifyValueReader() returned null");
+            }
+        }
+        return r;
+    }
+
+    protected ValueReader _createReader(Class<?> contextType, Class<?> type, Type genericType)
+    {
         if (type == Object.class) {
             return AnyReader.std;
         }
