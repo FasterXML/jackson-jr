@@ -152,18 +152,18 @@ public abstract class MapBuilder
         }
 
         @Override
-        public Map<String,Object> emptyMap() {
+        public Map<String, Object> emptyMap() {
             if ((_mapType == null) && isEnabled(Feature.READ_ONLY)) {
                 return Collections.emptyMap();
             }
             return _map(4);
         }
 
-        private final Map<String,Object> _map(int initialSize) {
+        private final Map<String, Object> _map(int initialSize) {
             if (_mapType != null) {
                 try {
                     @SuppressWarnings("unchecked")
-                    Map<String,Object> m = (Map<String,Object>) _mapType.newInstance();
+                    Map<String,Object> m = (Map<String,Object>) _mapType.getDeclaredConstructor().newInstance();
                     return m;
                 } catch (Exception e) {
                     Throwable t = e;
