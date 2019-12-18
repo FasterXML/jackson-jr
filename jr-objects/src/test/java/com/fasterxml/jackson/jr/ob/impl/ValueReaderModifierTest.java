@@ -86,7 +86,7 @@ public class ValueReaderModifierTest extends TestBase
                 new ValueReader(NameBean.class) {
             @Override
             public Object read(JSONReader reader, JsonParser p) throws IOException {
-                Map<Object, Object> map = reader.readMap();
+                Map<?, Object> map = reader.readMap();
                 return new NameBean(String.valueOf(map.get("first")).toUpperCase(),
                         String.valueOf(map.get("last")).toUpperCase());
             };
