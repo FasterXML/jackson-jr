@@ -125,10 +125,9 @@ public class CustomValueReadersTest extends TestBase
 
         @Override
         public Object read(JSONReader reader, JsonParser p) throws IOException {
-            Map<Object, Object> map = reader.readMap();
+            Map<String, Object> map = reader.readMap();
             return new Point((Integer) map.get("x"), (Integer) map.get("y"));
         }
-        
     }
 
     static class PointReaderProvider extends ReaderWriterProvider {

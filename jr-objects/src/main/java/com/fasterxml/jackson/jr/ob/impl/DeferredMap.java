@@ -9,9 +9,9 @@ import java.util.*;
  *<p>
  * Inspired by lazily initialized Map used by Boon library.
  */
-public class DeferredMap extends AbstractMap<Object, Object>
+public class DeferredMap extends AbstractMap<String, Object>
 {
-    private Map<Object, Object> _map;
+    private Map<String, Object> _map;
     private Object[] _entries;
     private int _end;
     private final boolean _ordered;
@@ -25,7 +25,7 @@ public class DeferredMap extends AbstractMap<Object, Object>
     }
 
     @Override
-    public Object put(Object key, Object value)
+    public Object put(String key, Object value)
     {
         if (_map == null) {
             if (_entries == null) {
@@ -44,7 +44,7 @@ public class DeferredMap extends AbstractMap<Object, Object>
     }
     
     @Override
-    public Set<Entry<Object, Object>> entrySet() {
+    public Set<Entry<String, Object>> entrySet() {
         buildIfNeeded();
         return _map.entrySet();
     }
@@ -94,7 +94,7 @@ public class DeferredMap extends AbstractMap<Object, Object>
     }
 
     @Override
-    public Set<Object> keySet() {
+    public Set<String> keySet() {
         buildIfNeeded();
         return _map.keySet();
     }
@@ -129,7 +129,7 @@ public class DeferredMap extends AbstractMap<Object, Object>
         if (_map instanceof HashMap)  {
             return ((HashMap<?,?>)_map).clone();
         }
-        return new HashMap<Object,Object>(_map);
+        return new HashMap<String, Object>(_map);
     }
 
     protected void buildIfNeeded() {
@@ -157,7 +157,7 @@ public class DeferredMap extends AbstractMap<Object, Object>
         return size + ((size>>2) & ~1);
     }
     
-    protected Map<Object,Object> _buildMap(int expSize)
+    protected Map<String, Object> _buildMap(int expSize)
     {
         int size;
         if (expSize < 4) {
@@ -167,8 +167,8 @@ public class DeferredMap extends AbstractMap<Object, Object>
             size = expSize + (3 * (expSize >> 3));
         }
         if (_ordered) {
-            return new LinkedHashMap<Object,Object>(size);
+            return new LinkedHashMap<String, Object>(size);
         }
-        return new HashMap<Object,Object>(size);
+        return new HashMap<String, Object>(size);
     }
 }

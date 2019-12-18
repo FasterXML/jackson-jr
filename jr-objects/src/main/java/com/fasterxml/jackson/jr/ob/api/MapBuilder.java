@@ -56,9 +56,9 @@ public abstract class MapBuilder
 
     public abstract MapBuilder start();
 
-    public abstract MapBuilder put(Object key, Object value);
+    public abstract MapBuilder put(String key, Object value);
 
-    public abstract Map<Object,Object> build();
+    public abstract Map<String, Object> build();
     
     /**
      * Specialized method that is called when an empty list needs to
@@ -71,7 +71,7 @@ public abstract class MapBuilder
      *</pre>
      * which assumes that a builder has been constructed with {@link #newBuilder}
      */
-    public Map<Object,Object> emptyMap() throws JSONObjectException {
+    public Map<String, Object> emptyMap() throws JSONObjectException {
         return start().build();
     }
 
@@ -85,7 +85,7 @@ public abstract class MapBuilder
      *  start().put(key, value).build();
      *</pre>
      */
-    public Map<Object,Object> singletonMap(Object key, Object value) throws JSONObjectException {
+    public Map<String, Object> singletonMap(String key, Object value) throws JSONObjectException {
         return start().put(key, value).build();
     }
 
@@ -105,7 +105,7 @@ public abstract class MapBuilder
      */
     public static class Default extends MapBuilder
     {
-        protected Map<Object,Object> _current;
+        protected Map<String, Object> _current;
 
         protected Default(int features, Class<?> type) {
             super(features, type);
@@ -132,14 +132,14 @@ public abstract class MapBuilder
         }
 
         @Override
-        public Map<Object,Object> build() {
-            Map<Object,Object> result = _current;
+        public Map<String, Object> build() {
+            Map<String, Object> result = _current;
             _current = null;
             return result;
         }
 
         @Override
-        public MapBuilder put(Object key, Object value) {
+        public MapBuilder put(String key, Object value) {
             if (_checkDups) {
                 if (_current.containsKey(key)) {
                     // 14-Apr-2017, tatu: Note that choice of `IllegalArgumentException` is arbitrary
@@ -152,18 +152,18 @@ public abstract class MapBuilder
         }
 
         @Override
-        public Map<Object,Object> emptyMap() {
+        public Map<String, Object> emptyMap() {
             if ((_mapType == null) && isEnabled(Feature.READ_ONLY)) {
                 return Collections.emptyMap();
             }
             return _map(4);
         }
 
-        private final Map<Object,Object> _map(int initialSize) {
+        private final Map<String, Object> _map(int initialSize) {
             if (_mapType != null) {
                 try {
                     @SuppressWarnings("unchecked")
-                    Map<Object,Object> m = (Map<Object,Object>) _mapType.newInstance();
+                    Map<String,Object> m = (Map<String,Object>) _mapType.newInstance();
                     return m;
                 } catch (Exception e) {
                     Throwable t = e;
@@ -179,8 +179,8 @@ public abstract class MapBuilder
             if (isEnabled(Feature.USE_DEFERRED_MAPS)) {
                 return new DeferredMap(sort, initialSize);
             }
-            return sort ? new LinkedHashMap<Object,Object>(initialSize)
-                    : new HashMap<Object,Object>(initialSize);
+            return sort ? new LinkedHashMap<String, Object>(initialSize)
+                    : new HashMap<String, Object>(initialSize);
         }
     }
 }

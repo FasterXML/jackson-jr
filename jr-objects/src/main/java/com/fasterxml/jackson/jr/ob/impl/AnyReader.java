@@ -90,14 +90,14 @@ public class AnyReader extends ValueReader
         throw JSONObjectException.from(p, "Unexpected value token: "+_tokenDesc(p));
     }
 
-    public Map<Object,Object> readFromObject(JSONReader r, JsonParser p, MapBuilder b) throws IOException
+    public Map<String, Object> readFromObject(JSONReader r, JsonParser p, MapBuilder b) throws IOException
     {
         // First, a minor optimization for empty Maps
         if (p.nextValue() == JsonToken.END_OBJECT) {
             return b.emptyMap();
         }
         // and another for singletons...
-        Object key = fromKey(p.getCurrentName());
+        String key = fromKey(p.getCurrentName());
         Object value = read(r, p);
 
         if (p.nextValue() == JsonToken.END_OBJECT) {
@@ -171,7 +171,7 @@ public class AnyReader extends ValueReader
     protected Object fromNull() throws IOException {
         return null;
     }
-    
+
     /**
      * Method called to let implementation change a {@link java.lang.Boolean} value that has been
      * read from input.
@@ -186,7 +186,7 @@ public class AnyReader extends ValueReader
      * after being parsed from input.
      * Default implementation returns key as is.
      */
-    protected Object fromKey(String key) throws IOException {
+    protected String fromKey(String key) throws IOException {
         return key;
     }
 
