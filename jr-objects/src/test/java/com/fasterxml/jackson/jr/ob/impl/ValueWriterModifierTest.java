@@ -39,6 +39,41 @@ public class ValueWriterModifierTest extends TestBase
         }
     }
 
+    static class ArrayingWriter implements ValueWriter
+    {
+        private final ValueWriter _origWriter;
+
+        public ArrayingWriter(ValueWriter orig) {
+            _origWriter = orig;
+        }
+
+        @Override
+        public void writeValue(JSONWriter context, JsonGenerator g,
+                Object value) throws IOException
+        {
+            g.writeStartArray();
+            _origWriter.writeValue(context, g, value);
+            g.writeEndArray();
+        }
+
+        @Override
+        public Class<?> valueType() {
+            return Object.class;
+        }
+    }
+
+    static class ArrayingWriterModifier extends ReaderWriterModifier
+    {
+        @Override
+        public ValueWriter modifyValueWriter(JSONWriter writeContext,
+                Class<?> type, ValueWriter defaultWriter) {
+            if (type == NameBean.class) {
+                return new ArrayingWriter(defaultWriter);
+            }
+            return defaultWriter;
+        }
+    }
+
     /*
     /**********************************************************************
     /* Tests for wholesale replacement of `ValueReader`
@@ -82,5 +117,12 @@ public class ValueWriterModifierTest extends TestBase
         });
         String json = JSON.std.with(mod).asString(new NameBean("Foo", "Bar"));
         assertEquals(quote("Foo-Bar"), json);
+    }
+
+    public void testPOJOWriterDelegatingReplacement() throws Exception
+    {
+        String json = JSON.std.with(new ArrayingWriterModifier())
+            .asString(new NameBean("Foo", "Bar"));
+        assertEquals(aposToQuotes("[{'first':'Foo','last':'Bar'}]"), json);
     }
 }
