@@ -82,10 +82,11 @@ public class JSONReader
     /**
      * Constructor used for per-operation (non-blueprint) instance.
      */
-    protected JSONReader(JSONReader base, int features, ValueReaderLocator td, JsonParser p)
+    protected JSONReader(JSONReader base, int features, JsonParser p)
     {
         _features = features;
-        _readerLocator = td;
+        _readerLocator = base._readerLocator.perOperationInstance(this, features);
+
         _treeCodec = base._treeCodec;
         _collectionBuilder = base._collectionBuilder.newBuilder(features);
         _mapBuilder = base._mapBuilder.newBuilder(features);
@@ -154,8 +155,7 @@ public class JSONReader
         if (getClass() != JSONReader.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
-        return new JSONReader(this, features,
-                _readerLocator.perOperationInstance(this, features), p);
+        return new JSONReader(this, features, p);
     }
 
     /*

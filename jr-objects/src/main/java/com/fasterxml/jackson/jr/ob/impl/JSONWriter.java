@@ -82,11 +82,11 @@ public class JSONWriter
     /**
      * Constructor for non-blueprint instances
      */
-    protected JSONWriter(JSONWriter base, int features, ValueWriterLocator td, JsonGenerator g)
+    protected JSONWriter(JSONWriter base, int features, JsonGenerator g)
     {
         _features = features;
         _writeNullValues = JSON.Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
-        _writerLocator = td;
+        _writerLocator = base._writerLocator.perOperationInstance(this, features);
         _treeCodec = base._treeCodec;
         _generator = g;
         _timezone = DEFAULT_TIMEZONE;
@@ -152,8 +152,7 @@ public class JSONWriter
         if (getClass() != JSONWriter.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
-        return new JSONWriter(this, features,
-                _writerLocator.perOperationInstance(this, features), g);
+        return new JSONWriter(this, features, g);
     }
 
     /*
