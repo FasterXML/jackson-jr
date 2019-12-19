@@ -170,7 +170,14 @@ public class JSONReader
     public boolean arraysAsLists() {
         return JSON.Feature.READ_JSON_ARRAYS_AS_JAVA_ARRAYS.isDisabled(_features);
     }
-    
+
+    /**
+     * @since 2.11
+     */
+    public boolean isEnabled(JSON.Feature f) {
+        return f.isEnabled(_features);
+    }
+
     /*
     /**********************************************************************
     /* Public entry points for reading Simple objects from JSON
