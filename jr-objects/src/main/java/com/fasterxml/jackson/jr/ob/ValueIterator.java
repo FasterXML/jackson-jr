@@ -406,14 +406,12 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
     }
     
     protected <R> R _handleMappingException(JSONObjectException e) {
-        // Only with JDK8:
-//        throw new UncheckedIOException(e.getMessage(), e);
-        throw new RuntimeException(e.getMessage(), e);
+        // 20-Dec-2019, tatu: Ok with JDK 8 now, finally
+        throw new UncheckedIOException(e.getMessage(), e);
     }
 
     protected <R> R _handleIOException(IOException e) {
-        // Only with JDK8:
-//        throw new UncheckedIOException(e.getMessage(), e);
-        throw new RuntimeException(e.getMessage(), e);
+        // 20-Dec-2019, tatu: Ok with JDK 8 now, finally
+        throw new UncheckedIOException(e.getMessage(), e);
     }
 }

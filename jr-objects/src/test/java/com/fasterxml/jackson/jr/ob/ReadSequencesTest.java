@@ -183,7 +183,7 @@ public class ReadSequencesTest extends TestBase
         try {
             it.hasNext();
             fail("Should not pass");
-        } catch (RuntimeException e) {
+        } catch (UncheckedIOException e) {
             verifyException(e, "Unrecognized token");
         }
     }
