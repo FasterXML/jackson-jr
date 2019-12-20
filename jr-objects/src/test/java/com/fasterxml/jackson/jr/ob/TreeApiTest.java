@@ -5,6 +5,8 @@ import java.util.Iterator;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
+import com.fasterxml.jackson.core.tree.ArrayTreeNode;
+import com.fasterxml.jackson.core.tree.ObjectTreeNode;
 
 public class TreeApiTest extends TestBase
 {
@@ -50,6 +52,16 @@ public class TreeApiTest extends TestBase
         }
 
         @Override
+        public boolean isNull() {
+            return false;
+        }
+
+        @Override
+        public boolean isEmbeddedValue() {
+            return false;
+        }
+
+        @Override
         public boolean isArray() {
             return false;
         }
@@ -85,17 +97,14 @@ public class TreeApiTest extends TestBase
         }
 
         @Override
-        public JsonParser traverse() {
-            return null;
-        }
-
-        @Override
-        public JsonParser traverse(ObjectCodec arg0) {
+        public JsonParser traverse(ObjectReadContext arg0) {
             return null;
         }
     }
 
-    static class TestArrayNode extends TestBaseNode {
+    static class TestArrayNode extends TestBaseNode
+        implements ArrayTreeNode
+    {
         @Override
         public JsonToken asToken() { return JsonToken.START_ARRAY; }
 
@@ -109,7 +118,9 @@ public class TreeApiTest extends TestBase
         }
     }
 
-    static class TestObjectNode extends TestBaseNode {
+    static class TestObjectNode extends TestBaseNode
+        implements ObjectTreeNode
+    {
         @Override
         public JsonToken asToken() { return JsonToken.START_OBJECT; }
 
@@ -123,15 +134,15 @@ public class TreeApiTest extends TestBase
         }
     }
 
-    static class TestTreeCodec extends TreeCodec
+    static class TestTreeCodec implements TreeCodec
     {
         @Override
-        public TreeNode createArrayNode() {
+        public ArrayTreeNode createArrayNode() {
             return new TestArrayNode();
         }
 
         @Override
-        public TreeNode createObjectNode() {
+        public ObjectTreeNode createObjectNode() {
             return new TestObjectNode();
         }
 
@@ -155,6 +166,26 @@ public class TreeApiTest extends TestBase
         @Override
         public void writeTree(JsonGenerator g, TreeNode tree) throws IOException {
             g.writeTree(tree);
+        }
+
+        @Override
+        public TreeNode booleanNode(boolean b) {
+            return null;
+        }
+
+        @Override
+        public TreeNode stringNode(String text) {
+            return null;
+        }
+
+        @Override
+        public TreeNode missingNode() {
+            return null;
+        }
+
+        @Override
+        public TreeNode nullNode() {
+            return null;
         }
     }
 
