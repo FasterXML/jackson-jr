@@ -849,7 +849,7 @@ public class JSON
             List<Object> result = _readerForOperation(p).readList();
             JsonParser p0 = p;
             p = null;
-            _close(p0, null);
+            _close(p0);
             return result;
         } catch (Exception e) {
             return _closeWithError(p, e);
@@ -872,7 +872,7 @@ public class JSON
             List<T> result = _readerForOperation(p).readListOf(type);
             JsonParser p0 = p;
             p = null;
-            _close(p0, null);
+            _close(p0);
             return result;
         } catch (Exception e) {
             return _closeWithError(p, e);
@@ -893,7 +893,7 @@ public class JSON
             Object[] result = _readerForOperation(p).readArray();
             JsonParser p0 = p;
             p = null;
-            _close(p0, null);
+            _close(p0);
             return result;
         } catch (Exception e) {
             return _closeWithError(p, e);
@@ -914,7 +914,7 @@ public class JSON
             T[] result = _readerForOperation(p).readArrayOf(type);
             JsonParser p0 = p;
             p = null;
-            _close(p0, null);
+            _close(p0);
             return result;
         } catch (Exception e) {
             return _closeWithError(p, e);
@@ -936,7 +936,7 @@ public class JSON
             Map<?,?> result = _readerForOperation(p).readMap();
             JsonParser p0 = p;
             p = null;
-            _close(p0, null);
+            _close(p0);
             return (Map<String,Object>) result;
         } catch (Exception e) {
             return _closeWithError(p, e);
@@ -963,7 +963,7 @@ public class JSON
             Map<?,?> result = _readerForOperation(p).readMapOf(type);
             JsonParser p0 = p;
             p = null;
-            _close(p0, null);
+            _close(p0);
             return (Map<String,T>) result;
         } catch (Exception e) {
             return _closeWithError(p, e);
@@ -984,7 +984,7 @@ public class JSON
             T result = _readerForOperation(p).readBean(type);
             JsonParser p0 = p;
             p = null;
-            _close(p0, null);
+            _close(p0);
             return result;
         } catch (Exception e) {
             return _closeWithError(p, e);
@@ -1023,10 +1023,10 @@ public class JSON
             Object result = _readerForOperation(p).readValue();
             JsonParser p0 = p;
             p = null;
-            _close(p0, null);
+            _close(p0);
             return result;
         } catch (Exception e) {
-            _close(p, e);
+            _closeWithError(p, e);
             return null;
         }
     }
@@ -1054,10 +1054,10 @@ public class JSON
             T result = (T) _treeCodec.readTree(p);
             JsonParser p0 = p;
             p = null;
-            _close(p0, null);
+            _close(p0);
             return result;
         } catch (Exception e) {
-            _close(p, e);
+            _closeWithError(p, e);
             return null;
         }
     }
@@ -1130,7 +1130,7 @@ public class JSON
         throws IOException, JSONObjectException
     {
         if (_treeCodec == null) {
-             _noTreeCodec("read TreeNode");
+            _noTreeCodec("read TreeNode");
         }
 
         JsonParser p;
@@ -1332,10 +1332,7 @@ public class JSON
             g.close();
         } finally {
             if (!closed) {
-                // need to catch possible failure, so as not to mask problem
-                try {
-                    g.close();
-                } catch (IOException ioe) { }
+                _close(g);
             }
         }
     }
@@ -1421,43 +1418,20 @@ public class JSON
         return p;
     }
 
-    protected void _close(Closeable cl) {
-        try {
-            cl.close();
-        } catch (IOException ioe) { }
-    }
-
-    protected void _close(Closeable cl, Exception e) throws IOException {
-        if (cl != null) {
-            if (e == null) {
-                cl.close();
-            } else {
-                try {
-                    cl.close();
-                } catch (Exception secondaryEx) {
-                    // what should we do here, if anything?
-                }
-            }
-        }
-        if (e != null) {
-            if (e instanceof IOException) {
-                throw (IOException) e;
-            }
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            }
-            throw new IOException(e); // should never occur
-        }
-    }
-
     protected <T> T _closeWithError(Closeable cl, Exception e) throws IOException {
+        _close(cl);
+        return _throw(e);
+    }
+
+    protected void _close(Closeable cl) {
         if (cl != null) {
             try {
                 cl.close();
-            } catch (Exception secondaryEx) {
-                e.addSuppressed(secondaryEx);
-            }
+            } catch (IOException ioe) { }
         }
+    }
+    
+    protected <T> T _throw(Exception e) throws IOException {
         if (e instanceof IOException) {
             throw (IOException) e;
         }
@@ -1466,7 +1440,7 @@ public class JSON
         }
         throw new IOException(e); // should never occur
     }
-
+    
     protected void _noTreeCodec(String msg) {
          throw new IllegalStateException("JSON instance does not have configured TreeCodec to "+msg);
     }
