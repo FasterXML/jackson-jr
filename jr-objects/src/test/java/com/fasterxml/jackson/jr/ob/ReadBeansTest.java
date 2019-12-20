@@ -2,6 +2,7 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.util.*;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.jr.ob.JSON;
 
 public class ReadBeansTest extends TestBase
@@ -122,25 +123,29 @@ public class ReadBeansTest extends TestBase
 
         // First, bean array
         TestBean[] beans = JSON.std.arrayOfFrom(TestBean.class, INPUT);
-        assertNotNull(beans);
-        assertEquals(2, beans.length);
-        assertEquals(13, beans[0].x);
-        assertEquals("Bob", beans[0].name.first);
-        assertEquals("Burger", beans[0].name.last);
-        assertEquals(-145, beans[1].x);
-        assertEquals("Billy", beans[1].name.first);
-        assertEquals("Bacon", beans[1].name.last);
+        _verifySimpleBeanCollections(Arrays.asList(beans));
 
         // then List
-        List<TestBean> beans2 = JSON.std.listOfFrom(TestBean.class, INPUT);
-        assertNotNull(beans2);
-        assertEquals(2, beans2.size());
-        assertEquals(13, beans2.get(0).x);
-        assertEquals("Bob", beans2.get(0).name.first);
-        assertEquals("Burger", beans2.get(0).name.last);
-        assertEquals(-145, beans2.get(1).x);
-        assertEquals("Billy", beans2.get(1).name.first);
-        assertEquals("Bacon", beans2.get(1).name.last);
+        _verifySimpleBeanCollections(JSON.std.listOfFrom(TestBean.class, INPUT));
+
+        // and slight variants
+        JsonParser p = parserFor(INPUT);
+        _verifySimpleBeanCollections(Arrays.asList(JSON.std.arrayOfFrom(TestBean.class, p)));
+        p.close();
+
+        p = parserFor(INPUT);
+        _verifySimpleBeanCollections(JSON.std.listOfFrom(TestBean.class, p));
+        p.close();
+    }
+
+    private void _verifySimpleBeanCollections(List<TestBean> beans) {
+        assertEquals(2, beans.size());
+        assertEquals(13, beans.get(0).x);
+        assertEquals("Bob", beans.get(0).name.first);
+        assertEquals("Burger", beans.get(0).name.last);
+        assertEquals(-145, beans.get(1).x);
+        assertEquals("Billy", beans.get(1).name.first);
+        assertEquals("Bacon", beans.get(1).name.last);
     }
 
     // @since 2.10
@@ -151,15 +156,24 @@ public class ReadBeansTest extends TestBase
                 +", 'second':{'x':-145,'name':{'first':'Billy','last':'Bacon'}}"
                 +"}");
         Map<String, TestBean> stuff = JSON.std.mapOfFrom(TestBean.class, INPUT);
-        assertEquals(2, stuff.size());
-        assertNotNull(stuff.get("first"));
-        TestBean bean2 = stuff.get("second");
+        _testSimpleBeanMaps(stuff);
+
+        JsonParser p = parserFor(INPUT);
+        stuff = JSON.std.mapOfFrom(TestBean.class, p);
+        _testSimpleBeanMaps(stuff);
+        p.close();
+    }
+
+    private void _testSimpleBeanMaps(Map<String, TestBean> map) {
+        assertEquals(2, map.size());
+        assertNotNull(map.get("first"));
+        TestBean bean2 = map.get("second");
         assertNotNull(bean2);
         assertEquals(-145, bean2.x);
         assertEquals("Billy", bean2.name.first);
         assertEquals("Bacon", bean2.name.last);
     }
-
+    
     public void testJvmSerializersPOJO() throws Exception
     {
         MediaItem.Content content = new MediaItem.Content();

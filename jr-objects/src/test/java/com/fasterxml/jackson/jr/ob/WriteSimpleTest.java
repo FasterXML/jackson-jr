@@ -1,6 +1,8 @@
 package com.fasterxml.jackson.jr.ob;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
@@ -37,7 +39,17 @@ public class WriteSimpleTest extends TestBase
         stuff.add("x");
         stuff.add(true);
         stuff.add(123);
-        assertEquals("[\"x\",true,123]", JSON.std.asString(stuff));
+        final String exp = "[\"x\",true,123]";
+        assertEquals(exp, JSON.std.asString(stuff));
+        assertEquals(exp, new String(JSON.std.asBytes(stuff), "ASCII"));
+
+        StringWriter sw = new StringWriter();
+        JSON.std.write(stuff, sw);
+        assertEquals(exp, sw.toString());
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        JSON.std.write(stuff, bytes);
+        assertEquals(exp, bytes.toString("UTF-8"));
     }
 
     public void testSimpleMap() throws Exception

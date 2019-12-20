@@ -315,7 +315,7 @@ public class JSONReader
 
     protected TreeCodec _treeCodec() throws JSONObjectException {
         if (_treeCodec == null) {
-            throw new JSONObjectException("No TreeCodec specified: can not bind JSON into TreeNode types");
+            throw new JSONObjectException("No `TreeCodec` specified: can not bind JSON into `TreeNode` types");
         }
         return _treeCodec;
     }

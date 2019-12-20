@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
@@ -20,28 +21,6 @@ public class ReadSimpleTest extends TestBase
 
     static class TreeWrapper {
         public TreeNode value;
-    }
-
-    /*
-    /**********************************************************************
-    /* Tests for Lists/Collections
-    /**********************************************************************
-     */
-    
-    public void testSimpleList() throws Exception
-    {
-        final String INPUT = "[1,2,3]";
-        Object ob = JSON.std.anyFrom(INPUT);
-        // default mapping should be to List:
-        assertTrue(ob instanceof List);
-        assertEquals(3, ((List<?>) ob).size());
-        // actually, verify with write...
-        assertEquals(INPUT, JSON.std.asString(ob));
-
-        // but same should be possible with explicit call as well
-        List<Object> list = JSON.std.listFrom(INPUT);
-        assertEquals(3, list.size());
-        assertEquals(INPUT, JSON.std.asString(list));
     }
 
     /*
@@ -71,9 +50,12 @@ public class ReadSimpleTest extends TestBase
     }
 
     // separate tests since code path differs
-    public void testSingleElementArray() throws Exception
-    {
+    public void testSingleElementArray() throws Exception {
         _testArray("[12]", 1);
+    }
+
+    public void testSmallArray() throws Exception {
+        _testArray("[true,42,\"maybe\"]", 3);
     }
 
     private void _testArray(String input, int expCount) throws Exception
@@ -86,7 +68,15 @@ public class ReadSimpleTest extends TestBase
         assertEquals(expCount, ((Object[]) ob).length);
         assertEquals(input, JSON.std.asString(ob));
 
-        // or, with
+        // via parser, too
+        JsonParser p = parserFor(input);
+        ob = JSON.std.arrayFrom(p);
+        assertTrue(ob instanceof Object[]);
+        assertEquals(expCount, ((Object[]) ob).length);
+        assertEquals(input, JSON.std.asString(ob));
+        p.close();
+
+        // or, with "List of Any"
         ob = JSON.std
                 .arrayOfFrom(Object.class, input);
         assertTrue(ob instanceof Object[]);
@@ -166,19 +156,50 @@ public class ReadSimpleTest extends TestBase
     /**********************************************************************
      */
 
-    public void testTreeNodeWithoutCodec() throws Exception {
+    public void testTreeReadWithoutCodec() throws Exception
+    {
+        try {
+            JSON.std.treeFrom("{\"value\":[ 3 ]}");
+            fail("Should not pass");
+        } catch (IllegalStateException e) {
+            verifyException(e, "not have configured `TreeCodec` to read `TreeNode`");
+        }
+
+        try {
+            JSON.std.treeSequenceFrom("{\"value\":[ 3 ]}");
+            fail("Should not pass");
+        } catch (IllegalStateException e) {
+            verifyException(e, "not have configured `TreeCodec` to read `TreeNode` sequence");
+        }
+
         try {
             JSON.std.beanFrom(TreeNode.class, quote("abc"));
             fail("Should not pass");
         } catch (JSONObjectException e) {
-            verifyException(e, "No TreeCodec specified");
+            verifyException(e, "No `TreeCodec` specified");
         }
 
         try {
             JSON.std.beanFrom(TreeWrapper.class, "{\"value\":[ 3 ]}");
             fail("Should not pass");
         } catch (JSONObjectException e) {
-            verifyException(e, "No TreeCodec specified");
+            verifyException(e, "No `TreeCodec` specified");
+        }
+    }
+        
+    public void testTreeNodeCreationWithoutCodec() throws Exception {
+        try {
+            JSON.std.createArrayNode();
+            fail("Should not pass");
+        } catch (IllegalStateException e) {
+            verifyException(e, "does not have configured `TreeCodec` to create Array node");
+        }
+
+        try {
+            JSON.std.createObjectNode();
+            fail("Should not pass");
+        } catch (IllegalStateException e) {
+            verifyException(e, "does not have configured `TreeCodec` to create Object node");
         }
     }
 
@@ -192,6 +213,24 @@ public class ReadSimpleTest extends TestBase
         }
     }
 
+    public void testInvalidSource() throws Exception {
+        try {
+            JSON.std.beanFrom(Object.class, Long.valueOf(67));
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "Can not use Source of type `java.lang.Long`");
+        }
+    }
+
+    public void testEmptySource() throws Exception {
+        try {
+            JSON.std.beanFrom(Object.class, "   ");
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "No content to map due to end-of-input");
+        }
+    }
+    
     /*
     /**********************************************************************
     /* Other tests
@@ -201,14 +240,21 @@ public class ReadSimpleTest extends TestBase
     public void testSimpleMixed() throws Exception
     {
         final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";
-        Object ob = JSON.std.anyFrom(INPUT);
+        _verifySimpleMixed(JSON.std.anyFrom(INPUT), INPUT);
+        JsonParser p = parserFor(INPUT);
+        _verifySimpleMixed(JSON.std.anyFrom(p), INPUT);
+        p.close();
+    }
+
+    private void _verifySimpleMixed(Object ob, String json) throws Exception
+    {
         assertTrue(ob instanceof Map);
         assertEquals(2, ((Map<?,?>) ob).size());
         Object list = (((Map<?,?>) ob).get("a"));
         assertTrue(list instanceof List<?>);
         
         // actually, verify with write...
-        assertEquals(INPUT, JSON.std.asString(ob));
+        assertEquals(json, JSON.std.asString(ob));
     }
 
     public void testSimpleEnums() throws Exception

@@ -1040,7 +1040,7 @@ public class JSON
             throws IOException, JSONObjectException
     {
         if (_treeCodec == null) {
-             _noTreeCodec("read TreeNode");
+             _noTreeCodec("read `TreeNode`");
         }
         if (source instanceof JsonParser) {
             JsonParser p = _initForReading((JsonParser) source);
@@ -1130,7 +1130,7 @@ public class JSON
         throws IOException, JSONObjectException
     {
         if (_treeCodec == null) {
-            _noTreeCodec("read TreeNode");
+            _noTreeCodec("read `TreeNode` sequence");
         }
 
         JsonParser p;
@@ -1289,7 +1289,7 @@ public class JSON
     @Override
     public ArrayTreeNode createArrayNode() {
          if (_treeCodec == null) {
-              _noTreeCodec("create Object node");
+              _noTreeCodec("create Array node");
           }
          return _treeCodec.createArrayNode();
     }
@@ -1379,8 +1379,8 @@ public class JSON
         if (source instanceof CharSequence) {
             return f.createParser(this, ((CharSequence) source).toString());
         }
-        throw new JSONObjectException("Can not use Source of type "+source.getClass().getName()
-                +" as input (use an InputStream, Reader, String, byte[], File or URL");
+        throw new JSONObjectException("Can not use Source of type `"+source.getClass().getName()
++"` as input (use an `InputStream`, `Reader`, `String`/`CharSequence`, `byte[]`, `char[]`, `File` or `URL`");
     }
 
     protected JsonParser _initForReading(JsonParser p) throws IOException
@@ -1442,6 +1442,6 @@ public class JSON
     }
     
     protected void _noTreeCodec(String msg) {
-         throw new IllegalStateException("JSON instance does not have configured TreeCodec to "+msg);
+         throw new IllegalStateException("JSON instance does not have configured `TreeCodec` to "+msg);
     }
 }
