@@ -2,6 +2,7 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.util.*;
 
+import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
@@ -34,7 +35,17 @@ public class ReadSimpleTest extends TestBase
     /* Tests for arrays
     /**********************************************************************
      */
-    
+
+    public void testByteArray() throws Exception {
+        byte[] result = JSON.std.beanFrom(byte[].class, quote("YWJj"));
+        assertEquals("abc", new String(result, "UTF-8"));
+    }
+
+    public void testCharArray() throws Exception {
+        char[] result = JSON.std.beanFrom(char[].class, quote("abc"));
+        assertEquals("abc", new String(result));
+    }
+
     public void testSimpleArray() throws Exception
     {
         _testArray("[true,\"abc\",3]", 3);
@@ -104,10 +115,61 @@ public class ReadSimpleTest extends TestBase
 
     /*
     /**********************************************************************
+    /* Tests for Scalars
+    /**********************************************************************
+     */
+
+    public void testBoolean() throws Exception {
+        assertEquals(Boolean.TRUE, JSON.std.beanFrom(Boolean.class, "true"));
+    }
+
+    public void testByte() throws Exception {
+        assertEquals(Byte.valueOf((byte) 13), JSON.std.beanFrom(Byte.class, "13"));
+    }
+
+    public void testDouble() throws Exception {
+        assertEquals(0.25, JSON.std.beanFrom(Double.class, "0.25"));
+    }
+    
+    public void testFloat() throws Exception {
+        assertEquals(0.25f, JSON.std.beanFrom(Float.class, "0.25"));
+    }
+
+    public void testShort() throws Exception {
+        assertEquals(Short.valueOf((short) 13), JSON.std.beanFrom(Short.class, "13"));
+    }
+    
+    /*
+    /**********************************************************************
+    /* Failing tests (mostly for code coverage)
+    /**********************************************************************
+     */
+
+    public void testTreeNodeWithoutCodec() throws Exception {
+        try {
+            JSON.std.beanFrom(TreeNode.class, quote("abc"));
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "No TreeCodec specified");
+        }
+    }
+
+    // not yet supported (but probably should)
+    public void testIntArray() throws Exception {
+        try {
+            JSON.std.beanFrom(int[].class, "[1, 2]");
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "not yet implemented");
+        }
+    }
+
+    /*
+    /**********************************************************************
     /* Other tests
     /**********************************************************************
      */
-    
+
     public void testSimpleMixed() throws Exception
     {
         final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";

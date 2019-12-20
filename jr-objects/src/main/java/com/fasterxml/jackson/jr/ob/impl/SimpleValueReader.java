@@ -73,13 +73,6 @@ public class SimpleValueReader extends ValueReader
     {
         switch (_typeId) {
 
-        case SER_MAP:
-        case SER_LIST:
-        case SER_COLLECTION:
-        case SER_OBJECT_ARRAY:
-            // should never get here: we have dedicated readers
-            break;
-
         case SER_INT_ARRAY:
             return _readIntArray(p);
 
@@ -159,6 +152,11 @@ public class SimpleValueReader extends ValueReader
         
             return URI.create(p.getValueAsString());
 
+//        case SER_MAP:
+//        case SER_LIST:
+//        case SER_COLLECTION:
+//        case SER_OBJECT_ARRAY:
+            // should never get here: we have dedicated readers
         default: // types that shouldn't get here
         //case SER_ENUM:
         }
