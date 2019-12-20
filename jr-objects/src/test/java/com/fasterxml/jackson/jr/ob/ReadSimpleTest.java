@@ -1,5 +1,7 @@
 package com.fasterxml.jackson.jr.ob;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 import com.fasterxml.jackson.core.TreeNode;
@@ -8,6 +10,18 @@ import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
 public class ReadSimpleTest extends TestBase
 {
+    static class BooleanWrapper {
+        public boolean value;
+    }
+
+    static class IntArrayWrapper {
+        public int[] value;
+    }
+
+    static class TreeWrapper {
+        public TreeNode value;
+    }
+
     /*
     /**********************************************************************
     /* Tests for Lists/Collections
@@ -121,22 +135,29 @@ public class ReadSimpleTest extends TestBase
 
     public void testBoolean() throws Exception {
         assertEquals(Boolean.TRUE, JSON.std.beanFrom(Boolean.class, "true"));
+        BooleanWrapper w = JSON.std.beanFrom(BooleanWrapper.class, "{\"value\":true}");
+        assertTrue(w.value);
     }
 
-    public void testByte() throws Exception {
+    public void testCharacter() throws Exception {
+        assertEquals(Character.valueOf('a'), JSON.std.beanFrom(Character.class, "\"a\""));
+    }
+
+    public void testNumbers() throws Exception {
         assertEquals(Byte.valueOf((byte) 13), JSON.std.beanFrom(Byte.class, "13"));
-    }
+        assertEquals(Short.valueOf((short) 13), JSON.std.beanFrom(Short.class, "13"));
+        assertEquals(Long.valueOf(42L), JSON.std.beanFrom(Long.class, "42"));
 
-    public void testDouble() throws Exception {
+        assertEquals(new BigDecimal("10.25"), JSON.std.beanFrom(BigDecimal.class, "10.25"));
+        assertEquals(BigInteger.TEN, JSON.std.beanFrom(BigInteger.class, "10"));
+        
         assertEquals(0.25, JSON.std.beanFrom(Double.class, "0.25"));
-    }
-    
-    public void testFloat() throws Exception {
         assertEquals(0.25f, JSON.std.beanFrom(Float.class, "0.25"));
     }
 
-    public void testShort() throws Exception {
-        assertEquals(Short.valueOf((short) 13), JSON.std.beanFrom(Short.class, "13"));
+    public void testMiscScalars() throws Exception {
+        assertEquals(new Date(123456L), JSON.std.beanFrom(Date.class,"123456"));
+        assertEquals(Object.class, JSON.std.beanFrom(Class.class, quote(Object.class.getName())));
     }
     
     /*
@@ -152,12 +173,19 @@ public class ReadSimpleTest extends TestBase
         } catch (JSONObjectException e) {
             verifyException(e, "No TreeCodec specified");
         }
+
+        try {
+            JSON.std.beanFrom(TreeWrapper.class, "{\"value\":[ 3 ]}");
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "No TreeCodec specified");
+        }
     }
 
     // not yet supported (but probably should)
     public void testIntArray() throws Exception {
         try {
-            JSON.std.beanFrom(int[].class, "[1, 2]");
+            JSON.std.beanFrom(IntArrayWrapper.class, "{\"value\":[ 3 ]}");
             fail("Should not pass");
         } catch (JSONObjectException e) {
             verifyException(e, "not yet implemented");
