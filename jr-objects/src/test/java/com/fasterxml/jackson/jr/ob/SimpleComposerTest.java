@@ -143,4 +143,13 @@ public class SimpleComposerTest extends TestBase
                 +"}"),
                 json);
     }
+
+    public void testSimpleComposeMap() throws Exception
+    {
+        Map<String, Object> map = JSON.std.composeMap()
+                .put("answer", 42)
+                .finish();
+        assertEquals(1, map.size());
+        assertEquals("{answer=42}", map.toString());
+    }
 }
