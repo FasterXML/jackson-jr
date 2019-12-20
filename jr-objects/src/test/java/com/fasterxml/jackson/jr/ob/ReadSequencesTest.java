@@ -1,9 +1,6 @@
 package com.fasterxml.jackson.jr.ob;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -186,7 +183,7 @@ public class ReadSequencesTest extends TestBase
         try {
             it.hasNext();
             fail("Should not pass");
-        } catch (UncheckedIOException e) {
+        } catch (RuntimeException e) {
             verifyException(e, "Unrecognized token");
         }
     }
