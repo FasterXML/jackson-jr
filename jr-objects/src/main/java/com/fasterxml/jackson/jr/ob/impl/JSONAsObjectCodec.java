@@ -209,7 +209,7 @@ public class JSONAsObjectCodec
     {
         TreeCodec c = _treeCodec;
         if (c == null) {
-            throw new IllegalStateException("No TreeCodec has been configured: can not use tree operations");
+            throw new IllegalStateException("No `TreeCodec` has been configured: can not use tree operations");
         }
         return c;
     }

@@ -3,12 +3,48 @@ package com.fasterxml.jackson.jr.ob;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonParser;
+
 public class ReadListTest extends TestBase
 {
     static class ListHolder {
         public List<Map<String, Integer>> stuff;
     }
 
+    /*
+    /**********************************************************************
+    /* Tests for simple Lists
+    /**********************************************************************
+     */
+    
+    public void testSimpleList() throws Exception
+    {
+        final String INPUT = "[1,2,3]";
+
+        _verifySimpleList(JSON.std.anyFrom(INPUT), INPUT);
+        // but same should be possible with explicit call as well
+        _verifySimpleList(JSON.std.listFrom(INPUT), INPUT);
+
+        JsonParser p = parserFor(INPUT);
+        _verifySimpleList(JSON.std.listFrom(p), INPUT);
+        assertFalse(p.hasCurrentToken());
+        p.close();
+    }
+
+    private void _verifySimpleList(Object ob, String asJson) throws Exception {
+        // default mapping should be to List:
+        assertTrue(ob instanceof List);
+        assertEquals(3, ((List<?>) ob).size());
+        // actually, verify with write...
+        assertEquals(asJson, JSON.std.asString(ob));
+    }
+
+    /*
+    /**********************************************************************
+    /* Tests for List of Maps
+    /**********************************************************************
+     */
+    
     public void testListOfMaps() throws Exception
     {
         ListHolder h = JSON.std

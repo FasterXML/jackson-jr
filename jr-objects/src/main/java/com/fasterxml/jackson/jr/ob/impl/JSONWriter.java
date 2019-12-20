@@ -554,7 +554,7 @@ public class JSONWriter
 
     protected void writeTreeNodeValue(TreeNode v) throws IOException {
         if (_treeCodec == null) {
-            throw new JSONObjectException("No TreeCodec configured: can not serializer TreeNode values");
+            throw new JSONObjectException("No `TreeCodec` configured: can not serialize `TreeNode` values");
         }
         _treeCodec.writeTree(_generator, v);
     }
