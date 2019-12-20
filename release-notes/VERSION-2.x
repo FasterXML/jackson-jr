@@ -8,6 +8,10 @@ Project: jackson-jr
 
 -
 
+2.10.2 (not yet released)
+
+#71: Jackson-jr 2.10 accidentally uses `UncheckedIOException` only available on JDK 8
+
 2.10.1 (09-Nov-2019)
 
 No changes since 2.10.0
