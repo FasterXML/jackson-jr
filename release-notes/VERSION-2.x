@@ -43,7 +43,11 @@ No changes since 2.9.9
 
 No changes since 2.8
 
-2.8.10 (not yet released)
+2.8.11 (24-Dec-2017)
+
+No changes since 2.8.10
+
+2.8.10 (24-Aug-2017)
 
 #53: `java.io.File` is not a valid source for anyFrom()/mapFrom()
  (reported by CoreyTeffetalor@github)
