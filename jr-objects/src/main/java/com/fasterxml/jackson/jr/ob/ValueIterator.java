@@ -2,7 +2,6 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
