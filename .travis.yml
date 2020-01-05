@@ -1,7 +1,5 @@
 language: java
 
-# 07-Sep-2017, tatu: Alas, jdk6 just doesn't work. First was missing JDK6 pkg
-#   but then Maven itself, or one of plugins, compiled with later. So... just leave
 jdk:
   - openjdk8
 
@@ -9,4 +7,4 @@ jdk:
 branches:
   only:
     - master
-    - "2.9"
+    - "2.10"
