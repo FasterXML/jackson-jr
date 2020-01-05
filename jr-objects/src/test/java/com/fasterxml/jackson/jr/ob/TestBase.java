@@ -3,7 +3,6 @@ package com.fasterxml.jackson.jr.ob;
 import java.io.IOException;
 import java.util.Arrays;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 
 import junit.framework.TestCase;
