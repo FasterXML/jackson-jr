@@ -1,7 +1,5 @@
 language: java
 
-# 27-Sep-2017, tatu: Older versions should compile with Java 6; but with 3.x as master
-#   only Java 8 and beyond work
 jdk:
   - openjdk8
   - openjdk11
