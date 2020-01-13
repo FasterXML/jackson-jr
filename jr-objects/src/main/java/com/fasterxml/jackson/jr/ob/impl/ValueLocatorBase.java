@@ -127,10 +127,6 @@ abstract class ValueLocatorBase
     /**********************************************************************
      */
 
-    protected POJODefinition _resolveBeanDef(Class<?> raw) {
-        return POJODefinition.find(raw);
-    }
-
     protected int _findSimpleType(Class<?> raw, boolean forSer)
     {
         if (raw == String.class) {

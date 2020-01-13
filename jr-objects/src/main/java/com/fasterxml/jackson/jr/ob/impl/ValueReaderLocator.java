@@ -390,6 +390,16 @@ public class ValueReaderLocator
     /**********************************************************************
      */
 
+    protected POJODefinition _resolveBeanDef(Class<?> raw) {
+        try {
+            return BeanPropertyIntrospector.instance().pojoDefinitionForDeserialization(_readContext, raw);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(String.format
+                    ("Failed to introspect ClassDefinition for type '%s': %s",
+                            raw.getName(), e.getMessage()), e);
+        }
+    }
+
     protected BeanReader _resolveBeanForDeser(Class<?> raw, POJODefinition beanDef)
     {
         Constructor<?> defaultCtor = beanDef.defaultCtor;

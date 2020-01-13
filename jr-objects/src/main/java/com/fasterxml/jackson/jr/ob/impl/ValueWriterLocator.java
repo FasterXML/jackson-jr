@@ -183,6 +183,16 @@ public class ValueWriterLocator extends ValueLocatorBase
     /**********************************************************************
      */
 
+    protected POJODefinition _resolveBeanDef(Class<?> raw) {
+        try {
+            return BeanPropertyIntrospector.instance().pojoDefinitionForSerialization(_writeContext, raw);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(String.format
+                    ("Failed to introspect ClassDefinition for type '%s': %s",
+                            raw.getName(), e.getMessage()), e);
+        }
+    }
+    
     /**
      * Method called to locate a serializer for given type and return numeric id.
      * Serializer can be found using one of follow methods (in order of lookups):
