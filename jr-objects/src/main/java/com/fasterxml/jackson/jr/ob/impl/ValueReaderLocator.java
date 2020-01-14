@@ -392,6 +392,12 @@ public class ValueReaderLocator
 
     protected POJODefinition _resolveBeanDef(Class<?> raw) {
         try {
+            if (_readerModifier != null) {
+                POJODefinition def = _readerModifier.pojoDefinitionForDeserialization(_readContext, raw);
+                if (def != null) {
+                    return def;
+                }
+            }
             return BeanPropertyIntrospector.instance().pojoDefinitionForDeserialization(_readContext, raw);
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format

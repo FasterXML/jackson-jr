@@ -29,7 +29,7 @@ public class BeanPropertyIntrospector
     public BeanPropertyIntrospector() { }
 
     public static BeanPropertyIntrospector instance() { return INSTANCE; }
-    
+
     public POJODefinition pojoDefinitionForDeserialization(JSONReader r, Class<?> pojoType) {
         return _construct(pojoType);
     }
