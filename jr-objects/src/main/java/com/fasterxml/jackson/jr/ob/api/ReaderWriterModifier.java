@@ -2,6 +2,7 @@ package com.fasterxml.jackson.jr.ob.api;
 
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
+import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
 
 /**
  * API to implement to apply modifications to {@link ValueReader}s and
@@ -12,6 +13,21 @@ import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
  */
 public abstract class ReaderWriterModifier
 {
+    // // Basic POJO introspection
+
+    public POJODefinition pojoDefinitionForDeserialization(JSONReader readContext,
+            Class<?> pojoType)
+    {
+        // use default
+        return null;
+    }
+
+    public POJODefinition pojoDefinitionForSerialization(JSONWriter writeContext,
+            Class<?> pojoType) {
+        // use default
+        return null;
+    }
+
     // // Reader handling
 
     /**
