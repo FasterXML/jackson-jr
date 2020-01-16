@@ -270,15 +270,15 @@ public class ValueWriterLocator extends ValueLocatorBase
     
     protected BeanPropertyWriter[] _resolveBeanForSer(Class<?> raw, POJODefinition beanDef)
     {
-        POJODefinition.Prop[] rawProps = beanDef.properties();
-        final int len = rawProps.length;
+        final List<POJODefinition.Prop> rawProps = beanDef.getProperties();
+        final int len = rawProps.size();
         List<BeanPropertyWriter> props = new ArrayList<BeanPropertyWriter>(len);
         final boolean includeReadOnly = JSON.Feature.WRITE_READONLY_BEAN_PROPERTIES.isEnabled(_features);
         final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
         final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
 
         for (int i = 0; i < len; ++i) {
-            POJODefinition.Prop rawProp = rawProps[i];
+            POJODefinition.Prop rawProp = rawProps.get(i);
             Method m = rawProp.getter;
             if (m == null) {
                 if (JSON.Feature.USE_IS_GETTERS.isEnabled(_features)) {

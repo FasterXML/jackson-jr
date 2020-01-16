@@ -3,6 +3,9 @@ package com.fasterxml.jackson.jr.ob.impl;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Definition of a single Bean-style Java class, without assumptions
@@ -31,12 +34,29 @@ public class POJODefinition
         longCtor = longCtor0;
     }
 
+    protected POJODefinition(POJODefinition base, Prop[] props) {
+        _type = base._type;
+        _properties = props;
+        defaultCtor = base.defaultCtor;
+        stringCtor = base.stringCtor;
+        longCtor = base.longCtor;
+    }
+
+    public POJODefinition withProperties(Collection<Prop> props) {
+        return new POJODefinition(this, props.toArray(new Prop[0]));
+    }
+
     /*
     /**********************************************************************
     /* Public API
     /**********************************************************************
      */
 
+    public List<Prop> getProperties() {
+        return Arrays.asList(_properties);
+    }
+
+    @Deprecated // in 2.11, will be removed soon
     public Prop[] properties() {
         return _properties;
     }

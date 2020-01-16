@@ -437,8 +437,8 @@ public class ValueReaderLocator
             }
         }
 
-        final POJODefinition.Prop[] rawProps = beanDef.properties();
-        final int len = rawProps.length;
+        final List<POJODefinition.Prop> rawProps = beanDef.getProperties();
+        final int len = rawProps.size();
         final Map<String, BeanPropertyReader> propMap;
         if (len == 0) {
             propMap = Collections.emptyMap();
@@ -446,7 +446,7 @@ public class ValueReaderLocator
             propMap = new HashMap<String, BeanPropertyReader>();
             final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
             for (int i = 0; i < len; ++i) {
-                POJODefinition.Prop rawProp = rawProps[i];                
+                POJODefinition.Prop rawProp = rawProps.get(i);
                 Method m = rawProp.setter;
                 Field f = useFields ? rawProp.field : null;
 

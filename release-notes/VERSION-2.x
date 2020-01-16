@@ -6,7 +6,8 @@ Project: jackson-jr
 
 2.11.0 (not yet released)
 
--
+#70: Add extension point (`ReaderWriterModifier`) to allow more customization of
+  POJO readers, writers
 
 2.10.2 (05-Jan-2020)
 
