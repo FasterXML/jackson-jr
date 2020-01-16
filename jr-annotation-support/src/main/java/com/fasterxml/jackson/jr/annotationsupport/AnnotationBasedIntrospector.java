@@ -146,7 +146,63 @@ public class AnnotationBasedIntrospector
     }
 
     protected void _findMethods() {
-        
+        _findMethods(_type);
+    }
+
+    protected void _findMethods(final Class<?> currType)
+    {
+        if (currType == null || currType == Object.class) {
+            return;
+        }
+        // Start with base type methods (so overrides work)
+        _findMethods(currType.getSuperclass());
+
+        // then get methods from within this class
+        for (Method m : currType.getDeclaredMethods()) {
+            final int flags = m.getModifiers();
+            // 13-Jun-2015, tatu: Skip synthetic, bridge methods altogether, for now
+            //    at least (add more complex handling only if absolutely necessary)
+            if (Modifier.isStatic(flags)
+                    || m.isSynthetic() || m.isBridge()) {
+                continue;
+            }
+        }
+//            Class<?> argTypes[] = m.getParameterTypes();
+            /*
+            if (argTypes.length == 0) { // getter?
+                // getters must be public to be used
+                if (!Modifier.isPublic(flags)) {
+                    continue;
+                }
+                Class<?> resultType = m.getReturnType();
+                if (resultType == Void.class) {
+                    continue;
+                }
+                String name = m.getName();
+                if (name.startsWith("get")) {
+                    if (name.length() > 3) {
+                        name = decap(name.substring(3));
+                        _propFrom(props, name).withGetter(m);
+                    }
+                } else if (name.startsWith("is")) {
+                    if (name.length() > 2) {
+                        // May or may not be used, but collect for now all the same:
+                        name = decap(name.substring(2));
+                        _propFrom(props, name).withIsGetter(m);
+                    }
+                }
+            } else if (argTypes.length == 1) { // setter?
+                // Non-public setters are fine if we can force access, don't yet check
+                // let's also not bother about return type; setters that return value are fine
+                String name = m.getName();
+                if (!name.startsWith("set") || name.length() == 3) {
+                    continue;
+                }
+                name = decap(name.substring(3));
+                _propFrom(props, name).withSetter(m);
+            }
+        }
+            */
     }
 
     /*
@@ -156,7 +212,9 @@ public class AnnotationBasedIntrospector
      */
 
     protected boolean _isFieldVisible(Field f) {
-        return Modifier.isPublic(f.getModifiers());
+        final int flags = f.getModifiers();
+        return !Modifier.isTransient(flags)
+                && Modifier.isPublic(f.getModifiers());
     }
 
     protected boolean _isGetterVisible(Field f) {
