@@ -448,6 +448,8 @@ public class JSON implements Versioned
     /**
      * Convenience method for constructing an adapter that uses this
      * instance as a {@link ObjectCodec}
+     *
+     * @return Wrapper over this object to adapt to {@link ObjectCodec} API
      */
     public ObjectCodec asCodec() {
         return new JSONAsObjectCodec(this);
@@ -470,6 +472,15 @@ public class JSON implements Versioned
     /**********************************************************************
      */
 
+    /**
+     * Mutant factory method for constructing new instance with specified {@link JsonFactory}
+     * if different from currently configured one (if not, return {@code this} as-is)
+     * 
+     * @param f Jackson core format factory to use for low-level decoding/encoding
+     *
+     * @return New instance with specified factory (if not same as currently configured);
+     *   {@code this} otherwise.
+     */
     public JSON with(JsonFactory f)
     {
         if (f == _jsonFactory) {
@@ -481,6 +492,11 @@ public class JSON implements Versioned
     /**
      * Mutant factory for constructing an instance with specified {@link TreeCodec},
      * and returning new instance (or, if there would be no change, this instance).
+     *
+     * @param c Tree codec to use for reading/writing of tree representation
+     *
+     * @return New instance with specified codec (if not same as currently configured);
+     *   {@code this} otherwise.
      */
     public JSON with(TreeCodec c)
     {
@@ -494,6 +510,11 @@ public class JSON implements Versioned
     /**
      * Mutant factory for constructing an instance with specified {@link JSONReader},
      * and returning new instance (or, if there would be no change, this instance).
+     *
+     * @param r Customized {@link JSONReader} to use instead of standard one
+     *
+     * @return New instance with specified {@link JSONReader} (if not same as currently configured);
+     *   {@code this} otherwise.
      */
     public JSON with(JSONReader r)
     {
@@ -507,6 +528,11 @@ public class JSON implements Versioned
     /**
      * Mutant factory for constructing an instance with specified {@link JSONWriter},
      * and returning new instance (or, if there would be no change, this instance).
+     *
+     * @param w Customized {@link JSONWriter} to use instead of standard one
+     *
+     * @return New instance with specified {@link JSONWriter} (if not same as currently configured);
+     *   {@code this} otherwise.
      */
     public JSON with(JSONWriter w)
     {
@@ -520,6 +546,12 @@ public class JSON implements Versioned
     /**
      * Mutant factory for constructing an instance with specified {@link PrettyPrinter},
      * and returning new instance (or, if there would be no change, this instance).
+     *
+     * @param pp {@link PrettyPrinter} to use for pretty-printing output (of {@code null} to disable
+     *    pretty-printing)
+     *
+     * @return New instance with specified {@link PrettyPrinter} (if not same as currently configured);
+     *   {@code this} otherwise.
      */
     public JSON with(PrettyPrinter pp)
     {
