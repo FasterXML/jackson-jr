@@ -6,6 +6,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
@@ -18,18 +19,25 @@ public class AnnotationBasedIntrospector
 {
     protected final Class<?> _type;
 
+    protected final boolean _forSerialization;
+    
     protected final Map<String, APropBuilder> _props = new HashMap<String, APropBuilder>();
 
-    protected AnnotationBasedIntrospector(Class<?> type) {
+    // Only for deserialization
+    protected Set<String> _toIgnore;
+    
+    protected AnnotationBasedIntrospector(Class<?> type, boolean serialization) {
         _type = type;
+        _forSerialization = serialization;
+        _toIgnore = serialization ? null : new HashSet<String>();
     }
 
     public static POJODefinition pojoDefinitionForDeserialization(JSONReader r, Class<?> pojoType) {
-        return new AnnotationBasedIntrospector(pojoType).forReading();
+        return new AnnotationBasedIntrospector(pojoType, false).introspectDefinition();
     }
 
     public static POJODefinition pojoDefinitionForSerialization(JSONWriter w, Class<?> pojoType) {
-        return new AnnotationBasedIntrospector(pojoType).forWriting();
+        return new AnnotationBasedIntrospector(pojoType, true).introspectDefinition();
     }
 
     /*
@@ -38,28 +46,30 @@ public class AnnotationBasedIntrospector
     /**********************************************************************
      */
 
-    protected POJODefinition forReading() {
+    protected POJODefinition introspectDefinition() {
 
         // and then find necessary constructors
         Constructor<?> defaultCtor = null;
         Constructor<?> stringCtor = null;
         Constructor<?> longCtor = null;
 
-        for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
-            Class<?>[] argTypes = ctor.getParameterTypes();
-            if (argTypes.length == 0) {
-                defaultCtor = ctor;
-            } else if (argTypes.length == 1) {
-                Class<?> argType = argTypes[0];
-                if (argType == String.class) {
-                    stringCtor = ctor;
-                } else if (argType == Long.class || argType == Long.TYPE) {
-                    longCtor = ctor;
+        if (!_forSerialization) {
+            for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
+                Class<?>[] argTypes = ctor.getParameterTypes();
+                if (argTypes.length == 0) {
+                    defaultCtor = ctor;
+                } else if (argTypes.length == 1) {
+                    Class<?> argType = argTypes[0];
+                    if (argType == String.class) {
+                        stringCtor = ctor;
+                    } else if (argType == Long.class || argType == Long.TYPE) {
+                        longCtor = ctor;
+                    } else {
+                        continue;
+                    }
                 } else {
                     continue;
                 }
-            } else {
-                continue;
             }
         }
 
@@ -69,15 +79,6 @@ public class AnnotationBasedIntrospector
         return new POJODefinition(_type, _pruneReadProperties(),
                 defaultCtor, stringCtor, longCtor);
     }
-    
-    protected POJODefinition forWriting()
-    {
-        _findFields();
-        _findMethods();
-
-        return new POJODefinition(_type, _pruneWriteProperties(),
-                null, null,null);
-    }
 
     /*
     /**********************************************************************
@@ -85,32 +86,66 @@ public class AnnotationBasedIntrospector
     /**********************************************************************
      */
 
-    protected POJODefinition.Prop[] _pruneReadProperties() {
-/*
-        Map<String,PropBuilder> propsByName = new TreeMap<String,PropBuilder>();
-        _introspect(_type, propsByName);
+    protected POJODefinition.Prop[] _pruneReadProperties()
+    {
+        // First round: entry removal, collections of things to rename
+        List<APropBuilder> renamed = null;
+        Iterator<APropBuilder> it = _props.values().iterator();
+        while (it.hasNext()) {
+            final APropBuilder prop = it.next();
 
-        final int len = propsByName.size();
-        POJODefinition.Prop[] props;
-        if (len == 0) {
-            props = NO_PROPS;
-        } else {
-            props = new Prop[len];
-            int i = 0;
-            for (PropBuilder builder : propsByName.values()) {
-                props[i++] = builder.build();
+            if (!prop.anyVisible()) { // if nothing visible, just remove altogether
+                it.remove();
+                continue;
+            }
+            if (prop.anyIgnorals()) {
+                // if one or more ignorals, and no explicit markers, remove the whole thing
+                if (!prop.anyExplicit()) {
+                    it.remove();
+                    _addIgnoral(prop.name);
+                } else {
+                    // otherwise just remove ones marked to be ignored
+                    prop.removeIgnored();
+                    if (!prop.couldDeserialize()) {
+                        _addIgnoral(prop.name);
+                    }
+                }
+                continue;
+            }
+            // plus then remove non-visible accessors
+            prop.removeNonVisible();
+
+            // and finally, see if renaming (due to explicit name override) needed:
+            String explName = prop.findPrimaryExplicitName(_forSerialization);
+            if (explName != null) {
+                it.remove();
+                if (renamed == null) {
+                    renamed = new LinkedList<APropBuilder>();
+                }
+                renamed.add(prop.withName(explName));
             }
         }
-*/
-        // !!! TODO
-        return null;
+
+        // If (but only if) renamings needed, re-process
+        if (renamed != null) {
+            for (APropBuilder prop : renamed) {
+                APropBuilder orig = _props.get(prop.name);
+                if (orig == null) { // Straight rename, no merge
+                    _props.put(prop.name, prop);
+                    continue;
+                }
+                APropBuilder merged = APropBuilder.merge(orig, prop);
+                _props.put(prop.name, merged);
+            }
+        }
+
+        
+        // For now, order alphabetically (natural order by name)
+        List<APropBuilder> sorted = new ArrayList<APropBuilder>(_props.values());
+        Collections.sort(sorted);
+        return sorted.toArray(new POJODefinition.Prop[0]);
     }
 
-    protected POJODefinition.Prop[] _pruneWriteProperties() {
-        // !!! TODO
-        return null;
-    }
-    
     protected void _findFields() {
         for (Field f : _type.getDeclaredFields()) {
             // Does not include static fields, but there are couple of things we do
@@ -166,43 +201,117 @@ public class AnnotationBasedIntrospector
                     || m.isSynthetic() || m.isBridge()) {
                 continue;
             }
-        }
-//            Class<?> argTypes[] = m.getParameterTypes();
-            /*
-            if (argTypes.length == 0) { // getter?
-                // getters must be public to be used
-                if (!Modifier.isPublic(flags)) {
-                    continue;
-                }
-                Class<?> resultType = m.getReturnType();
-                if (resultType == Void.class) {
-                    continue;
-                }
-                String name = m.getName();
-                if (name.startsWith("get")) {
-                    if (name.length() > 3) {
-                        name = decap(name.substring(3));
-                        _propFrom(props, name).withGetter(m);
-                    }
-                } else if (name.startsWith("is")) {
-                    if (name.length() > 2) {
-                        // May or may not be used, but collect for now all the same:
-                        name = decap(name.substring(2));
-                        _propFrom(props, name).withIsGetter(m);
-                    }
-                }
-            } else if (argTypes.length == 1) { // setter?
-                // Non-public setters are fine if we can force access, don't yet check
-                // let's also not bother about return type; setters that return value are fine
-                String name = m.getName();
-                if (!name.startsWith("set") || name.length() == 3) {
-                    continue;
-                }
-                name = decap(name.substring(3));
-                _propFrom(props, name).withSetter(m);
+            int argCount = m.getParameterCount();
+            if (argCount == 0) { // getters (including 'any getter')
+                _checkGetterMethod(m);
+            } else if (argCount == 1) { // setters
+                _checkSetterMethod(m);
             }
         }
-            */
+    }
+
+    protected void _checkGetterMethod(Method m)
+    {
+        Class<?> resultType = m.getReturnType();
+        if (resultType == Void.class) {
+            return;
+        }
+        final String name0 = m.getName();
+        String implName = null;
+
+        if (name0.startsWith("get")) {
+            if (name0.length() > 3) {
+                implName = _decap(name0.substring(3));
+            }
+        } else if (name0.startsWith("is")) {
+            if (name0.length() > 2) {
+                // May or may not be used, but collect for now all the same:
+                implName = _decap(name0.substring(2));
+            }
+        }
+
+        APropAccessor<Method> acc;
+        if (implName == null) { // does not follow naming convention; needs explicit
+            final String explName = _findExplicitName(m);
+            if (explName == null) {
+                return;
+            }
+            implName = name0;
+
+            // But let's first see if there is ignoral
+            if (Boolean.TRUE.equals(_hasIgnoreMarker(m))) {
+                // could just bail out as is, at this point? But there is explicit marker
+                acc = APropAccessor.createIgnorable(implName, m);
+            } else {
+                if (explName.isEmpty()) {
+                    acc = APropAccessor.createVisible(implName, m);
+                } else {
+                    acc = APropAccessor.createExplicit(explName, m);
+                }
+            }
+        } else { // implicit name already, but ignoral/explicit?
+            if (Boolean.TRUE.equals(_hasIgnoreMarker(m))) {
+                acc = APropAccessor.createIgnorable(implName, m);
+            } else {
+                final String explName = _findExplicitName(m);
+                if (explName == null) {
+                    acc = APropAccessor.createImplicit(implName, m,
+                            _isGetterVisible(m));
+                } else if (explName.isEmpty()) {
+                    acc = APropAccessor.createVisible(implName, m);
+                } else {
+                    acc = APropAccessor.createExplicit(explName, m);
+                }                    
+            }
+        }
+        _propBuilder(implName).getter = acc;
+    }
+
+    protected void _checkSetterMethod(Method m)
+    {
+        final String name0 = m.getName();
+        String implName;
+
+        if (name0.startsWith("set") && (name0.length() > 3)) {
+            implName = _decap(name0.substring(3));
+        } else {
+            implName = null;
+        }
+
+        // Pretty much the same as with getters (just calls to couple of diff methods)
+        APropAccessor<Method> acc;
+        if (implName == null) {
+            final String explName = _findExplicitName(m);
+            if (explName == null) {
+                return;
+            }
+            implName = name0;
+
+            if (Boolean.TRUE.equals(_hasIgnoreMarker(m))) {
+                acc = APropAccessor.createIgnorable(implName, m);
+            } else {
+                if (explName.isEmpty()) {
+                    acc = APropAccessor.createVisible(implName, m);
+                } else {
+                    acc = APropAccessor.createExplicit(explName, m);
+                }
+            }
+        } else {
+            if (Boolean.TRUE.equals(_hasIgnoreMarker(m))) {
+                acc = APropAccessor.createIgnorable(implName, m);
+            } else {
+                final String explName = _findExplicitName(m);
+                if (explName == null) {
+                    acc = APropAccessor.createImplicit(implName, m,
+                            _isSetterVisible(m));
+                } else if (explName.isEmpty()) {
+                    acc = APropAccessor.createVisible(implName, m);
+                } else {
+                    acc = APropAccessor.createExplicit(explName, m);
+                }                    
+            }
+        }
+        _propBuilder(implName).setter = acc;
     }
 
     /*
@@ -217,12 +326,12 @@ public class AnnotationBasedIntrospector
                 && Modifier.isPublic(f.getModifiers());
     }
 
-    protected boolean _isGetterVisible(Field f) {
-        return Modifier.isPublic(f.getModifiers());
+    protected boolean _isGetterVisible(Method m) {
+        return Modifier.isPublic(m.getModifiers());
     }
  
-    protected boolean _isSetterVisible(Field f) {
-        return Modifier.isPublic(f.getModifiers());
+    protected boolean _isSetterVisible(Method m) {
+        return Modifier.isPublic(m.getModifiers());
     }
     
     /*
@@ -263,6 +372,12 @@ public class AnnotationBasedIntrospector
         return b;
     }
 
+    protected void _addIgnoral(String name) {
+        if (_toIgnore != null) {
+            _toIgnore.add(name);
+        }
+    }
+
     protected static String _decap(String name) {
         char c = name.charAt(0);
         char lowerC = Character.toLowerCase(c);
@@ -278,64 +393,6 @@ public class AnnotationBasedIntrospector
         }
         return name;
     }
-    
-    /*
-    private static void _introspect(Class<?> currType, Map<String,PropBuilder> props)
-    {
-        if (currType == null || currType == Object.class) {
-            return;
-        }
-        // First, check base type
-        _introspect(currType.getSuperclass(), props);
-
-
-        // then get methods from within this class
-        for (Method m : currType.getDeclaredMethods()) {
-            final int flags = m.getModifiers();
-            // 13-Jun-2015, tatu: Skip synthetic, bridge methods altogether, for now
-            //    at least (add more complex handling only if absolutely necessary)
-            if (Modifier.isStatic(flags)
-                    || m.isSynthetic() || m.isBridge()) {
-                continue;
-            }
-            Class<?> argTypes[] = m.getParameterTypes();
-            if (argTypes.length == 0) { // getter?
-                // getters must be public to be used
-                if (!Modifier.isPublic(flags)) {
-                    continue;
-                }
-                
-                Class<?> resultType = m.getReturnType();
-                if (resultType == Void.class) {
-                    continue;
-                }
-                String name = m.getName();
-                if (name.startsWith("get")) {
-                    if (name.length() > 3) {
-                        name = decap(name.substring(3));
-                        _propFrom(props, name).withGetter(m);
-                    }
-                } else if (name.startsWith("is")) {
-                    if (name.length() > 2) {
-                        // May or may not be used, but collect for now all the same:
-                        name = decap(name.substring(2));
-                        _propFrom(props, name).withIsGetter(m);
-                    }
-                }
-            } else if (argTypes.length == 1) { // setter?
-                // Non-public setters are fine if we can force access, don't yet check
-                // let's also not bother about return type; setters that return value are fine
-                String name = m.getName();
-                if (!name.startsWith("set") || name.length() == 3) {
-                    continue;
-                }
-                name = decap(name.substring(3));
-                _propFrom(props, name).withSetter(m);
-            }
-        }
-    }
-*/
-
 
     /*
     /**********************************************************************
@@ -343,7 +400,9 @@ public class AnnotationBasedIntrospector
     /**********************************************************************
      */
     
-    protected static class APropBuilder {
+    protected static class APropBuilder
+        implements Comparable<APropBuilder>
+    {
         public final String name;
 
         protected APropAccessor<Field> field;
@@ -352,6 +411,121 @@ public class AnnotationBasedIntrospector
 
         public APropBuilder(String n) {
             name = n;
+        }
+
+        public static APropBuilder merge(APropBuilder b1, APropBuilder b2) {
+            APropBuilder newB = new APropBuilder(b1.name);
+            newB.field = _merge(b1.field, b2.field);
+            newB.getter = _merge(b1.getter, b2.getter);
+            newB.setter = _merge(b1.setter, b2.setter);
+            return newB;
+        }
+
+        private static <A extends AccessibleObject> APropAccessor<A> _merge(APropAccessor<A> a1, APropAccessor<A> a2)
+        {
+            if (a1 == null) {
+                return a2;
+            }
+            if (a2 == null) {
+                return a1;
+            }
+
+            if (a1.isNameExplicit) {
+                return a1;
+            }
+            if (a2.isNameExplicit) {
+                return a2;
+            }
+            if (a1.isExplicit) {
+                return a1;
+            }
+            if (a2.isExplicit) {
+                return a2;
+            }
+            // Could try other things too (visibility, place in hierarchy) but... for now
+            // should be fine to take first one
+            return a1;
+        }
+        
+        public APropBuilder withName(String newName) {
+            APropBuilder newB = new APropBuilder(newName);
+            newB.field = field;
+            newB.getter = getter;
+            newB.setter = setter;
+            return newB;
+        }
+
+        public void removeIgnored() {
+            if ((field != null) && field.isToIgnore) {
+                field = null;
+            }
+            if ((getter != null) && getter.isToIgnore) {
+                getter = null;
+            }
+            if ((setter != null) && setter.isToIgnore) {
+                setter = null;
+            }
+        }
+
+        public void removeNonVisible() {
+            if ((field != null) && !field.isVisible) {
+                field = null;
+            }
+            if ((getter != null) && !getter.isVisible) {
+                getter = null;
+            }
+            if ((setter != null) && !setter.isVisible) {
+                setter = null;
+            }
+        }
+
+        public boolean couldDeserialize() {
+            return (field != null) || (setter != null);
+        }
+
+        public String findPrimaryExplicitName(boolean forSer) {
+            if (forSer) {
+                return _firstExplicit(getter, setter, field);
+            }
+            return _firstExplicit(setter, getter, field);
+        }
+
+        private String _firstExplicit(APropAccessor<?> acc1,
+                APropAccessor<?> acc2,
+                APropAccessor<?> acc3) {
+            if (acc1 != null && acc1.isNameExplicit) {
+                return acc1.name;
+            }
+            if (acc2 != null && acc2.isNameExplicit) {
+                return acc2.name;
+            }
+            if (acc3 != null && acc3.isNameExplicit) {
+                return acc3.name;
+            }
+            return null;
+        }
+
+        public boolean anyVisible() {
+            return ((field != null) && field.isVisible)
+                    || ((getter != null) && getter.isVisible)
+                    || ((setter != null) && setter.isVisible);
+        }
+
+        public boolean anyExplicit() {
+            return ((field != null) && field.isExplicit)
+                    || ((getter != null) && getter.isExplicit)
+                    || ((setter != null) && setter.isExplicit);
+        }
+
+        public boolean anyIgnorals() {
+            return ((field != null) && field.isToIgnore)
+                    || ((getter != null) && getter.isToIgnore)
+                    || ((setter != null) && setter.isToIgnore);
+        }
+
+        @Override
+        public int compareTo(APropBuilder o) {
+            return name.compareTo(o.name);
         }
     }
 
