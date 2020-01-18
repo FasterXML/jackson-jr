@@ -143,7 +143,12 @@ public class AnnotationBasedIntrospector
         // For now, order alphabetically (natural order by name)
         List<APropBuilder> sorted = new ArrayList<APropBuilder>(_props.values());
         Collections.sort(sorted);
-        return sorted.toArray(new POJODefinition.Prop[0]);
+        final int len = sorted.size();
+        POJODefinition.Prop[] result = new POJODefinition.Prop[len];
+        for (int i = 0; i < len; ++i) {
+            result[i] = sorted.get(i).asProperty();
+        }
+        return result;
     }
 
     protected void _findFields() {
@@ -411,6 +416,14 @@ public class AnnotationBasedIntrospector
 
         public APropBuilder(String n) {
             name = n;
+        }
+
+        public POJODefinition.Prop asProperty() {
+            return new POJODefinition.Prop(name,
+                    (field == null) ? null : field.accessor,
+                    (setter == null) ? null : setter.accessor,
+                    (getter == null) ? null : getter.accessor,
+                    /* isGetter */ null);
         }
 
         public static APropBuilder merge(APropBuilder b1, APropBuilder b2) {
