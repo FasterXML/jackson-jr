@@ -59,7 +59,7 @@ public abstract class ASTestBase extends TestCase
         return "\"" + str + "\"";
     }
 
-    protected String aposToQuotes(String json) {
+    protected String a2q(String json) {
         return json.replace("'", "\"");
     }
 }
