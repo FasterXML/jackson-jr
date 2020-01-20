@@ -3,6 +3,7 @@ package com.fasterxml.jackson.jr.annotationsupport;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 public class BasicRenameTest extends ASTestBase
 {
@@ -20,8 +21,10 @@ public class BasicRenameTest extends ASTestBase
         }
     }
 
-    private final JSON JSON_WITH_ANNO = jsonWithAnnotationSupport();
-    
+    // for stricter validation, fail on unknown properties
+    private final JSON JSON_WITH_ANNO = jsonWithAnnotationSupport()
+            .with(JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY);
+
     public void testBasicRenameOnSerialize() throws Exception
     {
         final NameSimple input = new NameSimple("Bob", "Burger");
@@ -35,4 +38,21 @@ public class BasicRenameTest extends ASTestBase
         assertEquals(a2q("{'_first':'Bob','_last':'Burger'}"), JSON.std.asString(input));
     }
 
+    public void testBasicRenameOnDeserialize() throws Exception
+    {
+        final String json = a2q("{'firstName':'Bob','_last':'Burger'}");
+        final JSON j = JSON.std
+                .with(JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY);
+
+        try {
+            j.beanFrom(NameSimple.class, json);
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "Unrecognized JSON property 'firstName'");
+        }
+
+        NameSimple result = JSON_WITH_ANNO.beanFrom(NameSimple.class, json);
+        assertEquals("Bob", result._first);
+        assertEquals("Burger", result._last);
+    }
 }

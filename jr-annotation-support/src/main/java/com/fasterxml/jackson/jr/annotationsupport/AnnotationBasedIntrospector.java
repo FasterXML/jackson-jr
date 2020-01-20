@@ -6,7 +6,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
@@ -46,13 +46,16 @@ public class AnnotationBasedIntrospector
     /**********************************************************************
      */
 
-    protected POJODefinition introspectDefinition() {
+    protected POJODefinition introspectDefinition()
+    {
+        _findFields();
+        _findMethods();
 
-        // and then find necessary constructors
         Constructor<?> defaultCtor = null;
         Constructor<?> stringCtor = null;
         Constructor<?> longCtor = null;
 
+        // When serializing, order matters; when deserializing, need constructors:
         if (!_forSerialization) {
             for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
                 Class<?>[] argTypes = ctor.getParameterTypes();
@@ -73,10 +76,7 @@ public class AnnotationBasedIntrospector
             }
         }
 
-        _findFields();
-        _findMethods();
-
-        return new POJODefinition(_type, _pruneReadProperties(),
+        return new POJODefinition(_type, _pruneProperties(_forSerialization),
                 defaultCtor, stringCtor, longCtor);
     }
 
@@ -86,7 +86,7 @@ public class AnnotationBasedIntrospector
     /**********************************************************************
      */
 
-    protected POJODefinition.Prop[] _pruneReadProperties()
+    protected POJODefinition.Prop[] _pruneProperties(boolean sortProperties)
     {
         // First round: entry removal, collections of things to rename
         List<APropBuilder> renamed = null;
@@ -139,14 +139,33 @@ public class AnnotationBasedIntrospector
             }
         }
 
-        
-        // For now, order alphabetically (natural order by name)
-        List<APropBuilder> sorted = new ArrayList<APropBuilder>(_props.values());
-        Collections.sort(sorted);
-        final int len = sorted.size();
-        POJODefinition.Prop[] result = new POJODefinition.Prop[len];
-        for (int i = 0; i < len; ++i) {
-            result[i] = sorted.get(i).asProperty();
+        final int propCount = _props.size();
+        final POJODefinition.Prop[] result = new POJODefinition.Prop[propCount];
+        int i = 0;
+
+        if (sortProperties) { // sorting? (yes for serialization, no for deser)
+            // anything to sort by?
+            List<String> nameOrder = _findNameSortOrder();
+            if (!nameOrder.isEmpty()) {
+                for (String name : nameOrder) {
+                    APropBuilder prop = _findAndRemoveByName(name);
+                    if (prop != null) {
+                        result[i++] = prop.asProperty();
+                    }
+                }
+            }
+
+            // and anything remaining, add alphabetically
+            TreeMap<String, APropBuilder> sorted = new TreeMap<String, APropBuilder>(_props);
+
+            // For now, order alphabetically (natural order by name)
+            for (APropBuilder prop : sorted.values()) {
+                result[i++] = prop.asProperty();
+            }
+        } else {
+            for (APropBuilder prop : _props.values()) {
+                result[i++] = prop.asProperty();
+            }
         }
         return result;
     }
@@ -352,9 +371,24 @@ public class AnnotationBasedIntrospector
         return (ann != null) && ann.value();
     }
 
-    protected final String _findExplicitName(AnnotatedElement m) {
+    protected String _findExplicitName(AnnotatedElement m) {
         JsonProperty ann = _find(m, JsonProperty.class);
         return (ann == null) ? null : ann.value();
+    }
+
+    /**
+     * Lookup method for finding possible annotated order of property names
+     * for the type this introspector is to introspect
+     *
+     * @return List of property names that defines order (possibly partial); if 
+     *   none, empty List (but never null)
+     */
+    protected List<String> _findNameSortOrder() {
+        JsonPropertyOrder ann = _find(_type, JsonPropertyOrder.class);
+        if (ann == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(ann.value());
     }
 
     // Overridable accessor method
@@ -383,6 +417,29 @@ public class AnnotationBasedIntrospector
         }
     }
 
+    /**
+     * Helper method for locating a property (builder) identified by given name
+     * (either primary, or secondary), and if found, removing from main properties
+     * Map, returning.
+     *
+     * @param name Name of property to find (either primary [checked first] or secondary)
+     *
+     * @return Property (builder) if found; {@code null} if none
+     */
+    protected APropBuilder _findAndRemoveByName(String name) {
+        APropBuilder prop = _props.remove(name);
+        if (prop == null) {
+            // Not located by primary, check secondary ('original' or 'internal' name)
+            for (APropBuilder p2 : _props.values()) {
+                prop = _props.remove(p2.origName);
+                if (prop != null) {
+                    break;
+                }
+            }
+        }
+        return prop;
+    }
+
     protected static String _decap(String name) {
         char c = name.charAt(0);
         char lowerC = Character.toLowerCase(c);
@@ -408,6 +465,12 @@ public class AnnotationBasedIntrospector
     protected static class APropBuilder
         implements Comparable<APropBuilder>
     {
+        /**
+         * Initial name from accessor ("implicit" or "internal" name); not
+         * changed with renames
+         */
+        public final String origName;
+
         public final String name;
 
         protected APropAccessor<Field> field;
@@ -415,6 +478,12 @@ public class AnnotationBasedIntrospector
         protected APropAccessor<Method> setter;
 
         public APropBuilder(String n) {
+            origName = n;
+            name = n;
+        }
+
+        protected APropBuilder(APropBuilder base, String n) {
+            origName = base.origName;
             name = n;
         }
 
@@ -461,7 +530,7 @@ public class AnnotationBasedIntrospector
         }
         
         public APropBuilder withName(String newName) {
-            APropBuilder newB = new APropBuilder(newName);
+            APropBuilder newB = new APropBuilder(this, newName);
             newB.field = field;
             newB.getter = getter;
             newB.setter = setter;
