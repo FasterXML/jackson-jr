@@ -12,15 +12,12 @@ public class AnnotationBasedValueRWModifier
     public POJODefinition pojoDefinitionForDeserialization(JSONReader readContext,
             Class<?> pojoType)
     {
-        // use default
-        return null;
+        return AnnotationBasedIntrospector.pojoDefinitionForDeserialization(readContext, pojoType);
     }
 
     @Override
     public POJODefinition pojoDefinitionForSerialization(JSONWriter writeContext,
             Class<?> pojoType) {
-        // use default
-        return null;
+        return AnnotationBasedIntrospector.pojoDefinitionForSerialization(writeContext, pojoType);
     }
-
 }

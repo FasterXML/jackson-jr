@@ -24,6 +24,9 @@ public class BeanReader
 {
     protected final Map<String,BeanPropertyReader> _propsByName; // for deserialization
 
+    // @since 2.11
+    protected final Set<String> _ignorableNames;
+
     protected final Constructor<?> _defaultCtor;
     protected final Constructor<?> _stringCtor;
     protected final Constructor<?> _longCtor;
@@ -38,14 +41,16 @@ public class BeanReader
     /**
      * Constructors used for deserialization use case
      */
-    private BeanReader(Class<?> type, Map<String,BeanPropertyReader> propsByName,
-            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor)
+    protected BeanReader(Class<?> type, Map<String,BeanPropertyReader> propsByName,
+            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,
+            Set<String> ignorableNames)
     {
         super(type);
         _propsByName = propsByName;
         _defaultCtor = defaultCtor;
         _stringCtor = stringCtor;
         _longCtor = longCtor;
+        _ignorableNames = ignorableNames;
     }
 
     /**
@@ -81,9 +86,10 @@ public class BeanReader
      * @since 3.0
      */
     public static BeanReader construct(Class<?> type, Map<String, BeanPropertyReader> props,
-            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor)
+            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,
+            Set<String> ignorableProps)
     {
-        return new BeanReader(type, props, defaultCtor, stringCtor, longCtor);
+        return new BeanReader(type, props, defaultCtor, stringCtor, longCtor, ignorableProps);
     }
 
     public Map<String,BeanPropertyReader> propertiesByName() { return _propsByName; }
@@ -336,8 +342,12 @@ public class BeanReader
 
     protected void handleUnknown(JSONReader reader, JsonParser parser, String fieldName) throws IOException {
         if (JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY.isEnabled(reader._features)) {
-            throw JSONObjectException.from(parser, "Unrecognized JSON property '%s' for Bean type %s", 
-                    fieldName, _valueType.getName());
+            // 20-Jan-2020, tatu: With optional annotation support, may have "known ignorable"
+            //    that usually should behave as if safely ignorable
+            if (!_ignorableNames.contains(fieldName)) {
+                throw JSONObjectException.from(parser, "Unrecognized JSON property '%s' for Bean type %s", 
+                        fieldName, _valueType.getName());
+            }
         }
         parser.nextToken();
         parser.skipChildren();

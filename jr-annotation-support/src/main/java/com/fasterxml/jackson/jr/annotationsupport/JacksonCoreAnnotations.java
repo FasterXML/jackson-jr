@@ -1,22 +1,24 @@
 package com.fasterxml.jackson.jr.annotationsupport;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.jr.ob.JSON;
 
 /**
  * Helper object that provides limited support for Jackson core annotations.
  *<p>
  * Set of annotations supported includes:
  *<ul>
- * <li>{@code @JsonIgnore}
+ * <li>{link com.fasterxml.jackson.annotation.JsonIgnore}: supported on accessors
+ *  (fields, getters, setters)
  *  </li>
- * <li>{@code @JsonIgnoredProperties}
+ * <li>{@link com.fasterxml.jackson.annotation.JsonIgnoreProperties}: supported on classes,
+ *   but not on accessors
  *  </li>
- * <li>{@code @JsonProperty}
+ * <li>{@link com.fasterxml.jackson.annotation.JsonProperty} supported on accessors
+ *  (fields, getters, setters) to specify explicit inclusion, name override. Other properties
+ *  ({@code index}, {@code required}) not supported.
  *  </li>
- * <li>{@code @JsonPropertyOrder}
+ * <li>{@link com.fasterxml.jackson.annotation.JsonPropertyOrder}: supported on classes,
+ *    but not on accessors
  *  </li>
  *</ul>
  */
@@ -28,9 +30,17 @@ public class JacksonCoreAnnotations
         }
     }
 
+    protected final AnnotationBasedValueRWModifier _modifier;
+    
+    protected JacksonCoreAnnotations() {
+        _modifier = new AnnotationBasedValueRWModifier();
+    }
+
     public static Builder builder() {
         return new Builder();
     }
 
-
+    public JSON addAnnotationSupport(JSON json) {
+        return json.with(_modifier);
+    }
 }

@@ -5,7 +5,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Definition of a single Bean-style Java class, without assumptions
@@ -20,6 +22,14 @@ public class POJODefinition
 
     protected final Prop[] _properties;
 
+    /**
+     * Possible per-class definition of names that may be ignored safely
+     * during deserialization.
+     *
+     * @since 2.11
+     */
+    protected final Set<String> _ignorableNames;
+
     public final Constructor<?> defaultCtor;
     public final Constructor<?> stringCtor;
     public final Constructor<?> longCtor;
@@ -32,18 +42,27 @@ public class POJODefinition
         defaultCtor = defaultCtor0;
         stringCtor = stringCtor0;
         longCtor = longCtor0;
+        _ignorableNames = null;
     }
 
-    protected POJODefinition(POJODefinition base, Prop[] props) {
+    protected POJODefinition(POJODefinition base,
+            Prop[] props, Set<String> ignorableN)
+    {
         _type = base._type;
         _properties = props;
         defaultCtor = base.defaultCtor;
         stringCtor = base.stringCtor;
         longCtor = base.longCtor;
+        _ignorableNames = ignorableN;
     }
 
     public POJODefinition withProperties(Collection<Prop> props) {
-        return new POJODefinition(this, props.toArray(new Prop[0]));
+        return new POJODefinition(this, props.toArray(new Prop[0]), _ignorableNames);
+    }
+
+    // @since 2.11
+    public POJODefinition withIgnorals(Set<String> ignorableN) {
+        return new POJODefinition(this, _properties, ignorableN);
     }
 
     /*
@@ -59,6 +78,13 @@ public class POJODefinition
     @Deprecated // in 2.11, will be removed soon
     public Prop[] properties() {
         return _properties;
+    }
+
+    public Set<String> getIgnorableNames() {
+        if (_ignorableNames == null) {
+            return Collections.emptySet();
+        }
+        return _ignorableNames;
     }
 
     /*
