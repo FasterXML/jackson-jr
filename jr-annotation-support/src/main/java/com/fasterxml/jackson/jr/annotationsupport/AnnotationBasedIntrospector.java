@@ -5,6 +5,7 @@ import java.lang.reflect.*;
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
@@ -23,13 +24,14 @@ public class AnnotationBasedIntrospector
     
     protected final Map<String, APropBuilder> _props = new HashMap<String, APropBuilder>();
 
-    // Only for deserialization
-    protected Set<String> _toIgnore;
-    
+    // // State only for deserialization:
+
+    protected Set<String> _ignorableNames;
+
     protected AnnotationBasedIntrospector(Class<?> type, boolean serialization) {
         _type = type;
         _forSerialization = serialization;
-        _toIgnore = serialization ? null : new HashSet<String>();
+        _ignorableNames = serialization ? null : new HashSet<String>();
     }
 
     public static POJODefinition pojoDefinitionForDeserialization(JSONReader r, Class<?> pojoType) {
@@ -55,7 +57,8 @@ public class AnnotationBasedIntrospector
         Constructor<?> stringCtor = null;
         Constructor<?> longCtor = null;
 
-        // When serializing, order matters; when deserializing, need constructors:
+        // A few things only matter during deserialization: constructors,
+        // secondary ignoral information:
         if (!_forSerialization) {
             for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
                 Class<?>[] argTypes = ctor.getParameterTypes();
@@ -76,8 +79,13 @@ public class AnnotationBasedIntrospector
             }
         }
 
-        return new POJODefinition(_type, _pruneProperties(_forSerialization),
+        POJODefinition def = new POJODefinition(_type,
+                _pruneProperties(_forSerialization),
                 defaultCtor, stringCtor, longCtor);
+        if (_ignorableNames != null) {
+            def = def.withIgnorals(_ignorableNames);
+        }
+        return def;
     }
 
     /*
@@ -94,10 +102,8 @@ public class AnnotationBasedIntrospector
         while (it.hasNext()) {
             final APropBuilder prop = it.next();
 
-            if (!prop.anyVisible()) { // if nothing visible, just remove altogether
-                it.remove();
-                continue;
-            }
+            // Start with ignorals, since those can be used as marker for otherwise
+            // unknown properties
             if (prop.anyIgnorals()) {
                 // if one or more ignorals, and no explicit markers, remove the whole thing
                 if (!prop.anyExplicit()) {
@@ -110,6 +116,11 @@ public class AnnotationBasedIntrospector
                         _addIgnoral(prop.name);
                     }
                 }
+                continue;
+            }
+            // but even without ignorals, something has to be visible; if not, remove prop
+            if (!prop.anyVisible()) { // if nothing visible, just remove altogether
+                it.remove();
                 continue;
             }
             // plus then remove non-visible accessors
@@ -136,6 +147,18 @@ public class AnnotationBasedIntrospector
                 }
                 APropBuilder merged = APropBuilder.merge(orig, prop);
                 _props.put(prop.name, merged);
+            }
+        }
+
+        // Next step: removal by `@JsonIgnoreProperties`:
+        final Collection<String> ignorableNames = _findIgnorableNames();
+        if (!ignorableNames.isEmpty()) {
+            if (_ignorableNames != null) { // may be needed for deserialization
+                _ignorableNames.addAll(ignorableNames);
+            }
+            // but needs to be removed from set of known properties for both
+            for (String ignorableName : ignorableNames) {
+                _findAndRemoveByName(ignorableName);
             }
         }
 
@@ -391,6 +414,22 @@ public class AnnotationBasedIntrospector
         return Arrays.asList(ann.value());
     }
 
+    /**
+     * Lookup method for finding a set of property names
+     * for the type this introspector is to introspect that should be ignored
+     * (both for serialization and deserialization).
+     *
+     * @return List of property names that defines order (possibly partial); if 
+     *   none, empty List (but never null)
+     */
+    protected Collection<String> _findIgnorableNames() {
+        JsonIgnoreProperties ann = _find(_type, JsonIgnoreProperties.class);
+        if (ann == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(ann.value());
+    }
+
     // Overridable accessor method
     protected <ANN extends Annotation> ANN _find(AnnotatedElement elem, Class<ANN> annotationType) {
         return elem.getAnnotation(annotationType);
@@ -412,8 +451,8 @@ public class AnnotationBasedIntrospector
     }
 
     protected void _addIgnoral(String name) {
-        if (_toIgnore != null) {
-            _toIgnore.add(name);
+        if (_ignorableNames != null) {
+            _ignorableNames.add(name);
         }
     }
 

@@ -461,7 +461,8 @@ public class ValueReaderLocator
                 propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, f, m));
             }
         }
-        return new BeanReader(raw, propMap, defaultCtor, stringCtor, longCtor);
+        return new BeanReader(raw, propMap, defaultCtor, stringCtor, longCtor,
+                beanDef.getIgnorableNames());
     }
 
     private TypeBindings _bindings(Class<?> ctxt) {
