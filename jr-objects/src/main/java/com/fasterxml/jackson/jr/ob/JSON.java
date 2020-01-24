@@ -472,6 +472,10 @@ public class JSON implements Versioned
     /**********************************************************************
      */
 
+    public JSON register(JacksonJrExtension extension) {
+        return extension.register(this);
+    }
+
     /**
      * Mutant factory method for constructing new instance with specified {@link JsonFactory}
      * if different from currently configured one (if not, return {@code this} as-is)

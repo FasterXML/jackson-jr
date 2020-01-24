@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.jr.annotationsupport;
 
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.JacksonJrExtension;
 
 /**
  * Helper object that provides limited support for Jackson core annotations.
@@ -21,18 +22,26 @@ import com.fasterxml.jackson.jr.ob.JSON;
  *    but not on accessors
  *  </li>
  *</ul>
+ *<p>
+ * Usage is done by registering this extension with {@link JSON}, usually like:
+ *<pre>
+ *   JSON json = JSON.std.register(JacksonAnnotationExtension.builder()
+ *       // possible configuration calls
+ *       .build());
+ *</pre>
  */
-public class JacksonCoreAnnotations
+public class JacksonAnnotationExtension
+    extends JacksonJrExtension
 {
     public static class Builder {
-        public JacksonCoreAnnotations build() {
-            return new JacksonCoreAnnotations();
+        public JacksonAnnotationExtension build() {
+            return new JacksonAnnotationExtension();
         }
     }
 
     protected final AnnotationBasedValueRWModifier _modifier;
     
-    protected JacksonCoreAnnotations() {
+    protected JacksonAnnotationExtension() {
         _modifier = new AnnotationBasedValueRWModifier();
     }
 
@@ -40,7 +49,8 @@ public class JacksonCoreAnnotations
         return new Builder();
     }
 
-    public JSON addAnnotationSupport(JSON json) {
+    @Override
+    protected JSON register(JSON json) {
         return json.with(_modifier);
     }
 }

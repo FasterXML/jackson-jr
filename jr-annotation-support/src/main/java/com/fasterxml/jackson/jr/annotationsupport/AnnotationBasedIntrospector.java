@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,28 +19,43 @@ import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
  */
 public class AnnotationBasedIntrospector
 {
+    // // // Configuration
+
     protected final Class<?> _type;
 
     protected final boolean _forSerialization;
+
+    /**
+     * Visibility settings to use for auto-detecting accessors.
+     */
+    protected final JsonAutoDetect.Value _visibility;
+    
+    // // // State (collected properties, related)
     
     protected final Map<String, APropBuilder> _props = new HashMap<String, APropBuilder>();
 
-    // // State only for deserialization:
+    // // // State only for deserialization:
 
     protected Set<String> _ignorableNames;
 
-    protected AnnotationBasedIntrospector(Class<?> type, boolean serialization) {
+    protected AnnotationBasedIntrospector(Class<?> type, boolean serialization,
+            JsonAutoDetect.Value visibility) {
         _type = type;
         _forSerialization = serialization;
         _ignorableNames = serialization ? null : new HashSet<String>();
+        _visibility = visibility;
     }
 
-    public static POJODefinition pojoDefinitionForDeserialization(JSONReader r, Class<?> pojoType) {
-        return new AnnotationBasedIntrospector(pojoType, false).introspectDefinition();
+    public static POJODefinition pojoDefinitionForDeserialization(JSONReader r,
+            Class<?> pojoType, JsonAutoDetect.Value visibility) {
+        return new AnnotationBasedIntrospector(pojoType, false, visibility)
+                .introspectDefinition();
     }
 
-    public static POJODefinition pojoDefinitionForSerialization(JSONWriter w, Class<?> pojoType) {
-        return new AnnotationBasedIntrospector(pojoType, true).introspectDefinition();
+    public static POJODefinition pojoDefinitionForSerialization(JSONWriter w,
+            Class<?> pojoType, JsonAutoDetect.Value visibility) {
+        return new AnnotationBasedIntrospector(pojoType, true, visibility)
+                .introspectDefinition();
     }
 
     /*
