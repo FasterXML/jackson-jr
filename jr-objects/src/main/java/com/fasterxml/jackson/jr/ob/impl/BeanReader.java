@@ -65,7 +65,10 @@ public class BeanReader
      */
     protected void initFieldMatcher(TokenStreamFactory streamFactory)
     {
-        Map<String,BeanPropertyReader> byName = _propsByName;
+        // 26-Jan-2020, tatu: One complication are aliases, if any
+        Map<String,BeanPropertyReader> byName = _aliasMapping.isEmpty()
+                ? _propsByName : _mixInAliases(_propsByName, _aliasMapping);
+
         final int size = byName.size();
         List<Named> names = new ArrayList<>(size);
         _fieldReaders = new BeanPropertyReader[size];
@@ -88,6 +91,25 @@ public class BeanReader
         _fieldMatcher = streamFactory.constructFieldNameMatcher(names, true);
     }
 
+    private final Map<String,BeanPropertyReader> _mixInAliases(Map<String,BeanPropertyReader> props,
+            Map<String,String> aliases)
+    {
+        Map<String,BeanPropertyReader> result = new LinkedHashMap<String,BeanPropertyReader>(props);
+        for (Map.Entry<String, String> entry : aliases.entrySet()) {
+            final String alias = entry.getKey();
+            final String mappedTo = entry.getValue();
+
+            // First: can not override primary name:
+            if (!props.containsKey(alias)) {
+                final BeanPropertyReader prop = props.get(mappedTo);
+                if (prop != null) { // not sure if mismatch even allowed but...
+                    result.put(alias, prop);
+                }
+            }
+        }
+        return result;
+    }
+
     /**
      * @since 3.0
      */
@@ -108,16 +130,7 @@ public class BeanReader
     public Map<String,BeanPropertyReader> propertiesByName() { return _propsByName; }
 
     public BeanPropertyReader findProperty(String name) {
-        BeanPropertyReader prop = _propsByName.get(name);
-        if (prop == null) {
-            return _findAlias(name);
-        }
-        return prop;
-    }
-
-    private final BeanPropertyReader _findAlias(String name) {
-        String primaryName = _aliasMapping.get(name);
-        return (primaryName == null) ? null : _propsByName.get(primaryName);
+        return _propsByName.get(name);
     }
 
     /**
