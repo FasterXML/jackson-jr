@@ -508,7 +508,7 @@ public class JSON implements Versioned
             return this;
         }
         return _with(_features, _jsonFactory, c,
-                _reader, _writer.with(c), _prettyPrinter);
+                _reader.with(c), _writer.with(c), _prettyPrinter);
     }
 
     /**

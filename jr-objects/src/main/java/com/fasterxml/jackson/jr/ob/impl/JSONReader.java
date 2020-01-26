@@ -104,6 +104,11 @@ public class JSONReader
         return this;
     }
 
+    public JSONReader with(TreeCodec tc) {
+        if (_treeCodec == tc) return this;
+        return _with(_features, _readerLocator, tc, _collectionBuilder, _mapBuilder);
+    }
+
     public JSONReader with(MapBuilder mb) {
         if (_mapBuilder == mb) return this;
         return _with(_features, _readerLocator, _treeCodec, _collectionBuilder, mb);
