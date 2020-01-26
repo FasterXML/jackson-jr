@@ -20,7 +20,15 @@ import com.fasterxml.jackson.jr.ob.api.ValueReader;
 public class BeanReader
     extends ValueReader // so we can chain calls for Collections, arrays
 {
-    protected final Map<String,BeanPropertyReader> _propsByName; // for deserialization
+    protected final Map<String, BeanPropertyReader> _propsByName;
+
+    /**
+     * Mapping of aliased names to primary names (direct linkage unfortunately
+     * impractical due to implementation limits).
+     *
+     * @since 2.11
+     */
+    protected final Map<String, String> _aliasMapping;
 
     // @since 2.11
     protected final Set<String> _ignorableNames;
@@ -34,26 +42,42 @@ public class BeanReader
      */
     public BeanReader(Class<?> type, Map<String, BeanPropertyReader> props,
             Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,
-            Set<String> ignorableNames)
+            Set<String> ignorableNames, Map<String, String> aliasMapping)
     {
         super(type);
         _propsByName = props;
         _defaultCtor = defaultCtor;
         _stringCtor = stringCtor;
         _longCtor = longCtor;
+        if (ignorableNames == null) {
+            ignorableNames = Collections.<String>emptySet();
+        }
         _ignorableNames = ignorableNames;
+        if (aliasMapping == null) {
+            aliasMapping = Collections.emptyMap();
+        }
+        _aliasMapping = aliasMapping;
     }
 
     @Deprecated // since 2.11
     public BeanReader(Class<?> type, Map<String, BeanPropertyReader> props,
             Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor) {
-        this(type, props, defaultCtor, stringCtor, longCtor, Collections.<String>emptySet());
+        this(type, props, defaultCtor, stringCtor, longCtor, null, null);
     }
 
     public Map<String,BeanPropertyReader> propertiesByName() { return _propsByName; }
 
     public BeanPropertyReader findProperty(String name) {
-        return _propsByName.get(name);
+        BeanPropertyReader prop = _propsByName.get(name);
+        if (prop == null) {
+            return _findAlias(name);
+        }
+        return prop;
+    }
+
+    private final BeanPropertyReader _findAlias(String name) {
+        String primaryName = _aliasMapping.get(name);
+        return (primaryName == null) ? null : _propsByName.get(primaryName);
     }
 
     @Override

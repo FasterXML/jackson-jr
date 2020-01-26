@@ -176,6 +176,7 @@ public class JSONObjectException
         if (args.length > 0) {
             msg = String.format(msg, args);
         }
+problem.printStackTrace();        
         return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()), problem);
     }
     

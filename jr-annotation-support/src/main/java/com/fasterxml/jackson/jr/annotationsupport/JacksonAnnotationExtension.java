@@ -10,6 +10,11 @@ import com.fasterxml.jackson.jr.ob.JacksonJrExtension;
  *<p>
  * Set of annotations supported includes:
  *<ul>
+ * <li>{link com.fasterxml.jackson.annotation.JsonAlias}: supported on accessors
+ *  (fields, getters, setters)
+ *  </li>
+ * <li>{@link com.fasterxml.jackson.annotation.JsonPropertyOrder}: supported on classes
+ *  </li>
  * <li>{link com.fasterxml.jackson.annotation.JsonIgnore}: supported on accessors
  *  (fields, getters, setters)
  *  </li>

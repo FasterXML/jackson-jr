@@ -428,6 +428,8 @@ public class ValueReaderLocator
         final List<POJODefinition.Prop> rawProps = beanDef.getProperties();
         final int len = rawProps.size();
         final Map<String, BeanPropertyReader> propMap;
+        Map<String, String> aliasMapping = null;
+
         if (len == 0) {
             propMap = Collections.emptyMap();
         } else {
@@ -458,11 +460,24 @@ public class ValueReaderLocator
                         continue;
                     }
                 }
+
                 propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, f, m));
+
+                // 25-Jan-2020, tatu: Aliases are bit different because we can not tie them into
+                //   specific reader instance, due to resolution of cyclic dependencies. Instead,
+                //   we must link via name of primary property, unfortunately:
+                if (rawProp.hasAliases()) {
+                    if (aliasMapping == null) {
+                        aliasMapping = new HashMap<String, String>();
+                    }
+                    for (String alias : rawProp.aliases()) {
+                        aliasMapping.put(alias, rawProp.name);
+                    }
+                }
             }
         }
         return new BeanReader(raw, propMap, defaultCtor, stringCtor, longCtor,
-                beanDef.getIgnorableNames());
+                beanDef.getIgnorableNames(), aliasMapping);
     }
 
     private TypeBindings _bindings(Class<?> ctxt) {

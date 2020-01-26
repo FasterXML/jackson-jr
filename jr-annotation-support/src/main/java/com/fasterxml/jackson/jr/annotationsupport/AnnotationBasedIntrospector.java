@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -189,6 +190,7 @@ public class AnnotationBasedIntrospector
         final int propCount = _props.size();
         final POJODefinition.Prop[] result = new POJODefinition.Prop[propCount];
         int i = 0;
+        final boolean collectAliases = !_forSerialization;
 
         if (sortProperties) { // sorting? (yes for serialization, no for deser)
             // anything to sort by?
@@ -197,7 +199,7 @@ public class AnnotationBasedIntrospector
                 for (String name : nameOrder) {
                     APropBuilder prop = _findAndRemoveByName(name);
                     if (prop != null) {
-                        result[i++] = prop.asProperty();
+                        result[i++] = prop.asProperty(collectAliases);
                     }
                 }
             }
@@ -207,11 +209,11 @@ public class AnnotationBasedIntrospector
 
             // For now, order alphabetically (natural order by name)
             for (APropBuilder prop : sorted.values()) {
-                result[i++] = prop.asProperty();
+                result[i++] = prop.asProperty(collectAliases);
             }
         } else {
             for (APropBuilder prop : _props.values()) {
-                result[i++] = prop.asProperty();
+                result[i++] = prop.asProperty(collectAliases);
             }
         }
         return result;
@@ -394,8 +396,8 @@ public class AnnotationBasedIntrospector
      */
 
     protected boolean _isFieldVisible(Field f) {
-        // Consider transient fields non-visible (may still include with explicit
-        // annotation)
+        // Consider transient to be non-visible
+        // TODO: (maybe?) final
         return !Modifier.isTransient(f.getModifiers())
                 && _visibility.getFieldVisibility().isVisible(f);
     }
@@ -556,12 +558,14 @@ public class AnnotationBasedIntrospector
             name = n;
         }
 
-        public POJODefinition.Prop asProperty() {
+        public POJODefinition.Prop asProperty(boolean collectAliases) {
+            Set<String> aliases = collectAliases ? collectAliases() : null;
             return new POJODefinition.Prop(name,
                     (field == null) ? null : field.accessor,
                     (setter == null) ? null : setter.accessor,
                     (getter == null) ? null : getter.accessor,
-                    /* isGetter */ null);
+                    /* isGetter */ null,
+                    aliases);
         }
 
         public static APropBuilder merge(APropBuilder b1, APropBuilder b2) {
@@ -630,17 +634,35 @@ public class AnnotationBasedIntrospector
             }
         }
 
-        public boolean couldDeserialize() {
-            return (field != null) || (setter != null);
+        public Set<String> collectAliases() {
+            Set<String> collectedAliases = null;
+            // although aliases only relevant for deserialization, collect from
+            // all accessors nonetheless
+            collectedAliases = _collectAliases(field, collectedAliases);
+            collectedAliases = _collectAliases(getter, collectedAliases);
+            collectedAliases = _collectAliases(setter, collectedAliases);
+            return collectedAliases;
         }
 
-        public String findPrimaryExplicitName(boolean forSer) {
-            if (forSer) {
-                return _firstExplicit(getter, setter, field);
+        private static Set<String> _collectAliases(APropAccessor<?> acc, Set<String> collectedAliases) {
+            if (acc != null) {
+                AnnotatedElement accOb = acc.accessor;
+                if (accOb != null) {
+                    JsonAlias ann = accOb.getAnnotation(JsonAlias.class);
+                    if (ann != null) {
+                        final String[] names = ann.value();
+                        if (collectedAliases == null) {
+                            collectedAliases = new HashSet<String>();
+                        }
+                        for (String alias : names) {
+                            collectedAliases.add(alias);
+                        }
+                    }
+                }
             }
-            return _firstExplicit(setter, getter, field);
+            return collectedAliases;
         }
-
+        
         private String _firstExplicit(APropAccessor<?> acc1,
                 APropAccessor<?> acc2,
                 APropAccessor<?> acc3) {
@@ -654,6 +676,13 @@ public class AnnotationBasedIntrospector
                 return acc3.name;
             }
             return null;
+        }
+
+        public String findPrimaryExplicitName(boolean forSer) {
+            if (forSer) {
+                return _firstExplicit(getter, setter, field);
+            }
+            return _firstExplicit(setter, getter, field);
         }
 
         public boolean anyVisible() {
@@ -672,6 +701,10 @@ public class AnnotationBasedIntrospector
             return ((field != null) && field.isToIgnore)
                     || ((getter != null) && getter.isToIgnore)
                     || ((setter != null) && setter.isToIgnore);
+        }
+
+        public boolean couldDeserialize() {
+            return (field != null) || (setter != null);
         }
 
         @Override
