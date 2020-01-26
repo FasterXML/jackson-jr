@@ -40,9 +40,9 @@ public abstract class ASTestBase extends TestCase
     }
 
     protected JSON jsonWithAnnotationSupport() {
-        return JacksonCoreAnnotations.builder()
+        return JSON.std.register(JacksonAnnotationExtension.builder()
                 .build()
-                .addAnnotationSupport(JSON.std);
+        );
     }
 
     /*

@@ -4,6 +4,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,28 +20,51 @@ import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
  */
 public class AnnotationBasedIntrospector
 {
+    // // // Configuration
+
     protected final Class<?> _type;
 
     protected final boolean _forSerialization;
+
+    /**
+     * Visibility settings to use for auto-detecting accessors.
+     */
+    protected final JsonAutoDetect.Value _visibility;
+    
+    // // // State (collected properties, related)
     
     protected final Map<String, APropBuilder> _props = new HashMap<String, APropBuilder>();
 
-    // // State only for deserialization:
+    // // // State only for deserialization:
 
     protected Set<String> _ignorableNames;
 
-    protected AnnotationBasedIntrospector(Class<?> type, boolean serialization) {
+    protected AnnotationBasedIntrospector(Class<?> type, boolean serialization,
+            JsonAutoDetect.Value visibility) {
         _type = type;
         _forSerialization = serialization;
         _ignorableNames = serialization ? null : new HashSet<String>();
+
+        // First things first: find possible `@JsonAutoDetect` to override
+        // default visibility settings
+        JsonAutoDetect ann = _find(type, JsonAutoDetect.class); // bad form but...
+        if (ann == null) {
+            _visibility = visibility;
+        } else {
+            _visibility = visibility.withOverrides(JsonAutoDetect.Value.from(ann));
+        }
     }
 
-    public static POJODefinition pojoDefinitionForDeserialization(JSONReader r, Class<?> pojoType) {
-        return new AnnotationBasedIntrospector(pojoType, false).introspectDefinition();
+    public static POJODefinition pojoDefinitionForDeserialization(JSONReader r,
+            Class<?> pojoType, JsonAutoDetect.Value visibility) {
+        return new AnnotationBasedIntrospector(pojoType, false, visibility)
+                .introspectDefinition();
     }
 
-    public static POJODefinition pojoDefinitionForSerialization(JSONWriter w, Class<?> pojoType) {
-        return new AnnotationBasedIntrospector(pojoType, true).introspectDefinition();
+    public static POJODefinition pojoDefinitionForSerialization(JSONWriter w,
+            Class<?> pojoType, JsonAutoDetect.Value visibility) {
+        return new AnnotationBasedIntrospector(pojoType, true, visibility)
+                .introspectDefinition();
     }
 
     /*
@@ -165,6 +190,7 @@ public class AnnotationBasedIntrospector
         final int propCount = _props.size();
         final POJODefinition.Prop[] result = new POJODefinition.Prop[propCount];
         int i = 0;
+        final boolean collectAliases = !_forSerialization;
 
         if (sortProperties) { // sorting? (yes for serialization, no for deser)
             // anything to sort by?
@@ -173,7 +199,7 @@ public class AnnotationBasedIntrospector
                 for (String name : nameOrder) {
                     APropBuilder prop = _findAndRemoveByName(name);
                     if (prop != null) {
-                        result[i++] = prop.asProperty();
+                        result[i++] = prop.asProperty(collectAliases);
                     }
                 }
             }
@@ -183,11 +209,11 @@ public class AnnotationBasedIntrospector
 
             // For now, order alphabetically (natural order by name)
             for (APropBuilder prop : sorted.values()) {
-                result[i++] = prop.asProperty();
+                result[i++] = prop.asProperty(collectAliases);
             }
         } else {
             for (APropBuilder prop : _props.values()) {
-                result[i++] = prop.asProperty();
+                result[i++] = prop.asProperty(collectAliases);
             }
         }
         return result;
@@ -265,6 +291,7 @@ public class AnnotationBasedIntrospector
         }
         final String name0 = m.getName();
         String implName = null;
+        boolean isIsGetter = false;
 
         if (name0.startsWith("get")) {
             if (name0.length() > 3) {
@@ -274,6 +301,7 @@ public class AnnotationBasedIntrospector
             if (name0.length() > 2) {
                 // May or may not be used, but collect for now all the same:
                 implName = _decap(name0.substring(2));
+                isIsGetter = true;
             }
         }
 
@@ -303,7 +331,7 @@ public class AnnotationBasedIntrospector
                 final String explName = _findExplicitName(m);
                 if (explName == null) {
                     acc = APropAccessor.createImplicit(implName, m,
-                            _isGetterVisible(m));
+                            _isGetterVisible(m, isIsGetter));
                 } else if (explName.isEmpty()) {
                     acc = APropAccessor.createVisible(implName, m);
                 } else {
@@ -368,17 +396,21 @@ public class AnnotationBasedIntrospector
      */
 
     protected boolean _isFieldVisible(Field f) {
-        final int flags = f.getModifiers();
-        return !Modifier.isTransient(flags)
-                && Modifier.isPublic(f.getModifiers());
+        // Consider transient to be non-visible
+        // TODO: (maybe?) final
+        return !Modifier.isTransient(f.getModifiers())
+                && _visibility.getFieldVisibility().isVisible(f);
     }
 
-    protected boolean _isGetterVisible(Method m) {
-        return Modifier.isPublic(m.getModifiers());
+    protected boolean _isGetterVisible(Method m, boolean isIsGetter) {
+        if (isIsGetter) {
+            return _visibility.getIsGetterVisibility().isVisible(m);
+        }
+        return _visibility.getGetterVisibility().isVisible(m);
     }
- 
+
     protected boolean _isSetterVisible(Method m) {
-        return Modifier.isPublic(m.getModifiers());
+        return _visibility.getSetterVisibility().isVisible(m);
     }
     
     /*
@@ -526,12 +558,14 @@ public class AnnotationBasedIntrospector
             name = n;
         }
 
-        public POJODefinition.Prop asProperty() {
+        public POJODefinition.Prop asProperty(boolean collectAliases) {
+            Set<String> aliases = collectAliases ? collectAliases() : null;
             return new POJODefinition.Prop(name,
                     (field == null) ? null : field.accessor,
                     (setter == null) ? null : setter.accessor,
                     (getter == null) ? null : getter.accessor,
-                    /* isGetter */ null);
+                    /* isGetter */ null,
+                    aliases);
         }
 
         public static APropBuilder merge(APropBuilder b1, APropBuilder b2) {
@@ -600,17 +634,35 @@ public class AnnotationBasedIntrospector
             }
         }
 
-        public boolean couldDeserialize() {
-            return (field != null) || (setter != null);
+        public Set<String> collectAliases() {
+            Set<String> collectedAliases = null;
+            // although aliases only relevant for deserialization, collect from
+            // all accessors nonetheless
+            collectedAliases = _collectAliases(field, collectedAliases);
+            collectedAliases = _collectAliases(getter, collectedAliases);
+            collectedAliases = _collectAliases(setter, collectedAliases);
+            return collectedAliases;
         }
 
-        public String findPrimaryExplicitName(boolean forSer) {
-            if (forSer) {
-                return _firstExplicit(getter, setter, field);
+        private static Set<String> _collectAliases(APropAccessor<?> acc, Set<String> collectedAliases) {
+            if (acc != null) {
+                AnnotatedElement accOb = acc.accessor;
+                if (accOb != null) {
+                    JsonAlias ann = accOb.getAnnotation(JsonAlias.class);
+                    if (ann != null) {
+                        final String[] names = ann.value();
+                        if (collectedAliases == null) {
+                            collectedAliases = new HashSet<String>();
+                        }
+                        for (String alias : names) {
+                            collectedAliases.add(alias);
+                        }
+                    }
+                }
             }
-            return _firstExplicit(setter, getter, field);
+            return collectedAliases;
         }
-
+        
         private String _firstExplicit(APropAccessor<?> acc1,
                 APropAccessor<?> acc2,
                 APropAccessor<?> acc3) {
@@ -624,6 +676,13 @@ public class AnnotationBasedIntrospector
                 return acc3.name;
             }
             return null;
+        }
+
+        public String findPrimaryExplicitName(boolean forSer) {
+            if (forSer) {
+                return _firstExplicit(getter, setter, field);
+            }
+            return _firstExplicit(setter, getter, field);
         }
 
         public boolean anyVisible() {
@@ -642,6 +701,10 @@ public class AnnotationBasedIntrospector
             return ((field != null) && field.isToIgnore)
                     || ((getter != null) && getter.isToIgnore)
                     || ((setter != null) && setter.isToIgnore);
+        }
+
+        public boolean couldDeserialize() {
+            return (field != null) || (setter != null);
         }
 
         @Override

@@ -22,9 +22,14 @@ import com.fasterxml.jackson.jr.ob.api.ValueReader;
 public class BeanReader
     extends ValueReader // so we can chain calls for Collections, arrays
 {
-    protected final Map<String,BeanPropertyReader> _propsByName; // for deserialization
+    protected final Map<String, BeanPropertyReader> _propsByName;
 
-    // @since 2.11
+    /**
+     * Mapping of aliased names to primary names (direct linkage unfortunately
+     * impractical due to implementation limits).
+     */
+    protected final Map<String, String> _aliasMapping;
+
     protected final Set<String> _ignorableNames;
 
     protected final Constructor<?> _defaultCtor;
@@ -43,7 +48,7 @@ public class BeanReader
      */
     protected BeanReader(Class<?> type, Map<String,BeanPropertyReader> propsByName,
             Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,
-            Set<String> ignorableNames)
+            Set<String> ignorableNames, Map<String, String> aliasMapping)
     {
         super(type);
         _propsByName = propsByName;
@@ -51,6 +56,7 @@ public class BeanReader
         _stringCtor = stringCtor;
         _longCtor = longCtor;
         _ignorableNames = ignorableNames;
+        _aliasMapping = aliasMapping;
     }
 
     /**
@@ -87,15 +93,31 @@ public class BeanReader
      */
     public static BeanReader construct(Class<?> type, Map<String, BeanPropertyReader> props,
             Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,
-            Set<String> ignorableProps)
+            Set<String> ignorableProps, Map<String, String> aliasMapping)
     {
-        return new BeanReader(type, props, defaultCtor, stringCtor, longCtor, ignorableProps);
+        if (ignorableProps == null) {
+            ignorableProps = Collections.<String>emptySet();
+        }
+        if (aliasMapping == null) {
+            aliasMapping = Collections.emptyMap();
+        }
+        return new BeanReader(type, props, defaultCtor, stringCtor, longCtor,
+                ignorableProps, aliasMapping);
     }
 
     public Map<String,BeanPropertyReader> propertiesByName() { return _propsByName; }
 
-    protected BeanPropertyReader findProperty(String name) {
-        return _propsByName.get(name);
+    public BeanPropertyReader findProperty(String name) {
+        BeanPropertyReader prop = _propsByName.get(name);
+        if (prop == null) {
+            return _findAlias(name);
+        }
+        return prop;
+    }
+
+    private final BeanPropertyReader _findAlias(String name) {
+        String primaryName = _aliasMapping.get(name);
+        return (primaryName == null) ? null : _propsByName.get(primaryName);
     }
 
     /**

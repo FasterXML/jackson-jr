@@ -3,11 +3,7 @@ package com.fasterxml.jackson.jr.ob.impl;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Definition of a single Bean-style Java class, without assumptions
@@ -100,13 +96,21 @@ public class POJODefinition
         public final Field field;
         public final Method setter, getter, isGetter;
 
+        private final Collection<String> aliases;
+
         public Prop(String n, Field f,
-                Method setter0, Method getter0, Method isGetter0) {
+                Method setter0, Method getter0, Method isGetter0,
+                Collection<String> aliases0)
+        {
             name = n;
             field = f;
             setter = setter0;
             getter = getter0;
             isGetter = isGetter0;
+            if (aliases0 == null) {
+                aliases0 = Collections.emptyList();
+            }
+            aliases = aliases0;
         }
 
         public static PropBuilder builder(String name) {
@@ -116,6 +120,14 @@ public class POJODefinition
         public boolean hasSetter() {
             return (setter != null) || (field != null);
         }
+
+        public boolean hasAliases() {
+            return !aliases.isEmpty();
+        }
+
+        public Iterable<String> aliases() {
+            return aliases;
+        }
     }
 
     static final class PropBuilder {
@@ -123,13 +135,13 @@ public class POJODefinition
 
         private Field _field;
         private Method _setter, _getter, _isGetter;
-        
+
         public PropBuilder(String name) {
             _name = name;
         }
 
         public Prop build() {
-            return new Prop(_name, _field, _setter, _getter, _isGetter);
+            return new Prop(_name, _field, _setter, _getter, _isGetter, null);
         }
 
         public PropBuilder withField(Field f) {

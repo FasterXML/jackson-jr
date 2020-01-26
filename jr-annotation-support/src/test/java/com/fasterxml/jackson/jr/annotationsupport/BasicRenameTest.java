@@ -21,6 +21,12 @@ public class BasicRenameTest extends ASTestBase
         }
     }
 
+    /*
+    /**********************************************************************
+    /* Test methods
+    /**********************************************************************
+     */
+
     // for stricter validation, fail on unknown properties
     private final JSON JSON_WITH_ANNO = jsonWithAnnotationSupport()
             .with(JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY);

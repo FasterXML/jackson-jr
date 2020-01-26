@@ -482,6 +482,10 @@ public class JSON
     /**********************************************************************
      */
 
+    public JSON register(JacksonJrExtension extension) {
+        return extension.register(this);
+    }
+
     /**
      * Mutant factory method for constructing new instance with specified {@link TokenStreamFactory}
      * if different from currently configured one (if not, return {@code this} as-is)
