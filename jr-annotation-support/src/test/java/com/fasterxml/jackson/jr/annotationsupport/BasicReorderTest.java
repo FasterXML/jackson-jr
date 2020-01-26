@@ -36,7 +36,7 @@ public class BasicReorderTest extends ASTestBase
         public void setMiddle(String n) { _middle = n; }
         public void setLast(String n) { last = n; }
     }
-    
+
     private final JSON JSON_WITH_ANNO = jsonWithAnnotationSupport();
 
     public void testSimpleReorder() throws Exception

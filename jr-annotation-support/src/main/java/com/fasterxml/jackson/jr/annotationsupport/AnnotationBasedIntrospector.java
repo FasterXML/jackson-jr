@@ -43,7 +43,15 @@ public class AnnotationBasedIntrospector
         _type = type;
         _forSerialization = serialization;
         _ignorableNames = serialization ? null : new HashSet<String>();
-        _visibility = visibility;
+
+        // First things first: find possible `@JsonAutoDetect` to override
+        // default visibility settings
+        JsonAutoDetect ann = _find(type, JsonAutoDetect.class); // bad form but...
+        if (ann == null) {
+            _visibility = visibility;
+        } else {
+            _visibility = visibility.withOverrides(JsonAutoDetect.Value.from(ann));
+        }
     }
 
     public static POJODefinition pojoDefinitionForDeserialization(JSONReader r,
@@ -281,6 +289,7 @@ public class AnnotationBasedIntrospector
         }
         final String name0 = m.getName();
         String implName = null;
+        boolean isIsGetter = false;
 
         if (name0.startsWith("get")) {
             if (name0.length() > 3) {
@@ -290,6 +299,7 @@ public class AnnotationBasedIntrospector
             if (name0.length() > 2) {
                 // May or may not be used, but collect for now all the same:
                 implName = _decap(name0.substring(2));
+                isIsGetter = true;
             }
         }
 
@@ -319,7 +329,7 @@ public class AnnotationBasedIntrospector
                 final String explName = _findExplicitName(m);
                 if (explName == null) {
                     acc = APropAccessor.createImplicit(implName, m,
-                            _isGetterVisible(m));
+                            _isGetterVisible(m, isIsGetter));
                 } else if (explName.isEmpty()) {
                     acc = APropAccessor.createVisible(implName, m);
                 } else {
@@ -384,17 +394,21 @@ public class AnnotationBasedIntrospector
      */
 
     protected boolean _isFieldVisible(Field f) {
-        final int flags = f.getModifiers();
-        return !Modifier.isTransient(flags)
-                && Modifier.isPublic(f.getModifiers());
+        // Consider transient fields non-visible (may still include with explicit
+        // annotation)
+        return !Modifier.isTransient(f.getModifiers())
+                && _visibility.getFieldVisibility().isVisible(f);
     }
 
-    protected boolean _isGetterVisible(Method m) {
-        return Modifier.isPublic(m.getModifiers());
+    protected boolean _isGetterVisible(Method m, boolean isIsGetter) {
+        if (isIsGetter) {
+            return _visibility.getIsGetterVisibility().isVisible(m);
+        }
+        return _visibility.getGetterVisibility().isVisible(m);
     }
- 
+
     protected boolean _isSetterVisible(Method m) {
-        return Modifier.isPublic(m.getModifiers());
+        return _visibility.getSetterVisibility().isVisible(m);
     }
     
     /*
