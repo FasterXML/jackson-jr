@@ -9,8 +9,6 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
-import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
-import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.api.ValueWriter;
 
 import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
@@ -38,27 +36,27 @@ public class JSONWriter
     /**********************************************************************
      */
 
-    protected final int _features;
-
-    protected final boolean _writeNullValues;
-
-    /**
-     * Object that is used to dynamically find Bean (and custom type) value writers
-     */
-    protected final ValueWriterLocator _writerLocator;
-
-    protected final TreeCodec _treeCodec;
-
     /*
     /**********************************************************************
     /* Instance config
     /**********************************************************************
      */
 
+    protected final TreeCodec _treeCodec;
+
+    /**
+     * Object that is used to dynamically find Bean (and custom type) value writers
+     */
+    protected final ValueWriterLocator _writerLocator;
+
     protected final JsonGenerator _generator;
 
     protected final TimeZone _timezone;
 
+    protected final int _features;
+
+    protected final boolean _writeNullValues;
+    
     /*
     /**********************************************************************
     /* Blueprint construction
@@ -69,12 +67,12 @@ public class JSONWriter
      * Constructor used for creating differently configured blueprint
      * instances
      */
-    public JSONWriter(int features, ValueWriterLocator td, TreeCodec tc)
+    public JSONWriter()
     {
-        _features = features;
-        _writeNullValues = JSON.Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
-        _writerLocator = td;
-        _treeCodec = tc;
+        _features = 0;
+        _writeNullValues = false;
+        _writerLocator = null;
+        _treeCodec = null;
         _generator = null;
         _timezone = DEFAULT_TIMEZONE;
     }
@@ -82,12 +80,14 @@ public class JSONWriter
     /**
      * Constructor for non-blueprint instances
      */
-    protected JSONWriter(JSONWriter base, int features, JsonGenerator g)
+    protected JSONWriter(JSONWriter base, int features,
+            ValueWriterLocator loc, TreeCodec tc,
+            JsonGenerator g)
     {
         _features = features;
         _writeNullValues = JSON.Feature.WRITE_NULL_PROPERTIES.isEnabled(features);
-        _writerLocator = base._writerLocator.perOperationInstance(this, features);
-        _treeCodec = base._treeCodec;
+        _treeCodec = tc;
+        _writerLocator = loc.perOperationInstance(this, features);
         _generator = g;
         _timezone = DEFAULT_TIMEZONE;
     }
@@ -104,55 +104,20 @@ public class JSONWriter
         return this;
     }
 
-    public JSONWriter with(TreeCodec tc) {
-        if (_treeCodec == tc) {
-            return this;
-        }
-        return _with(_features, _writerLocator, tc);
-    }
-
-    // @since 2.10
-    public JSONWriter with(ReaderWriterProvider rwp) {
-        ValueWriterLocator l = _writerLocator.with(rwp);
-        if (_writerLocator == l) {
-            return this;
-        }
-        return _with(_features, l, _treeCodec);
-    }
-
-    // @since 2.11
-    public JSONWriter with(ReaderWriterModifier rwm) {
-        ValueWriterLocator l = _writerLocator.with(rwm);
-        if (_writerLocator == l) {
-            return this;
-        }
-        return _with(_features, l, _treeCodec);
-    }
-
-    /**
-     * Overridable method that all mutant factories call if a new instance
-     * is to be constructed
-     */
-    protected JSONWriter _with(int features, ValueWriterLocator td, TreeCodec tc)
-    {
-        if (getClass() != JSONWriter.class) { // sanity check
-            throw new IllegalStateException("Sub-classes MUST override _with(...)");
-        }
-        return new JSONWriter(features, td, tc);
-    }
-
     /*
     /**********************************************************************
     /* New instance creation
     /**********************************************************************
      */
 
-    public JSONWriter perOperationInstance(int features, JsonGenerator g)
+    public JSONWriter perOperationInstance(int features,
+            ValueWriterLocator loc, TreeCodec tc,
+            JsonGenerator g)
     {
         if (getClass() != JSONWriter.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
-        return new JSONWriter(this, features, g);
+        return new JSONWriter(this, features, loc, tc, g);
     }
 
     /*

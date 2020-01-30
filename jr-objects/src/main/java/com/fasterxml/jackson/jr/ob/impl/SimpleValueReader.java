@@ -77,7 +77,7 @@ public class SimpleValueReader extends ValueReader
             return _readIntArray(p);
 
         case SER_TREE_NODE:
-            return reader._treeCodec().readTree(p);
+            return reader.readTree();
 
         // Textual types, related:
         case SER_STRING:

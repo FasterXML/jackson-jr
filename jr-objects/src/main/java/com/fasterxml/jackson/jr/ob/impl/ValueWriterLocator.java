@@ -86,7 +86,7 @@ public class ValueWriterLocator extends ValueLocatorBase
      */
 
     /**
-     * Constructor for the blueprint instance
+     * Constructor for the blueprint instance (and variations)
      */
     protected ValueWriterLocator(int features,
             ReaderWriterProvider rwp, ReaderWriterModifier rwm)
@@ -110,9 +110,8 @@ public class ValueWriterLocator extends ValueLocatorBase
         _writerModifier = base._writerModifier;
     }
 
-    public final static ValueWriterLocator blueprint(int features,
-            ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
-        return new ValueWriterLocator(features & CACHE_FLAGS, rwp, rwm);
+    public final static ValueWriterLocator blueprint(ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
+        return new ValueWriterLocator(0, rwp, rwm);
     }
 
     public ValueWriterLocator with(ReaderWriterProvider rwp) {

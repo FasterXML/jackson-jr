@@ -376,7 +376,13 @@ public class JSON implements Versioned
      * read and write {@link TreeNode} instances that codec supports.
      */
     protected final TreeCodec _treeCodec;
-    
+
+    // @since 2.11
+    protected final ValueReaderLocator _valueReaderLocator;
+
+    // @since 2.11
+    protected final ValueWriterLocator _valueWriterLocator;
+
     /**
      * Blueprint instance of the reader to use for reading JSON as simple
      * Objects.
@@ -398,7 +404,7 @@ public class JSON implements Versioned
     protected final int _features;
 
     protected final PrettyPrinter _prettyPrinter;
-    
+
     /*
     /**********************************************************************
     /* Basic construction
@@ -406,16 +412,23 @@ public class JSON implements Versioned
      */
 
     public JSON() {
-        this(DEFAULT_FEATURES, new JsonFactory(), null,
-                null, null, null); // reader / writer / pretty-printer
+        this(new JsonFactory());
     }
 
-    public JSON(JsonFactory jsonF) {
-        this(DEFAULT_FEATURES, jsonF, null,
-                null, null, null); // reader / writer / pretty-printer
+    public JSON(JsonFactory jsonF)
+    {
+        _features = DEFAULT_FEATURES;
+        _jsonFactory = jsonF;
+        _treeCodec = null;
+        _valueReaderLocator = ValueReaderLocator.blueprint(null, null);
+        _valueWriterLocator = ValueWriterLocator.blueprint(null, null);
+        _reader = _defaultReader();
+        _writer = _defaultWriter();
+        _prettyPrinter = null;
     }
 
-    protected JSON(int features,
+    protected JSON(JSON base,
+            int features,
             JsonFactory jsonF, TreeCodec trees,
             JSONReader r, JSONWriter w,
             PrettyPrinter pp)
@@ -423,20 +436,30 @@ public class JSON implements Versioned
         _features = features;
         _jsonFactory = jsonF;
         _treeCodec = trees;
-        _reader = (r != null) ? r : _defaultReader(features, trees, null, null);
-        _writer = (w != null) ? w : _defaultWriter(features, trees, null, null);
+        _valueReaderLocator = base._valueReaderLocator;
+        _valueWriterLocator = base._valueWriterLocator;
+        _reader = r;
+        _writer = w;
         _prettyPrinter = pp;
     }
 
-    protected JSONReader _defaultReader(int features, TreeCodec tc,
-            ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
-        return new JSONReader(features, ValueReaderLocator.blueprint(features, rwp, rwm), tc,
-                CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
+    protected JSON(JSON base, ValueReaderLocator rloc, ValueWriterLocator wloc) {
+        _features = base._features;
+        _jsonFactory = base._jsonFactory;
+        _treeCodec = base._treeCodec;
+        _valueReaderLocator = rloc;
+        _valueWriterLocator = wloc;
+        _reader = base._reader;
+        _writer = base._writer;
+        _prettyPrinter = base._prettyPrinter;
+    }
+    
+    protected JSONReader _defaultReader() {
+        return new JSONReader(CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
 
-    protected JSONWriter _defaultWriter(int features, TreeCodec tc,
-            ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
-        return new JSONWriter(features, ValueWriterLocator.blueprint(features, rwp, rwm), tc);
+    protected JSONWriter _defaultWriter() {
+        return new JSONWriter();
     }
 
     /*
@@ -508,7 +531,7 @@ public class JSON implements Versioned
             return this;
         }
         return _with(_features, _jsonFactory, c,
-                _reader.with(c), _writer.with(c), _prettyPrinter);
+                _reader, _writer, _prettyPrinter);
     }
 
     /**
@@ -599,13 +622,12 @@ public class JSON implements Versioned
      * @since 2.10
      */
     public JSON with(ReaderWriterProvider rwp) {
-        JSONReader r = _reader.with(rwp);
-        JSONWriter w = _writer.with(rwp);
-        if ((r == _reader) && (w == _writer))  {
+        ValueReaderLocator rloc = _valueReaderLocator.with(rwp);
+        ValueWriterLocator wloc = _valueWriterLocator.with(rwp);
+        if ((rloc == _valueReaderLocator) && (wloc == _valueWriterLocator))  {
             return this;
         }
-        return _with(_features, _jsonFactory, _treeCodec,
-                r, w, _prettyPrinter);
+        return new JSON(this, rloc, wloc);
     }
 
     /**
@@ -615,15 +637,14 @@ public class JSON implements Versioned
      * @since 2.11
      */
     public JSON with(ReaderWriterModifier rwm) {
-        JSONReader r = _reader.with(rwm);
-        JSONWriter w = _writer.with(rwm);
-        if ((r == _reader) && (w == _writer))  {
+        ValueReaderLocator rloc = _valueReaderLocator.with(rwm);
+        ValueWriterLocator wloc = _valueWriterLocator.with(rwm);
+        if ((rloc == _valueReaderLocator) && (wloc == _valueWriterLocator))  {
             return this;
         }
-        return _with(_features, _jsonFactory, _treeCodec,
-                r, w, _prettyPrinter);
+        return new JSON(this, rloc, wloc);
     }
-    
+
     /**
      * Mutant factory for constructing an instance with specified feature
      * enabled or disabled (depending on <code>state</code>), and returning
@@ -696,12 +717,21 @@ public class JSON implements Versioned
             JSONReader reader, JSONWriter writer,
             PrettyPrinter pp)
     {
+        _verifySubclass();
+        return new JSON(this, features, jsonF, trees, reader, writer, pp);
+    }
+
+    protected JSON _with(ValueReaderLocator rloc, ValueWriterLocator wloc) {
+        _verifySubclass();
+        return new JSON(this, rloc, wloc);
+    }
+
+    private void _verifySubclass() {
         if (getClass() != JSON.class) {
             throw new IllegalStateException("Sub-classes MUST override _with(...)");
         }
-        return new JSON(features, jsonF, trees, reader, writer, pp);
     }
-    
+
     /*
     /**********************************************************************
     /* Simple accessors
@@ -1245,7 +1275,8 @@ public class JSON implements Versioned
     }
 
     protected JSONWriter _writerForOperation(JsonGenerator gen) {
-        return _writer.perOperationInstance(_features, gen);
+        return _writer.perOperationInstance(_features,
+                _valueWriterLocator, _treeCodec, gen);
     }
 
     /*
@@ -1255,7 +1286,7 @@ public class JSON implements Versioned
      */
     
     protected JSONReader _readerForOperation(JsonParser p) {
-        return _reader.perOperationInstance(_features, p);
+        return _reader.perOperationInstance(_features, _valueReaderLocator, _treeCodec, p);
     }
 
     protected JsonParser _parser(Object source) throws IOException, JSONObjectException

@@ -115,10 +115,9 @@ public class ValueReaderLocator
     /**
      * Constructor for the blueprint instance
      */
-    protected ValueReaderLocator(int features,
-            ReaderWriterProvider rwp, ReaderWriterModifier rwm)
+    protected ValueReaderLocator(ReaderWriterProvider rwp, ReaderWriterModifier rwm)
     {
-        _features = features;
+        _features = 0;
         _readerProvider = rwp;
         _readerModifier = rwm;
         _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(10, 0.75f, 2);
@@ -143,18 +142,17 @@ public class ValueReaderLocator
     {
         // create new cache as there may be custom writers:
         _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(10, 0.75f, 2);
-
+        _readerLock = new Object();
+        
         _features = base._features;
         _readContext = base._readContext;
         _readerProvider = rwp;
         _readerModifier = rwm;
         _typeResolver = base._typeResolver;
-        _readerLock = base._readerLock;
     }
     
-    public final static ValueReaderLocator blueprint(int features,
-            ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
-        return new ValueReaderLocator(features & CACHE_FLAGS, rwp, rwm);
+    public final static ValueReaderLocator blueprint(ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
+        return new ValueReaderLocator(rwp, rwm);
     }
 
     public ValueReaderLocator with(ReaderWriterProvider rwp) {

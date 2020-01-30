@@ -2,7 +2,6 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.util.*;
 
-import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.TestBase;
 import com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator;
 
@@ -43,7 +42,7 @@ public class ValueWriterLocatorTest extends TestBase
      */
 
     public void testBasicTypeDetectionForSer() {
-        ValueWriterLocator td = ValueWriterLocator.blueprint(JSON.Feature.defaults(), null, null);
+        ValueWriterLocator td = ValueWriterLocator.blueprint(null, null);
         assertEquals(ValueWriterLocator.SER_STRING, td.findSerializationType(String.class));
         assertEquals(ValueWriterLocator.SER_CHAR_ARRAY, td.findSerializationType(char[].class));
         assertEquals(ValueWriterLocator.SER_INT_ARRAY, td.findSerializationType(int[].class));
