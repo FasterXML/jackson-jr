@@ -124,11 +124,11 @@ public class ValueReaderLocator
     /**
      * Constructor for the blueprint instance
      */
-    protected ValueReaderLocator(TokenStreamFactory streamF, int features,
+    protected ValueReaderLocator(TokenStreamFactory streamF,
             ReaderWriterProvider rwp, ReaderWriterModifier rwm)
     {
         _streamFactory = streamF;
-        _features = features;
+        _features = 0;
         _readerProvider = rwp;
         _readerModifier = rwm;
         _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(10, 0.75f, 2);
@@ -152,19 +152,20 @@ public class ValueReaderLocator
             ReaderWriterProvider rwp, ReaderWriterModifier rwm)
     {
         _streamFactory = base._streamFactory;
+        // create new cache as there may be custom writers:
+        _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(10, 0.75f, 2);
+        _readerLock = new Object();
+        
         _features = base._features;
         _readContext = base._readContext;
         _readerProvider = rwp;
         _readerModifier = rwm;
-        // create new cache as there may be custom writers:
-        _knownReaders = new ConcurrentHashMap<>(10, 0.75f, 2);
         _typeResolver = base._typeResolver;
-        _readerLock = base._readerLock;
     }
 
     public final static ValueReaderLocator blueprint(TokenStreamFactory streamF,
-            int features, ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
-        return new ValueReaderLocator(streamF, features & CACHE_FLAGS, rwp, rwm);
+            ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
+        return new ValueReaderLocator(streamF, rwp, rwm);
     }
 
     public ValueReaderLocator with(ReaderWriterProvider rwp) {

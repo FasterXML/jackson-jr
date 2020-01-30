@@ -8,8 +8,6 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
 import com.fasterxml.jackson.jr.ob.api.MapBuilder;
-import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
-import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 /**
@@ -32,15 +30,6 @@ public class JSONReader
     /**********************************************************************
      */
 
-    protected final int _features;
-
-    protected final TreeCodec _treeCodec;
-    
-    /**
-     * Object that is used to find value readers dynamically.
-     */
-    protected final ValueReaderLocator _readerLocator;
-
     /**
      * Handler that takes care of constructing {@link java.util.Map}s as needed
      */
@@ -57,6 +46,22 @@ public class JSONReader
     /**********************************************************************
      */
 
+    protected final int _features;
+
+    /**
+     * Configured {@link TreeCodec} that is needed if values of type {@link TreeNode}
+     * are to be read.
+     */
+    protected final TreeCodec _treeCodec;
+
+    /**
+     * Object that is used to find value readers dynamically.
+     */
+    protected final ValueReaderLocator _readerLocator;
+
+    /**
+     * Parser used by this reader instance.
+     */
     protected final JsonParser _parser;
 
     /*
@@ -68,12 +73,11 @@ public class JSONReader
     /**
      * Constructor used for creating the blueprint instances.
      */
-    public JSONReader(int features, ValueReaderLocator td, TreeCodec treeCodec,
-            CollectionBuilder lb, MapBuilder mb)
+    public JSONReader(CollectionBuilder lb, MapBuilder mb)
     {
-        _features = features;
-        _readerLocator = td;
-        _treeCodec = treeCodec;
+        _features = 0;
+        _readerLocator = null;
+        _treeCodec = null;
         _collectionBuilder = lb;
         _mapBuilder = mb;
         _parser = null;
@@ -82,12 +86,13 @@ public class JSONReader
     /**
      * Constructor used for per-operation (non-blueprint) instance.
      */
-    protected JSONReader(JSONReader base, int features, JsonParser p)
+    protected JSONReader(JSONReader base, int features,
+            ValueReaderLocator loc, TreeCodec tc, JsonParser p)
     {
         _features = features;
-        _readerLocator = base._readerLocator.perOperationInstance(this, features);
+        _readerLocator = loc.perOperationInstance(this, features);
 
-        _treeCodec = base._treeCodec;
+        _treeCodec = tc;
         _collectionBuilder = base._collectionBuilder.newBuilder(features);
         _mapBuilder = base._mapBuilder.newBuilder(features);
         _parser = p;
@@ -106,42 +111,24 @@ public class JSONReader
 
     public JSONReader with(MapBuilder mb) {
         if (_mapBuilder == mb) return this;
-        return _with(_features, _readerLocator, _treeCodec, _collectionBuilder, mb);
+        return _with(_collectionBuilder, mb);
     }
 
     public JSONReader with(CollectionBuilder lb) {
         if (_collectionBuilder == lb) return this;
-        return _with(_features, _readerLocator, _treeCodec, lb, _mapBuilder);
-    }
-
-    public JSONReader with(ReaderWriterProvider rwp) {
-        ValueReaderLocator l = _readerLocator.with(rwp);
-        if (_readerLocator == l) {
-            return this;
-        }
-        return _with(_features, l, _treeCodec, _collectionBuilder, _mapBuilder);
-    }
-
-    // @since 2.11
-    public JSONReader with(ReaderWriterModifier rwm) {
-        ValueReaderLocator l = _readerLocator.with(rwm);
-        if (_readerLocator == l) {
-            return this;
-        }
-        return _with(_features, l, _treeCodec, _collectionBuilder, _mapBuilder);
+        return _with(lb, _mapBuilder);
     }
 
     /**
      * Overridable method that all mutant factories call if a new instance
      * is to be constructed
      */
-    protected JSONReader _with(int features,
-            ValueReaderLocator td, TreeCodec tc, CollectionBuilder lb, MapBuilder mb)
+    protected JSONReader _with(CollectionBuilder lb, MapBuilder mb)
     {
         if (getClass() != JSONReader.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override _with(...)");
         }
-        return new JSONReader(features, td, tc, lb, mb);
+        return new JSONReader(lb, mb);
     }
 
     /*
@@ -150,12 +137,14 @@ public class JSONReader
     /**********************************************************************
      */
 
-    public JSONReader perOperationInstance(int features, JsonParser p)
+    public JSONReader perOperationInstance(int features,
+            ValueReaderLocator loc, TreeCodec tc,
+            JsonParser p)
     {
         if (getClass() != JSONReader.class) { // sanity check
             throw new IllegalStateException("Sub-classes MUST override perOperationInstance(...)");
         }
-        return new JSONReader(this, features, p);
+        return new JSONReader(this, features, loc, tc, p);
     }
 
     /*
@@ -307,18 +296,21 @@ public class JSONReader
                 "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+ValueReader._tokenDesc(_parser));
     }
 
+    /**
+     * @since 2.11
+     */
+    public TreeNode readTree() throws IOException {
+        if (_treeCodec == null) {
+            throw new JSONObjectException("No `TreeCodec` specified: can not bind JSON into `TreeNode` types");
+        }
+        return _treeCodec.readTree(_parser);
+    }
+
     /*
     /**********************************************************************
     /* Internal methods; overridable for custom coercions
     /**********************************************************************
      */
-
-    protected TreeCodec _treeCodec() throws JSONObjectException {
-        if (_treeCodec == null) {
-            throw new JSONObjectException("No `TreeCodec` specified: can not bind JSON into `TreeNode` types");
-        }
-        return _treeCodec;
-    }
 
     protected MapBuilder _mapBuilder(Class<?> mapType) {
         return (mapType == null) ? _mapBuilder : _mapBuilder.newBuilder(mapType);

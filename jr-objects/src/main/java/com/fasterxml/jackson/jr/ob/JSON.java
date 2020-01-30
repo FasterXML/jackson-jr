@@ -377,7 +377,13 @@ public class JSON
      * read and write {@link TreeNode} instances that codec supports.
      */
     protected final TreeCodec _treeCodec;
-    
+
+    // @since 2.11
+    protected final ValueReaderLocator _valueReaderLocator;
+
+    // @since 2.11
+    protected final ValueWriterLocator _valueWriterLocator;
+
     /**
      * Blueprint instance of the reader to use for reading JSON as simple
      * Objects.
@@ -399,7 +405,7 @@ public class JSON
     protected final int _features;
 
     protected final PrettyPrinter _prettyPrinter;
-    
+
     /*
     /**********************************************************************
     /* Basic construction
@@ -407,44 +413,53 @@ public class JSON
      */
 
     public JSON() {
-        this(new JsonFactory(), null, DEFAULT_FEATURES);
+        this(new JsonFactory());
     }
 
-    /**
-     * @since 3.0
-     */
-    public JSON(TokenStreamFactory streamFactory) {
-        this(streamFactory, null, DEFAULT_FEATURES);
-    }
-
-    protected JSON(TokenStreamFactory jsonF, TreeCodec trees, int features)
+    public JSON(TokenStreamFactory streamF)
     {
-        this(jsonF, trees, features,
-                null, null, // reader, writer
-                null);
+        _features = DEFAULT_FEATURES;
+        _streamFactory = streamF;
+        _treeCodec = null;
+        _valueReaderLocator = ValueReaderLocator.blueprint(streamF, null, null);
+        _valueWriterLocator = ValueWriterLocator.blueprint(null, null);
+        _reader = _defaultReader();
+        _writer = _defaultWriter();
+        _prettyPrinter = null;
     }
 
-    protected JSON(TokenStreamFactory streamF, TreeCodec trees, int features,
+    protected JSON(JSON base,
+            int features, TokenStreamFactory streamF, TreeCodec trees,
             JSONReader r, JSONWriter w,
             PrettyPrinter pp)
     {
         _features = features;
         _streamFactory = streamF;
         _treeCodec = trees;
-        _reader = (r != null) ? r : _defaultReader(streamF, features, trees, null, null);
-        _writer = (w != null) ? w : _defaultWriter(features, trees, null, null);
+        _valueReaderLocator = base._valueReaderLocator;
+        _valueWriterLocator = base._valueWriterLocator;
+        _reader = r;
+        _writer = w;
         _prettyPrinter = pp;
     }
 
-    protected JSONReader _defaultReader(TokenStreamFactory streamF,
-            int features, TreeCodec tc, ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
-        return new JSONReader(features, ValueReaderLocator.blueprint(streamF, features, rwp, rwm), tc,
-                CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
+    protected JSON(JSON base, ValueReaderLocator rloc, ValueWriterLocator wloc) {
+        _features = base._features;
+        _streamFactory = base._streamFactory;
+        _treeCodec = base._treeCodec;
+        _valueReaderLocator = rloc;
+        _valueWriterLocator = wloc;
+        _reader = base._reader;
+        _writer = base._writer;
+        _prettyPrinter = base._prettyPrinter;
+    }
+    
+    protected JSONReader _defaultReader() {
+        return new JSONReader(CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
 
-    protected JSONWriter _defaultWriter(int features, TreeCodec tc,
-            ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
-        return new JSONWriter(features, ValueWriterLocator.blueprint(features, rwp, rwm), tc);
+    protected JSONWriter _defaultWriter() {
+        return new JSONWriter();
     }
 
     /*
@@ -518,7 +533,7 @@ public class JSON
             return this;
         }
         return _with(_features, _streamFactory, c,
-                _reader, _writer.with(c), _prettyPrinter);
+                _reader, _writer, _prettyPrinter);
     }
 
     /**
@@ -607,13 +622,12 @@ public class JSON
      * and returning new instance (or, if there would be no change, this instance).
      */
     public JSON with(ReaderWriterProvider rwp) {
-        JSONReader r = _reader.with(rwp);
-        JSONWriter w = _writer.with(rwp);
-        if ((r == _reader) && (w == _writer))  {
+        ValueReaderLocator rloc = _valueReaderLocator.with(rwp);
+        ValueWriterLocator wloc = _valueWriterLocator.with(rwp);
+        if ((rloc == _valueReaderLocator) && (wloc == _valueWriterLocator))  {
             return this;
         }
-        return _with(_features, _streamFactory, _treeCodec,
-                r, w, _prettyPrinter);
+        return new JSON(this, rloc, wloc);
     }
 
     /**
@@ -621,15 +635,14 @@ public class JSON
      * and returning new instance (or, if there would be no change, this instance).
      */
     public JSON with(ReaderWriterModifier rwm) {
-        JSONReader r = _reader.with(rwm);
-        JSONWriter w = _writer.with(rwm);
-        if ((r == _reader) && (w == _writer))  {
+        ValueReaderLocator rloc = _valueReaderLocator.with(rwm);
+        ValueWriterLocator wloc = _valueWriterLocator.with(rwm);
+        if ((rloc == _valueReaderLocator) && (wloc == _valueWriterLocator))  {
             return this;
         }
-        return _with(_features, _streamFactory, _treeCodec,
-                r, w, _prettyPrinter);
+        return new JSON(this, rloc, wloc);
     }
-    
+
     /**
      * Mutant factory for constructing an instance with specified feature
      * enabled or disabled (depending on <code>state</code>), and returning
@@ -701,10 +714,19 @@ public class JSON
             JSONReader reader, JSONWriter writer,
             PrettyPrinter pp)
     {
+        _verifySubclass();
+        return new JSON(this, features, jsonF, trees, reader, writer, pp);
+    }
+
+    protected JSON _with(ValueReaderLocator rloc, ValueWriterLocator wloc) {
+        _verifySubclass();
+        return new JSON(this, rloc, wloc);
+    }
+
+    private void _verifySubclass() {
         if (getClass() != JSON.class) {
             throw new IllegalStateException("Sub-classes MUST override _with(...)");
         }
-        return new JSON(jsonF, trees, features, reader, writer, pp);
     }
 
     /*
@@ -1372,7 +1394,8 @@ public class JSON
     }
 
     protected JSONWriter _writerForOperation(JsonGenerator gen) {
-        return _writer.perOperationInstance(_features, gen);
+        return _writer.perOperationInstance(_features,
+                _valueWriterLocator, _treeCodec, gen);
     }
 
     /*
@@ -1382,7 +1405,7 @@ public class JSON
      */
     
     protected JSONReader _readerForOperation(JsonParser p) {
-        return _reader.perOperationInstance(_features, p);
+        return _reader.perOperationInstance(_features, _valueReaderLocator, _treeCodec, p);
     }
 
     protected JsonParser _parser(Object source) throws IOException, JSONObjectException
