@@ -75,8 +75,7 @@ public class CustomValueWritersTest extends TestBase
         assertEquals("{}", JSON.std.asString(new CustomBean()));
         assertEquals("{\"wrapped\":{}}", JSON.std.asString(new CustomBeanWrapper()));
 
-        final JSON withCustom = JSON.std
-                .with(new CustomWriters());
+        final JSON withCustom = jsonWithProvider(new CustomWriters());
         assertEquals(quote("xxx"), withCustom.asString(new CustomBean()));
         assertEquals("{\"wrapped\":\"xxx\"}", withCustom.asString(new CustomBeanWrapper()));
         assertEquals("[\"xxx\"]", withCustom.asString(new CustomBean[] { new CustomBean() }));
@@ -84,8 +83,7 @@ public class CustomValueWritersTest extends TestBase
                 withCustom.asString(Collections.singletonMap("value", new CustomBean())));
 
         // plus also should be able to create new instance with different representation
-        final JSON withCustom42 = withCustom
-                .with(new CustomWriters42());
+        final JSON withCustom42 = jsonWithProvider(new CustomWriters42());
         assertEquals("{\"answer\":42}", withCustom42.asString(new CustomBean()));
         assertEquals("{\"wrapped\":{\"answer\":42}}",
                 withCustom42.asString(new CustomBeanWrapper()));

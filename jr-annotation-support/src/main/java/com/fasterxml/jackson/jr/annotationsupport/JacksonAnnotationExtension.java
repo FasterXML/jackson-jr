@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JacksonJrExtension;
+import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
 
 /**
  * Helper object that provides limited support for Jackson core annotations.
@@ -118,7 +119,7 @@ public class JacksonAnnotationExtension
     }
 
     @Override
-    protected JSON register(JSON json) {
-        return json.with(_modifier);
+    protected void register(ExtensionContext ctxt) {
+        ctxt.insertModifier(_modifier);
     }
 }

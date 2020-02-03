@@ -6,6 +6,10 @@ import java.util.Arrays;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectReadContext;
 
+import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
+import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
+import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
+
 import junit.framework.TestCase;
 
 public abstract class TestBase extends TestCase
@@ -55,5 +59,25 @@ public abstract class TestBase extends TestCase
 
     protected String aposToQuotes(String json) {
         return json.replace("'", "\"");
+    }
+
+    protected JSON jsonWithModifier(final ReaderWriterModifier modifier) {
+        return JSON.std.register(new JacksonJrExtension() {
+
+            @Override
+            protected void register(ExtensionContext ctxt) {
+                ctxt.insertModifier(modifier);
+            }
+        });
+    }
+
+    protected JSON jsonWithProvider(final ReaderWriterProvider provider) {
+        return JSON.std.register(new JacksonJrExtension() {
+
+            @Override
+            protected void register(ExtensionContext ctxt) {
+                ctxt.insertProvider(provider);
+            }
+        });
     }
 }

@@ -52,8 +52,7 @@ public class POJODefinitionOverrideTest extends TestBase
         assertEquals("Burger", bean.getLast());
 
         // but then use customized POJO introspection
-        bean = JSON.std
-                .with(new MyPropertyModifier("last"))
+        bean = jsonWithModifier(new MyPropertyModifier("last"))
                 .beanFrom(NameBean.class, INPUT);
         assertEquals("Bob", bean.getFirst());
         assertNull(bean.getLast());
@@ -73,8 +72,7 @@ public class POJODefinitionOverrideTest extends TestBase
         assertEquals(EXP_DEFAULT, JSON.std.asString(input));
 
         // but then use customized POJO introspection
-        String json = JSON.std
-                .with(new MyPropertyModifier("xxx"))
+        String json = jsonWithModifier(new MyPropertyModifier("xxx"))
                 .asString(input);
         assertEquals(aposToQuotes("{'last':'Burger','first':'Bob'}"), json);
         

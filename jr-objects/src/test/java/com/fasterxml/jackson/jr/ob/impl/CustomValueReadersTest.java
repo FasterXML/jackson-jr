@@ -158,8 +158,7 @@ public class CustomValueReadersTest extends TestBase
         }
 
         // then with custom, should be fine
-        JSON json = JSON.std
-                .with(new CustomReaders(0));
+        JSON json = jsonWithProvider(new CustomReaders(0));
         CustomValue v = json.beanFrom(CustomValue.class, "123");
         assertEquals(124, v.value);
 
@@ -169,7 +168,7 @@ public class CustomValueReadersTest extends TestBase
         assertEquals(138, bean.custom.value);
 
         // but also ensure we can change registered handler(s)
-        JSON json2 = json.with(new CustomReaders(100));
+        JSON json2 = jsonWithProvider(new CustomReaders(100));
         v = json2.beanFrom(CustomValue.class, "123");
         assertEquals(224, v.value);
     }
@@ -185,13 +184,12 @@ public class CustomValueReadersTest extends TestBase
         }
 
         // then with custom, should be fine
-        JSON json = JSON.std
-                .with(new CustomReaders(0));
+        JSON json = jsonWithProvider(new CustomReaders(0));
         ABC v = json.beanFrom(ABC.class, quote("n/a"));
         assertEquals(ABC.DEF, v);
 
         // but if we remove, again error
-        JSON json2 = json.with((ReaderWriterProvider) null);
+        JSON json2 = jsonWithProvider((ReaderWriterProvider) null);
         try {
             json2.beanFrom(ABC.class, quote("n/a"));
             fail("Should not pass");
@@ -203,8 +201,7 @@ public class CustomValueReadersTest extends TestBase
     // Even more fun, override default String deserializer!
     public void testCustomStringReader() throws Exception
     {
-        String allCaps = JSON.std
-                .with(new StringReaderProvider())
+        String allCaps = jsonWithProvider(new StringReaderProvider())
                 .beanFrom(String.class, quote("Some text"));
         assertEquals("SOME TEXT", allCaps);
     }
@@ -223,8 +220,7 @@ public class CustomValueReadersTest extends TestBase
         }
 
         // then with custom, should be fine
-        JSON json = JSON.std
-                .with(new PointReaderProvider());
+        JSON json = jsonWithProvider(new PointReaderProvider());
         Point v = json.beanFrom(Point.class, doc);
         assertEquals(2, v._x);
         assertEquals(3, v._y);

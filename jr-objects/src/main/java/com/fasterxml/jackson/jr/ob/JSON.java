@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.core.util.Instantiatable;
 import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
+import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
 import com.fasterxml.jackson.jr.ob.api.MapBuilder;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
@@ -496,9 +497,11 @@ public class JSON
     /* Mutant factories
     /**********************************************************************
      */
-
+    
     public JSON register(JacksonJrExtension extension) {
-        return extension.register(this);
+        ExtContextImpl ctxt = new ExtContextImpl(this);
+        extension.register(ctxt);
+        return ctxt.json();
     }
 
     /**
@@ -615,32 +618,6 @@ public class JSON
         }
         return _with(_features, _streamFactory, _treeCodec,
                 r, _writer, _prettyPrinter);
-    }
-
-    /**
-     * Mutant factory for constructing an instance with specified {@link ReaderWriterProvider},
-     * and returning new instance (or, if there would be no change, this instance).
-     */
-    public JSON with(ReaderWriterProvider rwp) {
-        ValueReaderLocator rloc = _valueReaderLocator.with(rwp);
-        ValueWriterLocator wloc = _valueWriterLocator.with(rwp);
-        if ((rloc == _valueReaderLocator) && (wloc == _valueWriterLocator))  {
-            return this;
-        }
-        return new JSON(this, rloc, wloc);
-    }
-
-    /**
-     * Mutant factory for constructing an instance with specified {@link ReaderWriterModifier},
-     * and returning new instance (or, if there would be no change, this instance).
-     */
-    public JSON with(ReaderWriterModifier rwm) {
-        ValueReaderLocator rloc = _valueReaderLocator.with(rwm);
-        ValueWriterLocator wloc = _valueWriterLocator.with(rwm);
-        if ((rloc == _valueReaderLocator) && (wloc == _valueWriterLocator))  {
-            return this;
-        }
-        return new JSON(this, rloc, wloc);
     }
 
     /**
@@ -1455,6 +1432,36 @@ public class JSON
         }
         return p;
     }
+
+    /*
+    /**********************************************************************
+    /* Internal methods, non-private mutant factories
+    /**********************************************************************
+     */
+
+    protected JSON _with(ReaderWriterProvider rwp) {
+        ValueReaderLocator rloc = _valueReaderLocator.with(rwp);
+        ValueWriterLocator wloc = _valueWriterLocator.with(rwp);
+        if ((rloc == _valueReaderLocator) && (wloc == _valueWriterLocator))  {
+            return this;
+        }
+        return new JSON(this, rloc, wloc);
+    }
+
+    /**
+     * Mutant factory for constructing an instance with specified {@link ReaderWriterModifier},
+     * and returning new instance (or, if there would be no change, this instance).
+     *
+     * @since 2.11
+     */
+    protected JSON _with(ReaderWriterModifier rwm) {
+        ValueReaderLocator rloc = _valueReaderLocator.with(rwm);
+        ValueWriterLocator wloc = _valueWriterLocator.with(rwm);
+        if ((rloc == _valueReaderLocator) && (wloc == _valueWriterLocator))  {
+            return this;
+        }
+        return new JSON(this, rloc, wloc);
+    }
     
     /*
     /**********************************************************************
@@ -1500,5 +1507,43 @@ public class JSON
     
     protected void _noTreeCodec(String msg) {
          throw new IllegalStateException("JSON instance does not have configured `TreeCodec` to "+msg);
+    }
+
+    /*
+    /**********************************************************************
+    /* Helper classes
+    /**********************************************************************
+     */
+    
+    private static class ExtContextImpl extends ExtensionContext {
+        private JSON _json;
+
+        ExtContextImpl(JSON json) { _json = json; }
+
+        public JSON json() { return _json; }
+
+        @Override
+        public ExtensionContext insertProvider(ReaderWriterProvider provider) {
+            _json = _json._with(provider);
+            return this;
+        }
+
+        @Override
+        public ExtensionContext appendProvider(ReaderWriterProvider provider) {
+            _json = _json._with(provider);
+            return this;
+        }
+
+        @Override
+        public ExtensionContext insertModifier(ReaderWriterModifier modifier) {
+            _json = _json._with(modifier);
+            return this;
+        }
+
+        @Override
+        public ExtensionContext appendModifier(ReaderWriterModifier modifier) {
+            _json = _json._with(modifier);
+            return this;
+        }
     }
 }
