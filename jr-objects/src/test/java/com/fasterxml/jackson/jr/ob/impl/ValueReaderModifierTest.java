@@ -81,7 +81,7 @@ public class ValueReaderModifierTest extends TestBase
             };
         });
         assertEquals("FOOBAR",
-                JSON.std.with(mod).beanFrom(String.class, input));
+                jsonWithModifier(mod).beanFrom(String.class, input));
 
         // but also verify that no caching occurs wrt global standard variant:
         assertEquals("foobar", JSON.std.beanFrom(String.class, input));
@@ -99,7 +99,7 @@ public class ValueReaderModifierTest extends TestBase
             };
         });
         final String input = aposToQuotes("{'first':'foo', 'last':'bar'}");
-        NameBean result = JSON.std.with(mod).beanFrom(NameBean.class, input);
+        NameBean result = jsonWithModifier(mod).beanFrom(NameBean.class, input);
         assertEquals("FOO", result.getFirst());
         assertEquals("BAR", result.getLast());
 
@@ -112,7 +112,7 @@ public class ValueReaderModifierTest extends TestBase
     public void testPOJOReaderDelegation() throws Exception
     {
         final String input = aposToQuotes("{'first':'Foo', 'last':'Bar'}");
-        NameBean result = JSON.std.with(new LowerCasingReaderModifier())
+        NameBean result = jsonWithModifier(new LowerCasingReaderModifier())
                 .beanFrom(NameBean.class, input);
         assertEquals("foo", result.getFirst());
         assertEquals("bar", result.getLast());

@@ -96,7 +96,7 @@ public class ValueWriterModifierTest extends TestBase
                     }
         });
         final String input = "foobar";
-        String result = JSON.std.with(mod).asString(input);
+        String result = jsonWithModifier(mod).asString(input);
         assertEquals(quote("FOOBAR"), result);
         // but also verify that no caching occurs wrt global standard variant:
         assertEquals(quote("foobar"), JSON.std.asString(input));
@@ -119,7 +119,7 @@ public class ValueWriterModifierTest extends TestBase
             }
         });
         final NameBean input = new NameBean("Foo", "Bar");
-        String json = JSON.std.with(mod).asString(input);
+        String json = jsonWithModifier(mod).asString(input);
         assertEquals(quote("Foo-Bar"), json);
         // but also verify that no caching occurs wrt global standard variant:
         assertEquals(aposToQuotes("{'first':'Foo','last':'Bar'}"),
@@ -129,7 +129,7 @@ public class ValueWriterModifierTest extends TestBase
     public void testPOJOWriterDelegatingReplacement() throws Exception
     {
         final NameBean input = new NameBean("Foo", "Bar");
-        String json = JSON.std.with(new ArrayingWriterModifier())
+        String json = jsonWithModifier(new ArrayingWriterModifier())
             .asString(input);
         assertEquals(aposToQuotes("[{'first':'Foo','last':'Bar'}]"), json);
 

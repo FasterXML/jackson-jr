@@ -1,5 +1,6 @@
 package com.fasterxml.jackson.jr.ob;
 
+import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
@@ -21,9 +22,7 @@ public abstract class JacksonJrExtension
      * Method called by {@link JSON} to let extension register handlers
      * it wants to.
      *
-     * @param json JSON instance to register extension with
-     *
-     * @return JSON instance after registering all handlers
+     * @param ctxt Context that allows extension to register handlers
      */
-    protected abstract JSON register(JSON json);
+    protected abstract void register(ExtensionContext ctxt);
 }
