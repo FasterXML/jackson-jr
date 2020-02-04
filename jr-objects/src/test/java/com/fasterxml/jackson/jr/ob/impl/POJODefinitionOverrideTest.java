@@ -43,6 +43,8 @@ public class POJODefinitionOverrideTest extends TestBase
         }
     }
 
+    static class NoOpModifier extends ReaderWriterModifier { }
+
     public void testReadIgnoreProperty() throws Exception
     {
         // verify default read first
@@ -80,4 +82,21 @@ public class POJODefinitionOverrideTest extends TestBase
         assertEquals(EXP_DEFAULT, JSON.std.asString(input));
     }
 
+    public void testModifierPairForReading() throws Exception
+    {
+    }
+    
+    public void testModifierPairForWriting() throws Exception
+    {
+        final NameBean input = new NameBean("Bill", "Burger");
+
+        String json = jsonWithModifiers(new NoOpModifier(), new MyPropertyModifier("xxx"))
+                .asString(input);
+        assertEquals(aposToQuotes("{'last':'Burger','first':'Bill'}"), json);
+
+        // and nulls fine too wrt chaining
+        json = jsonWithModifiers(null, new MyPropertyModifier("xxx"))
+                .asString(input);
+        assertEquals(aposToQuotes("{'last':'Burger','first':'Bill'}"), json);
+    }
 }

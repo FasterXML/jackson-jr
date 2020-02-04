@@ -266,7 +266,15 @@ public class CustomValueReadersTest extends TestBase
         // and ok not to have anything, too
         result = jsonWithProviders(new NoOpProvider(), new NoOpProvider())
                 .beanFrom(String.class, quote("Some text"));
-            assertEquals("Some text", result);
+        assertEquals("Some text", result);
+
+        // Plus nulls fine too
+        result = jsonWithProviders(null, new OverrideStringReaderProvider("foo"))
+                .beanFrom(String.class, quote("Some text"));
+        assertEquals("foo", result);
+        result = jsonWithProviders(new OverrideStringReaderProvider("foo"), null)
+                .beanFrom(String.class, quote("Some text"));
+        assertEquals("foo", result);
     }
     
     // But also can use methods from "JSONReader" for convenience

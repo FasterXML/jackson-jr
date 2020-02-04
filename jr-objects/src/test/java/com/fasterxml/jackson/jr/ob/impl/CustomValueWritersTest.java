@@ -105,5 +105,13 @@ public class CustomValueWritersTest extends TestBase
         assertEquals(quote("def"),
                 jsonWithProviders(new BogusProvider(), new CustomWriters("def"))
                 .asString(new CustomBean()));
+
+        // as well as passing `null`
+        assertEquals(quote("xxx"),
+                jsonWithProviders(null, new CustomWriters("xxx"))
+                .asString(new CustomBean()));
+        assertEquals(quote("yyy"),
+                jsonWithProviders(new CustomWriters("yyy"), null)
+                .asString(new CustomBean()));
     }
 }
