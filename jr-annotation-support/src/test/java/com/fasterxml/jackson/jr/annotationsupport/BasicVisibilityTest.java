@@ -267,10 +267,10 @@ public class BasicVisibilityTest extends ASTestBase
      */
 
     private JSON jsonWithVisibility(JsonAutoDetect.Value vis) {
-        return JSON.std
+        return JSON.builder()
                 .register(JacksonAnnotationExtension.builder()
                         .withVisibility(vis)
                         .build())
-                ;
+                .build();
     }
 }

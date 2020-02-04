@@ -50,7 +50,7 @@ public abstract class TestBase extends TestCase
     }
 
     protected JsonParser parserFor(JSON json, String source) throws IOException {
-        return json.getStreamingFactory().createParser(ObjectReadContext.empty(), source.toCharArray());
+        return json.streamingFactory().createParser(ObjectReadContext.empty(), source.toCharArray());
     }
 
     protected String quote(String str) {
@@ -62,44 +62,48 @@ public abstract class TestBase extends TestCase
     }
 
     protected JSON jsonWithModifier(final ReaderWriterModifier modifier) {
-        return JSON.std.register(new JacksonJrExtension() {
+        return JSON.builder().register(new JacksonJrExtension() {
             @Override
             protected void register(ExtensionContext ctxt) {
                 ctxt.insertModifier(modifier);
             }
-        });
+        })
+        .build();
     }
 
     protected JSON jsonWithModifiers(final ReaderWriterModifier prim,
             final ReaderWriterModifier sec) {
-        return JSON.std.register(new JacksonJrExtension() {
+        return JSON.builder().register(new JacksonJrExtension() {
             @Override
             protected void register(ExtensionContext ctxt) {
                 // could use either insert or append, just in right order, so:
                 ctxt.appendModifier(prim);
                 ctxt.appendModifier(sec);
             }
-        });
+        })
+        .build();
     }
 
     protected JSON jsonWithProvider(final ReaderWriterProvider provider) {
-        return JSON.std.register(new JacksonJrExtension() {
+        return JSON.builder().register(new JacksonJrExtension() {
             @Override
             protected void register(ExtensionContext ctxt) {
                 ctxt.insertProvider(provider);
             }
-        });
+        })
+        .build();
     }
 
     protected JSON jsonWithProviders(final ReaderWriterProvider prim,
             final ReaderWriterProvider sec) {
-        return JSON.std.register(new JacksonJrExtension() {
+        return JSON.builder().register(new JacksonJrExtension() {
             @Override
             protected void register(ExtensionContext ctxt) {
                 // could use either insert or append, just in right order, so:
                 ctxt.insertProvider(sec);
                 ctxt.insertProvider(prim);
             }
-        });
+        })
+        .build();
     }
 }
