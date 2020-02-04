@@ -8,11 +8,7 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.io.SegmentedStringWriter;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import com.fasterxml.jackson.core.util.Instantiatable;
-import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
-import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
-import com.fasterxml.jackson.jr.ob.api.MapBuilder;
-import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
-import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
+import com.fasterxml.jackson.jr.ob.api.*;
 import com.fasterxml.jackson.jr.ob.comp.CollectionComposer;
 import com.fasterxml.jackson.jr.ob.comp.ComposerBase;
 import com.fasterxml.jackson.jr.ob.comp.MapComposer;
@@ -298,7 +294,7 @@ public class JSON implements Versioned
        private Feature(boolean defaultState) {
            this(defaultState, false);
        }
-       
+
        private Feature(boolean defaultState, boolean affectsCaching) {
            _defaultState = defaultState;
            _affectsCaching = affectsCaching;
@@ -332,7 +328,7 @@ public class JSON implements Versioned
            }
            return flags;
        }
-       
+
        public final boolean enabledByDefault() { return _defaultState; }
        public final boolean affectsCaching() { return _affectsCaching; }
 
@@ -408,6 +404,83 @@ public class JSON implements Versioned
 
     /*
     /**********************************************************************
+    /* Builder (new in 2.11)
+    /**********************************************************************
+     */
+
+    /**
+     * Builder class that needs to be used for certain kind of "static" configuration
+     * (settings that can not vary on per-call basis for {@link JSON}), such as
+     * Extension registration.
+     *
+     * @since 2.11
+     */
+    public static class Builder {
+        // Configuration, simple settings
+
+        protected int _features = DEFAULT_FEATURES;
+        protected PrettyPrinter _prettyPrinter;
+
+        // Configuration, helper objects
+        
+        protected final JsonFactory _streamFactory;
+        protected TreeCodec _treeCodec;
+
+        // Configuration, extensions
+
+        protected ExtContextImpl _extContext;
+
+        public Builder(JsonFactory f) {
+            _streamFactory = f;
+        }
+        
+        public JSON build() {
+            return new JSON(this);
+        }
+
+        public Builder prettyPrinter(PrettyPrinter pp) {
+            _prettyPrinter = pp;
+            return this;
+        }
+
+        public Builder treeCodec(TreeCodec tc) {
+            _treeCodec = tc;
+            return this;
+        }
+
+        /**
+         * Method for registering given extension to be used by {@link JSON}
+         * this builder builds.
+         *
+         * @param extension Extension to register
+         *
+         * @return This builder for call chaining
+         */
+        public Builder register(JacksonJrExtension extension) {
+            if (_extContext == null) {
+                _extContext = new ExtContextImpl();
+            }
+            extension.register(_extContext);
+            return this;
+        }
+
+        public int featureMask() { return _features; }
+        public PrettyPrinter prettyPrinter() { return _prettyPrinter; }
+
+        public JsonFactory streamFactory() { return _streamFactory; }
+        public TreeCodec treeCodec() { return _treeCodec; }
+
+        public ReaderWriterModifier readerWriterModifier() {
+            return (_extContext == null) ? null : _extContext._rwModifier;
+        }
+
+        public ReaderWriterProvider readerWriterProvider() {
+            return (_extContext == null) ? null : _extContext._rwProvider;
+        }
+    }
+
+    /*
+    /**********************************************************************
     /* Basic construction
     /**********************************************************************
      */
@@ -426,6 +499,48 @@ public class JSON implements Versioned
         _reader = _defaultReader();
         _writer = _defaultWriter();
         _prettyPrinter = null;
+    }
+
+    /**
+     * @since 2.11
+     */
+    public JSON(Builder b) {
+        _features = b.featureMask();
+        _jsonFactory = b.streamFactory();
+        _treeCodec = b.treeCodec();
+
+        final ReaderWriterProvider rwProvider = b.readerWriterProvider();
+        final ReaderWriterModifier rwModifier = b.readerWriterModifier();
+        ValueReaderLocator rloc = ValueReaderLocator.blueprint(null, null);
+        ValueWriterLocator wloc = ValueWriterLocator.blueprint(null, null);
+        if (rwProvider != null) {
+            rloc = rloc.with(rwProvider);
+            wloc = wloc.with(rwProvider);
+        }
+        if (rwModifier != null) {
+            rloc = rloc.with(rwModifier);
+            wloc = wloc.with(rwModifier);
+        }
+        _valueReaderLocator = rloc;
+        _valueWriterLocator = wloc;
+
+        _reader = _defaultReader();
+        _writer = _defaultWriter();
+        _prettyPrinter = b.prettyPrinter();
+    }
+
+    /**
+     * @since 2.11
+     */
+    public static Builder builder() {
+        return builder(new JsonFactory());
+    }
+
+    /**
+     * @since 2.11
+     */
+    public static Builder builder(JsonFactory streamFactory) {
+        return new Builder(streamFactory);
     }
 
     protected JSON(JSON base,
@@ -454,7 +569,7 @@ public class JSON implements Versioned
         _writer = base._writer;
         _prettyPrinter = base._prettyPrinter;
     }
-    
+
     protected JSONReader _defaultReader() {
         return new JSONReader(CollectionBuilder.defaultImpl(), MapBuilder.defaultImpl());
     }
@@ -489,18 +604,12 @@ public class JSON implements Versioned
     public Version version() {
         return PackageVersion.VERSION;
     }
-    
+
     /*
     /**********************************************************************
-    /* Mutant factories
+    /* Mutant factories, supported
     /**********************************************************************
      */
-    
-    public JSON register(JacksonJrExtension extension) {
-        ExtContextImpl ctxt = new ExtContextImpl(this);
-        extension.register(ctxt);
-        return ctxt.json();
-    }
 
     /**
      * Mutant factory method for constructing new instance with specified {@link JsonFactory}
@@ -510,12 +619,12 @@ public class JSON implements Versioned
      *
      * @return New instance with specified factory (if not same as currently configured);
      *   {@code this} otherwise.
+     *
+     * @deprecated Since 2.11 should not try changing underlying stream factory but create
+     *   a new instance if necessary: method will be removed from 3.0 at latest 
      */
-    public JSON with(JsonFactory f)
-    {
-        if (f == _jsonFactory) {
-            return this;
-        }
+    @Deprecated
+    public JSON with(JsonFactory f) {
         return _with(_features, f, _treeCodec, _reader, _writer, _prettyPrinter);
     }
 
@@ -527,7 +636,11 @@ public class JSON implements Versioned
      *
      * @return New instance with specified codec (if not same as currently configured);
      *   {@code this} otherwise.
+     *
+     * @deprecated Since 2.11 should try using builder (see {@link #builder()} and create
+     *    properly configured instance
      */
+    @Deprecated
     public JSON with(TreeCodec c)
     {
         if (c == _treeCodec) {
@@ -545,7 +658,11 @@ public class JSON implements Versioned
      *
      * @return New instance with specified {@link JSONReader} (if not same as currently configured);
      *   {@code this} otherwise.
+     *
+     * @deprecated Since 2.11 should try using builder (see {@link #builder()} and create
+     *    properly configured instance
      */
+    @Deprecated
     public JSON with(JSONReader r)
     {
         if (r == _reader) {
@@ -563,7 +680,11 @@ public class JSON implements Versioned
      *
      * @return New instance with specified {@link JSONWriter} (if not same as currently configured);
      *   {@code this} otherwise.
+     *
+     * @deprecated Since 2.11 should try using builder (see {@link #builder()} and create
+     *    properly configured instance
      */
+    @Deprecated
     public JSON with(JSONWriter w)
     {
         if (w == _writer) {
@@ -626,7 +747,12 @@ public class JSON implements Versioned
      */
     @Deprecated
     public JSON with(ReaderWriterProvider rwp) {
-        return _with(rwp);
+        ValueReaderLocator rloc = _valueReaderLocator.with(rwp);
+        ValueWriterLocator wloc = _valueWriterLocator.with(rwp);
+        if ((rloc == _valueReaderLocator) && (wloc == _valueWriterLocator))  {
+            return this;
+        }
+        return new JSON(this, rloc, wloc);
     }
 
     /**
@@ -701,19 +827,7 @@ public class JSON implements Versioned
             JSONReader reader, JSONWriter writer,
             PrettyPrinter pp)
     {
-        _verifySubclass();
         return new JSON(this, features, jsonF, trees, reader, writer, pp);
-    }
-
-    protected JSON _with(ValueReaderLocator rloc, ValueWriterLocator wloc) {
-        _verifySubclass();
-        return new JSON(this, rloc, wloc);
-    }
-
-    private void _verifySubclass() {
-        if (getClass() != JSON.class) {
-            throw new IllegalStateException("Sub-classes MUST override _with(...)");
-        }
     }
 
     /*
@@ -1323,36 +1437,6 @@ public class JSON implements Versioned
 
     /*
     /**********************************************************************
-    /* Internal methods, non-private mutant factories
-    /**********************************************************************
-     */
-
-    protected JSON _with(ReaderWriterProvider rwp) {
-        ValueReaderLocator rloc = _valueReaderLocator.with(rwp);
-        ValueWriterLocator wloc = _valueWriterLocator.with(rwp);
-        if ((rloc == _valueReaderLocator) && (wloc == _valueWriterLocator))  {
-            return this;
-        }
-        return new JSON(this, rloc, wloc);
-    }
-
-    /**
-     * Mutant factory for constructing an instance with specified {@link ReaderWriterModifier},
-     * and returning new instance (or, if there would be no change, this instance).
-     *
-     * @since 2.11
-     */
-    protected JSON _with(ReaderWriterModifier rwm) {
-        ValueReaderLocator rloc = _valueReaderLocator.with(rwm);
-        ValueWriterLocator wloc = _valueWriterLocator.with(rwm);
-        if ((rloc == _valueReaderLocator) && (wloc == _valueWriterLocator))  {
-            return this;
-        }
-        return new JSON(this, rloc, wloc);
-    }
-    
-    /*
-    /**********************************************************************
     /* Internal methods, other
     /**********************************************************************
      */
@@ -1410,39 +1494,37 @@ public class JSON implements Versioned
     /* Helper classes
     /**********************************************************************
      */
-    
+
+    /**
+     * Extension context implementation used when 
+     */
     private static class ExtContextImpl extends ExtensionContext {
-        private JSON _json;
+        ReaderWriterProvider _rwProvider;
+        ReaderWriterModifier _rwModifier;
 
-        ExtContextImpl(JSON json) { _json = json; }
-
-        public JSON json() { return _json; }
+        ExtContextImpl() { }
 
         @Override
         public ExtensionContext insertProvider(ReaderWriterProvider provider) {
-            _json = _json._with(ReaderWriterProvider.Pair.of(provider,
-                    _json._valueReaderLocator.readerWriterProvider()));
+            _rwProvider = ReaderWriterProvider.Pair.of(provider, _rwProvider);
             return this;
         }
 
         @Override
         public ExtensionContext appendProvider(ReaderWriterProvider provider) {
-            _json = _json._with(ReaderWriterProvider.Pair.of(_json._valueReaderLocator.readerWriterProvider(),
-                    provider));
+            _rwProvider = ReaderWriterProvider.Pair.of(_rwProvider, provider);
             return this;
         }
 
         @Override
         public ExtensionContext insertModifier(ReaderWriterModifier modifier) {
-            _json = _json._with(ReaderWriterModifier.Pair.of(modifier,
-                    _json._valueReaderLocator.readerWriterModifier()));
+            _rwModifier = ReaderWriterModifier.Pair.of(modifier, _rwModifier);
             return this;
         }
 
         @Override
         public ExtensionContext appendModifier(ReaderWriterModifier modifier) {
-            _json = _json._with(ReaderWriterModifier.Pair.of(_json._valueReaderLocator.readerWriterModifier(),
-                    modifier));
+            _rwModifier = ReaderWriterModifier.Pair.of(_rwModifier, modifier);
             return this;
         }
     }

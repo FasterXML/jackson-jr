@@ -1,7 +1,7 @@
 package com.fasterxml.jackson.jr.ob.api;
 
 /**
- * API that lets {@link com.fasterxml.jackson.jr.ob..JacksonJrExtension}s to register handlers
+ * API that lets {@link com.fasterxml.jackson.jr.ob.JacksonJrExtension}s to register handlers
  * it needs to.
  *
  * @since 2.11
