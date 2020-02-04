@@ -30,7 +30,7 @@ public class MapReader extends ValueReader
             if (p.hasToken(JsonToken.VALUE_NULL)) {
                 return null;
             }
-            throw JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get START_OBJECT");
+            throw JSONObjectException.from(p, "Unexpected token "+p.currentToken()+"; should get START_OBJECT");
         }
         
         MapBuilder b = r._mapBuilder(_mapType);
@@ -102,6 +102,6 @@ public class MapReader extends ValueReader
     }
 
     protected JSONObjectException _reportProblem(JsonParser p) {
-        return JSONObjectException.from(p, "Unexpected token "+p.getCurrentToken()+"; should get FIELD_NAME or END_OBJECT");
+        return JSONObjectException.from(p, "Unexpected token "+p.currentToken()+"; should get FIELD_NAME or END_OBJECT");
     }
 }

@@ -35,9 +35,7 @@ public class AnyReader extends ValueReader
     @Override
     public Object read(JSONReader r, JsonParser p) throws IOException
     {
-        JsonToken t = p.getCurrentToken();
-        int id = (t == null) ? ID_NO_TOKEN : t.id();
-        switch (id) {
+        switch (p.currentTokenId()) {
         case ID_NULL:
             return null;
         case ID_START_OBJECT:

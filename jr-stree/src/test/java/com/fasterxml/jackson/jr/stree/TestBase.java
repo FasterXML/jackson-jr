@@ -18,9 +18,9 @@ public abstract class TestBase extends TestCase
         }
     }
 
-    protected void assertToken(JsonToken expToken, JsonParser jp)
+    protected void assertToken(JsonToken expToken, JsonParser p)
     {
-        assertToken(expToken, jp.getCurrentToken());
+        assertToken(expToken, p.currentToken());
     }
 
     protected void verifyException(Throwable e, String... matches)

@@ -35,7 +35,7 @@ public class JacksonJrsTreeCodec extends TreeCodec
     private JrsValue nodeFrom(JsonParser p) throws IOException
     {
         int tokenId = p.hasCurrentToken()
-                ? p.getCurrentTokenId() : p.nextToken().id();
+                ? p.currentTokenId() : p.nextToken().id();
         
         switch (tokenId) {
         case JsonTokenId.ID_TRUE:
@@ -74,7 +74,7 @@ public class JacksonJrsTreeCodec extends TreeCodec
             return JrsNull.instance;
         default:
         }
-        throw new UnsupportedOperationException("Unsupported token id "+tokenId+" ("+p.getCurrentToken()+")");
+        throw new UnsupportedOperationException("Unsupported token id "+tokenId+" ("+p.currentToken()+")");
     }
 
     @Override
