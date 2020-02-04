@@ -42,12 +42,17 @@ public class CustomValueWritersTest extends TestBase
     static class CustomBeanWrapper {
         public CustomBean wrapped = new CustomBean();
     }
-    
+
     static class CustomWriters extends ReaderWriterProvider {
+        private final String _str;
+
+        public CustomWriters() { this("xxx"); }
+        public CustomWriters(String str) { _str = str; }
+
         @Override
         public ValueWriter findValueWriter(JSONWriter writeContext, Class<?> type) {
             if (type == CustomBean.class) {
-                return new CustomBeanAsStringWriter("xxx");
+                return new CustomBeanAsStringWriter(_str);
             }
             return null;
         }
@@ -63,13 +68,16 @@ public class CustomValueWritersTest extends TestBase
         }
     }
     
+    static class BogusProvider extends ReaderWriterProvider {
+    }
+
     /*
     /**********************************************************************
     /* Test methdods
     /**********************************************************************
      */
 
-    public void testCustomBeanReader() throws Exception
+    public void testCustomBeanWriter() throws Exception
     {
         // without handler, empty "bean":
         assertEquals("{}", JSON.std.asString(new CustomBean()));
@@ -89,4 +97,13 @@ public class CustomValueWritersTest extends TestBase
                 withCustom42.asString(new CustomBeanWrapper()));
     }
 
+    public void testChainedBeanWriters() throws Exception
+    {
+        assertEquals(quote("abc"),
+                jsonWithProviders(new CustomWriters("abc"), new CustomWriters("def"))
+                .asString(new CustomBean()));
+        assertEquals(quote("def"),
+                jsonWithProviders(new BogusProvider(), new CustomWriters("def"))
+                .asString(new CustomBean()));
+    }
 }
