@@ -83,6 +83,21 @@ public class CustomValueReadersTest extends TestBase
         }
     }
 
+    static class OverrideStringReader extends ValueReader {
+        final String _value;
+
+        public OverrideStringReader(String str) {
+            super(String.class);
+            _value = str;
+        }
+
+        @Override
+        public Object read(JSONReader reader, JsonParser p) throws IOException {
+            p.skipChildren();
+            return _value;
+        }
+    }
+    
     static class CustomReaders extends ReaderWriterProvider {
         final int delta;
 
@@ -101,7 +116,7 @@ public class CustomValueReadersTest extends TestBase
         }
     }
 
-    static class StringReaderProvider extends ReaderWriterProvider {
+    static class CapStringReaderProvider extends ReaderWriterProvider {
         @Override
         public ValueReader findValueReader(JSONReader readContext, Class<?> type) {
             if (type.equals(String.class)) {
@@ -111,6 +126,22 @@ public class CustomValueReadersTest extends TestBase
         }
     }
 
+    static class OverrideStringReaderProvider extends ReaderWriterProvider {
+        final ValueReader vr;
+
+        public OverrideStringReaderProvider(String str) {
+            vr = new OverrideStringReader(str);
+        }
+
+        @Override
+        public ValueReader findValueReader(JSONReader readContext, Class<?> type) {
+            if (type.equals(String.class)) {
+                return vr;
+            }
+            return null;
+        }
+    }
+    
     static class Point {
         public int _x, _y;
 
@@ -138,6 +169,9 @@ public class CustomValueReadersTest extends TestBase
             }
             return null;
         }
+    }
+
+    static class NoOpProvider extends ReaderWriterProvider {
     }
 
     /*
@@ -173,6 +207,19 @@ public class CustomValueReadersTest extends TestBase
         assertEquals(224, v.value);
     }
 
+    public void testChainedCustomBeanReaders() throws Exception
+    {
+        JSON json = jsonWithProviders(new CustomReaders(0),
+                new CustomReaders(100));
+        CustomValue v = json.beanFrom(CustomValue.class, "69");
+        assertEquals(70, v.value);
+
+        json = jsonWithProviders(new CustomReaders(100),
+                new CustomReaders(0));
+        v = json.beanFrom(CustomValue.class, "72");
+        assertEquals(173, v.value);
+    }
+
     public void testCustomEnumReader() throws Exception
     {
         // First: without handler, will fail to map
@@ -201,11 +248,27 @@ public class CustomValueReadersTest extends TestBase
     // Even more fun, override default String deserializer!
     public void testCustomStringReader() throws Exception
     {
-        String allCaps = jsonWithProvider(new StringReaderProvider())
+        String allCaps = jsonWithProvider(new CapStringReaderProvider())
                 .beanFrom(String.class, quote("Some text"));
         assertEquals("SOME TEXT", allCaps);
     }
 
+    public void testChainedStringReaders() throws Exception {
+        String result = jsonWithProviders(new CapStringReaderProvider(),
+                new OverrideStringReaderProvider("foo"))
+                .beanFrom(String.class, quote("Some text"));
+        assertEquals("SOME TEXT", result);
+
+        result = jsonWithProviders(new NoOpProvider(), new OverrideStringReaderProvider("foo"))
+            .beanFrom(String.class, quote("Some text"));
+        assertEquals("foo", result);
+
+        // and ok not to have anything, too
+        result = jsonWithProviders(new NoOpProvider(), new NoOpProvider())
+                .beanFrom(String.class, quote("Some text"));
+            assertEquals("Some text", result);
+    }
+    
     // But also can use methods from "JSONReader" for convenience
     public void testCustomDelegatingReader() throws Exception
     {
