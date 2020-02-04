@@ -624,6 +624,7 @@ public class JSON implements Versioned
      *
      * @deprecated Since 2.11 should register using {@link JacksonJrExtension}
      */
+    @Deprecated
     public JSON with(ReaderWriterProvider rwp) {
         return _with(rwp);
     }

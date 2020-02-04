@@ -149,7 +149,18 @@ public class ReadSimpleTest extends TestBase
         assertEquals(new Date(123456L), JSON.std.beanFrom(Date.class,"123456"));
         assertEquals(Object.class, JSON.std.beanFrom(Class.class, quote(Object.class.getName())));
     }
-    
+
+    public void testMiscScalarFail() throws Exception {
+        for (String input : new String[] { " false ",  "true", "[ ]", "{ }", "null" } ) {
+            try {
+                JSON.std.beanFrom(Date.class, input);
+                fail("Should not pass");
+            } catch (JSONObjectException e) {
+                verifyException(e, "Can not get long numeric");
+            }
+        }
+    }
+
     /*
     /**********************************************************************
     /* Failing tests (mostly for code coverage)

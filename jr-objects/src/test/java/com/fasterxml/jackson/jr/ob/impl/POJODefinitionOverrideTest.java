@@ -65,6 +65,21 @@ public class POJODefinitionOverrideTest extends TestBase
         assertEquals("Burger", bean.getLast());
     }
 
+    public void testModifierPairForReading() throws Exception
+    {
+        final String INPUT = aposToQuotes("{'first':'Bob','last':'Burger'}");
+        NameBean bean = jsonWithModifiers(new NoOpModifier(), new MyPropertyModifier("last"))
+                .beanFrom(NameBean.class, INPUT);
+        assertEquals("Bob", bean.getFirst());
+        assertNull(bean.getLast());
+
+        // or with null
+        bean = jsonWithModifiers(null, new MyPropertyModifier("last"))
+                .beanFrom(NameBean.class, INPUT);
+        assertEquals("Bob", bean.getFirst());
+        assertNull(bean.getLast());
+    }
+
     public void testWriteInReverseOrder() throws Exception
     {
         // verify default write first
@@ -82,10 +97,6 @@ public class POJODefinitionOverrideTest extends TestBase
         assertEquals(EXP_DEFAULT, JSON.std.asString(input));
     }
 
-    public void testModifierPairForReading() throws Exception
-    {
-    }
-    
     public void testModifierPairForWriting() throws Exception
     {
         final NameBean input = new NameBean("Bill", "Burger");
