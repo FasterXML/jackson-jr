@@ -603,28 +603,6 @@ public class JSON
      */
 
     /**
-     * Mutant factory for constructing an instance with specified {@link TreeCodec},
-     * and returning new instance (or, if there would be no change, this instance).
-     *
-     * @param c Tree codec to use for reading/writing of tree representation
-     *
-     * @return New instance with specified codec (if not same as currently configured);
-     *   {@code this} otherwise.
-     *
-     * @deprecated Since 2.11 should try using builder (see {@link #builder()} and create
-     *    properly configured instance
-     */
-    @Deprecated
-    public JSON with(TreeCodec c)
-    {
-        if (c == _treeCodec) {
-            return this;
-        }
-        return _with(_features, _streamFactory, c,
-                _reader, _writer, _prettyPrinter);
-    }
-
-    /**
      * Mutant factory for constructing an instance with specified {@link JSONReader},
      * and returning new instance (or, if there would be no change, this instance).
      *
@@ -772,6 +750,12 @@ public class JSON
         return _with(features, _streamFactory, _treeCodec,
                 r, w, _prettyPrinter);
     }
+
+    /*
+    /**********************************************************************
+    /* Mutant factories, deprecated
+    /**********************************************************************
+     */
 
     /*
     /**********************************************************************
@@ -1146,8 +1130,8 @@ public class JSON
     }
 
     /**
-     * Method for reading content as a JSON Tree (of type that configured
-     * {@link TreeCodec}, see {@link #with(TreeCodec)}) supports.
+     * Method for reading content as a JSON Tree of type that configured
+     * {@link TreeCodec} supports.
      */
     @SuppressWarnings("unchecked")
     public <T extends TreeNode> T treeFrom(Object source)
@@ -1237,8 +1221,8 @@ public class JSON
      * Method for creating {@link ValueIterator} for reading
      * <a href="https://en.wikipedia.org/wiki/JSON_streaming">streaming JSON</a>
      * content (specifically line-delimited and concatenated variants);
-     * individual values are bound as JSON Trees(of type that configured
-     * {@link TreeCodec}, see {@link #with(TreeCodec)}) supports.
+     * individual values are bound as JSON Trees of type that configured
+     * {@link TreeCodec} supports.
      */
     public <T extends TreeNode> ValueIterator<T> treeSequenceFrom(Object source)
         throws IOException, JSONObjectException
@@ -1398,7 +1382,7 @@ public class JSON
      *   getTreeCodec().createArrayNode();
      *</pre>
      * Note that for call to succeed a {@link TreeCodec} must have been
-     * configured with this instance using {@link #with(TreeCodec)} method.
+     * configured with this instance.
      */
     @Override
     public ArrayTreeNode createArrayNode() {
@@ -1414,7 +1398,7 @@ public class JSON
      *   getTreeCodec().createObjectNode();
      *</pre>
      * Note that for call to succeed a {@link TreeCodec} must have been
-     * configured with this instance using {@link #with(TreeCodec)} method.
+     * configured with this instance.
      */
     @Override
     public ObjectTreeNode createObjectNode() {

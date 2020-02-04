@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.json.JsonFactory;
+import com.fasterxml.jackson.jr.ob.JSON;
 
 import junit.framework.TestCase;
 
@@ -42,5 +43,11 @@ public abstract class TestBase extends TestCase
 
     protected String aposToQuotes(String json) {
         return json.replace("'", "\"");
+    }
+
+    protected JSON jsonWithTreeCodec() {
+        return JSON.builder()
+            .treeCodec(new JacksonJrsTreeCodec())
+            .build();
     }
 }

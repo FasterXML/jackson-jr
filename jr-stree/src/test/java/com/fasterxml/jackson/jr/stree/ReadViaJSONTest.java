@@ -15,7 +15,7 @@ public class ReadViaJSONTest extends TestBase
      private final TreeCodec TREE_CODEC = new JacksonJrsTreeCodec();
      private final static ObjectWriteContext EMPTY_WRITE_CONTEXT = new ObjectWriteContext.Base();
 
-     private final JSON treeJSON = JSON.std.with(TREE_CODEC);
+     private final JSON treeJSON = jsonWithTreeCodec();
 
      public void testSimpleList() throws Exception
      {
