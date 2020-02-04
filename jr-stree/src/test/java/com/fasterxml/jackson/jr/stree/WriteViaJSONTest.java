@@ -6,7 +6,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
 
 public class WriteViaJSONTest extends TestBase
 {
-     private final JSON treeJSON = JSON.std.with(new JacksonJrsTreeCodec());
+     private final JSON treeJSON = jsonWithTreeCodec();
 
      public void testSimpleList() throws Exception
     {

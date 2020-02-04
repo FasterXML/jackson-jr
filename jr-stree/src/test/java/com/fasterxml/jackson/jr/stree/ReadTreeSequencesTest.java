@@ -4,14 +4,13 @@ import java.io.StringReader;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
-import com.fasterxml.jackson.core.TreeCodec;
+
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.ValueIterator;
 
 public class ReadTreeSequencesTest extends TestBase
 {
-    private final TreeCodec TREE_CODEC = new JacksonJrsTreeCodec();
-    private final JSON treeJSON = JSON.std.with(TREE_CODEC);
+    private final JSON treeJSON = jsonWithTreeCodec();
 
     public void testBeanSequence() throws Exception
     {

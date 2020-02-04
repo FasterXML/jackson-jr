@@ -158,7 +158,9 @@ public class TreeApiTest extends TestBase
         }
     }
 
-    private final JSON J = JSON.std.with(new TestTreeCodec());
+    private final JSON J = JSON.builder()
+            .treeCodec(new TestTreeCodec())
+            .build();
 
     public void testSimpleNodeCreation() {
         assertEquals(TestArrayNode.class, J.createArrayNode().getClass());

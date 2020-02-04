@@ -612,45 +612,6 @@ public class JSON implements Versioned
      */
 
     /**
-     * Mutant factory method for constructing new instance with specified {@link JsonFactory}
-     * if different from currently configured one (if not, return {@code this} as-is)
-     * 
-     * @param f Jackson core format factory to use for low-level decoding/encoding
-     *
-     * @return New instance with specified factory (if not same as currently configured);
-     *   {@code this} otherwise.
-     *
-     * @deprecated Since 2.11 should not try changing underlying stream factory but create
-     *   a new instance if necessary: method will be removed from 3.0 at latest 
-     */
-    @Deprecated
-    public JSON with(JsonFactory f) {
-        return _with(_features, f, _treeCodec, _reader, _writer, _prettyPrinter);
-    }
-
-    /**
-     * Mutant factory for constructing an instance with specified {@link TreeCodec},
-     * and returning new instance (or, if there would be no change, this instance).
-     *
-     * @param c Tree codec to use for reading/writing of tree representation
-     *
-     * @return New instance with specified codec (if not same as currently configured);
-     *   {@code this} otherwise.
-     *
-     * @deprecated Since 2.11 should try using builder (see {@link #builder()} and create
-     *    properly configured instance
-     */
-    @Deprecated
-    public JSON with(TreeCodec c)
-    {
-        if (c == _treeCodec) {
-            return this;
-        }
-        return _with(_features, _jsonFactory, c,
-                _reader, _writer, _prettyPrinter);
-    }
-
-    /**
      * Mutant factory for constructing an instance with specified {@link JSONReader},
      * and returning new instance (or, if there would be no change, this instance).
      *
@@ -814,6 +775,51 @@ public class JSON implements Versioned
         
         return _with(features, _jsonFactory, _treeCodec,
                 r, w, _prettyPrinter);
+    }
+
+    /*
+    /**********************************************************************
+    /* Mutant factories, deprecated
+    /**********************************************************************
+     */
+
+    /**
+     * Mutant factory method for constructing new instance with specified {@link JsonFactory}
+     * if different from currently configured one (if not, return {@code this} as-is)
+     * 
+     * @param f Jackson core format factory to use for low-level decoding/encoding
+     *
+     * @return New instance with specified factory (if not same as currently configured);
+     *   {@code this} otherwise.
+     *
+     * @deprecated Since 2.11 should not try changing underlying stream factory but create
+     *   a new instance if necessary: method will be removed from 3.0 at latest 
+     */
+    @Deprecated
+    public JSON with(JsonFactory f) {
+        return _with(_features, f, _treeCodec, _reader, _writer, _prettyPrinter);
+    }
+
+    /**
+     * Mutant factory for constructing an instance with specified {@link TreeCodec},
+     * and returning new instance (or, if there would be no change, this instance).
+     *
+     * @param c Tree codec to use for reading/writing of tree representation
+     *
+     * @return New instance with specified codec (if not same as currently configured);
+     *   {@code this} otherwise.
+     *
+     * @deprecated Since 2.11 should try using builder (see {@link #builder()} and create
+     *    properly configured instance
+     */
+    @Deprecated
+    public JSON with(TreeCodec c)
+    {
+        if (c == _treeCodec) {
+            return this;
+        }
+        return _with(_features, _jsonFactory, c,
+                _reader, _writer, _prettyPrinter);
     }
 
     /*

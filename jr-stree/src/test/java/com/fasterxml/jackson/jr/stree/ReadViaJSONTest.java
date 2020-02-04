@@ -13,7 +13,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
 public class ReadViaJSONTest extends TestBase
 {
      private final TreeCodec TREE_CODEC = new JacksonJrsTreeCodec();
-     private final JSON treeJSON = JSON.std.with(TREE_CODEC);
+     private final JSON treeJSON = jsonWithTreeCodec();
 
      public void testSimpleList() throws Exception
      {
