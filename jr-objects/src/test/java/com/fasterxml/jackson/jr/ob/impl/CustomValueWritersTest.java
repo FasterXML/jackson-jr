@@ -32,6 +32,7 @@ public class CustomValueWritersTest extends TestBase
                 Object v) throws IOException {
             g.writeStartObject();
             g.writeNumberField("answer", 42);
+            g.writeNullField("none");
             g.writeEndObject();
         }
 
@@ -92,8 +93,8 @@ public class CustomValueWritersTest extends TestBase
 
         // plus also should be able to create new instance with different representation
         final JSON withCustom42 = jsonWithProvider(new CustomWriters42());
-        assertEquals("{\"answer\":42}", withCustom42.asString(new CustomBean()));
-        assertEquals("{\"wrapped\":{\"answer\":42}}",
+        assertEquals("{\"answer\":42,\"none\":null}", withCustom42.asString(new CustomBean()));
+        assertEquals("{\"wrapped\":{\"answer\":42,\"none\":null}}",
                 withCustom42.asString(new CustomBeanWrapper()));
     }
 
