@@ -175,7 +175,17 @@ public class ValueReaderLocator
 
     /*
     /**********************************************************************
-    /* Public API
+    /* Public API, config access
+    /**********************************************************************
+     */
+
+    public ReaderWriterProvider readerWriterProvider() { return _readerProvider; }
+
+    public ReaderWriterModifier readerWriterModifier() { return _readerModifier; }
+
+    /*
+    /**********************************************************************
+    /* Public API, operations
     /**********************************************************************
      */
     

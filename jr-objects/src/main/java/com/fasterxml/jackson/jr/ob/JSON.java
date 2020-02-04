@@ -1389,7 +1389,7 @@ public class JSON implements Versioned
             } catch (IOException ioe) { }
         }
     }
-    
+
     protected <T> T _throw(Exception e) throws IOException {
         if (e instanceof IOException) {
             throw (IOException) e;
@@ -1419,25 +1419,29 @@ public class JSON implements Versioned
 
         @Override
         public ExtensionContext insertProvider(ReaderWriterProvider provider) {
-            _json = _json._with(provider);
+            _json = _json._with(ReaderWriterProvider.Pair.of(provider,
+                    _json._valueReaderLocator.readerWriterProvider()));
             return this;
         }
 
         @Override
         public ExtensionContext appendProvider(ReaderWriterProvider provider) {
-            _json = _json._with(provider);
+            _json = _json._with(ReaderWriterProvider.Pair.of(_json._valueReaderLocator.readerWriterProvider(),
+                    provider));
             return this;
         }
 
         @Override
         public ExtensionContext insertModifier(ReaderWriterModifier modifier) {
-            _json = _json._with(modifier);
+            _json = _json._with(ReaderWriterModifier.Pair.of(modifier,
+                    _json._valueReaderLocator.readerWriterModifier()));
             return this;
         }
 
         @Override
         public ExtensionContext appendModifier(ReaderWriterModifier modifier) {
-            _json = _json._with(modifier);
+            _json = _json._with(ReaderWriterModifier.Pair.of(_json._valueReaderLocator.readerWriterModifier(),
+                    modifier));
             return this;
         }
     }

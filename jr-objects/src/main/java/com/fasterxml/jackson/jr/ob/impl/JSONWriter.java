@@ -78,7 +78,13 @@ public class JSONWriter
     }
 
     /**
-     * Constructor for non-blueprint instances
+     * Constructor for non-blueprint instances.
+     *
+     * @param base Blueprint instance to base settings of the new instance on
+     * @param features Active features for the write operation
+     * @param loc Helper object to use for dynamically located value writers
+     * @param tc TreeCodec to use for writing tree values, if any
+     * @param g Underlying streaming encoder to use
      */
     protected JSONWriter(JSONWriter base, int features,
             ValueWriterLocator loc, TreeCodec tc,
