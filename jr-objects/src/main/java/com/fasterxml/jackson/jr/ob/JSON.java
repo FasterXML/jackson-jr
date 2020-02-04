@@ -612,50 +612,6 @@ public class JSON implements Versioned
      */
 
     /**
-     * Mutant factory for constructing an instance with specified {@link JSONReader},
-     * and returning new instance (or, if there would be no change, this instance).
-     *
-     * @param r Customized {@link JSONReader} to use instead of standard one
-     *
-     * @return New instance with specified {@link JSONReader} (if not same as currently configured);
-     *   {@code this} otherwise.
-     *
-     * @deprecated Since 2.11 should try using builder (see {@link #builder()} and create
-     *    properly configured instance
-     */
-    @Deprecated
-    public JSON with(JSONReader r)
-    {
-        if (r == _reader) {
-            return this;
-        }
-        return _with(_features, _jsonFactory, _treeCodec,
-                r, _writer, _prettyPrinter);
-    }
-
-    /**
-     * Mutant factory for constructing an instance with specified {@link JSONWriter},
-     * and returning new instance (or, if there would be no change, this instance).
-     *
-     * @param w Customized {@link JSONWriter} to use instead of standard one
-     *
-     * @return New instance with specified {@link JSONWriter} (if not same as currently configured);
-     *   {@code this} otherwise.
-     *
-     * @deprecated Since 2.11 should try using builder (see {@link #builder()} and create
-     *    properly configured instance
-     */
-    @Deprecated
-    public JSON with(JSONWriter w)
-    {
-        if (w == _writer) {
-            return this;
-        }
-        return _with( _features, _jsonFactory, _treeCodec,
-                _reader, w, _prettyPrinter);
-    }
-
-    /**
      * Mutant factory for constructing an instance with specified {@link PrettyPrinter},
      * and returning new instance (or, if there would be no change, this instance).
      *
@@ -672,48 +628,6 @@ public class JSON implements Versioned
         }
         return _with(_features, _jsonFactory, _treeCodec,
                 _reader, _writer, pp);
-    }
-
-    /**
-     * Mutant factory for constructing an instance with specified {@link MapBuilder},
-     * and returning new instance (or, if there would be no change, this instance).
-     */
-    public JSON with(MapBuilder b) {
-        JSONReader r = _reader.with(b);
-        if (r == _reader) {
-            return this;
-        }
-        return _with(_features, _jsonFactory, _treeCodec,
-                r, _writer, _prettyPrinter);
-    }
-
-    /**
-     * Mutant factory for constructing an instance with specified {@link CollectionBuilder},
-     * and returning new instance (or, if there would be no change, this instance).
-     */
-    public JSON with(CollectionBuilder b) {
-        JSONReader r = _reader.with(b);
-        if (r == _reader) {
-            return this;
-        }
-        return _with(_features, _jsonFactory, _treeCodec,
-                r, _writer, _prettyPrinter);
-    }
-
-    /**
-     * Mutant factory for constructing an instance with specified {@link ReaderWriterProvider},
-     * and returning new instance (or, if there would be no change, this instance).
-     *
-     * @deprecated Since 2.11 should register using {@link JacksonJrExtension}
-     */
-    @Deprecated
-    public JSON with(ReaderWriterProvider rwp) {
-        ValueReaderLocator rloc = _valueReaderLocator.with(rwp);
-        ValueWriterLocator wloc = _valueWriterLocator.with(rwp);
-        if ((rloc == _valueReaderLocator) && (wloc == _valueWriterLocator))  {
-            return this;
-        }
-        return new JSON(this, rloc, wloc);
     }
 
     /**
@@ -820,6 +734,92 @@ public class JSON implements Versioned
         }
         return _with(_features, _jsonFactory, c,
                 _reader, _writer, _prettyPrinter);
+    }
+
+    /**
+     * Mutant factory for constructing an instance with specified {@link JSONReader},
+     * and returning new instance (or, if there would be no change, this instance).
+     *
+     * @param r Customized {@link JSONReader} to use instead of standard one
+     *
+     * @return New instance with specified {@link JSONReader} (if not same as currently configured);
+     *   {@code this} otherwise.
+     *
+     * @deprecated Since 2.11 should try using builder (see {@link #builder()} and create
+     *    properly configured instance
+     */
+    @Deprecated
+    public JSON with(JSONReader r)
+    {
+        if (r == _reader) {
+            return this;
+        }
+        return _with(_features, _jsonFactory, _treeCodec,
+                r, _writer, _prettyPrinter);
+    }
+
+    /**
+     * Mutant factory for constructing an instance with specified {@link JSONWriter},
+     * and returning new instance (or, if there would be no change, this instance).
+     *
+     * @param w Customized {@link JSONWriter} to use instead of standard one
+     *
+     * @return New instance with specified {@link JSONWriter} (if not same as currently configured);
+     *   {@code this} otherwise.
+     *
+     * @deprecated Since 2.11 should try using builder (see {@link #builder()} and create
+     *    properly configured instance
+     */
+    @Deprecated
+    public JSON with(JSONWriter w)
+    {
+        if (w == _writer) {
+            return this;
+        }
+        return _with( _features, _jsonFactory, _treeCodec,
+                _reader, w, _prettyPrinter);
+    }
+
+    /**
+     * Mutant factory for constructing an instance with specified {@link MapBuilder},
+     * and returning new instance (or, if there would be no change, this instance).
+     */
+    public JSON with(MapBuilder b) {
+        JSONReader r = _reader.with(b);
+        if (r == _reader) {
+            return this;
+        }
+        return _with(_features, _jsonFactory, _treeCodec,
+                r, _writer, _prettyPrinter);
+    }
+
+    /**
+     * Mutant factory for constructing an instance with specified {@link CollectionBuilder},
+     * and returning new instance (or, if there would be no change, this instance).
+     */
+    public JSON with(CollectionBuilder b) {
+        JSONReader r = _reader.with(b);
+        if (r == _reader) {
+            return this;
+        }
+        return _with(_features, _jsonFactory, _treeCodec,
+                r, _writer, _prettyPrinter);
+    }
+
+    /**
+     * Mutant factory for constructing an instance with specified {@link ReaderWriterProvider},
+     * and returning new instance (or, if there would be no change, this instance).
+     *
+     * @deprecated Since 2.11 should register using {@link JacksonJrExtension}
+     */
+    @Deprecated
+    public JSON with(ReaderWriterProvider rwp) {
+        ValueReaderLocator rloc = _valueReaderLocator.with(rwp);
+        ValueWriterLocator wloc = _valueWriterLocator.with(rwp);
+        if ((rloc == _valueReaderLocator) && (wloc == _valueWriterLocator))  {
+            return this;
+        }
+        return new JSON(this, rloc, wloc);
     }
 
     /*
