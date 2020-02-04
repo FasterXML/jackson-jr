@@ -97,4 +97,74 @@ public abstract class ReaderWriterModifier
             Class<?> type, int stdTypeId) {
         return null;
     }
+
+    /**
+     * Implementation that allows chaining of two modifiers, one (first) with higher precedence
+     * than the other (second).
+     */
+    public static class Pair extends ReaderWriterModifier
+    {
+        protected final ReaderWriterModifier _primary, _secondary;
+
+        protected Pair(ReaderWriterModifier p, ReaderWriterModifier s) {
+            _primary = p;
+            _secondary = s;
+        }
+
+        /**
+         * Factory method for "combining" given 2 modifiers so that if neither is {@code null},
+         * a {@link Pair} is constructed; otherwise if one is non-null, that provider is returned;
+         * or if both are {@code null}s, {@code null} is returned.
+         *
+         * @param primary Primary provider
+         * @param secondary Secondary provider
+         *
+         * @return Provider instance either constructed (2 non-null providers), or non-null provider
+         *    given as-is, or, if both nulls, {@code null}.
+         */
+        public static ReaderWriterModifier of(ReaderWriterModifier primary, ReaderWriterModifier secondary) {
+            if (primary == null) {
+                return secondary;
+            }
+            if (secondary == null) {
+                return primary;
+            }
+            return new Pair(primary, secondary);
+        }
+        
+        @Override
+        public POJODefinition pojoDefinitionForDeserialization(JSONReader ctxt,
+                Class<?> pojoType) {
+            POJODefinition def = _primary.pojoDefinitionForDeserialization(ctxt, pojoType);
+            return (def == null) ? _secondary.pojoDefinitionForDeserialization(ctxt, pojoType) : def;
+        }
+
+        @Override
+        public POJODefinition pojoDefinitionForSerialization(JSONWriter ctxt,
+                Class<?> pojoType) {
+            POJODefinition def = _primary.pojoDefinitionForSerialization(ctxt, pojoType);
+            return (def == null) ? _secondary.pojoDefinitionForSerialization(ctxt, pojoType) : def;
+        }
+    
+        @Override
+        public ValueReader modifyValueReader(JSONReader ctxt,
+                Class<?> type, ValueReader defaultReader) {
+            defaultReader = _primary.modifyValueReader(ctxt, type, defaultReader);
+            return _secondary.modifyValueReader(ctxt, type, defaultReader);
+        }
+
+        @Override
+        public ValueWriter modifyValueWriter(JSONWriter ctxt,
+                Class<?> type, ValueWriter defaultWriter) {
+            defaultWriter = _primary.modifyValueWriter(ctxt, type, defaultWriter);
+            return _secondary.modifyValueWriter(ctxt, type, defaultWriter);
+        }
+
+        @Override
+        public ValueWriter overrideStandardValueWriter(JSONWriter ctxt,
+                Class<?> type, int stdTypeId) {
+            ValueWriter w = _primary.overrideStandardValueWriter(ctxt, type, stdTypeId);
+            return (w == null) ? _secondary.overrideStandardValueWriter(ctxt, type, stdTypeId) : w;
+        }
+    }
 }
