@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.api.MapBuilder;
 
 // for [jackson-jr#49], where `DeferredMap` explodes
 public class ReadMapTest extends TestBase
@@ -11,6 +12,46 @@ public class ReadMapTest extends TestBase
     static class MapHolder {
         public Map<String, List<Integer>> stuff;
     }
+
+    static class TreeMapBuilder extends MapBuilder {
+        protected TreeMap<String, Object> _map = new TreeMap<String, Object>();
+
+        TreeMapBuilder(int features) {
+            super(features, TreeMap.class);
+        }
+
+        @Override
+        public MapBuilder newBuilder(int features) {
+            return new TreeMapBuilder(features);
+        }
+
+        @Override
+        public MapBuilder newBuilder(Class<?> mapImpl) {
+            return this;
+        }
+
+        @Override
+        public MapBuilder start() {
+            return new TreeMapBuilder(_features);
+        }
+
+        @Override
+        public MapBuilder put(String key, Object value) {
+            _map.put(key, value);
+            return this;
+        }
+
+        @Override
+        public Map<String, Object> build() {
+            return _map;
+        }
+    }
+
+    /*
+    /**********************************************************************
+    /* Test methods
+    /**********************************************************************
+     */
 
     public void testMapOfLists() throws Exception
     {
@@ -45,6 +86,19 @@ public class ReadMapTest extends TestBase
         } catch (JSONObjectException e) {
             verifyException(e, "Unexpected token START_ARRAY");
         }
+    }
+
+    public void testCustomMapBuilder() throws Exception
+    {
+        final JSON json = JSON.builder()
+                .mapBuilder(new TreeMapBuilder(0))
+                .build();
+        Map<String, Object> map = json.mapFrom(a2q("{'a':1}"));
+        assertEquals(TreeMap.class, map.getClass());
+
+        map = json.mapFrom(a2q("{'b':1, 'a':2}"));
+        assertEquals(TreeMap.class, map.getClass());
+        assertEquals(Arrays.asList("a", "b"), new ArrayList<String>(map.keySet()));
     }
 
     public void testIssue49() throws Exception
