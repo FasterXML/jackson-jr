@@ -46,7 +46,9 @@ public abstract class TestBase extends TestCase
 
     protected JSON jsonWithTreeCodec() {
         return JSON.builder()
-            .treeCodec(new JacksonJrsTreeCodec())
+                // 13-Feb-2020, tatu: There are 2 different ways actually..
+//            .treeCodec(new JacksonJrsTreeCodec())
+                .register(new JrSimpleTreeExtension())
             .build();
     }
 }

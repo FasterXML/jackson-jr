@@ -24,13 +24,11 @@ has no other dependencies.
       <artifactId>jackson-core</artifactId>
     </dependency>
 
-    <!-- Let's actually test with jr-objects
-      -->
+    <!-- Since 2.11, strict dependency, not just test one -->
     <dependency>
       <groupId>com.fasterxml.jackson.jr</groupId>
       <artifactId>jackson-jr-objects</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 

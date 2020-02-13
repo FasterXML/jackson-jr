@@ -22,7 +22,9 @@ public class WriteDatesTest extends TestBase
             fail("Invalid output: "+json);
         }
 
-        j = j.with(Feature.WRITE_DATES_AS_TIMESTAMP);
+        j = JSON.builder()
+                .set(Feature.WRITE_DATES_AS_TIMESTAMP, true)
+                .build();
         assertTrue(j.isEnabled(Feature.WRITE_DATES_AS_TIMESTAMP));
 
         json = j.asString(input);

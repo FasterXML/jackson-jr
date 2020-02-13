@@ -25,7 +25,7 @@ public class JacksonJrsTreeCodec extends TreeCodec
     public JacksonJrsTreeCodec(ObjectCodec codec) {
         _objectCodec = codec;
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public <T extends TreeNode> T readTree(JsonParser p) throws IOException {

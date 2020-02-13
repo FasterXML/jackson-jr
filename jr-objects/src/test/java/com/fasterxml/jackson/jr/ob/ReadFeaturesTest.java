@@ -32,6 +32,13 @@ public class ReadFeaturesTest extends TestBase
                 .asString(new IsBean());
         assertEquals(aposToQuotes("{'value':42}"), json);
 
+        // .... as well as using alternative
+        json = JSON.builder()
+                .disable(JSON.Feature.USE_IS_GETTERS)
+                .build()
+                .asString(new IsBean());
+        assertEquals(aposToQuotes("{'value':42}"), json);
+        
         // and go back as well
         json = JSON.std
                 .with(JSON.Feature.USE_IS_GETTERS)
@@ -41,7 +48,9 @@ public class ReadFeaturesTest extends TestBase
 
     public void testFailOnDupMapKeys() throws Exception
     {
-        JSON j = JSON.std.with(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS);
+        JSON j = JSON.builder()
+                .enable(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS)
+                .build();
         assertTrue(j.isEnabled(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS));
         final String json = "{\"a\":1,\"b\":2,\"b\":3,\"c\":4}";
         try {
