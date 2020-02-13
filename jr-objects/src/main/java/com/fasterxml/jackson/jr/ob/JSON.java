@@ -432,20 +432,12 @@ public class JSON
         public Builder(JsonFactory f) {
             _streamFactory = f;
         }
-        
+
         public JSON build() {
             return new JSON(this);
         }
 
-        public Builder prettyPrinter(PrettyPrinter pp) {
-            _prettyPrinter = pp;
-            return this;
-        }
-
-        public Builder treeCodec(TreeCodec tc) {
-            _treeCodec = tc;
-            return this;
-        }
+        // // // Mutators:
 
         /**
          * Method for registering given extension to be used by {@link JSON}
@@ -457,10 +449,83 @@ public class JSON
          */
         public Builder register(JacksonJrExtension extension) {
             if (_extContext == null) {
-                _extContext = new ExtContextImpl();
+                _extContext = new ExtContextImpl(this);
             }
             extension.register(_extContext);
             return this;
+        }
+
+        public Builder set(Feature feature, boolean state) {
+            if (state) {
+                _features |= feature.mask();
+            } else {
+                _features &= ~feature.mask();
+            }
+            return this;
+        }
+
+        /**
+         * Method for enabling a set of Features for {@link JSON} to be built.
+         *
+         * @param features Features to enable
+         *
+         * @return This builder for call chaining
+         */
+        public Builder enable(Feature ... features)
+        {
+            for (Feature feature : features) {
+                _features |= feature.mask();
+            }
+            return this;
+        }
+
+        /**
+         * Method for disabling a set of Features for {@link JSON} to be built.
+         *
+         * @param features Features to disable
+         *
+         * @return This builder for call chaining
+         */
+        public Builder disable(Feature ... features)
+        {
+            for (Feature feature : features) {
+                _features &= ~feature.mask();
+            }
+            return this;
+        }
+
+        /**
+         * Method for specifying {@link PrettyPrinter} {@link JSON} to be built
+         * should use on serialization.
+         *
+         * @param pp Pretty printer to use
+         *
+         * @return This builder for call chaining
+         */
+        public Builder prettyPrinter(PrettyPrinter pp) {
+            _prettyPrinter = pp;
+            return this;
+        }
+
+        /**
+         * Method for specifying {@link TreeCodec} {@link JSON} to be built
+         * should use for reading and writing {@link TreeNode} values.
+         *<p>
+         * Note: by default no {@link TreeCodec} is configured.
+         *
+         * @param tc TreeCodec to use
+         *
+         * @return This builder for call chaining
+         */
+        public Builder treeCodec(TreeCodec tc) {
+            _treeCodec = tc;
+            return this;
+        }
+
+        // // // Accessors
+
+        public boolean isEnabled(Feature f) {
+            return f.isEnabled(_features);
         }
 
         public int featureMask() { return _features; }
@@ -1554,10 +1619,25 @@ public class JSON
      * Extension context implementation used when 
      */
     private static class ExtContextImpl extends ExtensionContext {
+        final Builder _builder;
+
         ReaderWriterProvider _rwProvider;
         ReaderWriterModifier _rwModifier;
 
-        ExtContextImpl() { }
+        ExtContextImpl(Builder b) {
+            _builder = b;
+        }
+
+        @Override
+        public ExtensionContext setTreeCodec(TreeCodec tc) {
+            _builder.treeCodec(tc);
+            return this;
+        }
+
+        @Override
+        public TreeCodec treeCodec() {
+            return _builder.treeCodec();
+        }
 
         @Override
         public ExtensionContext insertProvider(ReaderWriterProvider provider) {

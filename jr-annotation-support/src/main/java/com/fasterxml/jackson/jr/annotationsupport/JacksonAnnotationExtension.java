@@ -37,6 +37,8 @@ import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
  *       // possible configuration calls
  *       .build());
  *</pre>
+ *
+ * @since 2.11
  */
 public class JacksonAnnotationExtension
     extends JacksonJrExtension

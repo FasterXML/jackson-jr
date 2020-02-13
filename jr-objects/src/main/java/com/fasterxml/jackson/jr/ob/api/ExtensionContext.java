@@ -1,5 +1,7 @@
 package com.fasterxml.jackson.jr.ob.api;
 
+import com.fasterxml.jackson.core.TreeCodec;
+
 /**
  * API that lets {@link com.fasterxml.jackson.jr.ob.JacksonJrExtension}s to register handlers
  * it needs to.
@@ -8,6 +10,25 @@ package com.fasterxml.jackson.jr.ob.api;
  */
 public abstract class ExtensionContext
 {
+    // // // Override of (and access to) singleton handlers
+
+    /**
+     * Method for setting {@link TreeCodec} to use, replacing codec that was formerly configured
+     * (if any).
+     *
+     * @param tc (optional) Tree Codec to use, or {@link null} for removing currently configured one
+     *
+     * @return This context, to allow call chaining
+     */
+    public abstract ExtensionContext setTreeCodec(TreeCodec tc);
+
+    /**
+     * @return TreeCodec currently configured to be used, if any ({@code null} if none).
+     */
+    public abstract TreeCodec treeCodec();
+    
+    // // // Addition of chainable handlers
+    
     /**
      * Method for inserting specified {@link ReaderWriterProvider} as the highest priority
      * provider (that is, having higher precedence than anything registered so far)
