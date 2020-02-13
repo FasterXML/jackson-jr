@@ -1,14 +1,49 @@
 package com.fasterxml.jackson.jr.ob;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.jr.ob.ReadMapTest.TreeMapBuilder;
+import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
 
 public class ReadListTest extends TestBase
 {
     static class ListHolder {
         public List<Map<String, Integer>> stuff;
+    }
+
+    static class LinkedListBuilder extends CollectionBuilder {
+        LinkedList<Object> _set = new LinkedList<Object>();
+
+        LinkedListBuilder(int features) {
+            super(features, TreeSet.class);
+        }
+ 
+        @Override
+        public CollectionBuilder newBuilder(int features) {
+            return new LinkedListBuilder(features);
+        }
+
+        @Override
+        public CollectionBuilder newBuilder(Class<?> collImpl) {
+            return this;
+        }
+
+        @Override
+        public CollectionBuilder start() {
+            return new LinkedListBuilder(_features);
+        }
+
+        @Override
+        public CollectionBuilder add(Object value) {
+            _set.add(value);
+            return this;
+        }
+
+        @Override
+        public Collection<Object> buildCollection() {
+            return _set;
+        }
     }
 
     /*
@@ -69,5 +104,24 @@ public class ReadListTest extends TestBase
         } catch (JSONObjectException e) {
             verifyException(e, "Unexpected token START_OBJECT");
         }
+    }
+
+    /*
+    /**********************************************************************
+    /* Other tests
+    /**********************************************************************
+     */
+
+    public void testCustomMapBuilder() throws Exception
+    {
+        final JSON json = JSON.builder()
+                .collectionBuilder(new LinkedListBuilder(0))
+                .build();
+        Collection<Object> stuff = json.listFrom(a2q("['a']"));
+        assertEquals(LinkedList.class, stuff.getClass());
+
+        stuff = json.listFrom(a2q("['a', 'b', 'c']"));
+        assertEquals(LinkedList.class, stuff.getClass());
+        assertEquals(Arrays.asList("a", "b", "c"), stuff);
     }
 }

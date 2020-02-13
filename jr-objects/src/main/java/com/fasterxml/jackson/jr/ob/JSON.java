@@ -426,6 +426,12 @@ public class JSON implements Versioned
         protected final JsonFactory _streamFactory;
         protected TreeCodec _treeCodec;
 
+        protected JSONReader _reader;
+        protected JSONWriter _writer;
+
+        protected MapBuilder _mapBuilder;
+        protected CollectionBuilder _collectionBuilder;
+
         // Configuration, extensions
 
         protected ExtContextImpl _extContext;
@@ -438,7 +444,7 @@ public class JSON implements Versioned
             return new JSON(this);
         }
 
-        // // // Mutators:
+        // // // Mutators, features
 
         /**
          * Method for registering given extension to be used by {@link JSON}
@@ -495,6 +501,8 @@ public class JSON implements Versioned
             return this;
         }
 
+        // // // Mutators, helper objects
+        
         /**
          * Method for specifying {@link PrettyPrinter} {@link JSON} to be built
          * should use on serialization.
@@ -523,6 +531,38 @@ public class JSON implements Versioned
             return this;
         }
 
+        public Builder jsonReader(JSONReader r) {
+            if (_collectionBuilder != null) {
+                r = r.with(_collectionBuilder);
+            }
+            if (_mapBuilder != null) {
+                r = r.with(_mapBuilder);
+            }
+            _reader = r;
+            return this;
+        }
+
+        public Builder jsonWriter(JSONWriter w) {
+            _writer = w;
+            return this;
+        }
+
+        public Builder collectionBuilder(CollectionBuilder b) {
+            _collectionBuilder = b;
+            if (_reader != null) {
+                _reader = _reader.with(b);
+            }
+            return this;
+        }
+
+        public Builder mapBuilder(MapBuilder b) {
+            _mapBuilder = b;
+            if (_reader != null) {
+                _reader = _reader.with(b);
+            }
+            return this;
+        }
+
         // // // Accessors
 
         public boolean isEnabled(Feature f) {
@@ -541,6 +581,36 @@ public class JSON implements Versioned
 
         public ReaderWriterProvider readerWriterProvider() {
             return (_extContext == null) ? null : _extContext._rwProvider;
+        }
+
+        public JSONReader jsonReader() {
+            // create default impl dynamically if necessary
+            if (_reader == null) {
+                _reader = new JSONReader(collectionBuilder(), mapBuilder());
+            }
+            return _reader;
+        }
+
+        public JSONWriter jsonWriter() {
+            // create default impl dynamically if necessary
+            if (_writer == null) {
+                _writer = new JSONWriter();
+            }
+            return _writer;
+        }
+
+        public MapBuilder mapBuilder() {
+            if (_mapBuilder == null) {
+                _mapBuilder = MapBuilder.defaultImpl();
+            }
+            return _mapBuilder;
+        }
+
+        public CollectionBuilder collectionBuilder() {
+            if (_collectionBuilder == null) {
+                _collectionBuilder = CollectionBuilder.defaultImpl();
+            }
+            return _collectionBuilder;
         }
     }
 
@@ -567,6 +637,10 @@ public class JSON implements Versioned
     }
 
     /**
+     * Constructor used when creating instance using {@link Builder}.
+     *
+     * @param b Builder that has configured settings to use.
+     *
      * @since 2.11
      */
     public JSON(Builder b) {
@@ -589,8 +663,8 @@ public class JSON implements Versioned
         _valueReaderLocator = rloc;
         _valueWriterLocator = wloc;
 
-        _reader = _defaultReader();
-        _writer = _defaultWriter();
+        _reader = b.jsonReader();
+        _writer = b.jsonWriter();
         _prettyPrinter = b.prettyPrinter();
     }
 
@@ -664,7 +738,7 @@ public class JSON implements Versioned
     /* Versioned
     /**********************************************************************
      */
-    
+
     @Override
     public Version version() {
         return PackageVersion.VERSION;
