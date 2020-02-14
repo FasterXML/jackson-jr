@@ -2,7 +2,7 @@
 
 This package contains a simple extension, `JacksonAnnotationExtension` (subtype of
 `JacksonJrExtension`), registering of which allows use of some of
-[Core Jackson Annotations](../../../../jackson-annotations) with Jackson jr.
+[Core Jackson Annotations](/FasterXML/jackson-annotations) with Jackson jr.
 
 ### Usage
 
@@ -39,7 +39,7 @@ Support for additional properties is possible in future versions: this list is f
 
 ### General annotation limitations
 
-Compared to full [Jackson-databind](../../../../jackson-databind), handling of annotations is
+Compared to full [Jackson-databind](/FasterXML/jackson-databind), handling of annotations is
 limited in some ways for all annotations:
 
 * No inheritance: only annotations directly associated by class or accessors (Fields,
