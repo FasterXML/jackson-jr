@@ -107,6 +107,11 @@ public class JacksonAnnotationExtension
 
     protected final AnnotationBasedValueRWModifier _modifier;
 
+    /**
+     * Extension instance configured with default settings.
+     */
+    public final static JacksonAnnotationExtension std = new JacksonAnnotationExtension();
+    
     protected JacksonAnnotationExtension() {
         _modifier = new AnnotationBasedValueRWModifier(DEFAULT_VISIBILITY);
     }
