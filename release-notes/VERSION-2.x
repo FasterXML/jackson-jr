@@ -6,6 +6,8 @@ Project: jackson-jr
 
 2.11.0 (not yet released)
 
+#32: Add support for subset of jackson annotations
+ (suggested by Baron H)
 #70: Add extension point (`ReaderWriterModifier`) to allow more customization of
   POJO readers, writers
 
