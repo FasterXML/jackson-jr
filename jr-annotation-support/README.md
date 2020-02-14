@@ -4,6 +4,11 @@ This package contains a simple extension, `JacksonAnnotationExtension` (subtype 
 `JacksonJrExtension`), registering of which allows use of some of
 [Core Jackson Annotations](../../../../jackson-annotations) with Jackson jr.
 
+### Status
+
+Added in Jackson 2.11 (to be released in Feb/March 2020),
+considered experimental until following minor version.
+
 ### Usage
 
 To be able to use supported annotations, you need to register extension like so:
