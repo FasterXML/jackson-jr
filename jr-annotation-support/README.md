@@ -19,7 +19,27 @@ JSON json = JSON.builder()
 after which you can use normal read and write operations as usual:
 
 ```java
-List<Object> list = json.listFrom("[1, 2, 3]");
+static class Point {
+  @JsonProperty("x")
+  protected int _x;
+
+  @JsonProperty("y")
+  protected int _y;
+
+  protected Point() { } // for deserialization
+
+  public Point(int x, int y) {
+    _x = x;
+    _y = y;
+  }
+
+  public int getX() { return x; }
+  public int getY() { return y; }
+}
+
+// now works; without annotations would neither find fields to assign
+// nor (if they were public) match the name:
+Point p = json.beanFrom(Point.class, "{\"x\":1, \"y\":2}");
 ```
 
 ### Supported annotations
