@@ -3,7 +3,7 @@
 Jackson jr is a compact alternative to full [Jackson Databind](../../../jackson-databind) component.
 It implements a subset of functionality, for example for cases where:
 
-1. Size of jar matters (jackson-jr size is about 95kB)
+1. Size of jar matters (jackson-jr size is about 100 kB)
 2. Startup time matters (jackson-jr has very low initialization overhead)
 
 In addition to basic datatypes (core JDK types like `List`s, `Map`s, wrapper types),
@@ -38,11 +38,12 @@ Project is composed of multiple Maven sub-modules, each corresponding to a jar:
 * [jr-stree](../../tree/master/jr-stree) contains a simple `TreeCodec` implementation, with which it is possible to read JSON as `TreeNode`s (see more below)
 * [jr-retrofit2](../../tree/master/jr-retrofit2) contains `jackson-jr` - based handlers for [Retrofit 2](http://square.github.io/retrofit/) library
     * Depends on `jackson-jr` and `Retrofit` API jars, and indirectly on `jackson-core`
+* [jr-annotation-support](../../tree/master/jr-annotation-support) contains extension with support for a subset of core [Jackson annotations](../../../jackson-annotations)
 * jr-all creates an "uber-jar" that contains individual modules along with all their dependencies:
     * `jr-objects` classes as-is, without relocating
     * `jr-stree` classes as-is, without relocating
     * Jackson streaming (`jackson-core`) contents *relocated* ("shaded"), for private use by `jackson-jr`
-    * Does NOT contain `jr-retrofit2` component
+    * Does NOT contain `jr-retrofit2` or `jr-annotation-support` components
 
 If you are not sure which package to use, the answer is usually `jr-objects`, and build system (maven, gradle) will fetch the dependency needed. `jr-all` jar is only used if the single-jar deployment (self-contained, no external dependencies) is needed.
 
