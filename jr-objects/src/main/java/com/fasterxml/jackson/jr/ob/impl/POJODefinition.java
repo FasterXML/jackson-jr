@@ -9,8 +9,6 @@ import java.util.*;
  * Definition of a single Bean-style Java class, without assumptions
  * on usage for serialization or deserialization, used as input
  * for constructing bean readers and writers.
- *
- * @since 2.8
  */
 public class POJODefinition
 {
@@ -21,8 +19,6 @@ public class POJODefinition
     /**
      * Possible per-class definition of names that may be ignored safely
      * during deserialization.
-     *
-     * @since 2.11
      */
     protected final Set<String> _ignorableNames;
 
@@ -56,7 +52,6 @@ public class POJODefinition
         return new POJODefinition(this, props.toArray(new Prop[0]), _ignorableNames);
     }
 
-    // @since 2.11
     public POJODefinition withIgnorals(Set<String> ignorableN) {
         return new POJODefinition(this, _properties, ignorableN);
     }
@@ -69,11 +64,6 @@ public class POJODefinition
 
     public List<Prop> getProperties() {
         return Arrays.asList(_properties);
-    }
-
-    @Deprecated // in 2.11, will be removed soon
-    public Prop[] properties() {
-        return _properties;
     }
 
     public Set<String> getIgnorableNames() {

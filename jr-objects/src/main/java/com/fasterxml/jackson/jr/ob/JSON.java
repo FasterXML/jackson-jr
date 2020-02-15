@@ -821,56 +821,6 @@ public class JSON
                 r, w, _prettyPrinter);
     }
 
-    /*
-    /**********************************************************************
-    /* Mutant factories, deprecated
-    /**********************************************************************
-     */
-
-    /**
-     * Mutant factory for constructing an instance with specified {@link JSONReader},
-     * and returning new instance (or, if there would be no change, this instance).
-     *
-     * @param r Customized {@link JSONReader} to use instead of standard one
-     *
-     * @return New instance with specified {@link JSONReader} (if not same as currently configured);
-     *   {@code this} otherwise.
-     *
-     * @deprecated Since 2.11 should try using builder (see {@link #builder()} and create
-     *    properly configured instance
-     */
-    @Deprecated
-    public JSON with(JSONReader r)
-    {
-        if (r == _reader) {
-            return this;
-        }
-        return _with(_features, _streamFactory, _treeCodec,
-                r, _writer, _prettyPrinter);
-    }
-
-    /**
-     * Mutant factory for constructing an instance with specified {@link JSONWriter},
-     * and returning new instance (or, if there would be no change, this instance).
-     *
-     * @param w Customized {@link JSONWriter} to use instead of standard one
-     *
-     * @return New instance with specified {@link JSONWriter} (if not same as currently configured);
-     *   {@code this} otherwise.
-     *
-     * @deprecated Since 2.11 should try using builder (see {@link #builder()} and create
-     *    properly configured instance
-     */
-    @Deprecated
-    public JSON with(JSONWriter w)
-    {
-        if (w == _writer) {
-            return this;
-        }
-        return _with( _features, _streamFactory, _treeCodec,
-                _reader, w, _prettyPrinter);
-    }
-
     /**
      * Mutant factory for constructing an instance with specified {@link MapBuilder},
      * and returning new instance (or, if there would be no change, this instance).
