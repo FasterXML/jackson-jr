@@ -11,6 +11,10 @@ Project: jackson-jr
 #70: Add extension point (`ReaderWriterModifier`) to allow more customization of
   POJO readers, writers
 
+2.10.3 (03-Mar-2020)
+
+No changes since 2.10.2
+
 2.10.2 (05-Jan-2020)
 
 #71: Jackson-jr 2.10 accidentally uses `UncheckedIOException` only available on JDK 8
