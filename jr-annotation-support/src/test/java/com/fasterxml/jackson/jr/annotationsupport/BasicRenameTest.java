@@ -54,7 +54,7 @@ public class BasicRenameTest extends ASTestBase
             j.beanFrom(NameSimple.class, json);
             fail("Should not pass");
         } catch (JSONObjectException e) {
-            verifyException(e, "Unrecognized JSON property 'firstName'");
+            verifyException(e, "Unrecognized JSON property \"firstName\"");
         }
         NameSimple result = JSON_WITH_ANNO.beanFrom(NameSimple.class, json);
         assertEquals("Bob", result._first);

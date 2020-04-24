@@ -8,6 +8,7 @@ Project: jackson-jr
 
 #32: Add support for subset of jackson annotations
  (suggested by Baron H)
+#64: Indicate mismatching property if failing on unknown property
 #70: Add extension point (`ReaderWriterModifier`) to allow more customization of
   POJO readers, writers
 
