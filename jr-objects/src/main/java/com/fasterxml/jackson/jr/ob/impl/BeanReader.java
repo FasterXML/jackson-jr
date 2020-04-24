@@ -356,21 +356,21 @@ public class BeanReader
 
     protected Object create() throws Exception {
         if (_defaultCtor == null) {
-            throw new IllegalStateException("Class "+_valueType.getName()+" does not have default constructor to use");
+            throw new IllegalStateException("Class `"+_valueType.getName()+"` does not have default constructor to use");
         }
         return _defaultCtor.newInstance();
     }
     
     protected Object create(String str) throws Exception {
         if (_stringCtor == null) {
-            throw new IllegalStateException("Class "+_valueType.getName()+" does not have single-String constructor to use");
+            throw new IllegalStateException("Class `"+_valueType.getName()+"` does not have single-String constructor to use");
         }
         return _stringCtor.newInstance(str);
     }
 
     protected Object create(long l) throws Exception {
         if (_longCtor == null) {
-            throw new IllegalStateException("Class "+_valueType.getName()+" does not have single-long constructor to use");
+            throw new IllegalStateException("Class `"+_valueType.getName()+"` does not have single-long constructor to use");
         }
         return _longCtor.newInstance(l);
     }
@@ -380,8 +380,17 @@ public class BeanReader
             // 20-Jan-2020, tatu: With optional annotation support, may have "known ignorable"
             //    that usually should behave as if safely ignorable
             if (!_ignorableNames.contains(fieldName)) {
-                throw JSONObjectException.from(parser, "Unrecognized JSON property '%s' for Bean type %s", 
-                        fieldName, _valueType.getName());
+                final StringBuilder sb = new StringBuilder(60);
+                Iterator<String> it = new TreeSet<String>(_propsByName.keySet()).iterator();
+                if (it.hasNext()) {
+                    sb.append('"').append(it.next()).append('"');
+                    while (it.hasNext()) {
+                        sb.append(", \"").append(it.next()).append('"');
+                    }
+                }
+                throw JSONObjectException.from(parser,
+"Unrecognized JSON property \"%s\" for Bean type `%s` (known properties: [%s])",
+                        fieldName, _valueType.getName(), sb.toString());
             }
         }
         parser.nextToken();
@@ -394,7 +403,7 @@ public class BeanReader
             throw (IOException) e;
         }
         throw JSONObjectException.from(p, e,
-                "Failed to create an instance of %s due to (%s): %s",
+                "Failed to create an instance of `%s` due to (%s): %s",
                 _valueType.getName(), e.getClass().getName(), e.getMessage());
     }
 

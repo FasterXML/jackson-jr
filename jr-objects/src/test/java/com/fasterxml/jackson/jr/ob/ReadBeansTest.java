@@ -88,7 +88,8 @@ public class ReadBeansTest extends TestBase
                     .beanFrom(NameBean.class, INPUT);
             fail("Should have thrown exception");
         } catch (JSONObjectException e) {
-            verifyException(e, "unrecognized JSON property 'middle'");
+            verifyException(e, "unrecognized JSON property \"middle\"");
+            verifyException(e, "(known properties: [\"first\", \"last\"])");
         }
     }
 
