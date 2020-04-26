@@ -16,7 +16,7 @@ public abstract class ExtensionContext
      * Method for setting {@link TreeCodec} to use, replacing codec that was formerly configured
      * (if any).
      *
-     * @param tc (optional) Tree Codec to use, or {@link null} for removing currently configured one
+     * @param tc (optional) Tree Codec to use, or {@code null} for removing currently configured one
      *
      * @return This context, to allow call chaining
      */
