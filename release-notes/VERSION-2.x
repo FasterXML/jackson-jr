@@ -4,6 +4,10 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.11.1 (not yet released)
+
+-
+
 2.11.0 (26-Apr-2020)
 
 #32: Add support for subset of jackson annotations
