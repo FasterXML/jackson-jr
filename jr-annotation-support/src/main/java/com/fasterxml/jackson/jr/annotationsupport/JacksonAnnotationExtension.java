@@ -29,6 +29,8 @@ import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
  * <li>{@link com.fasterxml.jackson.annotation.JsonPropertyOrder}: supported on classes,
  *    but not on accessors
  *  </li>
+ * <li>{@link com.fasterxml.jackson.annotation.JsonAutoDetect}: supported on classes
+ *  </li>
  *</ul>
  *<p>
  * Usage is done by registering this extension with {@link JSON}, usually like:
