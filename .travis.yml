@@ -2,9 +2,15 @@ language: java
 
 jdk:
   - openjdk8
+  - openjdk11
+
+# 2020-05-23, tatu: Let's try caching Maven dependencies
+cache:
+  directories:
+    - $HOME/.m2
 
 # whitelist
 branches:
   only:
     - master
-    - "2.11"
+    - "2.12"
