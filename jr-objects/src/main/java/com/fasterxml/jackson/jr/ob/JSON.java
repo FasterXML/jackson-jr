@@ -273,7 +273,7 @@ public class JSON
         * Feature that enables use of public fields instead of setters and getters,
         * in cases where no setter/getter is available.
         *<p>
-        * Feature is <b>enabled</c> by default, so public fields are discovered by default.
+        * Feature is <b>enabled</b> by default, so public fields are discovered by default.
         */
        USE_FIELDS(true, true),
        ;

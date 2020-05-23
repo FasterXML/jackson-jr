@@ -41,7 +41,7 @@ public class ValueReaderLocator
      */
 
     /**
-     * We need stream factory for constructing {@link FieldNameMatcher}s for
+     * We need stream factory for constructing {@code FieldNameMatcher}s for
      * POJO deserializer.
      *
      * @since 3.0

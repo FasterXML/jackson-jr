@@ -7,6 +7,7 @@ import java.math.BigInteger;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.base.ParserMinimalBase;
+import com.fasterxml.jackson.core.util.JacksonFeatureSet;
 import com.fasterxml.jackson.jr.stree.JrsArray;
 import com.fasterxml.jackson.jr.stree.JrsNumber;
 import com.fasterxml.jackson.jr.stree.JrsObject;
@@ -83,14 +84,31 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
         }
     }
 
-    @Override
-    public Object getInputSource() {
-        return _source;
-    }
+    /*
+    /**********************************************************************
+    /* Config access, capability introspection
+    /**********************************************************************
+     */
 
     @Override
     public Version version() {
         return PackageVersion.VERSION;
+    }
+
+    @Override
+    public int formatReadFeatures() {
+        return 0;
+    }
+
+    @Override
+    public JacksonFeatureSet<StreamReadCapability> getReadCapabilities() {
+        // Defaults are fine
+        return DEFAULT_READ_CAPABILITIES;
+    }
+
+    @Override
+    public Object getInputSource() {
+        return _source;
     }
 
     /*
