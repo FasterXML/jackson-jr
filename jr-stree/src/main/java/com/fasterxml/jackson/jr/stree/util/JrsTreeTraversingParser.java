@@ -96,11 +96,6 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
 
     @Override
-    public int formatReadFeatures() {
-        return 0;
-    }
-
-    @Override
     public JacksonFeatureSet<StreamReadCapability> getReadCapabilities() {
         // Defaults are fine
         return DEFAULT_READ_CAPABILITIES;
