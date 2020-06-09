@@ -14,8 +14,11 @@
         accidentally double-exporting jr-objects types
       -->
     <osgi.export>
-${project.groupId}.retrofit2
+${project.groupId}.retrofit2;version=${project.version}
     </osgi.export>
+
+    <!-- No PackageVersion defined or needed, since N/A for this package
+      -->
   </properties>
 
   <dependencies>
