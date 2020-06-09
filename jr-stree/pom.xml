@@ -12,10 +12,13 @@ has no other dependencies.
 </description>
   <url>https://github.com/FasterXML/jackson-jr</url>
   <properties>
+    <!-- Looks like we need to be bit careful on OSGi exports, to avoid
+        accidentally double-exporting jr-objects types
+      -->
+    <osgi.export>${project.groupId}.stree;version=${project.version}</osgi.export>
+
     <packageVersion.dir>com/fasterxml/jackson/jr/stree</packageVersion.dir>
     <packageVersion.package>${project.groupId}.stree</packageVersion.package>
-    <packageVersion.template.input>${basedir}/src/main/java/${packageVersion.dir}/PackageVersion.java.in</packageVersion.template.input>
-    <packageVersion.template.output>${generatedSourcesDir}/${packageVersion.dir}/PackageVersion.java</packageVersion.template.output>
   </properties>
 
   <dependencies>
