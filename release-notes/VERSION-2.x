@@ -8,7 +8,7 @@ Project: jackson-jr
 
 -
 
-2.11.1 (not yet released)
+2.11.1 (25-Jun-2020)
 
 #72: Duplicate classes from `com.fasterxml.jackson.jr.ob` and
   `com.fasterxml.jackson.jr.type` in 2.11.0
