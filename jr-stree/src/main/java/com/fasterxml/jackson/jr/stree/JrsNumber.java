@@ -107,6 +107,16 @@ public class JrsNumber extends JrsValue.Scalar
         return new BigDecimal(_value.longValue());
     }
 
+    public boolean isNaN() {
+        if (_value instanceof Double) {
+            return ((Double) _value).isNaN();
+        }
+        if (_value instanceof Float) {
+            return ((Float) _value).isNaN();
+        }
+        return false;
+    }
+
     /*
     /**********************************************************************
     /* Abstract methods

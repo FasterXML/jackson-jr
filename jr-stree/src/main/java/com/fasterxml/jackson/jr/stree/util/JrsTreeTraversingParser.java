@@ -320,6 +320,11 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
 
     @Override
+    public boolean isNaN() throws IOException {
+        return currentNumericNode().isNaN();
+    }
+
+    @Override
     public Object getEmbeddedObject() {
         // 28-Dec-2015, tatu: Embedded values ("POJO nodes") not yet supported
         return null;
