@@ -10,6 +10,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
@@ -35,22 +36,46 @@ public class SimpleValueReader extends ValueReader
         // Textual types, related:
         case SER_STRING:
         case SER_CHARACTER_SEQUENCE:
-            return _nextString(p);
+            {
+                String str = p.nextTextValue();
+                if (str != null) {
+                    return str;
+                }
+                return read(reader, p);
+            }
 
         case SER_CHAR_ARRAY:
-            String str = _nextString(p);
-            return (str == null) ? null : str.toCharArray();
+            {
+                String str = p.nextTextValue();
+                if (str != null) {
+                    return str.toCharArray();
+                }
+                return read(reader, p);
+            }
 
         // Number types:
 
-        case SER_NUMBER_SHORT:
-            return Short.valueOf((short) _nextInt(p));
+        // Let's only optimize common ones, int/Integer, long/Long;
+        // and only when `nextXxx()` correctly returns value. In all other
+        // cases default to "standard" handling which does range checks etc
 
         case SER_NUMBER_INTEGER:
-            return Integer.valueOf(_nextInt(p));
+            {
+                int i = p.nextIntValue(-2);
+                if (i != -2) {
+                    return i;
+                }
+                return read(reader, p);
+            }
 
         case SER_NUMBER_LONG:
-            return Long.valueOf(_nextLong(p));
+            {
+                long l = p.nextLongValue(-2L);
+                if (l != -2L) {
+                    return l;
+                }
+                return read(reader, p);
+            }
 
         // Other scalar types:
 
@@ -60,7 +85,7 @@ public class SimpleValueReader extends ValueReader
                 if (b != null) {
                     return b;
                 }
-                return p.getValueAsBoolean();
+                return read(reader, p);
             }
         }
 
@@ -114,13 +139,29 @@ public class SimpleValueReader extends ValueReader
         // Other scalar types:
 
         case SER_BOOLEAN:
-            return p.getValueAsBoolean();
+            switch (p.currentTokenId()) {
+            case JsonTokenId.ID_TRUE:
+                return Boolean.TRUE;
+            case JsonTokenId.ID_FALSE:
+                return Boolean.FALSE;
+            case JsonTokenId.ID_NULL:
+                // 07-Jul-2020, tatu: since `boolean` and `java.lang.Boolean` both handled
+                //   here, can not (alas!) separate yet
+                return Boolean.FALSE;
+
+            case JsonTokenId.ID_STRING:
+                // 07-Jul-2020, tatu: Allow coercion for backwards compatibility (with 2.11)
+                return p.getValueAsBoolean();
+            }
+            // 07-Jul-2020, tatu: leave out more esoteric coercions with 2.12
+            break;
+
         case SER_CHAR:
             {
                 String str = p.getValueAsString();
                 return (str == null || str.isEmpty()) ? ' ' : str.charAt(0);
             }
-            
+
         case SER_CALENDAR:
             // [jackson-jr#73]: should allow null
             if (p.hasToken(JsonToken.VALUE_NULL)) {
@@ -186,9 +227,9 @@ public class SimpleValueReader extends ValueReader
         default: // types that shouldn't get here
         //case SER_ENUM:
         }
-        
+
         throw JSONObjectException.from(p,
-                "Can not create a "+_valueType.getName()+" instance out of "+_tokenDesc(p));
+                "Can not create a `"+_valueType.getName()+"` instance out of "+_tokenDesc(p));
     }    
 
     /*
@@ -215,26 +256,5 @@ public class SimpleValueReader extends ValueReader
         }
         throw JSONObjectException.from(p, "Can not get long numeric value from JSON (to construct "
                 +_valueType.getName()+") from "+_tokenDesc(p, t));
-    }
-
-    private final String _nextString(JsonParser p) throws IOException {
-        String str = p.nextTextValue();
-        return (str == null) ? p.getValueAsString() : str;
-    }
-
-    private final int _nextInt(JsonParser p) throws IOException {
-        int i = p.nextIntValue(-2);
-        if (i != -2) {
-            return i;
-        }
-        return p.getValueAsInt();
-    }
-
-    private final long _nextLong(JsonParser p) throws IOException {
-        long l = p.nextLongValue(-2L);
-        if (l != -2L) {
-            return l;
-        }
-        return p.getValueAsLong();
     }
 }
