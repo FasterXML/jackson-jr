@@ -2,6 +2,9 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -21,6 +24,10 @@ public class ReadSimpleTest extends TestBase
 
     static class TreeWrapper {
         public TreeNode value;
+    }
+
+    static class DateWrapper {
+        public Date value;
     }
 
     /*
@@ -151,13 +158,97 @@ public class ReadSimpleTest extends TestBase
     }
 
     public void testMiscScalarFail() throws Exception {
-        for (String input : new String[] { " false ",  "true", "[ ]", "{ }", "null" } ) {
+        for (String input : new String[] { " false ",  "true", "[ ]", "{ }" } ) {
             try {
                 JSON.std.beanFrom(Date.class, input);
                 fail("Should not pass");
             } catch (JSONObjectException e) {
                 verifyException(e, "Can not get long numeric");
             }
+        }
+    }
+
+    /*
+    /**********************************************************************
+    /* Tests for Scalars, null handling
+    /**********************************************************************
+     */
+
+    // 07-Jul-2020, tatu: Should be able to check but for 2.11 can't support
+    public void testNullForMiscNumbers() throws Exception {
+        /*
+        assertNull(JSON.std.beanFrom(Integer.class," null "));
+        assertNull(JSON.std.beanFrom(Long.class," null "));
+        assertNull(JSON.std.beanFrom(Double.class," null "));
+
+        assertNull(JSON.std.beanFrom(BigInteger.class," null "));
+        assertNull(JSON.std.beanFrom(BigDecimal.class," null "));
+         */
+    }
+
+    public void testNullForMiscScalars() throws Exception {
+        assertNull(JSON.std.beanFrom(Date.class," null "));
+        assertNull(JSON.std.beanFrom(Calendar.class," null "));
+
+        assertNull(JSON.std.beanFrom(String.class," null "));
+        assertNull(JSON.std.beanFrom(Class.class," null "));
+        assertNull(JSON.std.beanFrom(File.class," null "));
+        assertNull(JSON.std.beanFrom(URL.class," null "));
+        assertNull(JSON.std.beanFrom(URI.class," null "));
+    }
+
+    public void testNullForScalarProperties() throws Exception {
+        DateWrapper w = JSON.std.beanFrom(DateWrapper.class, aposToQuotes("{'value':null}"));
+        assertNotNull(w);
+        assertNull(w.value);
+    }
+
+    /*
+    /**********************************************************************
+    /* Tests for other simple types
+    /**********************************************************************
+     */
+
+    public void testSimpleMixed() throws Exception
+    {
+        final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";
+        _verifySimpleMixed(JSON.std.anyFrom(INPUT), INPUT);
+        JsonParser p = parserFor(INPUT);
+        _verifySimpleMixed(JSON.std.anyFrom(p), INPUT);
+        p.close();
+    }
+
+    private void _verifySimpleMixed(Object ob, String json) throws Exception
+    {
+        assertTrue(ob instanceof Map);
+        assertEquals(2, ((Map<?,?>) ob).size());
+        Object list = (((Map<?,?>) ob).get("a"));
+        assertTrue(list instanceof List<?>);
+        
+        // actually, verify with write...
+        assertEquals(json, JSON.std.asString(ob));
+    }
+
+    public void testSimpleEnums() throws Exception
+    {
+        // First using index
+        ABC abc = JSON.std.beanFrom(ABC.class, String.valueOf(ABC.B.ordinal()));
+        assertEquals(ABC.B, abc);
+
+        // then from name
+        abc = JSON.std.beanFrom(ABC.class, quote("C"));
+        assertEquals(ABC.C, abc);
+
+        // `null`s ok too
+        assertNull(JSON.std.beanFrom(ABC.class, "null"));
+
+        // But not others...
+        try {
+            JSON.std.beanFrom(ABC.class, " true ");
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "Can not read Enum ");
+            verifyException(e, "from `true`");
         }
     }
 
@@ -240,42 +331,5 @@ public class ReadSimpleTest extends TestBase
         } catch (JSONObjectException e) {
             verifyException(e, "No content to map due to end-of-input");
         }
-    }
-    
-    /*
-    /**********************************************************************
-    /* Other tests
-    /**********************************************************************
-     */
-
-    public void testSimpleMixed() throws Exception
-    {
-        final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";
-        _verifySimpleMixed(JSON.std.anyFrom(INPUT), INPUT);
-        JsonParser p = parserFor(INPUT);
-        _verifySimpleMixed(JSON.std.anyFrom(p), INPUT);
-        p.close();
-    }
-
-    private void _verifySimpleMixed(Object ob, String json) throws Exception
-    {
-        assertTrue(ob instanceof Map);
-        assertEquals(2, ((Map<?,?>) ob).size());
-        Object list = (((Map<?,?>) ob).get("a"));
-        assertTrue(list instanceof List<?>);
-        
-        // actually, verify with write...
-        assertEquals(json, JSON.std.asString(ob));
-    }
-
-    public void testSimpleEnums() throws Exception
-    {
-        // First using index
-        ABC abc = JSON.std.beanFrom(ABC.class, String.valueOf(ABC.B.ordinal()));
-        assertEquals(ABC.B, abc);
-
-        // then from name
-        abc = JSON.std.beanFrom(ABC.class, quote("C"));
-        assertEquals(ABC.C, abc);
     }
 }
