@@ -43,7 +43,7 @@ public class SimpleValueReader extends ValueReader
 
         // Number types:
 
-        case SER_NUMBER_SHORT: // fall through
+        case SER_NUMBER_SHORT:
             return Short.valueOf((short) _nextInt(p));
 
         case SER_NUMBER_INTEGER:
@@ -115,7 +115,6 @@ public class SimpleValueReader extends ValueReader
 
         case SER_BOOLEAN:
             return p.getValueAsBoolean();
-            
         case SER_CHAR:
             {
                 String str = p.getValueAsString();
@@ -123,6 +122,10 @@ public class SimpleValueReader extends ValueReader
             }
             
         case SER_CALENDAR:
+            // [jackson-jr#73]: should allow null
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             {
                 long l = _fetchLong(p);
                 Calendar cal = Calendar.getInstance();
@@ -131,10 +134,18 @@ public class SimpleValueReader extends ValueReader
             }
 
         case SER_DATE:
+            // [jackson-jr#73]: should allow null
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             return new Date(_fetchLong(p));
 
         case SER_CLASS:
         {
+            // [jackson-jr#73]: should allow null
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             String v = p.getValueAsString();
             try {
                 return Class.forName(v);
@@ -143,13 +154,28 @@ public class SimpleValueReader extends ValueReader
             }
         }
         case SER_FILE:
+            // [jackson-jr#73]: should allow null
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             return new File(p.getValueAsString());
         case SER_UUID:
+            // [jackson-jr#73]: should allow null
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             return UUID.fromString(p.getValueAsString());
         case SER_URL:
+            // [jackson-jr#73]: should allow null
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             return new URL(p.getValueAsString());
         case SER_URI:
-        
+            // [jackson-jr#73]: should allow null
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             return URI.create(p.getValueAsString());
 
 //        case SER_MAP:

@@ -51,9 +51,16 @@ public class EnumReader extends ValueReader
             }
             return _byIndex[ix];
         }
-        return _enum(p.getValueAsString().trim());
+        if (p.hasToken(JsonToken.VALUE_NULL)) {
+            return null;
+        }
+        if (p.hasToken(JsonToken.VALUE_STRING)) {
+            return _enum(p.getValueAsString().trim());
+        }
+        throw JSONObjectException.from(p, "Can not read Enum `"+_valueType.getName()+"` from "
+                +_tokenDesc(p, p.currentToken()));
     }
-    
+
     private Object _enum(String id) throws IOException
     {
         Object e = _byName.get(id);
