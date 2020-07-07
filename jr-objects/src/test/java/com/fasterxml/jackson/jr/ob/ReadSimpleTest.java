@@ -248,7 +248,7 @@ public class ReadSimpleTest extends TestBase
             fail("Should not pass");
         } catch (JSONObjectException e) {
             verifyException(e, "Can not read Enum ");
-            verifyException(e, "from `true`");
+            verifyException(e, "from 'true'");
         }
     }
 
