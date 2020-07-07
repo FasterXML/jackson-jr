@@ -4,6 +4,11 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.10.5 (not yet released)
+
+#73: Allow for reading `null` fields when reading simple objects
+ (reported by Jozsef B)
+
 2.10.4 (03-May-2020)
 2.10.3 (03-Mar-2020)
 

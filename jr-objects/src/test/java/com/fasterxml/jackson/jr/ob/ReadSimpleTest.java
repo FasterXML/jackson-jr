@@ -1,5 +1,8 @@
 package com.fasterxml.jackson.jr.ob;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
 import java.util.*;
 
 import com.fasterxml.jackson.jr.ob.JSON;
@@ -31,6 +34,10 @@ public class ReadSimpleTest extends TestBase
         assertEquals(INPUT, JSON.std.asString(list));
     }
 
+    static class DateWrapper {
+        public Date value;
+    }
+    
     /*
     /**********************************************************************
     /* Tests for arrays
@@ -106,10 +113,45 @@ public class ReadSimpleTest extends TestBase
 
     /*
     /**********************************************************************
+    /* Null tests for Scalars
+    /**********************************************************************
+     */
+
+    // 07-Jul-2020, tatu: Should be able to check but for 2.11 can't support
+    public void testNullForMiscNumbers() throws Exception {
+        /*
+        assertNull(JSON.std.beanFrom(Integer.class," null "));
+        assertNull(JSON.std.beanFrom(Long.class," null "));
+        assertNull(JSON.std.beanFrom(Double.class," null "));
+
+        assertNull(JSON.std.beanFrom(BigInteger.class," null "));
+        assertNull(JSON.std.beanFrom(BigDecimal.class," null "));
+         */
+    }
+
+    public void testNullForMiscScalars() throws Exception {
+        assertNull(JSON.std.beanFrom(Date.class," null "));
+        assertNull(JSON.std.beanFrom(Calendar.class," null "));
+
+        assertNull(JSON.std.beanFrom(String.class," null "));
+        assertNull(JSON.std.beanFrom(Class.class," null "));
+        assertNull(JSON.std.beanFrom(File.class," null "));
+        assertNull(JSON.std.beanFrom(URL.class," null "));
+        assertNull(JSON.std.beanFrom(URI.class," null "));
+    }
+
+    public void testNullForScalarProperties() throws Exception {
+        DateWrapper w = JSON.std.beanFrom(DateWrapper.class, aposToQuotes("{'value':null}"));
+        assertNotNull(w);
+        assertNull(w.value);
+    }
+
+    /*
+    /**********************************************************************
     /* Other tests
     /**********************************************************************
      */
-    
+
     public void testSimpleMixed() throws Exception
     {
         final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";
@@ -132,5 +174,17 @@ public class ReadSimpleTest extends TestBase
         // then from name
         abc = JSON.std.beanFrom(ABC.class, quote("C"));
         assertEquals(ABC.C, abc);
+
+        // `null`s ok too
+        assertNull(JSON.std.beanFrom(ABC.class, "null"));
+
+        // But not others...
+        try {
+            JSON.std.beanFrom(ABC.class, " true ");
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "Can not read Enum ");
+            verifyException(e, "from `true`");
+        }
     }
 }
