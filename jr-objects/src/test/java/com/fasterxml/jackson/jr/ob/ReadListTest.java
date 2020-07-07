@@ -3,7 +3,6 @@ package com.fasterxml.jackson.jr.ob;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.jr.ob.ReadMapTest.TreeMapBuilder;
 import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
 
 public class ReadListTest extends TestBase

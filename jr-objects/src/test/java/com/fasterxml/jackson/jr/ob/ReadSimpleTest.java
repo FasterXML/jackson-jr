@@ -152,6 +152,27 @@ public class ReadSimpleTest extends TestBase
         assertEquals(0.25f, JSON.std.beanFrom(Float.class, "0.25"));
     }
 
+    // 07-Jul-2020, tatu: Should probably make fail, but doesn't yet:
+    /*
+    public void testNumberFail() throws Exception {
+        try {
+            Integer I = JSON.std.beanFrom(Integer.class, "true");
+            fail("Should not pass, got: "+I);
+        } catch (JSONObjectException e) {
+            verifyException(e, "Can not get long numeric");
+        }
+    }
+    */
+
+    public void testBooleanFail() throws Exception {
+        try {
+            Boolean B = JSON.std.beanFrom(Boolean.class, "13");
+            fail("Should not pass, got: "+B);
+        } catch (JSONObjectException e) {
+            verifyException(e, "Can not create a `java.lang.Boolean` instance out of JSON Number");
+        }
+    }
+
     public void testMiscScalars() throws Exception {
         assertEquals(new Date(123456L), JSON.std.beanFrom(Date.class,"123456"));
         assertEquals(Object.class, JSON.std.beanFrom(Class.class, quote(Object.class.getName())));
@@ -174,17 +195,18 @@ public class ReadSimpleTest extends TestBase
     /**********************************************************************
      */
 
-    // 07-Jul-2020, tatu: Should be able to check but for 2.11 can't support
+    // 07-Jul-2020, tatu: Should be able to check but as of 2.11 same reader used
+    //    for wrapper and primitives.
+    /*
     public void testNullForMiscNumbers() throws Exception {
-        /*
         assertNull(JSON.std.beanFrom(Integer.class," null "));
         assertNull(JSON.std.beanFrom(Long.class," null "));
         assertNull(JSON.std.beanFrom(Double.class," null "));
 
         assertNull(JSON.std.beanFrom(BigInteger.class," null "));
         assertNull(JSON.std.beanFrom(BigDecimal.class," null "));
-         */
     }
+    */
 
     public void testNullForMiscScalars() throws Exception {
         assertNull(JSON.std.beanFrom(Date.class," null "));
@@ -195,6 +217,13 @@ public class ReadSimpleTest extends TestBase
         assertNull(JSON.std.beanFrom(File.class," null "));
         assertNull(JSON.std.beanFrom(URL.class," null "));
         assertNull(JSON.std.beanFrom(URI.class," null "));
+    }
+
+    // Testing that `null` will not cause an exception, for now at least
+    public void testNullForPrimitiveProperties() throws Exception {
+        BooleanWrapper w = JSON.std.beanFrom(BooleanWrapper.class, aposToQuotes("{'value':null}"));
+        assertNotNull(w);
+        assertFalse(w.value);
     }
 
     public void testNullForScalarProperties() throws Exception {
