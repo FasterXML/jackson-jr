@@ -13,6 +13,8 @@ Project: jackson-jr
 #72: Duplicate classes from `com.fasterxml.jackson.jr.ob` and
   `com.fasterxml.jackson.jr.type` in 2.11.0
   (reported by CListery@github)
+#74: jackson-jr-stree-2.11.1.jar is missing util package classes
+ (reported by Turloch O'T)
 
 2.11.0 (26-Apr-2020)
 
