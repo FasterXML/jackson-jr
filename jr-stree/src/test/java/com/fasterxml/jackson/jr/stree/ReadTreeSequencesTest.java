@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.JsonParser.NumberType;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.ValueIterator;
 
-public class ReadTreeSequencesTest extends TestBase
+public class ReadTreeSequencesTest extends JacksonJrTreeTestBase
 {
     private final JSON treeJSON = jsonWithTreeCodec();
 

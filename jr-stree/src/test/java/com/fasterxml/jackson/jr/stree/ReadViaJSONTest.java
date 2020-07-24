@@ -10,7 +10,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
  * Tests for reading content using {@link JSON} with proper
  * codec registration
  */
-public class ReadViaJSONTest extends TestBase
+public class ReadViaJSONTest extends JacksonJrTreeTestBase
 {
      private final TreeCodec TREE_CODEC = new JacksonJrsTreeCodec();
      private final static ObjectWriteContext EMPTY_WRITE_CONTEXT = new ObjectWriteContext.Base();
