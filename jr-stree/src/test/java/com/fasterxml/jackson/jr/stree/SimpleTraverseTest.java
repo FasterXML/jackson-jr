@@ -3,7 +3,7 @@ package com.fasterxml.jackson.jr.stree;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
 
-public class SimpleTraverseTest extends TestBase
+public class SimpleTraverseTest extends JacksonJrTreeTestBase
 {
     private final TreeCodec TREE_CODEC = new JacksonJrsTreeCodec();
 

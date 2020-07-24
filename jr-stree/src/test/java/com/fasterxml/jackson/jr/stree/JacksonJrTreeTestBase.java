@@ -7,7 +7,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
 
 import junit.framework.TestCase;
 
-public abstract class TestBase extends TestCase
+public abstract class JacksonJrTreeTestBase extends TestCase
 {
     protected final JsonFactory _factory = new JsonFactory();
 

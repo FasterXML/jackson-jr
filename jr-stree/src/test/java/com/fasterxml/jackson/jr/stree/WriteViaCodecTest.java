@@ -15,7 +15,7 @@ import com.fasterxml.jackson.jr.stree.JrsObject;
 import com.fasterxml.jackson.jr.stree.JrsString;
 import com.fasterxml.jackson.jr.stree.JrsValue;
 
-public class WriteViaCodecTest extends TestBase
+public class WriteViaCodecTest extends JacksonJrTreeTestBase
 {
     public void testSimpleList() throws Exception
     {

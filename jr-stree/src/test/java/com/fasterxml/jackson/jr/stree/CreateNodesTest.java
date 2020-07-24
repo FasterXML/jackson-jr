@@ -7,7 +7,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
  * so while Array/Object nodes may be created, they will be empty and can not
  * really be changed.
  */
-public class CreateNodesTest extends TestBase
+public class CreateNodesTest extends JacksonJrTreeTestBase
 {
      private final JSON treeJSON = jsonWithTreeCodec();
 

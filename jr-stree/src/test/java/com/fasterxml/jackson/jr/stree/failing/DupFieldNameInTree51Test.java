@@ -2,13 +2,13 @@ package com.fasterxml.jackson.jr.stree.failing;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
-import com.fasterxml.jackson.jr.stree.TestBase;
+import com.fasterxml.jackson.jr.stree.JacksonJrTreeTestBase;
 
 /**
  * Tests for reading content using {@link JSON} with proper
  * codec registration
  */
-public class DupFieldNameInTree51Test extends TestBase
+public class DupFieldNameInTree51Test extends JacksonJrTreeTestBase
 {
     private final JSON treeJSON = jsonWithTreeCodec();
 

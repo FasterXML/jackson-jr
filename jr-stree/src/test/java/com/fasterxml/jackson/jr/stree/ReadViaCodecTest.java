@@ -10,7 +10,7 @@ import com.fasterxml.jackson.core.TreeNode;
  * Tests for reading content directly using codec, and not
  * through <code>JSON</code>
  */
-public class ReadViaCodecTest extends TestBase
+public class ReadViaCodecTest extends JacksonJrTreeTestBase
 {
     private final TreeCodec TREE_CODEC = new JacksonJrsTreeCodec();
 

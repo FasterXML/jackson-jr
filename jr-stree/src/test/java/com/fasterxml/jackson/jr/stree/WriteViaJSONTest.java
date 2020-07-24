@@ -4,7 +4,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 
-public class WriteViaJSONTest extends TestBase
+public class WriteViaJSONTest extends JacksonJrTreeTestBase
 {
      private final JSON treeJSON = jsonWithTreeCodec();
 
