@@ -41,7 +41,10 @@
            build for Java 6 need to downgrade here to last working 2.x version
           (2.5.4 had some issues wrt shading)
       -->
-    <version.plugin.bundle>2.5.3</version.plugin.bundle>
+    <!-- 30-Jul-2020, tatu: But 4.2.0 seems to have worked for `jackson-annotations`
+           for a while now (since 2.10.x) so remove version lock
+    <version.plugin.bundle>4.2.1</version.plugin.bundle>
+      -->
 
     <!-- Aggressively minimize jar size; drop 'lines' and 'vars' -->
     <javac.debuglevel>source</javac.debuglevel>

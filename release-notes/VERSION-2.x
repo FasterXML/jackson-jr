@@ -4,6 +4,10 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.11.2 (not yet released)
+
+- Remove `maven-bundle-plugin` version override (was pinned to old 2.5.3)
+
 2.11.1 (25-Jun-2020)
 
 #72: Duplicate classes from `com.fasterxml.jackson.jr.ob` and
