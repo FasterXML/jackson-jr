@@ -8,7 +8,7 @@ Project: jackson-jr
 
 - Add Gradle Module Metadata (https://blog.gradle.org/alignment-with-gradle-module-metadata)
 
-2.11.2 (not yet released)
+2.11.2 (02-Aug-2020)
 
 - Remove `maven-bundle-plugin` version override (was pinned to old 2.5.3)
 
