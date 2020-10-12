@@ -93,11 +93,6 @@
           </execution>
         </executions>
       </plugin>
-      <!-- 05-Jul-2020, tatu: Add generation of Gradle Module Metadata -->
-       <plugin>
-        <groupId>de.jjohannes</groupId>
-        <artifactId>gradle-module-metadata-maven-plugin</artifactId>
-      </plugin>
     </plugins>
   </build>
 
