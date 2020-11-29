@@ -210,7 +210,7 @@ You can use Maven dependency like:
 <dependency>
   <groupId>com.fasterxml.jackson.jr</groupId>
   <artifactId>jackson-jr-objects</artifactId>
-  <version>2.9.0</version>
+  <version>2.12.0</version>
 </dependency>
 ```
 
