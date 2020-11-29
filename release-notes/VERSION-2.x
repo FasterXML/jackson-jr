@@ -4,7 +4,7 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
-2.12.0 (not yet released)
+2.12.0 (29-Nov-2020)
 
 - Add Gradle Module Metadata (https://blog.gradle.org/alignment-with-gradle-module-metadata)
 
