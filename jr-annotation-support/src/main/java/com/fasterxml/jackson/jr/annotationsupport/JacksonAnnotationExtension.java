@@ -14,8 +14,6 @@ import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
  * <li>{link com.fasterxml.jackson.annotation.JsonAlias}: supported on accessors
  *  (fields, getters, setters)
  *  </li>
- * <li>{@link com.fasterxml.jackson.annotation.JsonPropertyOrder}: supported on classes
- *  </li>
  * <li>{link com.fasterxml.jackson.annotation.JsonIgnore}: supported on accessors
  *  (fields, getters, setters)
  *  </li>
