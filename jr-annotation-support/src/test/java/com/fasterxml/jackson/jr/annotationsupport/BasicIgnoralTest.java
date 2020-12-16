@@ -18,14 +18,25 @@ public class BasicIgnoralTest extends ASTestBase
         }
     }
 
+    static class BaseXY {
+        public int x, y;
+
+        protected BaseXY() { }
+        protected BaseXY(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
     @JsonIgnoreProperties({ "y" })
-    static class XYZ {
-        public int x, y, z;
+    static class XYZ
+        extends BaseXY
+    {
+        public int z;
 
         protected XYZ() { }
         public XYZ(int x, int y, int z) {
-            this.x = x;
-            this.y = y;
+            super(x, y);
             this.z = z;
         }
     }

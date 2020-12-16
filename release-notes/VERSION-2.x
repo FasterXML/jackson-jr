@@ -4,6 +4,10 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.11.5 (not yet released)
+
+#76: Annotation-based introspector does not include super-class fields
+
 2.11.4 (12-Dec-2020)
 2.11.3 (02-Oct-2020)
 
