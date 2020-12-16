@@ -3,16 +3,17 @@
 Jackson jr is a compact alternative to full [Jackson Databind](../../../jackson-databind) component.
 It implements a subset of functionality, for example for cases where:
 
-1. Size of jar matters (`jackson-jr-objects` size is a bit over 100 kB)
-2. Startup time matters (jackson-jr has very low initialization overhead)
+1. Size of jar matters (`jackson-jr-objects` is bit over 100 kB)
+2. Startup time matters (`jackson-jr` has very low initialization overhead)
 
 In addition to basic datatypes (core JDK types like `List`s, `Map`s, wrapper types),
 package supports reading and writing of standard Java Beans (implementation that mimics standard
 JDK Bean Introspection): that is,
 subset of POJOs that define setters/getters and/or `public` fields.
-(with 2.11 and above there is even optional support for a subset of Jackson annotations!)
+And with 2.11 there is even optional support for a subset of Jackson annotations
+via optional `jackson-jr-annotatin-support` extension.
 
-Jackson jr also adds  `composer` implementation that can be used to
+Jackson-jr also adds  `composer` implementation that can be used to
 construct JSON output with builder-style API, but without necessarily having
 to build an in-memory representation: instead, it can directly use `streaming-api`
 for direct output. It is also possible to build actual in-memory
@@ -97,7 +98,17 @@ List<MyType> beans = JSON.std.listOfFrom(MyType.class, INPUT);
 ### Reading "streaming JSON" (LD-JSON)
 
 Version 2.10 added ability to read [Streaming JSON](https://en.wikipedia.org/wiki/JSON_streaming) content.
-See ["Jackson 2.10 features"](https://medium.com/@cowtowncoder/jackson-2-10-features-cd880674d8a2) for an example.
+See ["Jackson 2.10 features"](https://medium.com/@cowtowncoder/jackson-2-10-features-cd880674d8a2) (section "Jackson-jr feature expansion") for full example, but basic
+reading is done using new `ValueIterator` abstraction: 
+
+```
+File input = new File("json-stream.ldjson");
+try (ValueIterator<Bean> it = JSON.std.beanSequenceFrom(Bean.class, input)) {
+  while ((Bean bean = it.nextValue()) != null) {
+    // do something with 'bean'
+  }
+}
+```
 
 ### Writing with composers
 
@@ -171,10 +182,13 @@ To support readability and writability of your own types, your Java objects must
 Note that although getters and setters need to be public (since JDK Bean Introspection does not find any other methods),
 constructors may have any access right, including `private`.
 
-Also: starting with version 2.8, `public` fields may also be used (although their
+Starting with version 2.8, `public` fields may also be used (although their
 discovery may be disabled using `JSON.Feature.USE_FIELDS`) as an alternative:
 this is useful when limiting number of otherwise useless "getter" and "setter"
 methods.
+
+NEW! Jackson-jr 2.11 introduce `jackson-jr-annotation-support` extension (see more below)
+which allows use of Jackson annotations like `@JsonProperty`, `@JsonIgnore` and even `@JsonAutoDetect` for even more granular control of inclusion, naming and renaming.
 
 ### Customizing behavior with Features
 
@@ -192,14 +206,13 @@ String json = JSON.std
 Version 2.10 added ability to add custom `ValueReader`s and `ValueWriter`s, to
 allow pluggable support for types beyond basic JDK types and Beans.
 
-
 See section "Jackson-jr ValueReaders" of [Jackson-jr 2.10 improvements](https://cowtowncoder.medium.com/jackson-2-10-jackson-jr-improvements-9eb5bb7b35f) for an explanation of how to add custom `ValueReader`s and `ValueWriter`s
 
-You can check out unit test
+You can also check out unit test
 
    jr-objects/src/test/java/com/fasterxml/jackson/jr/ob/impl/CustomValueReadersTest.java
 
-for an example.
+for sample usage.
 
 ### Using (some of) Jackson annotations
 
