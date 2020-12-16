@@ -3,14 +3,14 @@
 Jackson jr is a compact alternative to full [Jackson Databind](../../../jackson-databind) component.
 It implements a subset of functionality, for example for cases where:
 
-1. Size of jar matters (jackson-jr size is about 100 kB)
+1. Size of jar matters (`jackson-jr-objects` size is a bit over 100 kB)
 2. Startup time matters (jackson-jr has very low initialization overhead)
 
 In addition to basic datatypes (core JDK types like `List`s, `Map`s, wrapper types),
 package supports reading and writing of standard Java Beans (implementation that mimics standard
 JDK Bean Introspection): that is,
-subset of POJOs that define setters/getters (starting with Jackson-jr `2.8`)
-you can alternatively use `public` fields).
+subset of POJOs that define setters/getters and/or `public` fields.
+(with 2.11 and above there is even optional support for a subset of Jackson annotations!)
 
 Jackson jr also adds  `composer` implementation that can be used to
 construct JSON output with builder-style API, but without necessarily having
@@ -18,9 +18,9 @@ to build an in-memory representation: instead, it can directly use `streaming-ap
 for direct output. It is also possible to build actual in-memory
 JSON `String` or `byte[]` representation, if that is preferable.
 
-Jackson jr artifact itself is currently about 95 kB in size, and only depends on
+Main Jackson-jr artifact (`jackson-jr-objects`) itself is currently about 120 kB in size, and only depends on
 [Jackson Streaming API](../../../jackson-core) package.
-Combined size, for "all" jar, is about 400 kB (of which streaming API is about 300 kB),
+Combined size, for "all" jar, is bit over 500 kB (of which streaming API is about 350 kB),
 for use cases where a single jar is preferred over more modular approach.
 Finally, use of jar minimizers like [ProGuard](http://proguard.sourceforge.net/) can bring the jar
 size down even further, by renaming and removing debug information.
@@ -98,8 +98,6 @@ List<MyType> beans = JSON.std.listOfFrom(MyType.class, INPUT);
 
 Version 2.10 added ability to read [Streaming JSON](https://en.wikipedia.org/wiki/JSON_streaming) content.
 See ["Jackson 2.10 features"](https://medium.com/@cowtowncoder/jackson-2-10-features-cd880674d8a2) for an example.
-
-[TO BE WRITTEN]
 
 ### Writing with composers
 
@@ -194,13 +192,29 @@ String json = JSON.std
 Version 2.10 added ability to add custom `ValueReader`s and `ValueWriter`s, to
 allow pluggable support for types beyond basic JDK types and Beans.
 
-You can check this unit test
+
+See section "Jackson-jr ValueReaders" of [Jackson-jr 2.10 improvements](https://cowtowncoder.medium.com/jackson-2-10-jackson-jr-improvements-9eb5bb7b35f) for an explanation of how to add custom `ValueReader`s and `ValueWriter`s
+
+You can check out unit test
 
    jr-objects/src/test/java/com/fasterxml/jackson/jr/ob/impl/CustomValueReadersTest.java
 
 for an example.
 
-[TO BE COMPLETED]
+### Using (some of) Jackson annotations
+
+Jackson 2.11 added a new extension (a `JacksonJrExtension`) -- `jr-annotation-support` -- that adds support for a subset of Jackson annotations.
+See [jr-annotation-support/README.md](../../tree/master/jr-annotation-support) for details of this extension, but basic usage is by registering extension:
+
+```
+import com.fasterxml.jackson.jr.annotationsupport.JacksonAnnotationExtension;
+
+JSON json = JSON.builder()
+    .register(JacksonAnnotationExtension.std)
+    .build();
+```
+
+and then using `JSON` instance as usual.
 
 ## Get it!
 

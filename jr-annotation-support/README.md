@@ -6,8 +6,7 @@ This package contains a simple extension, `JacksonAnnotationExtension` (subtype 
 
 ### Status
 
-Added in Jackson 2.11 (to be released in Feb/March 2020),
-considered experimental until following minor version.
+Added in Jackson 2.11, considered stable as of 2.12 release.
 
 ### Usage
 
