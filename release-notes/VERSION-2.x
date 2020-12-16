@@ -4,6 +4,10 @@ Project: jackson-jr
 === Releases ===
 ------------------------------------------------------------------------
 
+2.12.1 (not yet released)
+
+#76: Annotation-based introspector does not include super-class fields
+
 2.12.0 (29-Nov-2020)
 
 - Add Gradle Module Metadata (https://blog.gradle.org/alignment-with-gradle-module-metadata)

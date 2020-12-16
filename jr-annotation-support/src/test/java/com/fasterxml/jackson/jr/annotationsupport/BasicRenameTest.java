@@ -37,7 +37,7 @@ public class BasicRenameTest extends ASTestBase
         // default, no ignorals:
         assertEquals(a2q("{'_first':'Bob','_last':'Burger'}"), JSON.std.asString(input));
 
-        // but if we ignore 'x'...
+        // but if we rename "_last"
         assertEquals(a2q("{'_last':'Burger','firstName':'Bob'}"), JSON_WITH_ANNO.asString(input));
 
         // and ensure no leakage to default one:

@@ -220,7 +220,20 @@ public class AnnotationBasedIntrospector
     }
 
     protected void _findFields() {
-        for (Field f : _type.getDeclaredFields()) {
+        _findFields(_type);
+    }
+
+    protected void _findFields(final Class<?> currType)
+    {
+        if (currType == null || currType == Object.class) {
+            return;
+        }
+        // [jackson-jr#76]: Was not doing recursive field detection
+        // Start with base type fields (so overrides work)
+        _findFields(currType.getSuperclass());
+
+        // then get fields from within class itself
+        for (Field f : currType.getDeclaredFields()) {
             // Does not include static fields, but there are couple of things we do
             // not include regardless:
             if (f.isEnumConstant() || f.isSynthetic()) {
