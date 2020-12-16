@@ -94,6 +94,13 @@ List<MyType> beans = JSON.std.listOfFrom(MyType.class, INPUT);
 
 (writing of `List`s and arrays works without addition effort: just pass List/array as-is)
 
+### Reading "streaming JSON" (LD-JSON)
+
+Version 2.10 added ability to read [Streaming JSON](https://en.wikipedia.org/wiki/JSON_streaming) content.
+See ["Jackson 2.10 features"](https://medium.com/@cowtowncoder/jackson-2-10-features-cd880674d8a2) for an example.
+
+[TO BE WRITTEN]
+
 ### Writing with composers
 
 An alternative method exists for writing: "fluent" style output can be used as follows:
@@ -160,7 +167,7 @@ and in future other tree models may be offered as part of jackson-jr, or via oth
 
 To support readability and writability of your own types, your Java objects must either:
 
-* Implement Bean style accesors (getters for accessing data to write and/or setter for binding JSON data into objects), and define no-argument (default) constructor, OR
+* Implement Bean style accessors (getters for accessing data to write and/or setter for binding JSON data into objects), and define no-argument (default) constructor, OR
 * Define single-argument constructor if binding from JSON String (single-String argument) or JSON integer number (single-`long` or `Long` argument)
 
 Note that although getters and setters need to be public (since JDK Bean Introspection does not find any other methods),
@@ -182,6 +189,19 @@ String json = JSON.std
   .asString(...);
 ```
 
+### Adding custom value readers, writers
+
+Version 2.10 added ability to add custom `ValueReader`s and `ValueWriter`s, to
+allow pluggable support for types beyond basic JDK types and Beans.
+
+You can check this unit test
+
+   jr-objects/src/test/java/com/fasterxml/jackson/jr/ob/impl/CustomValueReadersTest.java
+
+for an example.
+
+[TO BE COMPLETED]
+
 ## Get it!
 
 You can use Maven dependency like:
@@ -190,7 +210,7 @@ You can use Maven dependency like:
 <dependency>
   <groupId>com.fasterxml.jackson.jr</groupId>
   <artifactId>jackson-jr-objects</artifactId>
-  <version>2.9.0</version>
+  <version>2.12.0</version>
 </dependency>
 ```
 
