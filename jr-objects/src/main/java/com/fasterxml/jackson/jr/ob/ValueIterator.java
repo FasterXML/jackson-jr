@@ -2,7 +2,6 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
@@ -190,26 +189,14 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
     @Override
     public boolean hasNext()
     {
-        try {
-            return hasNextValue();
-        } catch (JSONObjectException e) {
-            return (Boolean) _handleMappingException(e);
-        } catch (IOException e) {
-            return (Boolean) _handleIOException(e);
-        }
+        return hasNextValue();
     }
     
     @SuppressWarnings("unchecked")
     @Override
     public T next()
     {
-        try {
-            return nextValue();
-        } catch (JSONObjectException e) {
-            return (T) _handleMappingException(e);
-        } catch (IOException e) {
-            return (T) _handleIOException(e);
-        }
+        return nextValue();
     }
 
     @Override
@@ -237,7 +224,7 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
      * Equivalent of {@link #next} but one that may throw checked
      * exceptions from Jackson due to invalid input.
      */
-    public boolean hasNextValue() throws IOException
+    public boolean hasNextValue() throws JacksonException
     {
         switch (_state) {
         case STATE_CLOSED:
@@ -266,7 +253,7 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
         return true;
     }
 
-    public T nextValue() throws IOException
+    public T nextValue() throws JacksonException
     {
         switch (_state) {
         case STATE_CLOSED:
@@ -318,7 +305,7 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
      * 
      * @return List of entries read
      */
-    public List<T> readAll() throws IOException {
+    public List<T> readAll() throws JacksonException {
         return readAll(new ArrayList<T>());
     }
 
@@ -328,7 +315,7 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
      * 
      * @return List of entries read (same as passed-in argument)
      */
-    public <L extends List<? super T>> L readAll(L resultList) throws IOException
+    public <L extends List<? super T>> L readAll(L resultList) throws JacksonException
     {
         while (hasNextValue()) {
             resultList.add(nextValue());
@@ -339,7 +326,7 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
     /**
      * Convenience method for reading all entries accessible via this iterator
      */
-    public <C extends Collection<? super T>> C readAll(C results) throws IOException
+    public <C extends Collection<? super T>> C readAll(C results) throws JacksonException
     {
         while (hasNextValue()) {
             results.add(nextValue());
@@ -378,7 +365,7 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
     /**********************************************************************
      */
 
-    protected void _resync() throws IOException
+    protected void _resync() throws JacksonException
     {
         final JsonParser p = _parser;
         // First, a quick check to see if we might have been lucky and no re-sync needed
@@ -403,15 +390,5 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
 
     protected <R> R _throwNoSuchElement() {
         throw new NoSuchElementException();
-    }
-    
-    protected <R> R _handleMappingException(JSONObjectException e) {
-        // 20-Dec-2019, tatu: Ok with JDK 8 now, finally
-        throw new UncheckedIOException(e.getMessage(), e);
-    }
-
-    protected <R> R _handleIOException(IOException e) {
-        // 20-Dec-2019, tatu: Ok with JDK 8 now, finally
-        throw new UncheckedIOException(e.getMessage(), e);
     }
 }

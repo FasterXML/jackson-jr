@@ -1,8 +1,8 @@
 package com.fasterxml.jackson.jr.stree;
 
-import java.io.IOException;
 import java.util.*;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonToken;
@@ -96,7 +96,8 @@ public class JrsArray
      */
 
     @Override
-    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws IOException
+    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec)
+        throws JacksonException
     {
         g.writeStartArray();
         for (int i = 0, end = _values.size(); i < end; ++i) {

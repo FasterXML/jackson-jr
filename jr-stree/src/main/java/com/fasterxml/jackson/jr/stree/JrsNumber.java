@@ -1,15 +1,15 @@
 package com.fasterxml.jackson.jr.stree;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 import static com.fasterxml.jackson.core.JsonToken.VALUE_NUMBER_FLOAT;
 import static com.fasterxml.jackson.core.JsonToken.VALUE_NUMBER_INT;
@@ -83,7 +83,7 @@ public class JrsNumber extends JrsValue.Scalar
     /**********************************************************************
      */
     
-    public BigInteger asBigInteger() throws IOException {
+    public BigInteger asBigInteger() {
         if (_value instanceof BigInteger) {
             return (BigInteger) _value;
         }
@@ -94,7 +94,7 @@ public class JrsNumber extends JrsValue.Scalar
         return BigInteger.valueOf(_value.longValue());
     }
 
-    public BigDecimal asBigDecimal() throws IOException {
+    public BigDecimal asBigDecimal() {
         if (_value instanceof BigDecimal) {
             return (BigDecimal) _value;
         }
@@ -124,7 +124,8 @@ public class JrsNumber extends JrsValue.Scalar
      */
 
     @Override
-    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws IOException
+    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec)
+        throws JacksonException
     {
         switch (numberType()) {
         case INT:

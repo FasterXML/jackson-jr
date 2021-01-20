@@ -2,15 +2,11 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Standard exception exposed by this package; equivalent of
@@ -19,7 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  * had to be cut-n-pasted since we do not depend on databind package).
  */
 public class JSONObjectException
-    extends JsonProcessingException
+    extends JacksonException
 {
     private static final long serialVersionUID = 1L;
 
@@ -30,9 +26,9 @@ public class JSONObjectException
     final static int MAX_REFS_TO_LIST = 250;
 
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Helper classes
-    /**********************************************************
+    /**********************************************************************
      */
 
     /**
@@ -126,9 +122,9 @@ public class JSONObjectException
     }
 
     /*
-    /**********************************************************
+    /**********************************************************************
     /* State/configuration
-    /**********************************************************
+    /**********************************************************************
      */
 
     /**
@@ -138,9 +134,9 @@ public class JSONObjectException
     protected LinkedList<Reference> _path;
 
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Life-cycle
-    /**********************************************************
+    /**********************************************************************
      */
 
     public JSONObjectException(String msg) {
@@ -152,7 +148,7 @@ public class JSONObjectException
     }
 
     public JSONObjectException(String msg, JsonLocation loc) {
-        super(msg, loc);
+        super(msg, loc, null);
     }
 
     public JSONObjectException(String msg, JsonLocation loc, Throwable rootCause) {
@@ -240,9 +236,9 @@ public class JSONObjectException
     }
     
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Accessors/mutators
-    /**********************************************************
+    /**********************************************************************
      */
 
     /**
@@ -306,9 +302,9 @@ public class JSONObjectException
     }
     
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Overridden methods
-    /**********************************************************
+    /**********************************************************************
      */
 
     @Override
@@ -345,9 +341,9 @@ public class JSONObjectException
     }
 
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Internal methods
-    /**********************************************************
+    /**********************************************************************
      */
 
     protected void _appendPathDesc(StringBuilder sb)

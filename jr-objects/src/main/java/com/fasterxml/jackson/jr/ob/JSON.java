@@ -344,7 +344,7 @@ public class JSON
     }
 
     // Important: has to come before 'std' instance, since it refers to it
-    private final static int DEFAULT_FEATURES = Feature.defaults();
+    final static int DEFAULT_FEATURES = Feature.defaults();
 
     public final static int CACHE_FLAGS = Feature.cacheBreakers();
 
@@ -900,10 +900,8 @@ public class JSON
      *<p>
      * Rules regarding closing of the underlying source follow rules
      * that {@link JsonFactory} has for its {@code createParser} method.
-     *
-     * @since 2.10
      */
-    public JsonParser createParser(Object source) throws IOException, JSONObjectException {
+    public JsonParser createParser(Object source) {
         return _parser(source);
     }
 
@@ -913,35 +911,23 @@ public class JSON
     /**********************************************************************
      */
 
-    public String asString(Object value) throws IOException, JSONObjectException
+    public String asString(Object value) throws JacksonException
     {
         SegmentedStringWriter sw = new SegmentedStringWriter(_streamFactory._getBufferRecycler());
-        try {
-            _writeAndClose(value, _streamFactory.createGenerator(this, sw));
-        } catch (JsonProcessingException e) {
-            throw e;
-        } catch (IOException e) { // shouldn't really happen, but is declared as possibility so:
-            throw JSONObjectException.fromUnexpectedIOE(e);
-        }
+        _writeAndClose(value, _streamFactory.createGenerator(this, sw));
         return sw.getAndClear();
     }
 
-    public byte[] asBytes(Object value) throws IOException, JSONObjectException
+    public byte[] asBytes(Object value) throws JacksonException
     {
         ByteArrayBuilder bb = new ByteArrayBuilder(_streamFactory._getBufferRecycler());
-        try {
-            _writeAndClose(value, _streamFactory.createGenerator(this, bb, JsonEncoding.UTF8));
-        } catch (JsonProcessingException e) {
-            throw e;
-        } catch (IOException e) { // shouldn't really happen, but is declared as possibility so:
-            throw JSONObjectException.fromUnexpectedIOE(e);
-        }
+        _writeAndClose(value, _streamFactory.createGenerator(this, bb, JsonEncoding.UTF8));
         byte[] result = bb.toByteArray();
         bb.release();
         return result;
     }
 
-    public void write(Object value, JsonGenerator gen) throws IOException, JSONObjectException {
+    public void write(Object value, JsonGenerator gen) throws JacksonException {
         // NOTE: no call to _config(); assumed to be fully configured
         _writerForOperation(gen).writeValue(value);
         if (Feature.FLUSH_AFTER_WRITE_VALUE.isEnabled(_features)) {
@@ -949,15 +935,15 @@ public class JSON
         }
     }
 
-    public void write(Object value, OutputStream out) throws IOException, JSONObjectException {
+    public void write(Object value, OutputStream out) throws JacksonException {
         _writeAndClose(value, _streamFactory.createGenerator(this, out));
     }
 
-    public void write(Object value, Writer w) throws IOException, JSONObjectException {
+    public void write(Object value, Writer w) throws JacksonException {
         _writeAndClose(value, _streamFactory.createGenerator(this, w));
     }
 
-    public void write(Object value, File f) throws IOException, JSONObjectException {
+    public void write(Object value, File f) throws JacksonException {
         _writeAndClose(value, _streamFactory.createGenerator(this, f, JsonEncoding.UTF8));
     }
 
@@ -967,32 +953,32 @@ public class JSON
     /**********************************************************************
      */
 
-    public JSONComposer<OutputStream> composeUsing(JsonGenerator gen) throws IOException, JSONObjectException {
+    public JSONComposer<OutputStream> composeUsing(JsonGenerator gen) throws JacksonException {
         return JSONComposer.streamComposer(_features, gen, false);
     }
 
-    public JSONComposer<OutputStream> composeTo(OutputStream out) throws IOException, JSONObjectException {
+    public JSONComposer<OutputStream> composeTo(OutputStream out) throws JacksonException {
         return JSONComposer.streamComposer(_features,
                 _config(_streamFactory.createGenerator(this, out)), true);
     }
 
-    public JSONComposer<OutputStream> composeTo(Writer w) throws IOException, JSONObjectException {
+    public JSONComposer<OutputStream> composeTo(Writer w) throws JacksonException {
         return JSONComposer.streamComposer(_features,
                 _config(_streamFactory.createGenerator(this, w)), true);
     }
 
-    public JSONComposer<OutputStream> composeTo(File f) throws IOException, JSONObjectException {
+    public JSONComposer<OutputStream> composeTo(File f) throws JacksonException {
         return JSONComposer.streamComposer(_features,
                 _config(_streamFactory.createGenerator(this, f, JsonEncoding.UTF8)), true);
     }
 
-    public JSONComposer<String> composeString() throws IOException, JSONObjectException {
+    public JSONComposer<String> composeString() throws JacksonException {
         SegmentedStringWriter out = new SegmentedStringWriter(_streamFactory._getBufferRecycler());
         JsonGenerator gen = _config(_streamFactory.createGenerator(this, out));
         return JSONComposer.stringComposer(_features, gen, out);
     }
 
-    public JSONComposer<byte[]> composeBytes() throws IOException, JSONObjectException {
+    public JSONComposer<byte[]> composeBytes() throws JacksonException {
         ByteArrayBuilder out = new ByteArrayBuilder(_streamFactory._getBufferRecycler());
         JsonGenerator gen = _config(_streamFactory.createGenerator(this, out));
         return JSONComposer.bytesComposer(_features, gen, out);
@@ -1021,7 +1007,7 @@ public class JSON
     /**********************************************************************
      */
 
-    public List<Object> listFrom(Object source) throws IOException, JSONObjectException
+    public List<Object> listFrom(Object source) throws JacksonException
     {
         if (source instanceof JsonParser) {
             // note: no call to _config(), should come pre-configured
@@ -1031,20 +1017,14 @@ public class JSON
             p.clearCurrentToken();
             return result;
         }
-        JsonParser p = _parser(source);
-        try {
+        try (JsonParser p = _parser(source)) {
             _initForReading(_config(p));
             List<Object> result = _readerForOperation(p).readList();
-            JsonParser p0 = p;
-            p = null;
-            _close(p0);
             return result;
-        } catch (Exception e) {
-            return _closeWithError(p, e);
         }
     }
 
-    public <T> List<T> listOfFrom(Class<T> type, Object source) throws IOException, JSONObjectException
+    public <T> List<T> listOfFrom(Class<T> type, Object source) throws JacksonException
     {
         if (source instanceof JsonParser) {
             // note: no call to _config(), should come pre-configured
@@ -1054,20 +1034,14 @@ public class JSON
             p.clearCurrentToken();
             return result;
         }
-        JsonParser p = _parser(source);
-        try {
+        try (JsonParser p = _parser(source)) {
             _initForReading(_config(p));
             List<T> result = _readerForOperation(p).readListOf(type);
-            JsonParser p0 = p;
-            p = null;
-            _close(p0);
             return result;
-        } catch (Exception e) {
-            return _closeWithError(p, e);
         }
     }
 
-    public Object[] arrayFrom(Object source) throws IOException, JSONObjectException
+    public Object[] arrayFrom(Object source) throws JacksonException
     {
         if (source instanceof JsonParser) {
             JsonParser p = _initForReading((JsonParser) source);
@@ -1075,20 +1049,14 @@ public class JSON
             p.clearCurrentToken();
             return result;
         }
-        JsonParser p = _parser(source);
-        try {
+        try (JsonParser p = _parser(source)) {
             _initForReading(_config(p));
             Object[] result = _readerForOperation(p).readArray();
-            JsonParser p0 = p;
-            p = null;
-            _close(p0);
             return result;
-        } catch (Exception e) {
-            return _closeWithError(p, e);
         }
     }
 
-    public <T> T[] arrayOfFrom(Class<T> type, Object source) throws IOException, JSONObjectException
+    public <T> T[] arrayOfFrom(Class<T> type, Object source) throws JacksonException
     {
         if (source instanceof JsonParser) {
             JsonParser p = _initForReading((JsonParser) source);
@@ -1096,21 +1064,16 @@ public class JSON
             p.clearCurrentToken();
             return result;
         }
-        JsonParser p = _parser(source);
-        try {
+        
+        try (JsonParser p = _parser(source)) {
             _initForReading(_config(p));
             T[] result = _readerForOperation(p).readArrayOf(type);
-            JsonParser p0 = p;
-            p = null;
-            _close(p0);
             return result;
-        } catch (Exception e) {
-            return _closeWithError(p, e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String,Object> mapFrom(Object source) throws IOException, JSONObjectException
+    public Map<String,Object> mapFrom(Object source) throws JacksonException
     {
         if (source instanceof JsonParser) {
             JsonParser p = _initForReading((JsonParser) source);
@@ -1118,23 +1081,15 @@ public class JSON
             p.clearCurrentToken();
             return (Map<String,Object>) result;
         }
-        JsonParser p = _parser(source);
-        try {
+        try (JsonParser p = _parser(source)) {
             _initForReading(_config(p));
             Map<?,?> result = _readerForOperation(p).readMap();
-            JsonParser p0 = p;
-            p = null;
-            _close(p0);
             return (Map<String,Object>) result;
-        } catch (Exception e) {
-            return _closeWithError(p, e);
         }
     }
 
     /**
      * Read method for reading a {@link Map} of {@code type} (usually POJO) values.
-     *
-     * @since 2.10
      */
     @SuppressWarnings("unchecked")
     public <T> Map<String,T> mapOfFrom(Class<T> type, Object source) throws IOException, JSONObjectException
@@ -1145,16 +1100,10 @@ public class JSON
             p.clearCurrentToken();
             return (Map<String,T>) result;
         }
-        JsonParser p = _parser(source);
-        try {
+        try (JsonParser p = _parser(source)) {
             _initForReading(_config(p));
             Map<?,?> result = _readerForOperation(p).readMapOf(type);
-            JsonParser p0 = p;
-            p = null;
-            _close(p0);
             return (Map<String,T>) result;
-        } catch (Exception e) {
-            return _closeWithError(p, e);
         }
     }
 
@@ -1166,19 +1115,13 @@ public class JSON
             p.clearCurrentToken();
             return result;
         }
-        JsonParser p = _parser(source);
-        try {
+        try (JsonParser p = _parser(source)) {
             _initForReading(_config(p));
             T result = _readerForOperation(p).readBean(type);
-            JsonParser p0 = p;
-            p = null;
-            _close(p0);
             return result;
-        } catch (Exception e) {
-            return _closeWithError(p, e);
         }
     }
-    
+
     /**
      * Read method that will take given JSON Source (of one of supported types),
      * read contents and map it to one of simple mappings ({@link java.util.Map}
@@ -1205,17 +1148,9 @@ public class JSON
             p.clearCurrentToken();
             return result;
         }
-        JsonParser p = _parser(source);
-        try {
+        try (JsonParser p = _parser(source)) {
             _initForReading(_config(p));
-            Object result = _readerForOperation(p).readValue();
-            JsonParser p0 = p;
-            p = null;
-            _close(p0);
-            return result;
-        } catch (Exception e) {
-            _closeWithError(p, e);
-            return null;
+            return _readerForOperation(p).readValue();
         }
     }
 
@@ -1236,17 +1171,10 @@ public class JSON
             p.clearCurrentToken();
             return result;
         }
-        JsonParser p = _parser(source);
-        try {
+        try (JsonParser p = _parser(source)) {
             _initForReading(_config(p));
             T result = (T) _treeCodec.readTree(p);
-            JsonParser p0 = p;
-            p = null;
-            _close(p0);
             return result;
-        } catch (Exception e) {
-            _closeWithError(p, e);
-            return null;
         }
     }
 
@@ -1358,7 +1286,8 @@ public class JSON
      */
     
     @Override
-    public <T extends TreeNode> T readTree(JsonParser p) throws IOException {
+    public <T extends TreeNode> T readTree(JsonParser p) throws JacksonException
+    {
         if (_treeCodec == null) {
             _noTreeCodec("write TreeNode");
         }
@@ -1366,8 +1295,7 @@ public class JSON
     }
 
     @Override
-    public <T> T readValue(JsonParser p, Class<T> valueType)
-            throws IOException
+    public <T> T readValue(JsonParser p, Class<T> valueType) throws JacksonException
     {
         // 11-Oct-2017, tatu: Not sure this is sufficient but it's best we got:
         // !!! TODO: maybe support array types?
@@ -1377,8 +1305,7 @@ public class JSON
     }
 
     @Override
-    public <T> T readValue(JsonParser p, TypeReference<T> valueTypeRef)
-        throws IOException
+    public <T> T readValue(JsonParser p, TypeReference<T> valueTypeRef) throws JacksonException
     {
         // 11-Oct-2017, tatu: Not sure what to do here really
         throw new UnsupportedOperationException("`TypeReference<T>` not support by jackson-jr");
@@ -1386,7 +1313,7 @@ public class JSON
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T readValue(JsonParser p, ResolvedType type) throws IOException {
+    public <T> T readValue(JsonParser p, ResolvedType type) throws JacksonException {
         return (T) readValue(p, type.getRawClass());
     }
 
@@ -1448,7 +1375,7 @@ public class JSON
      */
     
     @Override
-    public void writeValue(JsonGenerator g, Object value) throws IOException {
+    public void writeValue(JsonGenerator g, Object value) throws JacksonException {
         write(value, g);
     }
 
@@ -1459,7 +1386,7 @@ public class JSON
      */
 
     @Override
-    public void writeTree(JsonGenerator g, TreeNode tree) throws IOException {
+    public void writeTree(JsonGenerator g, TreeNode tree) throws JacksonException {
         if (_treeCodec == null) {
             _noTreeCodec("write TreeNode");
         }
@@ -1509,19 +1436,13 @@ public class JSON
     /**********************************************************************
      */
 
-    protected final void _writeAndClose(Object value, JsonGenerator g)
-        throws IOException
+    protected final void _writeAndClose(Object value, JsonGenerator g0)
+        throws JacksonException
     {
-        boolean closed = false;
-        try {
+        try (JsonGenerator g = g0) {
             _config(g);
             _writerForOperation(g).writeValue(value);
-            closed = true;
             g.close();
-        } finally {
-            if (!closed) {
-                _close(g);
-            }
         }
     }
 
@@ -1540,7 +1461,7 @@ public class JSON
         return _reader.perOperationInstance(_features, _valueReaderLocator, _treeCodec, p);
     }
 
-    protected JsonParser _parser(Object source) throws IOException, JSONObjectException
+    protected JsonParser _parser(Object source) throws JacksonException
     {
         final TokenStreamFactory f = _streamFactory;
         final Class<?> type = source.getClass();
@@ -1572,7 +1493,7 @@ public class JSON
 +"` as input (use an `InputStream`, `Reader`, `String`/`CharSequence`, `byte[]`, `char[]`, `File` or `URL`");
     }
 
-    protected JsonParser _initForReading(JsonParser p) throws IOException
+    protected JsonParser _initForReading(JsonParser p) throws JacksonException
     {
         /* First: must point to a token; if not pointing to one, advance.
          * This occurs before first read from JsonParser, as well as
@@ -1607,6 +1528,7 @@ public class JSON
         return p;
     }
 
+    /*
     protected <T> T _closeWithError(Closeable cl, Exception e) throws IOException {
         _close(cl);
         return _throw(e);
@@ -1629,6 +1551,7 @@ public class JSON
         }
         throw new IOException(e); // should never occur
     }
+    */
     
     protected void _noTreeCodec(String msg) {
          throw new IllegalStateException("JSON instance does not have configured `TreeCodec` to "+msg);

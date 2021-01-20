@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.IOException;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -41,7 +40,7 @@ public class ValueReaderModifierTest extends TestBase
         }
 
         @Override
-        public Object read(JSONReader reader, JsonParser p) throws IOException {
+        public Object read(JSONReader reader, JsonParser p) {
             NameBean nb = (NameBean) _origReader.read(reader, p);
             return new NameBean(nb.getFirst().toLowerCase(),
                     nb.getLast().toLowerCase());
@@ -76,7 +75,7 @@ public class ValueReaderModifierTest extends TestBase
         final ReaderWriterModifier mod = new RWModifier(String.class,
                 new ValueReader(String.class) {
             @Override
-            public Object read(JSONReader reader, JsonParser p) throws IOException {
+            public Object read(JSONReader reader, JsonParser p) {
                 return p.getText().toUpperCase();
             };
         });
@@ -92,7 +91,7 @@ public class ValueReaderModifierTest extends TestBase
         final ReaderWriterModifier mod = new RWModifier(NameBean.class,
                 new ValueReader(NameBean.class) {
             @Override
-            public Object read(JSONReader reader, JsonParser p) throws IOException {
+            public Object read(JSONReader reader, JsonParser p) {
                 Map<?, Object> map = reader.readMap();
                 return new NameBean(String.valueOf(map.get("first")).toUpperCase(),
                         String.valueOf(map.get("last")).toUpperCase());

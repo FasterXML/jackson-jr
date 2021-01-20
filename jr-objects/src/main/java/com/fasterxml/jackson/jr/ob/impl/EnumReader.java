@@ -1,8 +1,8 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.IOException;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
@@ -33,7 +33,7 @@ public class EnumReader extends ValueReader
     }
 
     @Override
-    public Object readNext(JSONReader reader, JsonParser p) throws IOException {
+    public Object readNext(JSONReader reader, JsonParser p) throws JacksonException {
         String name = p.nextTextValue();
         if (name != null) {
             return _enum(name);
@@ -42,7 +42,7 @@ public class EnumReader extends ValueReader
     }
     
     @Override
-    public Object read(JSONReader reader, JsonParser p) throws IOException {
+    public Object read(JSONReader reader, JsonParser p) throws JacksonException {
         if (p.hasToken(JsonToken.VALUE_NUMBER_INT)) {
             int ix = p.getIntValue();
             if (ix < 0 || ix >= _byIndex.length) {
@@ -61,7 +61,7 @@ public class EnumReader extends ValueReader
                 +_tokenDesc(p, p.currentToken()));
     }
 
-    private Object _enum(String id) throws IOException
+    private Object _enum(String id) throws JacksonException
     {
         Object e = _byName.get(id);
         if (e == null) {

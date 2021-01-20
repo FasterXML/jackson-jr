@@ -2,8 +2,6 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.util.*;
 
-import com.fasterxml.jackson.jr.ob.JSON;
-
 public class IndentationTest extends TestBase
 {
     public void testSimpleList() throws Exception

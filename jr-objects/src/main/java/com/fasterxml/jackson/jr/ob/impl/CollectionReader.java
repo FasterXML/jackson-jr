@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
@@ -32,7 +31,7 @@ public class CollectionReader extends ValueReader
     }
 
     @Override
-    public Object readNext(JSONReader r, JsonParser p) throws IOException {
+    public Object readNext(JSONReader r, JsonParser p) throws JacksonException {
         if (p.nextToken() != JsonToken.START_ARRAY) {
             if (p.hasToken(JsonToken.VALUE_NULL)) {
                 return null;
@@ -56,7 +55,7 @@ public class CollectionReader extends ValueReader
     }
         
     @Override
-    public Object read(JSONReader r, JsonParser p) throws IOException {
+    public Object read(JSONReader r, JsonParser p) throws JacksonException {
         CollectionBuilder b = r._collectionBuilder(_collectionType);
         if (p.nextToken() == JsonToken.END_ARRAY) {
             return b.emptyCollection();

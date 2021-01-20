@@ -1,8 +1,8 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.IOException;
 import java.util.*;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
@@ -25,7 +25,7 @@ public class MapReader extends ValueReader
     }
 
     @Override
-    public Object readNext(JSONReader r, JsonParser p) throws IOException {
+    public Object readNext(JSONReader r, JsonParser p) throws JacksonException {
         if (p.nextToken() != JsonToken.START_OBJECT) {
             if (p.hasToken(JsonToken.VALUE_NULL)) {
                 return null;
@@ -68,7 +68,7 @@ public class MapReader extends ValueReader
     }
 
     @Override
-    public Object read(JSONReader r, JsonParser p) throws IOException {
+    public Object read(JSONReader r, JsonParser p) throws JacksonException {
         MapBuilder b = r._mapBuilder(_mapType);
         String propName0 = p.nextFieldName();
         if (propName0 == null) {

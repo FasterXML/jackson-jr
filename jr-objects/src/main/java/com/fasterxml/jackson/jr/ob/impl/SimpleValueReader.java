@@ -1,18 +1,20 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.core.exc.WrappedIOException;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
+
+import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
 
 /**
  * Default {@link ValueReader} used for simple scalar types and related,
@@ -29,7 +31,7 @@ public class SimpleValueReader extends ValueReader
     }
     
     @Override
-    public Object readNext(JSONReader reader, JsonParser p) throws IOException
+    public Object readNext(JSONReader reader, JsonParser p) throws JacksonException
     {
         // NOTE: only cases where we can optimize
         switch (_typeId) {
@@ -94,7 +96,7 @@ public class SimpleValueReader extends ValueReader
     }    
     
     @Override
-    public Object read(JSONReader reader, JsonParser p) throws IOException
+    public Object read(JSONReader reader, JsonParser p) throws JacksonException
     {
         switch (_typeId) {
 
@@ -211,7 +213,11 @@ public class SimpleValueReader extends ValueReader
             if (p.hasToken(JsonToken.VALUE_NULL)) {
                 return null;
             }
-            return new URL(p.getValueAsString());
+            try {
+                return new URL(p.getValueAsString());
+            } catch (IOException e) {
+                throw WrappedIOException.construct(e);
+            }
         case SER_URI:
             // [jackson-jr#73]: should allow null
             if (p.hasToken(JsonToken.VALUE_NULL)) {
@@ -238,17 +244,17 @@ public class SimpleValueReader extends ValueReader
     /**********************************************************************
      */
 
-    protected byte[] _readBinary(JsonParser p) throws IOException {
+    protected byte[] _readBinary(JsonParser p) throws JacksonException {
         return p.getBinaryValue();
     }
     
-    protected int[] _readIntArray(JsonParser p) throws IOException
+    protected int[] _readIntArray(JsonParser p) throws JacksonException
     {
         // !!! TODO
         throw new JSONObjectException("Reading of int[] not yet implemented");
     }
 
-    protected long _fetchLong(JsonParser p) throws IOException
+    protected long _fetchLong(JsonParser p) throws JacksonException
     {
         JsonToken t = p.currentToken();
         if (t == JsonToken.VALUE_NUMBER_INT) {

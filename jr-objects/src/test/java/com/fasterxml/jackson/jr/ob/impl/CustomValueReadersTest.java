@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.IOException;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -44,7 +43,7 @@ public class CustomValueReadersTest extends TestBase
         }
 
         @Override
-        public Object read(JSONReader reader, JsonParser p) throws IOException {
+        public Object read(JSONReader reader, JsonParser p) {
             return new CustomValue(p.getIntValue() + delta, true);
         }
 
@@ -63,7 +62,7 @@ public class CustomValueReadersTest extends TestBase
         }
 
         @Override
-        public Object read(JSONReader reader, JsonParser p) throws IOException {
+        public Object read(JSONReader reader, JsonParser p) {
             final String str = p.getText();
             if ("n/a".equals(str)) {
                 return ABC.DEF;
@@ -78,7 +77,7 @@ public class CustomValueReadersTest extends TestBase
         }
 
         @Override
-        public Object read(JSONReader reader, JsonParser p) throws IOException {
+        public Object read(JSONReader reader, JsonParser p) {
             return p.getText().toUpperCase();
         }
     }
@@ -92,7 +91,7 @@ public class CustomValueReadersTest extends TestBase
         }
 
         @Override
-        public Object read(JSONReader reader, JsonParser p) throws IOException {
+        public Object read(JSONReader reader, JsonParser p) {
             p.skipChildren();
             return _value;
         }
@@ -155,7 +154,7 @@ public class CustomValueReadersTest extends TestBase
         public PointReader() { super(Point.class); }
 
         @Override
-        public Object read(JSONReader reader, JsonParser p) throws IOException {
+        public Object read(JSONReader reader, JsonParser p) {
             Map<String, Object> map = reader.readMap();
             return new Point((Integer) map.get("x"), (Integer) map.get("y"));
         }

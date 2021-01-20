@@ -1,7 +1,6 @@
 package com.fasterxml.jackson.jr.stree;
 
-import java.io.IOException;
-
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonToken;
 
@@ -39,7 +38,7 @@ public class JrsString extends JrsValue.Scalar
      */
 
     @Override
-    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws IOException {
+    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws JacksonException {
         g.writeString(_value);
     }
 }

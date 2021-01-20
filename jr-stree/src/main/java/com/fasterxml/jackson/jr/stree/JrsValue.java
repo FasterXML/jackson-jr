@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.stree;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import com.fasterxml.jackson.core.*;
@@ -121,7 +120,8 @@ public abstract class JrsValue implements TreeNode
 
     protected abstract JrsValue _at(JsonPointer ptr);
 
-    protected abstract void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws IOException;
+    protected abstract void write(JsonGenerator g, JacksonJrsTreeCodec codec)
+        throws JacksonException;
 
     /*
     /**********************************************************************

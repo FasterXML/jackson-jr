@@ -1,9 +1,9 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.*;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
+
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
@@ -173,7 +173,7 @@ public class JSONReader
      * for JSON Array (or, <code>Object[]</code> if so configured),
      * {@link java.lang.String} for JSON String value and so on.
      */
-    public Object readValue() throws IOException {
+    public Object readValue() throws JacksonException {
         return AnyReader.std.read(this, _parser);
     }
 
@@ -182,7 +182,7 @@ public class JSONReader
      * out of it. Note that if input does NOT contain a
      * JSON Object, {@link JSONObjectException} will be thrown.
      */
-    public Map<String,Object> readMap() throws IOException {
+    public Map<String,Object> readMap() throws JacksonException {
         if (_parser.isExpectedStartObjectToken()) {
             return (Map<String,Object>) AnyReader.std.readFromObject(this, _parser, _mapBuilder);
         }
@@ -198,7 +198,7 @@ public class JSONReader
      * out of it. Note that if input does NOT contain a
      * JSON Array, {@link JSONObjectException} will be thrown.
      */
-    public List<Object> readList() throws IOException {
+    public List<Object> readList() throws JacksonException {
         if (_parser.isExpectedStartArrayToken()) {
             return (List<Object>) AnyReader.std.readCollectionFromArray(this, _parser, _collectionBuilder);
         }
@@ -214,7 +214,7 @@ public class JSONReader
      * out of it. Note that if input does NOT contain a
      * JSON Array, {@link JSONObjectException} will be thrown.
      */
-    public Object[] readArray() throws IOException
+    public Object[] readArray() throws JacksonException
     {
         if (_parser.isExpectedStartArrayToken()) {
             return AnyReader.std.readArrayFromArray(this, _parser, _collectionBuilder);
@@ -238,12 +238,12 @@ public class JSONReader
      * specification by having setters for passing JSON Object properties.
      */
     @SuppressWarnings("unchecked")
-    public <T> T readBean(Class<T> type) throws IOException {
+    public <T> T readBean(Class<T> type) throws JacksonException {
         return (T) _readerLocator.findReader(type).read(this, _parser);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T[] readArrayOf(Class<T> type) throws IOException {
+    public <T> T[] readArrayOf(Class<T> type) throws JacksonException {
         if (_parser.isExpectedStartArrayToken()) {
             // NOTE: "array type" we give is incorrect, but should usually not matter
             // -- to fix would need to instantiate 0-element array, get that type
@@ -264,7 +264,7 @@ public class JSONReader
      * Note that if input does NOT contain a JSON Array, {@link JSONObjectException} will be thrown.
      */
     @SuppressWarnings("unchecked")
-    public <T> List<T> readListOf(Class<T> type) throws IOException
+    public <T> List<T> readListOf(Class<T> type) throws JacksonException
     {
         if (_parser.isExpectedStartArrayToken()) {
             return (List<T>) new CollectionReader(List.class, _readerLocator.findReader(type))
@@ -283,7 +283,7 @@ public class JSONReader
      * Note that if input does NOT contain a JSON Object, {@link JSONObjectException} will be thrown.
      */
     @SuppressWarnings("unchecked")
-    public <T> Map<String, T> readMapOf(Class<T> type) throws IOException
+    public <T> Map<String, T> readMapOf(Class<T> type) throws JacksonException
     {
         if (_parser.isExpectedStartObjectToken()) {
             return (Map<String, T>) new MapReader(Map.class, _readerLocator.findReader(type))
@@ -296,10 +296,7 @@ public class JSONReader
                 "Can not read a Map: expect to see START_OBJECT ('{'), instead got: "+ValueReader._tokenDesc(_parser));
     }
 
-    /**
-     * @since 2.11
-     */
-    public TreeNode readTree() throws IOException {
+    public TreeNode readTree() throws JacksonException {
         if (_treeCodec == null) {
             throw new JSONObjectException("No `TreeCodec` specified: can not bind JSON into `TreeNode` types");
         }

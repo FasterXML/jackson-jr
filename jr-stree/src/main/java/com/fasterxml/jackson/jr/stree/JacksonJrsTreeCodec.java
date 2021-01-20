@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.stree;
 
-import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
@@ -20,11 +19,11 @@ public class JacksonJrsTreeCodec implements TreeCodec
 
     @SuppressWarnings("unchecked")
     @Override
-    public JrsValue readTree(JsonParser p) throws IOException {
+    public JrsValue readTree(JsonParser p) throws JacksonException {
         return nodeFrom(p);
     }
 
-    private JrsValue nodeFrom(JsonParser p) throws IOException
+    private JrsValue nodeFrom(JsonParser p) throws JacksonException
     {
         int tokenId = p.hasCurrentToken() ? p.currentTokenId() : p.nextToken().id();
         
@@ -69,7 +68,8 @@ public class JacksonJrsTreeCodec implements TreeCodec
     }
 
     @Override
-    public void writeTree(JsonGenerator g, TreeNode treeNode) throws IOException {
+    public void writeTree(JsonGenerator g, TreeNode treeNode) throws JacksonException
+    {
         if (treeNode == null) {
             g.writeNull();
         } else {

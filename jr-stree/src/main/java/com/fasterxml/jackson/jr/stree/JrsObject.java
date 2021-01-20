@@ -1,10 +1,10 @@
 package com.fasterxml.jackson.jr.stree;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonToken;
@@ -103,7 +103,7 @@ public class JrsObject
      */
 
     @Override
-    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws IOException
+    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws JacksonException
     {
         g.writeStartObject();
         if (!_values.isEmpty()) {

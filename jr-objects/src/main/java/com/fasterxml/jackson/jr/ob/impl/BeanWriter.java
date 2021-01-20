@@ -1,8 +1,8 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.IOException;
-
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
+
 import com.fasterxml.jackson.jr.ob.api.ValueWriter;
 
 public class BeanWriter
@@ -19,7 +19,7 @@ public class BeanWriter
     
     @Override
     public void writeValue(JSONWriter context, JsonGenerator g, Object value)
-        throws IOException
+        throws JacksonException
     {
         context.writeBeanValue(_properties, value);
     }

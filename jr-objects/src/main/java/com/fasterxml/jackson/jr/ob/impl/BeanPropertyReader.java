@@ -1,11 +1,11 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
@@ -69,7 +69,7 @@ public final class BeanPropertyReader
     public ValueReader getReader() { return _valueReader; }
     public String getName() { return _name; }
 
-    public void setValueFor(Object bean, Object value) throws IOException
+    public void setValueFor(Object bean, Object value) throws JacksonException
     {
         if (_setter == null) {
             try {
@@ -105,7 +105,7 @@ public final class BeanPropertyReader
         return _name;
     }
 
-    private void _reportProblem(Exception e) throws IOException
+    private void _reportProblem(Exception e) throws JacksonException
     {
         Throwable t = e;
         if (t instanceof InvocationTargetException) {

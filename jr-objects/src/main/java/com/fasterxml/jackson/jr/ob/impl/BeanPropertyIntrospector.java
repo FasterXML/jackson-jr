@@ -17,8 +17,6 @@ import com.fasterxml.jackson.jr.ob.impl.POJODefinition.PropBuilder;
  *<p>
  * Note that most of the usage is via {@link ValueReaderLocator} and
  * {@link ValueWriterLocator}
- *
- * @since 2.11
  */
 public class BeanPropertyIntrospector
 {

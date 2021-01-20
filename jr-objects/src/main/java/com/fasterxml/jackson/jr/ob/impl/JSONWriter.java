@@ -149,7 +149,7 @@ public class JSONWriter
      * Main entry point for non-blueprint instances: called for the root value to
      * write it out.
      */
-    public void writeValue(Object value) throws IOException
+    public void writeValue(Object value) throws JacksonException
     {
         if (value == null) {
             writeNullValue();
@@ -158,7 +158,7 @@ public class JSONWriter
         _writeValue(value, _writerLocator.findSerializationType(value.getClass()));
     }
 
-    public void writeField(String fieldName, Object value, int type) throws IOException
+    public void writeField(String fieldName, Object value, int type) throws JacksonException
     {
         switch (type) {
         case SER_NULL:
@@ -278,7 +278,7 @@ public class JSONWriter
         _badType(type, value);
     }
 
-    protected void _writeValue(Object value, int type) throws IOException
+    protected void _writeValue(Object value, int type) throws JacksonException
     {
         switch (type) {
         case SER_NULL:
@@ -401,7 +401,7 @@ public class JSONWriter
     /**********************************************************************
      */
     
-    protected void writeCollectionValue(Collection<?> v) throws IOException
+    protected void writeCollectionValue(Collection<?> v) throws JacksonException
     {
         _generator.writeStartArray();
         for (Object ob : v) {
@@ -410,13 +410,13 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeCollectionField(String fieldName, Collection<?> v) throws IOException
+    protected void writeCollectionField(String fieldName, Collection<?> v) throws JacksonException
     {
         _generator.writeFieldName(fieldName);
         writeCollectionValue(v);
     }
     
-    protected void writeIterableValue(Iterable<?> v) throws IOException
+    protected void writeIterableValue(Iterable<?> v) throws JacksonException
     {
         _generator.writeStartArray();
         for (Object ob : v) {
@@ -425,13 +425,13 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeIterableField(String fieldName, Iterable<?> v) throws IOException
+    protected void writeIterableField(String fieldName, Iterable<?> v) throws JacksonException
     {
         _generator.writeFieldName(fieldName);
         writeIterableValue(v);
     }
     
-    protected void writeListValue(List<?> list) throws IOException
+    protected void writeListValue(List<?> list) throws JacksonException
     {
         final int len = list.size();
         _generator.writeStartArray(list, len);
@@ -446,13 +446,13 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeListField(String fieldName, List<?> v) throws IOException
+    protected void writeListField(String fieldName, List<?> v) throws JacksonException
     {
         _generator.writeFieldName(fieldName);
         writeListValue(v);
     }
     
-    protected void writeMapValue(Map<?,?> v) throws IOException
+    protected void writeMapValue(Map<?,?> v) throws JacksonException
     {
         _generator.writeStartObject(v);
         if (!v.isEmpty()) {
@@ -472,13 +472,13 @@ public class JSONWriter
         _generator.writeEndObject();
     }
 
-    protected void writeMapField(String fieldName, Map<?,?> v) throws IOException
+    protected void writeMapField(String fieldName, Map<?,?> v) throws JacksonException
     {
         _generator.writeFieldName(fieldName);
         writeMapValue(v);
     }
 
-    protected void writeObjectArrayValue(Object[] v) throws IOException {
+    protected void writeObjectArrayValue(Object[] v) throws JacksonException {
         final int len = v.length;
         _generator.writeStartArray(v, len);
         int i = 0;
@@ -505,12 +505,12 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeObjectArrayField(String fieldName, Object[] v) throws IOException {
+    protected void writeObjectArrayField(String fieldName, Object[] v) throws JacksonException {
         _generator.writeFieldName(fieldName);
         writeObjectArrayValue(v);
     }
 
-    protected void writeIntArrayValue(int[] v) throws IOException {
+    protected void writeIntArrayValue(int[] v) throws JacksonException {
         final int len = v.length;
         _generator.writeStartArray(v, len);
         for (int i = 0; i < len; ++i) {
@@ -519,12 +519,12 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeIntArrayField(String fieldName, int[] v) throws IOException {
+    protected void writeIntArrayField(String fieldName, int[] v) throws JacksonException {
         _generator.writeFieldName(fieldName);
         writeIntArrayValue(v);
     }
     
-    protected void writeLongArrayValue(long[] v) throws IOException {
+    protected void writeLongArrayValue(long[] v) throws JacksonException {
         final int len = v.length;
         _generator.writeStartArray(v, len);
         for (int i = 0; i < len; ++i) {
@@ -533,12 +533,12 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeLongArrayField(String fieldName, long[] v) throws IOException {
+    protected void writeLongArrayField(String fieldName, long[] v) throws JacksonException {
         _generator.writeFieldName(fieldName);
         writeLongArrayValue(v);
     }
     
-    protected void writeBooleanArrayValue(boolean[] v) throws IOException {
+    protected void writeBooleanArrayValue(boolean[] v) throws JacksonException {
         final int len = v.length;
         _generator.writeStartArray(v, len);
         for (int i = 0; i < len; ++i) {
@@ -547,19 +547,19 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeBooleanArrayField(String fieldName, boolean[] v) throws IOException {
+    protected void writeBooleanArrayField(String fieldName, boolean[] v) throws JacksonException {
         _generator.writeFieldName(fieldName);
         writeBooleanArrayValue(v);
     }
 
-    protected void writeTreeNodeValue(TreeNode v) throws IOException {
+    protected void writeTreeNodeValue(TreeNode v) throws JacksonException {
         if (_treeCodec == null) {
             throw new JSONObjectException("No `TreeCodec` configured: can not serialize `TreeNode` values");
         }
         _treeCodec.writeTree(_generator, v);
     }
 
-    protected void writeTreeNodeField(String fieldName, TreeNode v) throws IOException
+    protected void writeTreeNodeField(String fieldName, TreeNode v) throws JacksonException
     {
         _generator.writeFieldName(fieldName);
         writeTreeNodeValue(v);
@@ -571,52 +571,52 @@ public class JSONWriter
     /**********************************************************************
      */
 
-    protected void writeBooleanValue(boolean v) throws IOException {
+    protected void writeBooleanValue(boolean v) throws JacksonException {
         _generator.writeBoolean(v);
     }
 
-    protected void writeBooleanField(String fieldName, boolean v) throws IOException {
+    protected void writeBooleanField(String fieldName, boolean v) throws JacksonException {
         _generator.writeBooleanField(fieldName, v);
     }
 
-    protected void writeIntValue(int v) throws IOException {
+    protected void writeIntValue(int v) throws JacksonException {
         _generator.writeNumber(v);
     }
 
-    protected void writeIntField(String fieldName, int v) throws IOException {
+    protected void writeIntField(String fieldName, int v) throws JacksonException {
         _generator.writeNumberField(fieldName, v);
     }
 
-    protected void writeLongValue(long v) throws IOException {
+    protected void writeLongValue(long v) throws JacksonException {
         _generator.writeNumber(v);
     }
 
-    protected void writeBigIntegerValue(BigInteger v) throws IOException {
+    protected void writeBigIntegerValue(BigInteger v) throws JacksonException {
         _generator.writeNumber(v);
     }
 
-    protected void writeBigIntegerField(String fieldName, BigInteger v) throws IOException {
+    protected void writeBigIntegerField(String fieldName, BigInteger v) throws JacksonException {
         _generator.writeFieldName(fieldName);
         writeBigIntegerValue(v);
     }
     
-    protected void writeLongField(String fieldName, long v) throws IOException {
+    protected void writeLongField(String fieldName, long v) throws JacksonException {
         _generator.writeNumberField(fieldName, v);
     }
     
-    protected void writeDoubleValue(double v) throws IOException {
+    protected void writeDoubleValue(double v) throws JacksonException {
         _generator.writeNumber(v);
     }
 
-    protected void writeDoubleField(String fieldName, double v) throws IOException {
+    protected void writeDoubleField(String fieldName, double v) throws JacksonException {
         _generator.writeNumberField(fieldName, v);
     }
 
-    protected void writeBigDecimalValue(BigDecimal v) throws IOException {
+    protected void writeBigDecimalValue(BigDecimal v) throws JacksonException {
         _generator.writeNumber(v);
     }
 
-    protected void writeBigDecimalField(String fieldName, BigDecimal v) throws IOException {
+    protected void writeBigDecimalField(String fieldName, BigDecimal v) throws JacksonException {
         _generator.writeNumberField(fieldName, v);
     }
 
@@ -626,27 +626,27 @@ public class JSONWriter
     /**********************************************************************
      */
 
-    protected void writeStringValue(String v) throws IOException {
+    protected void writeStringValue(String v) throws JacksonException {
         _generator.writeString(v);
     }
 
-    protected void writeStringField(String fieldName, String v) throws IOException {
+    protected void writeStringField(String fieldName, String v) throws JacksonException {
         _generator.writeStringField(fieldName, v);
     }
 
-    protected void writeStringLikeValue(String v, int actualType) throws IOException {
+    protected void writeStringLikeValue(String v, int actualType) throws JacksonException {
         _generator.writeString(v);
     }
 
-    protected void writeStringLikeField(String fieldName, String v, int actualType) throws IOException {
+    protected void writeStringLikeField(String fieldName, String v, int actualType) throws JacksonException {
         _generator.writeStringField(fieldName, v);
     }
     
-    protected void writeBinaryValue(byte[] data) throws IOException {
+    protected void writeBinaryValue(byte[] data) throws JacksonException {
         _generator.writeBinary(data);
     }
 
-    protected void writeBinaryField(String fieldName, byte[] data) throws IOException {
+    protected void writeBinaryField(String fieldName, byte[] data) throws JacksonException {
         _generator.writeBinaryField(fieldName, data);
     }
 
@@ -656,24 +656,24 @@ public class JSONWriter
     /**********************************************************************
      */
 
-    protected void writeNullValue() throws IOException {
+    protected void writeNullValue() throws JacksonException {
         _generator.writeNull();
     }
 
-    protected void writeNullField(String fieldName) throws IOException {
+    protected void writeNullField(String fieldName) throws JacksonException {
         if (_writeNullValues) {
             _generator.writeNullField(fieldName);
         }
     }
 
-    protected void writeNullField(SerializedString fieldName) throws IOException {
+    protected void writeNullField(SerializedString fieldName) throws JacksonException {
         if (_writeNullValues) {
             _generator.writeFieldName(fieldName);
             _generator.writeNull();
         }
     }
 
-    protected void writeDateValue(Date v) throws IOException {
+    protected void writeDateValue(Date v) throws JacksonException {
         if (JSON.Feature.WRITE_DATES_AS_TIMESTAMP.isEnabled(_features)) {
             writeLongValue(v.getTime());
         } else {
@@ -681,7 +681,7 @@ public class JSONWriter
         }
     }
 
-    protected void writeDateField(String fieldName, Date v) throws IOException {
+    protected void writeDateField(String fieldName, Date v) throws JacksonException {
         if (JSON.Feature.WRITE_DATES_AS_TIMESTAMP.isEnabled(_features)) {
             writeLongField(fieldName, v.getTime());
         } else {
@@ -689,7 +689,7 @@ public class JSONWriter
         }
     }
 
-    protected void writeEnumValue(Enum<?> v) throws IOException {
+    protected void writeEnumValue(Enum<?> v) throws JacksonException {
         if (JSON.Feature.WRITE_ENUMS_USING_INDEX.isEnabled(_features)) {
             writeIntValue(v.ordinal());
         } else {
@@ -697,7 +697,7 @@ public class JSONWriter
         }
     }
 
-    protected void writeEnumField(String fieldName, Enum<?> v) throws IOException {
+    protected void writeEnumField(String fieldName, Enum<?> v) throws JacksonException {
         if (JSON.Feature.WRITE_ENUMS_USING_INDEX.isEnabled(_features)) {
             writeIntField(fieldName, v.ordinal());
         } else {
@@ -705,7 +705,7 @@ public class JSONWriter
         }
     }
 
-    public void writeBeanValue(BeanPropertyWriter[] props, Object bean) throws IOException
+    public void writeBeanValue(BeanPropertyWriter[] props, Object bean) throws JacksonException
     {
         _generator.writeStartObject(bean);
         int i = 0;
@@ -816,17 +816,17 @@ public class JSONWriter
         _generator.writeEndObject();
     }
 
-    protected void writeUnknownValue(Object data) throws IOException {
+    protected void writeUnknownValue(Object data) throws JacksonException {
         _checkUnknown(data);
         writeStringValue(data.toString());
     }
 
-    protected void writeUnknownField(String fieldName, Object data) throws IOException {
+    protected void writeUnknownField(String fieldName, Object data) throws JacksonException {
         _checkUnknown(data);
         writeStringField(fieldName, data.toString());
     }
 
-    protected void _checkUnknown(Object value) throws IOException
+    protected void _checkUnknown(Object value) throws JacksonException
     {
         if (JSON.Feature.FAIL_ON_UNKNOWN_TYPE_WRITE.isEnabled(_features)) {
             throw new JSONObjectException("Unrecognized type ("+value.getClass().getName()

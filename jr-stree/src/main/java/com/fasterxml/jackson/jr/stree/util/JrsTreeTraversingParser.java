@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.stree.util;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -113,7 +112,7 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
      */
 
     @Override
-    public void close() throws IOException
+    public void close()
     {
         if (!_closed) {
             _closed = true;
@@ -129,7 +128,7 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
      */
 
     @Override
-    public JsonToken nextToken() throws IOException
+    public JsonToken nextToken() throws JacksonException
     {
         if (_nextToken != null) {
             _currToken = _nextToken;
@@ -172,10 +171,10 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
     
     // default works well here:
-    //public JsonToken nextValue() throws IOException
+    //public JsonToken nextValue() throws JacksonException
 
     @Override
-    public JsonParser skipChildren() throws IOException
+    public JsonParser skipChildren() throws JacksonException
     {
         if (_currToken == JsonToken.START_OBJECT) {
             _startContainer = false;
@@ -249,17 +248,17 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
 
     @Override
-    public char[] getTextCharacters() throws IOException {
+    public char[] getTextCharacters() throws JacksonException {
         return getText().toCharArray();
     }
 
     @Override
-    public int getTextLength() throws IOException {
+    public int getTextLength() throws JacksonException {
         return getText().length();
     }
 
     @Override
-    public int getTextOffset() throws IOException {
+    public int getTextOffset() throws JacksonException {
         return 0;
     }
 
@@ -275,52 +274,52 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     /**********************************************************************
      */
 
-    //public byte getByteValue() throws IOException
+    //public byte getByteValue() throws JacksonException
 
     @Override
-    public NumberType getNumberType() throws IOException {
+    public NumberType getNumberType() {
         JrsValue n = currentNumericNode();
         return (n == null) ? null : n.numberType();
     }
 
     @Override
-    public BigInteger getBigIntegerValue() throws IOException
+    public BigInteger getBigIntegerValue() throws JacksonException
     {
         return currentNumericNode().asBigInteger();
     }
 
     @Override
-    public BigDecimal getDecimalValue() throws IOException {
+    public BigDecimal getDecimalValue() throws JacksonException {
         return currentNumericNode().asBigDecimal();
     }
 
     @Override
-    public double getDoubleValue() throws IOException {
+    public double getDoubleValue() throws JacksonException {
         return currentNumericValue().doubleValue();
     }
 
     @Override
-    public float getFloatValue() throws IOException {
+    public float getFloatValue() throws JacksonException {
         return (float) currentNumericValue().doubleValue();
     }
 
     @Override
-    public long getLongValue() throws IOException {
+    public long getLongValue() throws JacksonException {
         return currentNumericValue().longValue();
     }
 
     @Override
-    public int getIntValue() throws IOException {
+    public int getIntValue() throws JacksonException {
         return currentNumericValue().intValue();
     }
 
     @Override
-    public Number getNumberValue() throws IOException {
+    public Number getNumberValue() throws JacksonException {
         return currentNumericValue();
     }
 
     @Override
-    public boolean isNaN() throws IOException {
+    public boolean isNaN() {
         return currentNumericNode().isNaN();
     }
 
@@ -337,14 +336,14 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
      */
 
     @Override
-    public byte[] getBinaryValue(Base64Variant b64variant) throws IOException {
+    public byte[] getBinaryValue(Base64Variant b64variant) throws JacksonException {
         // 28-Dec-2015, tatu: Binary nodes not yet supported
         return null;
     }
 
 
     @Override
-    public int readBinaryValue(Base64Variant b64variant, OutputStream out) throws IOException {
+    public int readBinaryValue(Base64Variant b64variant, OutputStream out) throws JacksonException {
         // 28-Dec-2015, tatu: Binary nodes not yet supported
         return -1;
     }
@@ -367,7 +366,7 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
         JrsValue n = currentNode();
         if ((n == null) || !(n instanceof JrsNumber)) {
             JsonToken t = (n == null) ? null : n.asToken();
-            throw _constructError("Current token ("+t+") not numeric, can not use numeric value accessors");
+            throw _constructReadException("Current token (%s) not numeric, can not use numeric value accessors", t);
         }
         return (JrsNumber) n;
     }
