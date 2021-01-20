@@ -1,9 +1,9 @@
 package com.fasterxml.jackson.jr.ob.api;
 
-import java.io.IOException;
-
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 
 /**
@@ -14,8 +14,6 @@ public abstract class ValueReader
 {
     /**
      * Type of values this reader will read
-     *
-     * @since 2.10
      */
     protected final Class<?> _valueType;
 
@@ -29,7 +27,7 @@ public abstract class ValueReader
     /**********************************************************************
      */
 
-    public abstract Object read(JSONReader reader, JsonParser p) throws IOException;
+    public abstract Object read(JSONReader reader, JsonParser p) throws JacksonException;
 
     /**
      * Method called to deserialize value of type supported by this reader, using
@@ -45,7 +43,7 @@ public abstract class ValueReader
      *     values of different types (for example for collection readers).
      * @param p Underlying parser used for reading decoded token stream
      */
-    public Object readNext(JSONReader reader, JsonParser p) throws IOException {
+    public Object readNext(JSONReader reader, JsonParser p) throws JacksonException {
         p.nextToken();
         return read(reader, p);
     }
@@ -72,11 +70,11 @@ public abstract class ValueReader
     /**********************************************************************
      */
 
-    public static String _tokenDesc(JsonParser p) throws IOException {
+    public static String _tokenDesc(JsonParser p) {
         return _tokenDesc(p, p.currentToken());
     }
     
-    protected static String _tokenDesc(JsonParser p, JsonToken t) throws IOException {
+    protected static String _tokenDesc(JsonParser p, JsonToken t) {
         if (t == null) {
             return "NULL";
         }

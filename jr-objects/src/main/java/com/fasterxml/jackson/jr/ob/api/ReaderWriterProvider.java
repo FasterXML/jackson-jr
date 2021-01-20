@@ -7,8 +7,6 @@ import com.fasterxml.jackson.jr.type.ResolvedType;
 /**
  * API to implement to provide custom {@link ValueReader}s and
  * {@link ValueWriter}s.
- *
- * @since 2.10
  */
 public abstract class ReaderWriterProvider
 {

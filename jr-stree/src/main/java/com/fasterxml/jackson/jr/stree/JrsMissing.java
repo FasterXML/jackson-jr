@@ -1,7 +1,6 @@
 package com.fasterxml.jackson.jr.stree;
 
-import java.io.IOException;
-
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonToken;
@@ -93,7 +92,7 @@ public final class JrsMissing extends JrsValue
      */
 
     @Override
-    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws IOException {
+    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws JacksonException {
         // not 100% sure what to do... 
         g.writeNull();
     }

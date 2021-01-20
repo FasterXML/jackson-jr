@@ -5,8 +5,6 @@ import com.fasterxml.jackson.core.TreeCodec;
 /**
  * API that lets {@link com.fasterxml.jackson.jr.ob.JacksonJrExtension}s to register handlers
  * it needs to.
- *
- * @since 2.11
  */
 public abstract class ExtensionContext
 {

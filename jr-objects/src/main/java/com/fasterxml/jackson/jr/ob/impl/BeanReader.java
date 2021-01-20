@@ -1,15 +1,16 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.core.TokenStreamFactory;
 import com.fasterxml.jackson.core.sym.FieldNameMatcher;
 import com.fasterxml.jackson.core.util.Named;
+
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
@@ -138,7 +139,7 @@ public class BeanReader
      * type using given parser.
      */
     @Override
-    public Object read(JSONReader r, JsonParser p) throws IOException
+    public Object read(JSONReader r, JsonParser p) throws JacksonException
     {
         if (p.isExpectedStartObjectToken()) {
             final Object bean;
@@ -168,7 +169,7 @@ public class BeanReader
     }
 
     @Override
-    public Object readNext(JSONReader r, JsonParser p) throws IOException
+    public Object readNext(JSONReader r, JsonParser p) throws JacksonException
     {
         JsonToken t = p.nextToken();
         if (t == JsonToken.START_OBJECT) {
@@ -200,7 +201,8 @@ public class BeanReader
                 _valueType.getName(), _tokenDesc(p));
     }
 
-    private final Object _readBean(JSONReader r, JsonParser p, final Object bean) throws IOException
+    private final Object _readBean(JSONReader r, JsonParser p, final Object bean)
+        throws JacksonException
     {
         // 13-Dec-2017, tatu: Unrolling is unpredictable business, and 
         //     performance does not seem linear. In fact, choices of 2 or 8 unrolls
@@ -262,7 +264,7 @@ public class BeanReader
     }
 
     /*
-    private final Object _readBean(JSONReader r, JsonParser p, final Object bean) throws IOException
+    private final Object _readBean(JSONReader r, JsonParser p, final Object bean) throws JacksonException
     {
         String propName;
         BeanPropertyReader prop;
@@ -334,7 +336,7 @@ public class BeanReader
 
     private final Object _readWithUnknown(JSONReader r, JsonParser p,
             final Object bean, String propName)
-        throws IOException
+        throws JacksonException
     {
         // first, skip current property
         handleUnknown(r, p, propName);
@@ -375,7 +377,9 @@ public class BeanReader
         return _longCtor.newInstance(l);
     }
 
-    protected void handleUnknown(JSONReader reader, JsonParser parser, String fieldName) throws IOException {
+    protected void handleUnknown(JSONReader reader, JsonParser parser, String fieldName)
+        throws JacksonException
+    {
         if (JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY.isEnabled(reader._features)) {
             // 20-Jan-2020, tatu: With optional annotation support, may have "known ignorable"
             //    that usually should behave as if safely ignorable
@@ -397,17 +401,18 @@ public class BeanReader
         parser.skipChildren();
     }
 
-    protected Object _reportFailureToCreate(JsonParser p, Exception e) throws IOException
+    protected Object _reportFailureToCreate(JsonParser p, Exception e)
+        throws JacksonException
     {
-        if (e instanceof IOException) {
-            throw (IOException) e;
+        if (e instanceof JacksonException) {
+            throw (JacksonException) e;
         }
         throw JSONObjectException.from(p, e,
                 "Failed to create an instance of `%s` due to (%s): %s",
                 _valueType.getName(), e.getClass().getName(), e.getMessage());
     }
 
-    protected IOException _reportProblem(JsonParser p) {
+    protected JacksonException _reportProblem(JsonParser p) {
         return JSONObjectException.from(p, "Unexpected token %s; should get FIELD_NAME or END_OBJECT",
                 p.currentToken());
     }

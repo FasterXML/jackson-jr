@@ -2,9 +2,9 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import static com.fasterxml.jackson.core.JsonTokenId.*;
 
-import java.io.IOException;
 import java.util.*;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
@@ -26,7 +26,7 @@ public class AnyReader extends ValueReader
     public AnyReader() { super(Object.class); }
     
     @Override
-    public Object readNext(JSONReader r, JsonParser p) throws IOException
+    public Object readNext(JSONReader r, JsonParser p) throws JacksonException
     {
         JsonToken t = p.nextToken();
         if (t != null) {
@@ -85,7 +85,7 @@ public class AnyReader extends ValueReader
     }
     
     @Override
-    public Object read(JSONReader r, JsonParser p) throws IOException
+    public Object read(JSONReader r, JsonParser p) throws JacksonException
     {
         switch (p.currentTokenId()) {
         case ID_NULL:
@@ -140,7 +140,8 @@ public class AnyReader extends ValueReader
         throw JSONObjectException.from(p, "Unexpected value token: "+_tokenDesc(p));
     }
 
-    public Map<String, Object> readFromObject(JSONReader r, JsonParser p, MapBuilder b) throws IOException
+    public Map<String, Object> readFromObject(JSONReader r, JsonParser p, MapBuilder b)
+        throws JacksonException
     {
         // First, a minor optimization for empty Maps
         String k;
@@ -179,7 +180,8 @@ public class AnyReader extends ValueReader
         return b.build();
     }
 
-    public Object[] readArrayFromArray(JSONReader r, JsonParser p, CollectionBuilder b) throws IOException
+    public Object[] readArrayFromArray(JSONReader r, JsonParser p, CollectionBuilder b)
+        throws JacksonException
     {
         // First two special cases; empty, single-element
         if (p.nextToken() == JsonToken.END_ARRAY) {
@@ -200,7 +202,8 @@ public class AnyReader extends ValueReader
         }
     }
 
-    public Collection<Object> readCollectionFromArray(JSONReader r, JsonParser p, CollectionBuilder b) throws IOException
+    public Collection<Object> readCollectionFromArray(JSONReader r, JsonParser p, CollectionBuilder b)
+        throws JacksonException
     {
         if (p.nextToken() == JsonToken.END_ARRAY) {
             return b.emptyCollection();
@@ -220,7 +223,7 @@ public class AnyReader extends ValueReader
         }
     }
 
-    private final void _reportNotEndObject(JsonParser p) throws IOException {
+    private final void _reportNotEndObject(JsonParser p) throws JacksonException {
         throw JSONObjectException.from(p, "Unexpected token: %s (should get FIELD_NAME or END_OBJECT)",
                 _tokenDesc(p));
     }
@@ -236,7 +239,7 @@ public class AnyReader extends ValueReader
      * read from input.
      * Default implementation returns null as is.
      */
-    protected Object fromNull() throws IOException {
+    protected Object fromNull() throws JacksonException {
         return null;
     }
     
@@ -245,7 +248,7 @@ public class AnyReader extends ValueReader
      * read from input.
      * Default implementation returns Boolean value as is.
      */
-    protected Object fromBoolean(boolean b) throws IOException {
+    protected Object fromBoolean(boolean b) throws JacksonException {
         return b ? Boolean.TRUE : Boolean.FALSE;
     }
 
@@ -254,7 +257,7 @@ public class AnyReader extends ValueReader
      * after being parsed from input.
      * Default implementation returns key as is.
      */
-    protected String fromKey(String key) throws IOException {
+    protected String fromKey(String key) throws JacksonException {
         return key;
     }
 
@@ -263,12 +266,12 @@ public class AnyReader extends ValueReader
      * read from input.
      * Default implementation returns String value as is.
      */
-    protected Object fromString(String str) throws IOException {
+    protected Object fromString(String str) throws JacksonException {
         // Nothing fancy, by default; return as is
         return str;
     }
 
-    protected Object fromEmbedded(Object value) throws IOException {
+    protected Object fromEmbedded(Object value) throws JacksonException {
         return value;
     }
 }

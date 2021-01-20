@@ -1,7 +1,5 @@
 package com.fasterxml.jackson.jr.ob;
 
-import com.fasterxml.jackson.jr.ob.JSON;
-
 public class ReadWithCtorsTest extends TestBase
 {
     static class FromString {

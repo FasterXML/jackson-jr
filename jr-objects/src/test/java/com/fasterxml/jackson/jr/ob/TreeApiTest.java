@@ -148,7 +148,7 @@ public class TreeApiTest extends TestBase
 
         @SuppressWarnings("unchecked")
         @Override
-        public <T extends TreeNode> T readTree(JsonParser p) throws IOException {
+        public <T extends TreeNode> T readTree(JsonParser p) {
             if (p.isExpectedStartArrayToken()) {
                 return (T) createArrayNode();
             }
@@ -164,7 +164,7 @@ public class TreeApiTest extends TestBase
         }
 
         @Override
-        public void writeTree(JsonGenerator g, TreeNode tree) throws IOException {
+        public void writeTree(JsonGenerator g, TreeNode tree) {
             g.writeTree(tree);
         }
 

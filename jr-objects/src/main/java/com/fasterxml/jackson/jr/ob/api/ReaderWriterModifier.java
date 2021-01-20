@@ -8,8 +8,6 @@ import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
  * API to implement to apply modifications to {@link ValueReader}s and
  * {@link ValueWriter}s of all kinds (default scalar ones, custom ones,
  * POJO ones).
- *
- * @since 2.11
  */
 public abstract class ReaderWriterModifier
 {

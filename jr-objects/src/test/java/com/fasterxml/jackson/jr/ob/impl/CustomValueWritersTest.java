@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.IOException;
 import java.util.Collections;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -18,7 +17,7 @@ public class CustomValueWritersTest extends TestBase
         
         @Override
         public void writeValue(JSONWriter context, JsonGenerator g,
-                Object v) throws IOException {
+                Object v) {
             g.writeString(text);
         }
 
@@ -29,7 +28,7 @@ public class CustomValueWritersTest extends TestBase
     static class CustomBeanAsAnswerWriter implements ValueWriter {
         @Override
         public void writeValue(JSONWriter context, JsonGenerator g,
-                Object v) throws IOException {
+                Object v) {
             g.writeStartObject();
             g.writeNumberField("answer", 42);
             g.writeNullField("none");

@@ -1,7 +1,5 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import com.fasterxml.jackson.jr.ob.JSON;
@@ -49,7 +47,7 @@ public class ValueWriterModifierTest extends TestBase
 
         @Override
         public void writeValue(JSONWriter context, JsonGenerator g,
-                Object value) throws IOException
+                Object value)
         {
             g.writeStartArray();
             _origWriter.writeValue(context, g, value);
@@ -86,7 +84,7 @@ public class ValueWriterModifierTest extends TestBase
                 new ValueWriter() {
                     @Override
                     public void writeValue(JSONWriter context, JsonGenerator g,
-                            Object value) throws IOException {
+                            Object value) {
                         g.writeString(String.valueOf(value).toUpperCase());
                     }
 
@@ -108,7 +106,7 @@ public class ValueWriterModifierTest extends TestBase
                 new ValueWriter() {
             @Override
             public void writeValue(JSONWriter context, JsonGenerator g,
-                    Object value) throws IOException {
+                    Object value) {
                 NameBean nb = (NameBean) value;
                 g.writeString(nb.getFirst() + "-" + nb.getLast());
             }

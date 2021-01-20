@@ -1,17 +1,15 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 /**
  * Simple container class used to contain information needed for serializing
  * value of a single POJO property.
- *
- * @since 2.8
  */
 public final class BeanPropertyWriter
 {
@@ -32,9 +30,6 @@ public final class BeanPropertyWriter
         _getter = getter;
     }
 
-    /**
-     * @since 2.10
-     */
     public BeanPropertyWriter withName(String newName) {
         if (name.toString().equals(newName)) {
             return this;
@@ -42,7 +37,7 @@ public final class BeanPropertyWriter
         return new BeanPropertyWriter(typeId, newName, _field, _getter);
     }
 
-    public Object getValueFor(Object bean) throws IOException
+    public Object getValueFor(Object bean) throws JacksonException
     {
         try {
             if (_getter == null) {
