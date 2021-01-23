@@ -50,7 +50,7 @@ public class CustomValueReadersTest extends TestBase
         // Base class impl should be fine, although we'd use this for optimal
         /*
         @Override
-        public Object readNext(JSONReader reader, JsonParser p) throws IOException {
+        public Object readNext(JSONReader reader, JsonParser p) {
             return new CustomValue(p.nextIntValue(-1), true);
         }
         */

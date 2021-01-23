@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.ob;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import com.fasterxml.jackson.core.*;
@@ -14,7 +13,7 @@ public class TreeApiTest extends TestBase
         @Override
         public abstract JsonToken asToken();
 
-        public abstract void write(JsonGenerator g) throws IOException;
+        public abstract void write(JsonGenerator g);
 
         @Override
         public TreeNode at(JsonPointer arg0) {
@@ -112,7 +111,7 @@ public class TreeApiTest extends TestBase
         public boolean isArray() { return true; }
 
         @Override
-        public void write(JsonGenerator g) throws IOException {
+        public void write(JsonGenerator g) {
             g.writeStartArray();
             g.writeEndArray();
         }
@@ -128,7 +127,7 @@ public class TreeApiTest extends TestBase
         public boolean isObject() { return true; }
 
         @Override
-        public void write(JsonGenerator g) throws IOException {
+        public void write(JsonGenerator g) {
             g.writeStartObject();
             g.writeEndObject();
         }

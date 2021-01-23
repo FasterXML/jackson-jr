@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.ob;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -10,7 +9,7 @@ import com.fasterxml.jackson.core.JsonParser;
 
 /**
  * Standard exception exposed by this package; equivalent of
- * <code>com.fasterxml.jackson.databind.JsonMappingException</code>
+ * {@code com.fasterxml.jackson.databind.DatabindException}
  * (and, in fact, much of implementation came from that class, but
  * had to be cut-n-pasted since we do not depend on databind package).
  */
@@ -174,49 +173,38 @@ public class JSONObjectException
         }
         return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()), problem);
     }
-    
+
     /**
-     * Factory method used when "upgrading" an {@link IOException} into
-     * {@link JSONObjectException}: usually only needed to comply with
-     * a signature.
-     */
-    public static JSONObjectException fromUnexpectedIOE(IOException src)
-    {
-        return new JSONObjectException("Unexpected IOException (of type "
-                +src.getClass().getName()+"): "+src.getMessage(), (JsonLocation)null, src);
-    }
-    
-    /**
-     * Method that can be called to either create a new JsonMappingException
-     * (if underlying exception is not a JsonMappingException), or augment
+     * Method that can be called to either create a new instance
+     * (if underlying exception is not of this type), or augment
      * given exception with given path/reference information.
      *
      * This version of method is called when the reference is through a
      * non-indexed object, such as a Map or POJO/bean.
      */
     public static JSONObjectException wrapWithPath(Throwable src, Object refFrom,
-                                                    String refFieldName)
+            String refFieldName)
     {
         return wrapWithPath(src, new Reference(refFrom, refFieldName));
     }
 
     /**
-     * Method that can be called to either create a new JsonMappingException
-     * (if underlying exception is not a JsonMappingException), or augment
+     * Method that can be called to either create a new instance
+     * (if underlying exception is not this type), or augment
      * given exception with given path/reference information.
      *
      * This version of method is called when the reference is through an
      * index, which happens with arrays and Collections.
      */
     public static JSONObjectException wrapWithPath(Throwable src, Object refFrom,
-                                                    int index)
+            int index)
     {
         return wrapWithPath(src, new Reference(refFrom, index));
     }
 
     /**
-     * Method that can be called to either create a new JsonMappingException
-     * (if underlying exception is not a JsonMappingException), or augment
+     * Method that can be called to either create a new instance
+     * (if underlying exception is not this type), or augment
      * given exception with given path/reference information.
      */
     public static JSONObjectException wrapWithPath(Throwable src, Reference ref)

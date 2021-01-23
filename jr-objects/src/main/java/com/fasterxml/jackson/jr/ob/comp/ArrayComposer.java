@@ -1,9 +1,6 @@
 package com.fasterxml.jackson.jr.ob.comp;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class ArrayComposer<PARENT extends ComposerBase>
     extends SequenceComposer<ArrayComposer<PARENT>>
@@ -22,13 +19,13 @@ public class ArrayComposer<PARENT extends ComposerBase>
      */
 
     @Override
-    protected ArrayComposer<PARENT> _start() throws IOException, JsonProcessingException {
+    protected ArrayComposer<PARENT> _start() {
         _generator.writeStartArray();
         return this;
     }
 
     @Override
-    protected Object _finish() throws IOException, JsonProcessingException {
+    protected Object _finish() {
         if (_open) {
             _open = false;
             _generator.writeEndArray();
@@ -43,7 +40,6 @@ public class ArrayComposer<PARENT extends ComposerBase>
      */
     
     public PARENT end()
-        throws IOException, JsonProcessingException
     {
         _closeChild();
         if (_open) {

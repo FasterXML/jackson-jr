@@ -1,7 +1,6 @@
 package com.fasterxml.jackson.jr.ob;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
@@ -9,8 +8,10 @@ import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 
 /**
  * Iterator exposed by {@link JSON} when binding sequence of
- * objects. Extension is done to allow more convenient exposing of
- * {@link IOException} (which basic {@link Iterator} does not expose).
+ * objects. Extension was originally (Jackson 2.x) done to allow more convenient
+ * exposing of checked exceptions
+ * (which basic {@link Iterator} does not expose),
+ * but with Jackson 3.0 this is not necessary any more.
  *<p>
  * NOTE: adapted from `jackson-databind` {@code MappingIterator}
  */
@@ -192,7 +193,6 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
         return hasNextValue();
     }
     
-    @SuppressWarnings("unchecked")
     @Override
     public T next()
     {
@@ -205,7 +205,7 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
     }
     
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (_state != STATE_CLOSED) {
             _state = STATE_CLOSED;
             if (_parser != null) {

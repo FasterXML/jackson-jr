@@ -1,7 +1,5 @@
 package com.fasterxml.jackson.jr.ob.comp;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 
 public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
@@ -24,7 +22,7 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
      * Calls {@link JsonGenerator#flush} on underlying {@link JsonGenerator}.
      */
     @Override
-    public void flush() throws IOException {
+    public void flush() {
         if (_generator != null) {
             _generator.close();
         }
@@ -36,13 +34,13 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
     /**********************************************************************
      */
 
-    public ArrayComposer<THIS> startArray() throws IOException
+    public ArrayComposer<THIS> startArray()
     {
         _closeChild();
         return _startArray(_this(), _generator);
     }
 
-    public ObjectComposer<THIS> startObject() throws IOException
+    public ObjectComposer<THIS> startObject()
     {
         _closeChild();
         return _startObject(_this(), _generator);
@@ -54,19 +52,19 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
     /**********************************************************************
      */
 
-    public THIS add(int value) throws IOException
+    public THIS add(int value)
     {
         _generator.writeNumber(value);
         return _this();
     }
 
-    public THIS add(long value) throws IOException
+    public THIS add(long value)
     {
         _generator.writeNumber(value);
         return _this();
     }
 
-    public THIS add(double value) throws IOException
+    public THIS add(double value)
     {
         _generator.writeNumber(value);
         return _this();
@@ -78,13 +76,13 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
     /**********************************************************************
      */
 
-    public THIS add(String value) throws IOException
+    public THIS add(String value)
     {
         _generator.writeString(value);
         return _this();
     }
 
-    public THIS add(CharSequence value) throws IOException
+    public THIS add(CharSequence value)
     {
         String str = (value == null) ? null : value.toString();
         _generator.writeString(str);
@@ -97,13 +95,13 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
     /**********************************************************************
      */
 
-    public THIS addNull() throws IOException
+    public THIS addNull()
     {
         _generator.writeNull();
         return _this();
     }
 
-    public THIS add(boolean value) throws IOException
+    public THIS add(boolean value)
     {
         _generator.writeBoolean(value);
         return _this();
@@ -114,7 +112,7 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
      * composed:
      * has to be of type that jackson-jr package knows how to serialize.
      */
-    public THIS addObject(Object pojo) throws IOException
+    public THIS addObject(Object pojo)
     {
         _generator.writeObject(pojo);
         return _this();
@@ -126,7 +124,7 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
     /**********************************************************************
      */
 
-    protected void _closeChild() throws IOException
+    protected void _closeChild()
     {
         if (_child != null) {
             _child._finish();

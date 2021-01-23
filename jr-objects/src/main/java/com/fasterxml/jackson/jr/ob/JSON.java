@@ -1092,7 +1092,7 @@ public class JSON
      * Read method for reading a {@link Map} of {@code type} (usually POJO) values.
      */
     @SuppressWarnings("unchecked")
-    public <T> Map<String,T> mapOfFrom(Class<T> type, Object source) throws IOException, JSONObjectException
+    public <T> Map<String,T> mapOfFrom(Class<T> type, Object source)
     {
         if (source instanceof JsonParser) {
             JsonParser p = _initForReading((JsonParser) source);
@@ -1107,7 +1107,7 @@ public class JSON
         }
     }
 
-    public <T> T beanFrom(Class<T> type, Object source) throws IOException, JSONObjectException
+    public <T> T beanFrom(Class<T> type, Object source)
     {
         if (source instanceof JsonParser) {
             JsonParser p = _initForReading((JsonParser) source);
@@ -1140,7 +1140,7 @@ public class JSON
      * <li><code>char[]</code></li>
      *</ul>
      */
-    public Object anyFrom(Object source) throws IOException
+    public Object anyFrom(Object source)
     {
         if (source instanceof JsonParser) {
             JsonParser p = _initForReading((JsonParser) source);
@@ -1160,7 +1160,6 @@ public class JSON
      */
     @SuppressWarnings("unchecked")
     public <T extends TreeNode> T treeFrom(Object source)
-            throws IOException, JSONObjectException
     {
         if (_treeCodec == null) {
              _noTreeCodec("read `TreeNode`");
@@ -1189,11 +1188,8 @@ public class JSON
      * <a href="https://en.wikipedia.org/wiki/JSON_streaming">streaming JSON</a>
      * content (specifically line-delimited and concatenated variants);
      * individual values are bound to specific Bean (POJO) type.
-     *
-     * @since 2.10
      */
     public <T> ValueIterator<T> beanSequenceFrom(Class<T> type, Object source)
-        throws IOException, JSONObjectException
     {
         JsonParser p;
         final boolean managed = !(source instanceof JsonParser);
@@ -1219,7 +1215,6 @@ public class JSON
      * @since 2.10
      */
     public ValueIterator<Object> anySequenceFrom(Object source)
-        throws IOException, JSONObjectException
     {
         JsonParser p;
         final boolean managed = !(source instanceof JsonParser);
@@ -1243,7 +1238,6 @@ public class JSON
      * {@link TreeCodec} supports.
      */
     public <T extends TreeNode> ValueIterator<T> treeSequenceFrom(Object source)
-        throws IOException, JSONObjectException
     {
         if (_treeCodec == null) {
             _noTreeCodec("read `TreeNode` sequence");
@@ -1528,31 +1522,6 @@ public class JSON
         return p;
     }
 
-    /*
-    protected <T> T _closeWithError(Closeable cl, Exception e) throws IOException {
-        _close(cl);
-        return _throw(e);
-    }
-
-    protected void _close(Closeable cl) {
-        if (cl != null) {
-            try {
-                cl.close();
-            } catch (IOException ioe) { }
-        }
-    }
-
-    protected <T> T _throw(Exception e) throws IOException {
-        if (e instanceof IOException) {
-            throw (IOException) e;
-        }
-        if (e instanceof RuntimeException) {
-            throw (RuntimeException) e;
-        }
-        throw new IOException(e); // should never occur
-    }
-    */
-    
     protected void _noTreeCodec(String msg) {
          throw new IllegalStateException("JSON instance does not have configured `TreeCodec` to "+msg);
     }

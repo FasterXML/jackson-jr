@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.stree;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
 
@@ -11,7 +10,7 @@ import com.fasterxml.jackson.core.TreeNode;
 
 public class WriteViaCodecTest extends JacksonJrTreeTestBase
 {
-    public void testSimpleList() throws Exception
+    public void testSimpleList()
     {
         List<JrsValue> stuff = new LinkedList<JrsValue>();
         stuff.add(new JrsString("x"));
@@ -20,7 +19,7 @@ public class WriteViaCodecTest extends JacksonJrTreeTestBase
         assertEquals("[\"x\",true,123]", writeTree(new JacksonJrsTreeCodec(), new JrsArray(stuff)));
     }
 
-    public void testSimpleMap() throws Exception
+    public void testSimpleMap()
     {
         Map<String,JrsValue> stuff = new LinkedHashMap<String,JrsValue>();
         stuff.put("a", new JrsNumber(15));
@@ -31,7 +30,7 @@ public class WriteViaCodecTest extends JacksonJrTreeTestBase
                 writeTree(new JacksonJrsTreeCodec(), new JrsObject(stuff)));
     }
 
-    public void testNest() throws Exception
+    public void testNest()
     {
         Map<String,JrsValue> stuff = new LinkedHashMap<String,JrsValue>();
         List<JrsValue> list = new ArrayList<JrsValue>();
@@ -47,7 +46,8 @@ public class WriteViaCodecTest extends JacksonJrTreeTestBase
                 writeTree(new JacksonJrsTreeCodec(), new JrsObject(stuff)));
     }
 
-    protected String writeTree(TreeCodec treeCodec, TreeNode treeNode) throws IOException {
+    protected String writeTree(TreeCodec treeCodec, TreeNode treeNode)
+    {
          StringWriter writer = new StringWriter();
          JsonGenerator g = _factory.createGenerator(ObjectWriteContext.empty(), writer);
          treeCodec.writeTree(g, treeNode);

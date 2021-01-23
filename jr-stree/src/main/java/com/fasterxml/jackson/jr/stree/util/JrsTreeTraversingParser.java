@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.base.ParserMinimalBase;
 import com.fasterxml.jackson.core.util.JacksonFeatureSet;
+
 import com.fasterxml.jackson.jr.stree.JrsArray;
 import com.fasterxml.jackson.jr.stree.JrsNumber;
 import com.fasterxml.jackson.jr.stree.JrsObject;
@@ -361,7 +362,7 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
         return _nodeCursor.currentNode();
     }
 
-    protected JrsNumber currentNumericNode() throws JsonParseException
+    protected JrsNumber currentNumericNode()
     {
         JrsValue n = currentNode();
         if ((n == null) || !(n instanceof JrsNumber)) {
@@ -371,12 +372,12 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
         return (JrsNumber) n;
     }
 
-    protected Number currentNumericValue() throws JsonParseException {
+    protected Number currentNumericValue() {
         return currentNumericNode().getValue();
     }
     
     @Override
-    protected void _handleEOF() throws JsonParseException {
+    protected void _handleEOF() {
         _throwInternal(); // should never get called
     }
 }

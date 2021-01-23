@@ -184,7 +184,7 @@ public class CollectionComposer<PARENT extends ComposerBase,
     protected void _closeChild()
     {
         if (_child != null) {
-            Object value = _child._safeFinish();
+            Object value = _child._finish();
             _collection.add(value);
             _child = null;
         }

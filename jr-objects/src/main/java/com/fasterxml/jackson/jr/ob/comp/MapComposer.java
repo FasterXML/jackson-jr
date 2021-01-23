@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.ob.comp;
 
-import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.SerializableString;
@@ -37,7 +36,7 @@ public class MapComposer<PARENT extends ComposerBase>
      */
 
     @Override
-    public void flush() throws IOException { }
+    public void flush() { }
 
     @Override
     protected MapComposer<PARENT> _start() {
@@ -171,7 +170,7 @@ public class MapComposer<PARENT extends ComposerBase>
     protected void _closeChild()
     {
         if (_child != null) {
-            Object value = _child._safeFinish();
+            Object value = _child._finish();
             _map.put(_fieldName, value);
             _child = null;
         }

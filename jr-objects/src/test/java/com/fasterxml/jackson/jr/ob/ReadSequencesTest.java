@@ -3,8 +3,8 @@ package com.fasterxml.jackson.jr.ob;
 import java.io.*;
 import java.util.*;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.exc.StreamReadException;
 
 public class ReadSequencesTest extends TestBase
 {
@@ -155,7 +155,7 @@ public class ReadSequencesTest extends TestBase
         try {
             it.nextValue();
             fail("Should not pass");
-        } catch (JsonParseException e) {
+        } catch (StreamReadException e) {
             verifyException(e, "Unexpected character ('a'");
         }
 
@@ -183,7 +183,7 @@ public class ReadSequencesTest extends TestBase
         try {
             it.hasNext();
             fail("Should not pass");
-        } catch (JsonParseException e) {
+        } catch (StreamReadException e) {
             verifyException(e, "Unrecognized token");
         }
     }

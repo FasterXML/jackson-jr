@@ -1,7 +1,6 @@
 package com.fasterxml.jackson.jr.ob.comp;
 
 import java.io.Flushable;
-import java.io.IOException;
 import java.util.Collection;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -24,24 +23,13 @@ public abstract class ComposerBase
     /**********************************************************************
      */
     
-    protected abstract ComposerBase _start() throws IOException;
-    protected abstract Object _finish() throws IOException;
+    protected abstract ComposerBase _start();
+    protected abstract Object _finish();
 
-    /**
-     * Helper method used to "peel away" bogus exception declaration
-     */
-    protected Object _safeFinish() {
-        try {
-            return _finish();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
     protected final void _childClosed() {
         _child = null;
     }
-    
+
     /*
     /**********************************************************************
     /* Helper methods for sub-classes
@@ -53,7 +41,6 @@ public abstract class ComposerBase
     }
 
     protected <P extends ComposerBase> ArrayComposer<P> _startArray(P parent, JsonGenerator g)
-        throws IOException
     {
         ArrayComposer<P> child = new ArrayComposer<P>(parent, g);
         _child = child;
@@ -61,7 +48,6 @@ public abstract class ComposerBase
     }
 
     protected <P extends ComposerBase> ObjectComposer<P> _startObject(P parent, JsonGenerator g)
-            throws IOException
     {
         ObjectComposer<P> child = new ObjectComposer<P>(parent, g);
         _child = child;

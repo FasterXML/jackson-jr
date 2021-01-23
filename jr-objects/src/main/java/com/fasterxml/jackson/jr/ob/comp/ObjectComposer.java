@@ -1,9 +1,6 @@
 package com.fasterxml.jackson.jr.ob.comp;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.SerializableString;
 
 public class ObjectComposer<PARENT extends ComposerBase>
@@ -26,20 +23,20 @@ public class ObjectComposer<PARENT extends ComposerBase>
      */
 
     @Override
-    public void flush() throws IOException {
+    public void flush() {
         if (_generator != null) {
             _generator.close();
         }
     }
 
     @Override
-    protected ObjectComposer<PARENT> _start() throws IOException, JsonProcessingException {
+    protected ObjectComposer<PARENT> _start() {
         _generator.writeStartObject();
         return this;
     }
 
     @Override
-    protected Object _finish() throws IOException, JsonProcessingException
+    protected Object _finish()
     {
         if (_open) {
             _open = false;
@@ -55,7 +52,6 @@ public class ObjectComposer<PARENT extends ComposerBase>
      */
 
     public ArrayComposer<ObjectComposer<PARENT>> startArrayField(String fieldName)
-        throws IOException, JsonProcessingException
     {
         _closeChild();
         _generator.writeFieldName(fieldName);
@@ -63,7 +59,6 @@ public class ObjectComposer<PARENT extends ComposerBase>
     }
 
     public ArrayComposer<ObjectComposer<PARENT>> startArrayField(SerializableString fieldName)
-        throws IOException, JsonProcessingException
     {
         _closeChild();
         _generator.writeFieldName(fieldName);
@@ -71,7 +66,6 @@ public class ObjectComposer<PARENT extends ComposerBase>
     }
     
     public ObjectComposer<ObjectComposer<PARENT>> startObjectField(String fieldName)
-        throws IOException, JsonProcessingException
     {
         _closeChild();
         _generator.writeFieldName(fieldName);
@@ -79,7 +73,6 @@ public class ObjectComposer<PARENT extends ComposerBase>
     }
 
     public ObjectComposer<ObjectComposer<PARENT>> startObjectField(SerializableString fieldName)
-        throws IOException, JsonProcessingException
     {
         _closeChild();
         _generator.writeFieldName(fieldName);
@@ -87,7 +80,6 @@ public class ObjectComposer<PARENT extends ComposerBase>
     }
 
     public PARENT end()
-        throws IOException, JsonProcessingException
     {
         _closeChild();
         if (_open) {
@@ -105,14 +97,12 @@ public class ObjectComposer<PARENT extends ComposerBase>
      */
 
     public ObjectComposer<PARENT> put(String fieldName, boolean value)
-        throws IOException, JsonProcessingException
     {
         _generator.writeBooleanField(fieldName, value);
         return this;
     }
 
     public ObjectComposer<PARENT> putNull(String fieldName)
-        throws IOException, JsonProcessingException
     {
         _generator.writeNullField(fieldName);
         return this;
@@ -124,42 +114,36 @@ public class ObjectComposer<PARENT extends ComposerBase>
      * has to be of type that jackson-jr package knows how to serialize.
      */
     public ObjectComposer<PARENT> putObject(String fieldName, Object value)
-        throws IOException, JsonProcessingException
     {
         _generator.writeObjectField(fieldName, value);
         return this;
     }
 
     public ObjectComposer<PARENT> put(String fieldName, int value)
-        throws IOException, JsonProcessingException
     {
         _generator.writeNumberField(fieldName, value);
         return this;
     }
 
     public ObjectComposer<PARENT> put(String fieldName, long value)
-        throws IOException, JsonProcessingException
     {
         _generator.writeNumberField(fieldName, value);
         return this;
     }
 
     public ObjectComposer<PARENT> put(String fieldName, double value)
-        throws IOException, JsonProcessingException
     {
         _generator.writeNumberField(fieldName, value);
         return this;
     }
     
     public ObjectComposer<PARENT> put(String fieldName, String value)
-        throws IOException, JsonProcessingException
     {
         _generator.writeStringField(fieldName, value);
         return this;
     }
 
     public ObjectComposer<PARENT> put(String fieldName, CharSequence value)
-        throws IOException, JsonProcessingException
     {
         String str = (value == null) ? null : value.toString();
         _generator.writeStringField(fieldName, str);
@@ -171,9 +155,8 @@ public class ObjectComposer<PARENT extends ComposerBase>
     /* Internal methods
     /**********************************************************************
      */
-    
+
     protected void _closeChild()
-        throws IOException, JsonProcessingException
     {
         if (_child != null) {
             _child._finish();

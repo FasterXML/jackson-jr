@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.ob;
 
-import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -112,7 +111,7 @@ public class JSONComposer<T>
      * and return instance of specified result type.
      */
     @SuppressWarnings("unchecked")
-    public T finish() throws IOException
+    public T finish()
     {
         if (_open) {
             _closeChild();
@@ -146,13 +145,13 @@ public class JSONComposer<T>
      */
 
     @Override
-    protected JSONComposer<T> _start() throws IOException {
+    protected JSONComposer<T> _start() {
         // Should never be called
         throw _illegalCall();
     }
 
     @Override
-    protected Object _finish() throws IOException {
+    protected Object _finish() {
         // Should never be called
         throw _illegalCall();
     }

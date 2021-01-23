@@ -44,11 +44,11 @@ public abstract class ASTestBase extends TestCase
     }
 
     /*
-    protected JsonParser parserFor(String source) throws IOException {
+    protected JsonParser parserFor(String source) {
         return parserFor(JSON.std, source);
     }
 
-    protected JsonParser parserFor(JSON json, String source) throws IOException {
+    protected JsonParser parserFor(JSON json, String source) {
         return json.getStreamingFactory().createParser(source.toCharArray());
     }
     */

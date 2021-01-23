@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.ob;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -45,11 +44,11 @@ public abstract class TestBase extends TestCase
         fail("Expected an exception with one of substrings ("+Arrays.asList(matches)+"): got one with message \""+msg+"\"");
     }
 
-    protected JsonParser parserFor(String source) throws IOException {
+    protected JsonParser parserFor(String source) {
         return parserFor(JSON.std, source);
     }
 
-    protected JsonParser parserFor(JSON json, String source) throws IOException {
+    protected JsonParser parserFor(JSON json, String source) {
         return json.streamingFactory().createParser(ObjectReadContext.empty(), source.toCharArray());
     }
 
