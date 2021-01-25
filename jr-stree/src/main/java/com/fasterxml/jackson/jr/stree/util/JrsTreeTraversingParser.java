@@ -208,8 +208,8 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
         return _nodeCursor;
     }
 
-    @Override public void setCurrentValue(Object v) { _nodeCursor.setCurrentValue(v); }
-    @Override public Object getCurrentValue() { return _nodeCursor.getCurrentValue(); }
+    @Override public void assignCurrentValue(Object v) { _nodeCursor.assignCurrentValue(v); }
+    @Override public Object currentValue() { return _nodeCursor.currentValue(); }
     
     @Override
     public JsonLocation getTokenLocation() {

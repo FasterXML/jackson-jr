@@ -132,6 +132,8 @@ public class JSONObjectException
      */
     protected LinkedList<Reference> _path;
 
+    protected Object _processor;
+
     /*
     /**********************************************************************
     /* Life-cycle
@@ -155,14 +157,16 @@ public class JSONObjectException
     }
 
     public static JSONObjectException from(JsonParser p, String msg) {
-        return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()));
+        return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()))
+                .with(p);
     }
 
     public static JSONObjectException from(JsonParser p, String msg, Object... args) {
         if (args.length > 0) {
             msg = String.format(msg, args);
         }
-        return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()));
+        return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()))
+                .with(p);
     }
 
     public static JSONObjectException from(JsonParser p, Throwable problem,
@@ -171,7 +175,8 @@ public class JSONObjectException
         if (args.length > 0) {
             msg = String.format(msg, args);
         }
-        return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()), problem);
+        return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()), problem)
+                .with(p);
     }
 
     /**
@@ -222,13 +227,23 @@ public class JSONObjectException
         jme.prependPath(ref);
         return jme;
     }
+
+    protected JSONObjectException with(JsonParser p) {
+        _processor = p;
+        return this;
+    }
     
     /*
     /**********************************************************************
-    /* Accessors/mutators
+    /* Accessors
     /**********************************************************************
      */
 
+    @Override
+    public Object processor() {
+        return _processor;
+
+    }
     /**
      * Method for accessing full structural path within type hierarchy
      * down to problematic property.

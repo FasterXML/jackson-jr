@@ -54,12 +54,12 @@ abstract class JrsValueCursor
     }
 
     @Override
-    public java.lang.Object getCurrentValue() {
+    public java.lang.Object currentValue() {
         return _currentValue;
     }
 
     @Override
-    public void setCurrentValue(java.lang.Object v) {
+    public void assignCurrentValue(java.lang.Object v) {
         _currentValue = v;
     }
     

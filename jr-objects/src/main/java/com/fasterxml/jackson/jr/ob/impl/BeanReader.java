@@ -148,7 +148,7 @@ public class BeanReader
             } catch (Exception e) {
                 return _reportFailureToCreate(p, e);
             }
-            p.setCurrentValue(bean);
+            p.assignCurrentValue(bean);
             return _readBean(r, p, bean);
         }
         try {
@@ -179,7 +179,7 @@ public class BeanReader
             } catch (Exception e) {
                 return _reportFailureToCreate(p, e);
             }
-            p.setCurrentValue(bean);
+            p.assignCurrentValue(bean);
             return _readBean(r, p, bean);
         }
         if (t != null) {
