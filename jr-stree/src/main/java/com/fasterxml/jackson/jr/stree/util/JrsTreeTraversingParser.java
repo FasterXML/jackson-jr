@@ -235,7 +235,7 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
         }
         // need to separate handling a bit...
         switch (_currToken) {
-        case FIELD_NAME:
+        case PROPERTY_NAME:
             return _nodeCursor.currentName();
         case VALUE_STRING:
         case VALUE_NUMBER_INT:

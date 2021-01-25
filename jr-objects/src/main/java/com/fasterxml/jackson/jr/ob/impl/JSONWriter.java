@@ -158,119 +158,119 @@ public class JSONWriter
         _writeValue(value, _writerLocator.findSerializationType(value.getClass()));
     }
 
-    public void writeField(String fieldName, Object value, int type) throws JacksonException
+    public void writeProperty(String propName, Object value, int type) throws JacksonException
     {
         switch (type) {
         case SER_NULL:
             if (_writeNullValues) {
-                writeNullField(fieldName);
+                writeNullProperty(propName);
             }
             return;
         // Structured types:
         case SER_MAP:
-            writeMapField(fieldName, (Map<?,?>) value);
+            writeMapProperty(propName, (Map<?,?>) value);
             return;
         case SER_LIST:
-            writeListField(fieldName, (List<?>) value);
+            writeListProperty(propName, (List<?>) value);
             return;
         case SER_COLLECTION:
-            writeCollectionField(fieldName, (Collection<?>) value);
+            writeCollectionProperty(propName, (Collection<?>) value);
             return;
         case SER_OBJECT_ARRAY:
-            writeObjectArrayField(fieldName, (Object[]) value);
+            writeObjectArrayProperty(propName, (Object[]) value);
             return;
         case SER_INT_ARRAY:
-            writeIntArrayField(fieldName, (int[]) value);
+            writeIntArrayProperty(propName, (int[]) value);
             return;
         case SER_LONG_ARRAY:
-            writeLongArrayField(fieldName, (long[]) value);
+            writeLongArrayProperty(propName, (long[]) value);
             return;
         case SER_BOOLEAN_ARRAY:
-            writeBooleanArrayField(fieldName, (boolean[]) value);
+            writeBooleanArrayProperty(propName, (boolean[]) value);
             return;
         case SER_TREE_NODE:
-            writeTreeNodeField(fieldName, (TreeNode) value);
+            writeTreeNodeProperty(propName, (TreeNode) value);
             return;
 
         // Textual types, similar:
 
         case SER_STRING:
-            writeStringField(fieldName, (String) value);
+            writeStringProperty(propName, (String) value);
             return;
         case SER_CHAR_ARRAY:
-            writeStringField(fieldName, new String((char[]) value));
+            writeStringProperty(propName, new String((char[]) value));
             return;
         case SER_CHARACTER_SEQUENCE:
-            writeStringField(fieldName, ((CharSequence) value).toString());
+            writeStringProperty(propName, ((CharSequence) value).toString());
             return;
         case SER_BYTE_ARRAY:
-            writeBinaryField(fieldName, (byte[]) value);
+            writeBinaryProperty(propName, (byte[]) value);
             return;
 
         // Number types:
         case SER_NUMBER_BIG_DECIMAL:
-            writeBigDecimalField(fieldName, (BigDecimal) value);
+            writeBigDecimalProperty(propName, (BigDecimal) value);
             return;
         case SER_NUMBER_BIG_INTEGER:
-            writeBigIntegerField(fieldName, (BigInteger) value);
+            writeBigIntegerProperty(propName, (BigInteger) value);
             return;
         case SER_NUMBER_FLOAT: // fall through
         case SER_NUMBER_DOUBLE:
-            writeDoubleField(fieldName, ((Number) value).doubleValue());
+            writeDoubleProperty(propName, ((Number) value).doubleValue());
             return;
         case SER_NUMBER_BYTE: // fall through
         case SER_NUMBER_SHORT: // fall through
         case SER_NUMBER_INTEGER:
-            writeIntField(fieldName, ((Number) value).intValue());
+            writeIntProperty(propName, ((Number) value).intValue());
             return;
         case SER_NUMBER_LONG:
-            writeLongField(fieldName, ((Number) value).longValue());
+            writeLongProperty(propName, ((Number) value).longValue());
             return;
 
         // Scalar types:
 
         case SER_BOOLEAN:
-            writeBooleanField(fieldName, ((Boolean) value).booleanValue());
+            writeBooleanProperty(propName, ((Boolean) value).booleanValue());
             return;
         case SER_CHAR:
-            writeStringField(fieldName, String.valueOf(value));
+            writeStringProperty(propName, String.valueOf(value));
             return;
         case SER_CALENDAR:
-            writeDateField(fieldName, ((Calendar) value).getTime());
+            writeDateProperty(propName, ((Calendar) value).getTime());
             return;
         case SER_DATE:
-            writeDateField(fieldName, (Date) value);
+            writeDateProperty(propName, (Date) value);
             return;
         case SER_ENUM:
-            writeEnumField(fieldName, (Enum<?>) value);
+            writeEnumProperty(propName, (Enum<?>) value);
             return;
         case SER_CLASS:
-            writeStringLikeField(fieldName, ((Class<?>) value).getName(), type);
+            writeStringLikeProperty(propName, ((Class<?>) value).getName(), type);
             return;
         case SER_FILE:
-            writeStringLikeField(fieldName, ((File) value).getAbsolutePath(), type);
+            writeStringLikeProperty(propName, ((File) value).getAbsolutePath(), type);
             return;
         case SER_UUID:
         case SER_URL:
         case SER_URI:
-            writeStringLikeField(fieldName, value.toString(), type);
+            writeStringLikeProperty(propName, value.toString(), type);
             return;
 
         // Others
             
         case SER_ITERABLE:
-            writeIterableField(fieldName, (Iterable<?>) value);
+            writeIterableProperty(propName, (Iterable<?>) value);
             return;
 
         case SER_UNKNOWN:
-            writeUnknownField(fieldName, value);
+            writeUnknownProperty(propName, value);
             return;
         }
 
         if (type < 0) { // Bean type!
             ValueWriter writer = _writerLocator.getValueWriter(type);
             if (writer != null) { // sanity check
-                _generator.writeFieldName(fieldName);
+                _generator.writeName(propName);
                 writer.writeValue(this, _generator, value);
                 return;
             }
@@ -410,9 +410,9 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeCollectionField(String fieldName, Collection<?> v) throws JacksonException
+    protected void writeCollectionProperty(String propName, Collection<?> v) throws JacksonException
     {
-        _generator.writeFieldName(fieldName);
+        _generator.writeName(propName);
         writeCollectionValue(v);
     }
     
@@ -425,9 +425,9 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeIterableField(String fieldName, Iterable<?> v) throws JacksonException
+    protected void writeIterableProperty(String propName, Iterable<?> v) throws JacksonException
     {
-        _generator.writeFieldName(fieldName);
+        _generator.writeName(propName);
         writeIterableValue(v);
     }
     
@@ -446,9 +446,9 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeListField(String fieldName, List<?> v) throws JacksonException
+    protected void writeListProperty(String propName, List<?> v) throws JacksonException
     {
-        _generator.writeFieldName(fieldName);
+        _generator.writeName(propName);
         writeListValue(v);
     }
     
@@ -466,15 +466,15 @@ public class JSONWriter
                     Class<?> cls = value.getClass();
                     type = _writerLocator.findSerializationType(cls);
                 }
-                writeField(key, value, type);
+                writeProperty(key, value, type);
             }
         }
         _generator.writeEndObject();
     }
 
-    protected void writeMapField(String fieldName, Map<?,?> v) throws JacksonException
+    protected void writeMapProperty(String propName, Map<?,?> v) throws JacksonException
     {
-        _generator.writeFieldName(fieldName);
+        _generator.writeName(propName);
         writeMapValue(v);
     }
 
@@ -505,8 +505,8 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeObjectArrayField(String fieldName, Object[] v) throws JacksonException {
-        _generator.writeFieldName(fieldName);
+    protected void writeObjectArrayProperty(String propName, Object[] v) throws JacksonException {
+        _generator.writeName(propName);
         writeObjectArrayValue(v);
     }
 
@@ -519,8 +519,8 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeIntArrayField(String fieldName, int[] v) throws JacksonException {
-        _generator.writeFieldName(fieldName);
+    protected void writeIntArrayProperty(String propName, int[] v) throws JacksonException {
+        _generator.writeName(propName);
         writeIntArrayValue(v);
     }
     
@@ -533,8 +533,8 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeLongArrayField(String fieldName, long[] v) throws JacksonException {
-        _generator.writeFieldName(fieldName);
+    protected void writeLongArrayProperty(String propName, long[] v) throws JacksonException {
+        _generator.writeName(propName);
         writeLongArrayValue(v);
     }
     
@@ -547,8 +547,8 @@ public class JSONWriter
         _generator.writeEndArray();
     }
 
-    protected void writeBooleanArrayField(String fieldName, boolean[] v) throws JacksonException {
-        _generator.writeFieldName(fieldName);
+    protected void writeBooleanArrayProperty(String propName, boolean[] v) throws JacksonException {
+        _generator.writeName(propName);
         writeBooleanArrayValue(v);
     }
 
@@ -559,9 +559,9 @@ public class JSONWriter
         _treeCodec.writeTree(_generator, v);
     }
 
-    protected void writeTreeNodeField(String fieldName, TreeNode v) throws JacksonException
+    protected void writeTreeNodeProperty(String propName, TreeNode v) throws JacksonException
     {
-        _generator.writeFieldName(fieldName);
+        _generator.writeName(propName);
         writeTreeNodeValue(v);
     }
     
@@ -575,16 +575,16 @@ public class JSONWriter
         _generator.writeBoolean(v);
     }
 
-    protected void writeBooleanField(String fieldName, boolean v) throws JacksonException {
-        _generator.writeBooleanField(fieldName, v);
+    protected void writeBooleanProperty(String propName, boolean v) throws JacksonException {
+        _generator.writeBooleanProperty(propName, v);
     }
 
     protected void writeIntValue(int v) throws JacksonException {
         _generator.writeNumber(v);
     }
 
-    protected void writeIntField(String fieldName, int v) throws JacksonException {
-        _generator.writeNumberField(fieldName, v);
+    protected void writeIntProperty(String propName, int v) throws JacksonException {
+        _generator.writeNumberProperty(propName, v);
     }
 
     protected void writeLongValue(long v) throws JacksonException {
@@ -595,29 +595,29 @@ public class JSONWriter
         _generator.writeNumber(v);
     }
 
-    protected void writeBigIntegerField(String fieldName, BigInteger v) throws JacksonException {
-        _generator.writeFieldName(fieldName);
+    protected void writeBigIntegerProperty(String propName, BigInteger v) throws JacksonException {
+        _generator.writeName(propName);
         writeBigIntegerValue(v);
     }
     
-    protected void writeLongField(String fieldName, long v) throws JacksonException {
-        _generator.writeNumberField(fieldName, v);
+    protected void writeLongProperty(String propName, long v) throws JacksonException {
+        _generator.writeNumberProperty(propName, v);
     }
     
     protected void writeDoubleValue(double v) throws JacksonException {
         _generator.writeNumber(v);
     }
 
-    protected void writeDoubleField(String fieldName, double v) throws JacksonException {
-        _generator.writeNumberField(fieldName, v);
+    protected void writeDoubleProperty(String propName, double v) throws JacksonException {
+        _generator.writeNumberProperty(propName, v);
     }
 
     protected void writeBigDecimalValue(BigDecimal v) throws JacksonException {
         _generator.writeNumber(v);
     }
 
-    protected void writeBigDecimalField(String fieldName, BigDecimal v) throws JacksonException {
-        _generator.writeNumberField(fieldName, v);
+    protected void writeBigDecimalProperty(String propName, BigDecimal v) throws JacksonException {
+        _generator.writeNumberProperty(propName, v);
     }
 
     /*
@@ -630,24 +630,24 @@ public class JSONWriter
         _generator.writeString(v);
     }
 
-    protected void writeStringField(String fieldName, String v) throws JacksonException {
-        _generator.writeStringField(fieldName, v);
+    protected void writeStringProperty(String propName, String v) throws JacksonException {
+        _generator.writeStringProperty(propName, v);
     }
 
     protected void writeStringLikeValue(String v, int actualType) throws JacksonException {
         _generator.writeString(v);
     }
 
-    protected void writeStringLikeField(String fieldName, String v, int actualType) throws JacksonException {
-        _generator.writeStringField(fieldName, v);
+    protected void writeStringLikeProperty(String propName, String v, int actualType) throws JacksonException {
+        _generator.writeStringProperty(propName, v);
     }
     
     protected void writeBinaryValue(byte[] data) throws JacksonException {
         _generator.writeBinary(data);
     }
 
-    protected void writeBinaryField(String fieldName, byte[] data) throws JacksonException {
-        _generator.writeBinaryField(fieldName, data);
+    protected void writeBinaryProperty(String propName, byte[] data) throws JacksonException {
+        _generator.writeBinaryProperty(propName, data);
     }
 
     /*
@@ -660,15 +660,15 @@ public class JSONWriter
         _generator.writeNull();
     }
 
-    protected void writeNullField(String fieldName) throws JacksonException {
+    protected void writeNullProperty(String propName) throws JacksonException {
         if (_writeNullValues) {
-            _generator.writeNullField(fieldName);
+            _generator.writeNullProperty(propName);
         }
     }
 
-    protected void writeNullField(SerializedString fieldName) throws JacksonException {
+    protected void writeNullProperty(SerializedString propName) throws JacksonException {
         if (_writeNullValues) {
-            _generator.writeFieldName(fieldName);
+            _generator.writeName(propName);
             _generator.writeNull();
         }
     }
@@ -681,11 +681,11 @@ public class JSONWriter
         }
     }
 
-    protected void writeDateField(String fieldName, Date v) throws JacksonException {
+    protected void writeDateProperty(String propName, Date v) throws JacksonException {
         if (JSON.Feature.WRITE_DATES_AS_TIMESTAMP.isEnabled(_features)) {
-            writeLongField(fieldName, v.getTime());
+            writeLongProperty(propName, v.getTime());
         } else {
-            writeStringField(fieldName, dateToString(v));
+            writeStringProperty(propName, dateToString(v));
         }
     }
 
@@ -697,11 +697,11 @@ public class JSONWriter
         }
     }
 
-    protected void writeEnumField(String fieldName, Enum<?> v) throws JacksonException {
+    protected void writeEnumProperty(String propName, Enum<?> v) throws JacksonException {
         if (JSON.Feature.WRITE_ENUMS_USING_INDEX.isEnabled(_features)) {
-            writeIntField(fieldName, v.ordinal());
+            writeIntProperty(propName, v.ordinal());
         } else {
-            writeStringField(fieldName, v.toString());
+            writeStringProperty(propName, v.toString());
         }
     }
 
@@ -724,7 +724,7 @@ public class JSONWriter
                         typeId = _writerLocator.findSerializationType(value.getClass());
                     }
                 }
-                _generator.writeFieldName(property.name);
+                _generator.writeName(property.name);
                 _writeValue(value, typeId);
 
                 property = props[i+1];
@@ -737,7 +737,7 @@ public class JSONWriter
                         typeId = _writerLocator.findSerializationType(value.getClass());
                     }
                 }
-                _generator.writeFieldName(property.name);
+                _generator.writeName(property.name);
                 _writeValue(value, typeId);
 
                 property = props[i+2];
@@ -750,7 +750,7 @@ public class JSONWriter
                         typeId = _writerLocator.findSerializationType(value.getClass());
                     }
                 }
-                _generator.writeFieldName(property.name);
+                _generator.writeName(property.name);
                 _writeValue(value, typeId);
 
                 property = props[i+3];
@@ -763,7 +763,7 @@ public class JSONWriter
                         typeId = _writerLocator.findSerializationType(value.getClass());
                     }
                 }
-                _generator.writeFieldName(property.name);
+                _generator.writeName(property.name);
                 _writeValue(value, typeId);
                 left -= 4;
                 i += 4;
@@ -784,7 +784,7 @@ public class JSONWriter
                     typeId = _writerLocator.findSerializationType(value.getClass());
                 }
             }
-            _generator.writeFieldName(property.name);
+            _generator.writeName(property.name);
             _writeValue(value, typeId);
         case 2:
             property = props[i++];
@@ -797,7 +797,7 @@ public class JSONWriter
                     typeId = _writerLocator.findSerializationType(value.getClass());
                 }
             }
-            _generator.writeFieldName(property.name);
+            _generator.writeName(property.name);
             _writeValue(value, typeId);
         case 1:
             property = props[i++];
@@ -810,7 +810,7 @@ public class JSONWriter
                     typeId = _writerLocator.findSerializationType(value.getClass());
                 }
             }
-            _generator.writeFieldName(property.name);
+            _generator.writeName(property.name);
             _writeValue(value, typeId);
         }
         _generator.writeEndObject();
@@ -821,9 +821,9 @@ public class JSONWriter
         writeStringValue(data.toString());
     }
 
-    protected void writeUnknownField(String fieldName, Object data) throws JacksonException {
+    protected void writeUnknownProperty(String propName, Object data) throws JacksonException {
         _checkUnknown(data);
-        writeStringField(fieldName, data.toString());
+        writeStringProperty(propName, data.toString());
     }
 
     protected void _checkUnknown(Object value) throws JacksonException

@@ -57,7 +57,7 @@ public class JrsEmbeddedObject extends JrsValue.Scalar
         } else if (_value instanceof byte[]) {
             g.writeBinary((byte[]) _value);
         } else {
-            g.writeObject(_value);
+            g.writePOJO(_value);
         }
     }
 }

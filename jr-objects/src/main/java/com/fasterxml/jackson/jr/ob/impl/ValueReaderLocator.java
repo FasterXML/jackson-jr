@@ -41,7 +41,7 @@ public class ValueReaderLocator
      */
 
     /**
-     * We need stream factory for constructing {@code FieldNameMatcher}s for
+     * We need stream factory for constructing {@code PropertyNameMatcher}s for
      * POJO deserializer.
      *
      * @since 3.0
@@ -399,7 +399,7 @@ public class ValueReaderLocator
                     entry.setValue(prop.withReader(createReader(type,
                             prop.rawSetterType(), prop.genericSetterType())));
                 }
-                def.initFieldMatcher(_streamFactory);
+                def.initPropertyMatcher(_streamFactory);
             } finally {
                 _incompleteReaders.remove(key);
             }

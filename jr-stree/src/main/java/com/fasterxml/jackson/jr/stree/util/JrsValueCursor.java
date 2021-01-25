@@ -206,7 +206,7 @@ abstract class JrsValueCursor
                 _needEntry = false;
                 _current = _contents.next();
                 _currentName = (_current == null) ? null : _current.getKey();
-                return JsonToken.FIELD_NAME;
+                return JsonToken.PROPERTY_NAME;
             }
             _needEntry = true;
             return _current.getValue().asToken();
@@ -216,7 +216,7 @@ abstract class JrsValueCursor
         public JsonToken nextValue()
         {
             JsonToken t = nextToken();
-            if (t == JsonToken.FIELD_NAME) {
+            if (t == JsonToken.PROPERTY_NAME) {
                 t = nextToken();
             }
             return t;

@@ -16,7 +16,7 @@ public class SimpleTraverseTest extends JacksonJrTreeTestBase
         JsonParser p = node.traverse(EMPTY_READ_CONTEXT);
 
         assertToken(JsonToken.START_OBJECT, p.nextToken());
-        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertToken(JsonToken.PROPERTY_NAME, p.nextToken());
         assertEquals("a", p.currentName());
 
         assertToken(JsonToken.START_ARRAY, p.nextToken());
@@ -27,7 +27,7 @@ public class SimpleTraverseTest extends JacksonJrTreeTestBase
         assertEquals(2, p.getIntValue());
 
         assertToken(JsonToken.START_OBJECT, p.nextToken());
-        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertToken(JsonToken.PROPERTY_NAME, p.nextToken());
         assertEquals("b", p.currentName());
         assertToken(JsonToken.VALUE_TRUE, p.nextToken());
         assertToken(JsonToken.END_OBJECT, p.nextToken());
@@ -36,12 +36,12 @@ public class SimpleTraverseTest extends JacksonJrTreeTestBase
         assertEquals(3, p.getIntValue());
         assertToken(JsonToken.END_ARRAY, p.nextToken());
 
-        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertToken(JsonToken.PROPERTY_NAME, p.nextToken());
         assertEquals("c", p.currentName());
         assertToken(JsonToken.VALUE_NUMBER_INT, p.nextToken());
         assertEquals(-2, p.getIntValue());
 
-        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertToken(JsonToken.PROPERTY_NAME, p.nextToken());
         assertEquals("d", p.currentName());
         assertToken(JsonToken.VALUE_NULL, p.nextToken());
         

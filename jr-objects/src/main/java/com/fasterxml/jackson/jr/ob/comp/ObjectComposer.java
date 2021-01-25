@@ -51,31 +51,31 @@ public class ObjectComposer<PARENT extends ComposerBase>
     /**********************************************************************
      */
 
-    public ArrayComposer<ObjectComposer<PARENT>> startArrayField(String fieldName)
+    public ArrayComposer<ObjectComposer<PARENT>> startArrayProperty(String fieldName)
     {
         _closeChild();
-        _generator.writeFieldName(fieldName);
+        _generator.writeName(fieldName);
         return _startArray(this, _generator);
     }
 
-    public ArrayComposer<ObjectComposer<PARENT>> startArrayField(SerializableString fieldName)
+    public ArrayComposer<ObjectComposer<PARENT>> startArrayProperty(SerializableString fieldName)
     {
         _closeChild();
-        _generator.writeFieldName(fieldName);
+        _generator.writeName(fieldName);
         return _startArray(this, _generator);
     }
     
-    public ObjectComposer<ObjectComposer<PARENT>> startObjectField(String fieldName)
+    public ObjectComposer<ObjectComposer<PARENT>> startObjectProperty(String fieldName)
     {
         _closeChild();
-        _generator.writeFieldName(fieldName);
+        _generator.writeName(fieldName);
         return _startObject(this, _generator);
     }
 
-    public ObjectComposer<ObjectComposer<PARENT>> startObjectField(SerializableString fieldName)
+    public ObjectComposer<ObjectComposer<PARENT>> startObjectProperty(SerializableString fieldName)
     {
         _closeChild();
-        _generator.writeFieldName(fieldName);
+        _generator.writeName(fieldName);
         return _startObject(this, _generator);
     }
 
@@ -98,13 +98,13 @@ public class ObjectComposer<PARENT extends ComposerBase>
 
     public ObjectComposer<PARENT> put(String fieldName, boolean value)
     {
-        _generator.writeBooleanField(fieldName, value);
+        _generator.writeBooleanProperty(fieldName, value);
         return this;
     }
 
     public ObjectComposer<PARENT> putNull(String fieldName)
     {
-        _generator.writeNullField(fieldName);
+        _generator.writeNullProperty(fieldName);
         return this;
     }
 
@@ -115,38 +115,38 @@ public class ObjectComposer<PARENT extends ComposerBase>
      */
     public ObjectComposer<PARENT> putObject(String fieldName, Object value)
     {
-        _generator.writeObjectField(fieldName, value);
+        _generator.writePOJOProperty(fieldName, value);
         return this;
     }
 
     public ObjectComposer<PARENT> put(String fieldName, int value)
     {
-        _generator.writeNumberField(fieldName, value);
+        _generator.writeNumberProperty(fieldName, value);
         return this;
     }
 
     public ObjectComposer<PARENT> put(String fieldName, long value)
     {
-        _generator.writeNumberField(fieldName, value);
+        _generator.writeNumberProperty(fieldName, value);
         return this;
     }
 
     public ObjectComposer<PARENT> put(String fieldName, double value)
     {
-        _generator.writeNumberField(fieldName, value);
+        _generator.writeNumberProperty(fieldName, value);
         return this;
     }
     
     public ObjectComposer<PARENT> put(String fieldName, String value)
     {
-        _generator.writeStringField(fieldName, value);
+        _generator.writeStringProperty(fieldName, value);
         return this;
     }
 
     public ObjectComposer<PARENT> put(String fieldName, CharSequence value)
     {
         String str = (value == null) ? null : value.toString();
-        _generator.writeStringField(fieldName, str);
+        _generator.writeStringProperty(fieldName, str);
         return this;
     }
     

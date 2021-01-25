@@ -30,8 +30,8 @@ public class CustomValueWritersTest extends TestBase
         public void writeValue(JSONWriter context, JsonGenerator g,
                 Object v) {
             g.writeStartObject();
-            g.writeNumberField("answer", 42);
-            g.writeNullField("none");
+            g.writeNumberProperty("answer", 42);
+            g.writeNullProperty("none");
             g.writeEndObject();
         }
 

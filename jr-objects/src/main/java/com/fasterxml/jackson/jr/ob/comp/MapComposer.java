@@ -9,7 +9,7 @@ public class MapComposer<PARENT extends ComposerBase>
 {
     protected final PARENT _parent;
 
-    protected String _fieldName;
+    protected String _propName;
 
     protected Map<String,Object> _map;
     
@@ -61,30 +61,30 @@ public class MapComposer<PARENT extends ComposerBase>
     /**********************************************************************
      */
     
-    public CollectionComposer<MapComposer<PARENT>,?> startArrayField(String fieldName)
+    public CollectionComposer<MapComposer<PARENT>,?> startArrayProperty(String propName)
     {
         _closeChild();
-        _fieldName = fieldName;
+        _propName = propName;
         CollectionComposer<MapComposer<PARENT>,?> child = _startCollection(this);
-        _map.put(fieldName, child._collection);
+        _map.put(propName, child._collection);
         return child;
     }
     
-    public CollectionComposer<MapComposer<PARENT>,?> startArrayField(SerializableString fieldName) {
-        return startArrayField(fieldName.getValue());
+    public CollectionComposer<MapComposer<PARENT>,?> startArrayProperty(SerializableString propName) {
+        return startArrayProperty(propName.getValue());
     }
     
-    public MapComposer<MapComposer<PARENT>> startObjectField(String fieldName)
+    public MapComposer<MapComposer<PARENT>> startObjectProperty(String propName)
     {
         _closeChild();
-        _fieldName = fieldName;
+        _propName = propName;
         MapComposer<MapComposer<PARENT>> child = _startMap(this);
-        _map.put(fieldName, child._map);
+        _map.put(propName, child._map);
         return child;
     }
     
-    public MapComposer<MapComposer<PARENT>> startObjectField(SerializableString fieldName) {
-        return startObjectField(fieldName.getValue());
+    public MapComposer<MapComposer<PARENT>> startObjectProperty(SerializableString propName) {
+        return startObjectProperty(propName.getValue());
     }
     
     public PARENT end()
@@ -107,47 +107,47 @@ public class MapComposer<PARENT extends ComposerBase>
     /**********************************************************************
      */
     
-    public MapComposer<PARENT> put(String fieldName, boolean value)
+    public MapComposer<PARENT> put(String propName, boolean value)
     {
-        _map.put(fieldName, value ? Boolean.TRUE : Boolean.FALSE);
+        _map.put(propName, value ? Boolean.TRUE : Boolean.FALSE);
         return this;
     }
     
-    public MapComposer<PARENT> putNull(String fieldName)
+    public MapComposer<PARENT> putNull(String propName)
     {
         // could maybe just omit but...
-        _map.put(fieldName, null);
+        _map.put(propName, null);
         return this;
     }
     
-    public MapComposer<PARENT> put(String fieldName, int value)
+    public MapComposer<PARENT> put(String propName, int value)
     {
-        _map.put(fieldName, value);
+        _map.put(propName, value);
         return this;
     }
 
-    public MapComposer<PARENT> put(String fieldName, long value)
+    public MapComposer<PARENT> put(String propName, long value)
     {
-        _map.put(fieldName, value);
+        _map.put(propName, value);
         return this;
     }
 
-    public MapComposer<PARENT> put(String fieldName, double value)
+    public MapComposer<PARENT> put(String propName, double value)
     {
-        _map.put(fieldName, value);
+        _map.put(propName, value);
         return this;
     }
     
-    public MapComposer<PARENT> put(String fieldName, String value)
+    public MapComposer<PARENT> put(String propName, String value)
     {
-        _map.put(fieldName, value);
+        _map.put(propName, value);
         return this;
     }
     
-    public MapComposer<PARENT> put(String fieldName, CharSequence value)
+    public MapComposer<PARENT> put(String propName, CharSequence value)
     {
         String str = (value == null) ? null : value.toString();
-        _map.put(fieldName, str);
+        _map.put(propName, str);
         return this;
     }
 
@@ -171,7 +171,7 @@ public class MapComposer<PARENT extends ComposerBase>
     {
         if (_child != null) {
             Object value = _child._finish();
-            _map.put(_fieldName, value);
+            _map.put(_propName, value);
             _child = null;
         }
     }

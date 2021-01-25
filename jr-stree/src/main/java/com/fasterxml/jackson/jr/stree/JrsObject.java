@@ -108,7 +108,7 @@ public class JrsObject
         g.writeStartObject();
         if (!_values.isEmpty()) {
             for (Map.Entry<String,JrsValue> entry : _values.entrySet()) {
-                g.writeFieldName(entry.getKey());
+                g.writeName(entry.getKey());
                 codec.writeTree(g, entry.getValue());
             }
         }

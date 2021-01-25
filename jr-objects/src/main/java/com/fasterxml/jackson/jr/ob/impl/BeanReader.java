@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.core.TokenStreamFactory;
-import com.fasterxml.jackson.core.sym.FieldNameMatcher;
+import com.fasterxml.jackson.core.sym.PropertyNameMatcher;
 import com.fasterxml.jackson.core.util.Named;
 
 import com.fasterxml.jackson.jr.ob.JSON;
@@ -41,8 +41,8 @@ public class BeanReader
     // //    not during it (due to need to resolve possible cyclic deps). So they are
     // //    non-final due to this but never `null` before use.
 
-    protected FieldNameMatcher _fieldMatcher;
-    protected BeanPropertyReader[] _fieldReaders;
+    protected PropertyNameMatcher _propNameMatcher;
+    protected BeanPropertyReader[] _propValueReaders;
 
     /**
      * Constructors used for deserialization use case
@@ -64,7 +64,7 @@ public class BeanReader
      * Initialization method called after construction and resolution of all property
      * readers: separate since caller needs to handle resolution of cyclic dependencies.
      */
-    protected void initFieldMatcher(TokenStreamFactory streamFactory)
+    protected void initPropertyMatcher(TokenStreamFactory streamFactory)
     {
         // 26-Jan-2020, tatu: One complication are aliases, if any
         Map<String,BeanPropertyReader> byName = _aliasMapping.isEmpty()
@@ -72,11 +72,11 @@ public class BeanReader
 
         final int size = byName.size();
         List<Named> names = new ArrayList<>(size);
-        _fieldReaders = new BeanPropertyReader[size];
+        _propValueReaders = new BeanPropertyReader[size];
         int ix = 0;
         for (Map.Entry<String, BeanPropertyReader> entry : byName.entrySet()) {
             names.add(Named.fromString(entry.getKey()));
-            _fieldReaders[ix++] = entry.getValue();
+            _propValueReaders[ix++] = entry.getValue();
         }
         // 13-Dec-2017, tatu: We could relatively easily support case-insensitive matching,
         //    except for one problem: when we cache readers we cache matcher... so would
@@ -84,12 +84,12 @@ public class BeanReader
         //    easily.
         /*
         if (_caseInsensitive) {
-            _fieldMatcher = streamFactory.constructCIFieldNameMatcher(names, true);
+            _propNameMatcher = streamFactory.constructCINameMatcher(names, true);
         } else {
-            _fieldMatcher = streamFactory.constructFieldNameMatcher(names, true);
+            _propNameMatcher = streamFactory.constructNameMatcher(names, true);
         }
         */
-        _fieldMatcher = streamFactory.constructFieldNameMatcher(names, true);
+        _propNameMatcher = streamFactory.constructNameMatcher(names, true);
     }
 
     private final Map<String,BeanPropertyReader> _mixInAliases(Map<String,BeanPropertyReader> props,
@@ -207,14 +207,14 @@ public class BeanReader
         // 13-Dec-2017, tatu: Unrolling is unpredictable business, and 
         //     performance does not seem linear. In fact, choices of 2 or 8 unrolls
         //     seem to have about same performance for our test (but in between less... :) )
-        int ix = p.nextFieldName(_fieldMatcher);
-        final BeanPropertyReader[] readers = _fieldReaders;
+        int ix = p.nextFieldName(_propNameMatcher);
+        final BeanPropertyReader[] readers = _propValueReaders;
         while (ix >= 0) {
             BeanPropertyReader prop = readers[ix]; // elem #1
             Object value = prop.getReader().readNext(r, p);
             prop.setValueFor(bean, value);
 
-            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            if ((ix = p.nextFieldName(_propNameMatcher)) < 0) break;
             prop = readers[ix]; // elem #2
             value = prop.getReader().readNext(r, p);
             prop.setValueFor(bean, value);
@@ -251,11 +251,11 @@ public class BeanReader
             prop.setValueFor(bean, value);
 */
             // and then for next loop
-            ix = p.nextFieldName(_fieldMatcher);
+            ix = p.nextFieldName(_propNameMatcher);
         }
 
-        if (ix != FieldNameMatcher.MATCH_END_OBJECT) {
-            if (ix == FieldNameMatcher.MATCH_UNKNOWN_NAME) {
+        if (ix != PropertyNameMatcher.MATCH_END_OBJECT) {
+            if (ix == PropertyNameMatcher.MATCH_UNKNOWN_NAME) {
                 return _readWithUnknown(r, p, bean, p.currentName());
             }
             throw _reportProblem(p);

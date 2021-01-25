@@ -79,8 +79,8 @@ public abstract class ValueReader
             return "NULL";
         }
         switch (t) {
-        case FIELD_NAME:
-            return "JSON Field name '"+p.currentName()+"'";
+        case PROPERTY_NAME:
+            return "JSON Object property name '"+p.currentName()+"'";
         case START_ARRAY:
             return "JSON Array";
         case START_OBJECT:

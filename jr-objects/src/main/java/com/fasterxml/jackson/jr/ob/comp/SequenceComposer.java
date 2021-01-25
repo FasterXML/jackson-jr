@@ -112,12 +112,12 @@ public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
      * composed:
      * has to be of type that jackson-jr package knows how to serialize.
      */
-    public THIS addObject(Object pojo)
+    public THIS addPOJO(Object pojo)
     {
-        _generator.writeObject(pojo);
+        _generator.writePOJO(pojo);
         return _this();
     }
-    
+
     /*
     /**********************************************************************
     /* Internal helper methods

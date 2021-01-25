@@ -48,12 +48,12 @@ public class JSONObjectException
         protected Object _from;
 
         /**
-         * Name of field (for beans) or key (for Maps) that is part
+         * Name of property (for beans) or key (for Maps) that is part
          * of the reference. May be null for Collection types (which
          * generally have {@link #_index} defined), or when resolving
          * Map classes without (yet) having an instance to operate on.
          */
-        protected String _fieldName;
+        protected String _propertyName;
 
         /**
          * Index within a {@link Collection} instance that contained
@@ -75,7 +75,7 @@ public class JSONObjectException
             if (fieldName == null) {
                 throw new NullPointerException("Can not pass null fieldName");
             }
-            _fieldName = fieldName;
+            _propertyName = fieldName;
         }
 
         public Reference(Object from, int index) {
@@ -84,11 +84,11 @@ public class JSONObjectException
         }
 
         public void setFrom(Object o) { _from = o; }
-        public void setFieldName(String n) { _fieldName = n; }
+        public void setPropertyName(String n) { _propertyName = n; }
         public void setIndex(int ix) { _index = ix; }
 
-        public Object getFrom() { return _from; }
-        public String getFieldName() { return _fieldName; }
+        public Object from() { return _from; }
+        public String getPropertyName() { return _propertyName; }
         public int getIndex() { return _index; }
 
         @Override public String toString() {
@@ -106,9 +106,9 @@ public class JSONObjectException
             }
             sb.append(cls.getSimpleName());
             sb.append('[');
-            if (_fieldName != null) {
+            if (_propertyName != null) {
                 sb.append('"');
-                sb.append(_fieldName);
+                sb.append(_propertyName);
                 sb.append('"');
             } else if (_index >= 0) {
                 sb.append(_index);
@@ -188,9 +188,9 @@ public class JSONObjectException
      * non-indexed object, such as a Map or POJO/bean.
      */
     public static JSONObjectException wrapWithPath(Throwable src, Object refFrom,
-            String refFieldName)
+            String refPropertyName)
     {
-        return wrapWithPath(src, new Reference(refFrom, refFieldName));
+        return wrapWithPath(src, new Reference(refFrom, refPropertyName));
     }
 
     /**
