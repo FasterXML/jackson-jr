@@ -35,7 +35,7 @@ public class MapReader extends ValueReader
         }
         
         MapBuilder b = r._mapBuilder(_mapType);
-        String propName0 = p.nextFieldName();
+        String propName0 = p.nextName();
         if (propName0 == null) {
             if (p.hasToken(JsonToken.END_OBJECT)) {
                 return b.emptyMap();
@@ -43,7 +43,7 @@ public class MapReader extends ValueReader
             throw _reportWrongToken(p);
         }
         Object value = _valueReader.readNext(r, p);
-        String propName = p.nextFieldName();
+        String propName = p.nextName();
         if (propName == null) {
             if (p.hasToken(JsonToken.END_OBJECT)) {
                 return b.singletonMap(propName0, value);
@@ -54,7 +54,7 @@ public class MapReader extends ValueReader
             b = b.start().put(propName0, value);
             while (true) {
                 b = b.put(propName, _valueReader.readNext(r, p));
-                propName = p.nextFieldName();
+                propName = p.nextName();
                 if (propName == null) {
                     if (p.hasToken(JsonToken.END_OBJECT)) {
                         return b.build();
@@ -70,7 +70,7 @@ public class MapReader extends ValueReader
     @Override
     public Object read(JSONReader r, JsonParser p) throws JacksonException {
         MapBuilder b = r._mapBuilder(_mapType);
-        String propName0 = p.nextFieldName();
+        String propName0 = p.nextName();
         if (propName0 == null) {
             if (p.hasToken(JsonToken.END_OBJECT)) {
                 return b.emptyMap();
@@ -78,7 +78,7 @@ public class MapReader extends ValueReader
             throw _reportWrongToken(p);
         }
         Object value = _valueReader.readNext(r, p);
-        String propName = p.nextFieldName();
+        String propName = p.nextName();
         if (propName == null) {
             if (p.hasToken(JsonToken.END_OBJECT)) {
                 return b.singletonMap(propName0, value);
@@ -89,7 +89,7 @@ public class MapReader extends ValueReader
             b = b.start().put(propName0, value);
             while (true) {
                 b = b.put(propName, _valueReader.readNext(r, p));
-                propName = p.nextFieldName();
+                propName = p.nextName();
                 if (propName == null) {
                     if (p.hasToken(JsonToken.END_OBJECT)) {
                         return b.build();

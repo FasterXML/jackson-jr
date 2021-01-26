@@ -207,51 +207,51 @@ public class BeanReader
         // 13-Dec-2017, tatu: Unrolling is unpredictable business, and 
         //     performance does not seem linear. In fact, choices of 2 or 8 unrolls
         //     seem to have about same performance for our test (but in between less... :) )
-        int ix = p.nextFieldName(_propNameMatcher);
+        int ix = p.nextNameMatch(_propNameMatcher);
         final BeanPropertyReader[] readers = _propValueReaders;
         while (ix >= 0) {
             BeanPropertyReader prop = readers[ix]; // elem #1
             Object value = prop.getReader().readNext(r, p);
             prop.setValueFor(bean, value);
 
-            if ((ix = p.nextFieldName(_propNameMatcher)) < 0) break;
+            if ((ix = p.nextNameMatch(_propNameMatcher)) < 0) break;
             prop = readers[ix]; // elem #2
             value = prop.getReader().readNext(r, p);
             prop.setValueFor(bean, value);
 
 /*
-            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            if ((ix = p.nextName(_fieldMatcher)) < 0) break;
             prop = readers[ix]; // elem #3
             value = prop.getReader().readNext(r, p);
             prop.setValueFor(bean, value);
 
-            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            if ((ix = p.nextName(_fieldMatcher)) < 0) break;
             prop = readers[ix]; // elem #4
             value = prop.getReader().readNext(r, p);
             prop.setValueFor(bean, value);
 
-            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            if ((ix = p.nextName(_fieldMatcher)) < 0) break;
             prop = readers[ix]; // elem #5
             value = prop.getReader().readNext(r, p);
             prop.setValueFor(bean, value);
 
-            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            if ((ix = p.nextName(_fieldMatcher)) < 0) break;
             prop = readers[ix]; // elem #6
             value = prop.getReader().readNext(r, p);
             prop.setValueFor(bean, value);
 
-            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            if ((ix = p.nextName(_fieldMatcher)) < 0) break;
             prop = readers[ix]; // elem #7
             value = prop.getReader().readNext(r, p);
             prop.setValueFor(bean, value);
 
-            if ((ix = p.nextFieldName(_fieldMatcher)) < 0) break;
+            if ((ix = p.nextName(_fieldMatcher)) < 0) break;
             prop = readers[ix]; // elem #8
             value = prop.getReader().readNext(r, p);
             prop.setValueFor(bean, value);
 */
             // and then for next loop
-            ix = p.nextFieldName(_propNameMatcher);
+            ix = p.nextNameMatch(_propNameMatcher);
         }
 
         if (ix != PropertyNameMatcher.MATCH_END_OBJECT) {
@@ -274,49 +274,49 @@ public class BeanReader
         // Unroll first 6 rounds (similar to databind)
         do {
             // Element 1
-            if ((propName = p.nextFieldName()) == null) { break; }
+            if ((propName = p.nextName()) == null) { break; }
             if ((prop = findProperty(propName)) == null) {
                 return _readWithUnknown(r, p, bean, propName);
             }
             prop.setValueFor(bean, prop.getReader().readNext(r, p));
 
             // Element 2
-            if ((propName = p.nextFieldName()) == null) { break; }
+            if ((propName = p.nextName()) == null) { break; }
             if ((prop = findProperty(propName)) == null) {
                 return _readWithUnknown(r, p, bean, propName);
             }
             prop.setValueFor(bean, prop.getReader().readNext(r, p));
 
             // Element 3
-            if ((propName = p.nextFieldName()) == null) { break; }
+            if ((propName = p.nextName()) == null) { break; }
             if ((prop = findProperty(propName)) == null) {
                 return _readWithUnknown(r, p, bean, propName);
             }
             prop.setValueFor(bean, prop.getReader().readNext(r, p));
 
             // Element 4
-            if ((propName = p.nextFieldName()) == null) { break; }
+            if ((propName = p.nextName()) == null) { break; }
             if ((prop = findProperty(propName)) == null) {
                 return _readWithUnknown(r, p, bean, propName);
             }
             prop.setValueFor(bean, prop.getReader().readNext(r, p));
 
             // Element 5
-            if ((propName = p.nextFieldName()) == null) { break; }
+            if ((propName = p.nextName()) == null) { break; }
             if ((prop = findProperty(propName)) == null) {
                 return _readWithUnknown(r, p, bean, propName);
             }
             prop.setValueFor(bean, prop.getReader().readNext(r, p));
 
             // Element 6
-            if ((propName = p.nextFieldName()) == null) { break; }
+            if ((propName = p.nextName()) == null) { break; }
             if ((prop = findProperty(propName)) == null) {
                 return _readWithUnknown(r, p, bean, propName);
             }
             prop.setValueFor(bean, prop.getReader().readNext(r, p));
 
             // and if more, just loop
-            for (; (propName = p.nextFieldName()) != null; ) {
+            for (; (propName = p.nextName()) != null; ) {
                 prop = findProperty(propName);
                 if (prop == null) {
                     handleUnknown(r, p, propName);
@@ -341,7 +341,7 @@ public class BeanReader
         // first, skip current property
         handleUnknown(r, p, propName);
         // then do the rest with looping
-        for (; (propName = p.nextFieldName()) != null; ) {
+        for (; (propName = p.nextName()) != null; ) {
             BeanPropertyReader prop = findProperty(propName);
             if (prop == null) {
                 handleUnknown(r, p, propName);

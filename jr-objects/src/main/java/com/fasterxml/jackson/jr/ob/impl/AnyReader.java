@@ -145,7 +145,7 @@ public class AnyReader extends ValueReader
     {
         // First, a minor optimization for empty Maps
         String k;
-        if ((k = p.nextFieldName()) == null) {
+        if ((k = p.nextName()) == null) {
             if (!p.hasToken(JsonToken.END_OBJECT)) {
                 _reportNotEndObject(p);
             }
@@ -155,7 +155,7 @@ public class AnyReader extends ValueReader
         String key = fromKey(k);
         Object value = readNext(r, p);
 
-        if ((k = p.nextFieldName()) == null) {
+        if ((k = p.nextName()) == null) {
             if (!p.hasToken(JsonToken.END_OBJECT)) {
                 _reportNotEndObject(p);
             }
@@ -168,7 +168,7 @@ public class AnyReader extends ValueReader
         // but then it's loop-de-loop
         try {
             b = b.put(key, value);
-            while ((k = p.nextFieldName()) != null) {
+            while ((k = p.nextName()) != null) {
                 b = b.put(fromKey(k), readNext(r, p));
             }
         } catch (IllegalArgumentException e) {

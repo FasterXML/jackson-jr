@@ -12,8 +12,10 @@ import com.fasterxml.jackson.jr.ob.impl.JSONReader;
  * exposing of checked exceptions
  * (which basic {@link Iterator} does not expose),
  * but with Jackson 3.0 this is not necessary any more.
+ * There are, however, some accessor that may be useful, including location
+ * information.
  *<p>
- * NOTE: adapted from `jackson-databind` {@code MappingIterator}
+ * NOTE: adapted from {@code jackson-databind} type {@code MappingIterator}.
  */
 public class ValueIterator<T> implements Iterator<T>, Closeable
 {
@@ -159,7 +161,7 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
             _seqContext = null;
             _state = STATE_CLOSED;
         } else {
-            TokenStreamContext sctxt = p.getParsingContext();
+            TokenStreamContext sctxt = p.streamReadContext();
             if (managedParser && p.isExpectedStartArrayToken()) {
                 // If pointing to START_ARRAY, context should be that ARRAY
                 p.clearCurrentToken();
@@ -343,7 +345,7 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
     /**
      * Accessor for getting underlying parser this iterator uses.
      */
-    public JsonParser getParser() {
+    public JsonParser parser() {
         return _parser;
     }
 
@@ -355,8 +357,8 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
      * 
      * @return Location of the input stream of the underlying parser
      */
-    public JsonLocation getCurrentLocation() {
-        return _parser.getCurrentLocation();
+    public JsonLocation currentLocation() {
+        return _parser.currentLocation();
     }
 
     /*
@@ -369,14 +371,14 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
     {
         final JsonParser p = _parser;
         // First, a quick check to see if we might have been lucky and no re-sync needed
-        if (p.getParsingContext() == _seqContext) {
+        if (p.streamReadContext() == _seqContext) {
             return;
         }
 
         while (true) {
             JsonToken t = p.nextToken();
             if ((t == JsonToken.END_ARRAY) || (t == JsonToken.END_OBJECT)) {
-                if (p.getParsingContext() == _seqContext) {
+                if (p.streamReadContext() == _seqContext) {
                     p.clearCurrentToken();
                     return;
                 }
