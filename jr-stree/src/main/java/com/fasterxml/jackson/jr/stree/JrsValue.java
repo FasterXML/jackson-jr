@@ -44,7 +44,7 @@ public abstract class JrsValue implements TreeNode
     }
     
     @Override
-    public Iterator<String> fieldNames() {
+    public Iterator<String> propertyNames() {
         return null;
     }
 

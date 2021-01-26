@@ -26,7 +26,7 @@ public class TreeApiTest extends TestBase
         }
 
         @Override
-        public Iterator<String> fieldNames() {
+        public Iterator<String> propertyNames() {
             return null;
         }
 

@@ -50,8 +50,7 @@ public class JrsObject
     }
 
     @Override
-    public Iterator<String> fieldNames()
-    {
+    public Iterator<String> propertyNames() {
         return _values.keySet().iterator();
     }
 
