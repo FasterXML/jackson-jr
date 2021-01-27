@@ -131,7 +131,7 @@ public class JSONComposer<T>
                 x = _byteWriter.toByteArray();
                 _byteWriter = null;
             } else {
-                x = _generator.streamWriteTarget();
+                x = _generator.streamWriteOutputTarget();
             }
             _result = (T) x;
         }

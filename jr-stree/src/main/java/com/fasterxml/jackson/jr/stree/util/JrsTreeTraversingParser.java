@@ -102,7 +102,7 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
 
     @Override
-    public Object streamReadSource() {
+    public Object streamReadInputSource() {
         return _source;
     }
 
