@@ -96,13 +96,13 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
 
     @Override
-    public JacksonFeatureSet<StreamReadCapability> getReadCapabilities() {
+    public JacksonFeatureSet<StreamReadCapability> streamReadCapabilities() {
         // Defaults are fine
         return DEFAULT_READ_CAPABILITIES;
     }
 
     @Override
-    public Object getInputSource() {
+    public Object streamReadSource() {
         return _source;
     }
 
@@ -204,20 +204,20 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
 
     @Override
-    public TokenStreamContext getParsingContext() {
+    public TokenStreamContext streamReadContext() {
         return _nodeCursor;
     }
 
     @Override public void assignCurrentValue(Object v) { _nodeCursor.assignCurrentValue(v); }
     @Override public Object currentValue() { return _nodeCursor.currentValue(); }
-    
+
     @Override
-    public JsonLocation getTokenLocation() {
+    public JsonLocation currentTokenLocation() {
         return JsonLocation.NA;
     }
 
     @Override
-    public JsonLocation getCurrentLocation() {
+    public JsonLocation currentLocation() {
         return JsonLocation.NA;
     }
 

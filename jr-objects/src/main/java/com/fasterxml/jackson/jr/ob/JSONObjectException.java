@@ -157,7 +157,7 @@ public class JSONObjectException
     }
 
     public static JSONObjectException from(JsonParser p, String msg) {
-        return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()))
+        return new JSONObjectException(msg, ((p == null) ? null : p.currentTokenLocation()))
                 .with(p);
     }
 
@@ -165,7 +165,7 @@ public class JSONObjectException
         if (args.length > 0) {
             msg = String.format(msg, args);
         }
-        return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()))
+        return new JSONObjectException(msg, ((p == null) ? null : p.currentTokenLocation()))
                 .with(p);
     }
 
@@ -175,7 +175,7 @@ public class JSONObjectException
         if (args.length > 0) {
             msg = String.format(msg, args);
         }
-        return new JSONObjectException(msg, ((p == null) ? null : p.getTokenLocation()), problem)
+        return new JSONObjectException(msg, ((p == null) ? null : p.currentTokenLocation()), problem)
                 .with(p);
     }
 
