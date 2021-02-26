@@ -7,13 +7,6 @@ import java.util.*;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.TreeCodec;
 import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.jr.stree.JacksonJrsTreeCodec;
-import com.fasterxml.jackson.jr.stree.JrsArray;
-import com.fasterxml.jackson.jr.stree.JrsBoolean;
-import com.fasterxml.jackson.jr.stree.JrsNumber;
-import com.fasterxml.jackson.jr.stree.JrsObject;
-import com.fasterxml.jackson.jr.stree.JrsString;
-import com.fasterxml.jackson.jr.stree.JrsValue;
 
 public class WriteViaCodecTest extends JacksonJrTreeTestBase
 {

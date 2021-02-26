@@ -3,8 +3,6 @@ package com.fasterxml.jackson.jr.ob;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.jr.ob.JSON;
-
 public class NullHandlingTest extends TestBase
 {
     // Test to verify that outputting of nulls is configurable

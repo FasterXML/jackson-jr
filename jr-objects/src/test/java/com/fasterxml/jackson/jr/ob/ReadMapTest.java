@@ -3,7 +3,7 @@ package com.fasterxml.jackson.jr.ob;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.jr.ob.JSON;
+
 import com.fasterxml.jackson.jr.ob.api.MapBuilder;
 
 // for [jackson-jr#49], where `DeferredMap` explodes

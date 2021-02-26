@@ -210,9 +210,12 @@ See section "Jackson-jr ValueReaders" of [Jackson-jr 2.10 improvements](https://
 
 You can also check out unit test
 
-   jr-objects/src/test/java/com/fasterxml/jackson/jr/ob/impl/CustomValueReadersTest.java
+    jr-objects/src/test/java/com/fasterxml/jackson/jr/ob/impl/CustomValueReadersTest.java
 
 for sample usage.
+
+There is also a blog post [Enable support for java.time.* with Jackson-jr](https://www.andersaaberg.dk/2020/enable-support-for-java-time-with-jackson-jr/) which shows how to write custom readers/writers; in this
+case ones for Java 8 date/time types, but the concept is general.
 
 ### Using (some of) Jackson annotations
 
