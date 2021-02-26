@@ -9,7 +9,6 @@ import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
 public class ReadSimpleTest extends TestBase

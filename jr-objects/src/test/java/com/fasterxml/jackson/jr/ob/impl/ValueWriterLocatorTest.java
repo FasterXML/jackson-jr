@@ -3,7 +3,6 @@ package com.fasterxml.jackson.jr.ob.impl;
 import java.util.*;
 
 import com.fasterxml.jackson.jr.ob.TestBase;
-import com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator;
 
 public class ValueWriterLocatorTest extends TestBase
 {

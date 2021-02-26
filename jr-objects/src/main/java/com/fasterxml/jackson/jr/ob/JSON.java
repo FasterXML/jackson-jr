@@ -343,7 +343,7 @@ public class JSON implements Versioned
     }
 
     // Important: has to come before 'std' instance, since it refers to it
-    private final static int DEFAULT_FEATURES = Feature.defaults();
+    final static int DEFAULT_FEATURES = Feature.defaults();
 
     public final static int CACHE_FLAGS = Feature.cacheBreakers();
 
