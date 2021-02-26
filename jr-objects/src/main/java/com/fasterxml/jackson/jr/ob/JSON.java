@@ -1343,6 +1343,11 @@ public class JSON
     }
 
     @Override
+    public boolean hasPrettyPrinter() {
+        return (_prettyPrinter != null) || isEnabled(Feature.PRETTY_PRINT_OUTPUT);
+    }
+
+    @Override
     public SerializableString getRootValueSeparator(SerializableString defaultSeparator) {
         return defaultSeparator;
     }
