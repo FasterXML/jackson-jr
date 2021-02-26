@@ -2,9 +2,10 @@ Project: jackson-jr
 Major version: 3 (for earlier, see VERSION-2.x)
 
 Modules:
+  jackson-jr-annotation-support
   jackson-jr-objects
-  jr-retrofit2
-  jr-stree
+  jackson-jr-retrofit2
+  jackson-jr-stree
 
 ------------------------------------------------------------------------
 === Releases ===
