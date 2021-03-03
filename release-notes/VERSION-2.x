@@ -15,6 +15,10 @@ Modules:
 
 No changes since 2.12
 
+2.12.2 (03-Mar-2021)
+
+No changes since 2.12.1
+
 2.12.1 (08-Jan-2021)
 
 #76: Annotation-based introspector does not include super-class fields
