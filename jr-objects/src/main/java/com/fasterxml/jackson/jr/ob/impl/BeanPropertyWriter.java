@@ -48,7 +48,9 @@ public final class BeanPropertyWriter
             if (_getter == null) {
                 return _field.get(bean);
             }
-            return _getter.invoke(bean);
+            return _getter.invoke(bean, (Object[]) null);
+            // 03-Apr-2021, tatu: Important! Pass `null` as 2nd arg to avoid
+            //   allocation of bogus Object[0]
         } catch (Exception e) {
             final String accessorDesc = (_getter != null)
                     ? String.format("method %s.%s()", _bean(), _getter.getName())
