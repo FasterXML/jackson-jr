@@ -163,7 +163,8 @@ public abstract class MapBuilder
             if (_mapType != null) {
                 try {
                     @SuppressWarnings("unchecked")
-                    Map<String,Object> m = (Map<String,Object>) _mapType.getDeclaredConstructor().newInstance();
+                    Map<String,Object> m = (Map<String,Object>)
+                        _mapType.getDeclaredConstructor().newInstance((Object[]) null);
                     return m;
                 } catch (Exception e) {
                     Throwable t = e;

@@ -69,19 +69,21 @@ public final class BeanPropertyReader
     public ValueReader getReader() { return _valueReader; }
     public String getName() { return _name; }
 
-    public void setValueFor(Object bean, Object value) throws IOException
+    public void setValueFor(Object bean, Object[] valueBuf)
+        throws IOException
     {
         try {
             if (_setter == null) {
-                _field.set(bean, value);
+                _field.set(bean, valueBuf[0]);
             } else {
-                _setter.invoke(bean, value);
+                _setter.invoke(bean, valueBuf);
             }
         } catch (Exception e) {
             Throwable t = e;
             if (t instanceof InvocationTargetException) {
                 t = t.getCause();
             }
+            final Object value = valueBuf[0];
             final String valueTypeDesc = (value == null) ? "NULL" : value.getClass().getName();
             throw new JSONObjectException(String.format(
                     "Failed to set property '%s' (raw type %s) to value of type %s; exception (%s): %s",

@@ -93,6 +93,7 @@ public class BeanReader
             case START_OBJECT:
                 {
                     Object bean = create();
+                    final Object[] valueBuf = r._setterBuffer;
                     String propName;
                     
                     for (; (propName = p.nextFieldName()) != null; ) {
@@ -101,14 +102,13 @@ public class BeanReader
                             handleUnknown(r, p, propName);
                             continue;
                         }
-                        ValueReader vr = prop.getReader();
-                        prop.setValueFor(bean, vr.readNext(r, p));
+                        valueBuf[0] = prop.getReader().readNext(r, p);
+                        prop.setValueFor(bean, valueBuf);
                     }
                     // also verify we are not confused...
                     if (!p.hasToken(JsonToken.END_OBJECT)) {
                         throw _reportProblem(p);
                     }                    
-                    
                     return bean;
                 }
             default:
@@ -145,6 +145,7 @@ public class BeanReader
                 {
                     Object bean = create();
                     String propName;
+                    final Object[] valueBuf = r._setterBuffer;
                     
                     for (; (propName = p.nextFieldName()) != null; ) {
                         BeanPropertyReader prop = findProperty(propName);
@@ -152,8 +153,8 @@ public class BeanReader
                             handleUnknown(r, p, propName);
                             continue;
                         }
-                        final Object value = prop.getReader().readNext(r, p);
-                        prop.setValueFor(bean, value);
+                        valueBuf[0] = prop.getReader().readNext(r, p);
+                        prop.setValueFor(bean, valueBuf);
                     }
                     // also verify we are not confused...
                     if (!p.hasToken(JsonToken.END_OBJECT)) {
@@ -179,7 +180,7 @@ public class BeanReader
         if (_defaultCtor == null) {
             throw new IllegalStateException("Class "+_valueType.getName()+" does not have default constructor to use");
         }
-        return _defaultCtor.newInstance();
+        return _defaultCtor.newInstance((Object[]) null);
     }
     
     protected Object create(String str) throws Exception {
