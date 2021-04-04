@@ -41,6 +41,20 @@ public class WriteBeansTest extends TestBase
         public void setExtra(int v) { _extra = v; }
         
     }
+
+    static class StringBean {
+        public String value;
+
+        public StringBean(String v) { value = v; }
+    }
+
+    static class StringBeanBean {
+        public StringBean bean;
+
+        public StringBeanBean(StringBean b) {
+            bean = b;
+        }
+    }
     
     public void testBinary() throws Exception
     {
@@ -94,5 +108,24 @@ public class WriteBeansTest extends TestBase
                 aposToQuotes("{ 'extra':5, 'value':-245 }"));
         assertEquals(5, result.getExtra());
         assertEquals(-245, result.getValue());
+    }
+
+    public void testBeanNulls() throws Exception
+    {
+        final JSON withNulls = JSON.std.with(JSON.Feature.WRITE_NULL_PROPERTIES);
+        
+        // by default, no nulls for either "String" property
+        assertEquals("{}", JSON.std.asString(new StringBean(null)));
+        assertEquals("{}", JSON.std.asString(new StringBeanBean(null)));
+        assertEquals(a2q("{'bean':{}}"),
+                JSON.std.asString(new StringBeanBean(new StringBean(null))));
+
+        // but we can make them appear
+        assertEquals(a2q("{'value':null}"),
+                withNulls.asString(new StringBean(null)));
+        assertEquals(a2q("{'bean':null}"),
+                withNulls.asString(new StringBeanBean(null)));
+        assertEquals(a2q("{'bean':{'value':null}}"),
+                withNulls.asString(new StringBeanBean(new StringBean(null))));
     }
 }
