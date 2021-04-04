@@ -41,7 +41,9 @@ public class ValueWriterLocatorTest extends TestBase
      */
 
     public void testBasicTypeDetectionForSer() {
-        ValueWriterLocator td = ValueWriterLocator.blueprint(null, null);
+        // note: must create non-blue-print instance to avoid NPE
+        ValueWriterLocator td = ValueWriterLocator.blueprint(null, null)
+                .perOperationInstance(null, 0);
         assertEquals(ValueWriterLocator.SER_STRING, td.findSerializationType(String.class));
         assertEquals(ValueWriterLocator.SER_CHAR_ARRAY, td.findSerializationType(char[].class));
         assertEquals(ValueWriterLocator.SER_INT_ARRAY, td.findSerializationType(int[].class));
