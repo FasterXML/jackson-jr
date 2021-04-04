@@ -73,7 +73,7 @@ public class ValueWriterLocator extends ValueLocatorBase
     /**
      * Reusable lookup key; only used by per-thread instances.
      */
-    private ClassKey _key;
+    private final ClassKey _key;
 
     private Class<?> _prevClass;
 
@@ -97,17 +97,21 @@ public class ValueWriterLocator extends ValueLocatorBase
         _writeContext = null;
         _writerProvider = rwp;
         _writerModifier = rwm;
+        // should not be needed for blueprint instance
+        _key = null;
     }
 
     // for per-call instances
     protected ValueWriterLocator(ValueWriterLocator base,
-            int features, JSONWriter w) {
+            int features, JSONWriter w)
+    {
         _features = features;
         _writeContext = w;
         _knownSerTypes = base._knownSerTypes;
         _knownWriters = base._knownWriters;
         _writerProvider = base._writerProvider;
         _writerModifier = base._writerModifier;
+        _key = new ClassKey();
     }
 
     public final static ValueWriterLocator blueprint(ReaderWriterProvider rwp, ReaderWriterModifier rwm) {
@@ -160,9 +164,8 @@ public class ValueWriterLocator extends ValueLocatorBase
         if (raw == String.class && (_writerModifier == null)) {
             return SER_STRING;
         }
-        ClassKey k = (_key == null) ? new ClassKey(raw, _features) : _key.with(raw, _features);
+        final ClassKey k = _key.with(raw, _features);
         int type;
-
         Integer I = _knownSerTypes.get(k);
 
         if (I == null) {

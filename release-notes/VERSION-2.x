@@ -13,7 +13,7 @@ Modules:
 
 2.13.0 (not yet released)
 
-No changes since 2.12
+#79: Reuse of ClassKey in ValueWriterLocator not working
 
 2.12.2 (03-Mar-2021)
 
