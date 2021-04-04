@@ -132,9 +132,6 @@ public class JSONWriter
     /**********************************************************************
      */
 
-    /**
-     * @since 2.11
-     */
     public boolean isEnabled(JSON.Feature f) {
         return f.isEnabled(_features);
     }
@@ -717,54 +714,62 @@ public class JSONWriter
                 BeanPropertyWriter property = props[i];
                 Object value = property.getValueFor(bean);
                 if (value == null) {
-                    typeId = SER_NULL;
+                    if (_writeNullValues) {
+                        writeNullProperty(property.name);
+                    }
                 } else {
                     typeId = property.typeId;
                     if (typeId == 0) {
                         typeId = _writerLocator.findSerializationType(value.getClass());
                     }
+                    _generator.writeName(property.name);
+                    _writeValue(value, typeId);
                 }
-                _generator.writeName(property.name);
-                _writeValue(value, typeId);
 
                 property = props[i+1];
                 value = property.getValueFor(bean);
                 if (value == null) {
-                    typeId = SER_NULL;
+                    if (_writeNullValues) {
+                        writeNullProperty(property.name);
+                    }
                 } else {
                     typeId = property.typeId;
                     if (typeId == 0) {
                         typeId = _writerLocator.findSerializationType(value.getClass());
                     }
+                    _generator.writeName(property.name);
+                    _writeValue(value, typeId);
                 }
-                _generator.writeName(property.name);
-                _writeValue(value, typeId);
 
                 property = props[i+2];
                 value = property.getValueFor(bean);
                 if (value == null) {
-                    typeId = SER_NULL;
+                    if (_writeNullValues) {
+                        writeNullProperty(property.name);
+                    }
                 } else {
                     typeId = property.typeId;
                     if (typeId == 0) {
                         typeId = _writerLocator.findSerializationType(value.getClass());
                     }
+                    _generator.writeName(property.name);
+                    _writeValue(value, typeId);
                 }
-                _generator.writeName(property.name);
-                _writeValue(value, typeId);
 
                 property = props[i+3];
                 value = property.getValueFor(bean);
                 if (value == null) {
-                    typeId = SER_NULL;
+                    if (_writeNullValues) {
+                        writeNullProperty(property.name);
+                    }
                 } else {
                     typeId = property.typeId;
                     if (typeId == 0) {
                         typeId = _writerLocator.findSerializationType(value.getClass());
                     }
+                    _generator.writeName(property.name);
+                    _writeValue(value, typeId);
                 }
-                _generator.writeName(property.name);
-                _writeValue(value, typeId);
                 left -= 4;
                 i += 4;
             } while (left > 3);
@@ -777,41 +782,47 @@ public class JSONWriter
             property = props[i++];
             value = property.getValueFor(bean);
             if (value == null) {
-                typeId = SER_NULL;
+                if (_writeNullValues) {
+                    writeNullProperty(property.name);
+                }
             } else {
                 typeId = property.typeId;
                 if (typeId == 0) {
                     typeId = _writerLocator.findSerializationType(value.getClass());
                 }
+                _generator.writeName(property.name);
+                _writeValue(value, typeId);
             }
-            _generator.writeName(property.name);
-            _writeValue(value, typeId);
         case 2:
             property = props[i++];
             value = property.getValueFor(bean);
             if (value == null) {
-                typeId = SER_NULL;
+                if (_writeNullValues) {
+                    writeNullProperty(property.name);
+                }
             } else {
                 typeId = property.typeId;
                 if (typeId == 0) {
                     typeId = _writerLocator.findSerializationType(value.getClass());
                 }
+                _generator.writeName(property.name);
+                _writeValue(value, typeId);
             }
-            _generator.writeName(property.name);
-            _writeValue(value, typeId);
         case 1:
             property = props[i++];
             value = property.getValueFor(bean);
             if (value == null) {
-                typeId = SER_NULL;
+                if (_writeNullValues) {
+                    writeNullProperty(property.name);
+                }
             } else {
                 typeId = property.typeId;
                 if (typeId == 0) {
                     typeId = _writerLocator.findSerializationType(value.getClass());
                 }
+                _generator.writeName(property.name);
+                _writeValue(value, typeId);
             }
-            _generator.writeName(property.name);
-            _writeValue(value, typeId);
         }
         _generator.writeEndObject();
     }
