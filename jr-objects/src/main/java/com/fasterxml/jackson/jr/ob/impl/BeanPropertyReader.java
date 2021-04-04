@@ -69,18 +69,18 @@ public final class BeanPropertyReader
     public ValueReader getReader() { return _valueReader; }
     public String getName() { return _name; }
 
-    public void setValueFor(Object bean, Object value) throws JacksonException
+    public void setValueFor(Object bean, Object[] valueBuf) throws JacksonException
     {
         if (_setter == null) {
             try {
-                _field.set(bean, value);
+                _field.set(bean, valueBuf[0]);
             } catch (Exception e) {
                 _reportProblem(e);
             }
             return;
         }
         try {
-            _setter.invoke(bean, value);
+            _setter.invoke(bean, valueBuf);
         } catch (Exception e) {
             _reportProblem(e);
         }

@@ -209,46 +209,27 @@ public class BeanReader
         //     seem to have about same performance for our test (but in between less... :) )
         int ix = p.nextNameMatch(_propNameMatcher);
         final BeanPropertyReader[] readers = _propValueReaders;
+        final Object[] valueBuf = r._setterBuffer;
         while (ix >= 0) {
             BeanPropertyReader prop = readers[ix]; // elem #1
-            Object value = prop.getReader().readNext(r, p);
-            prop.setValueFor(bean, value);
+            valueBuf[0] = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, valueBuf);
 
             if ((ix = p.nextNameMatch(_propNameMatcher)) < 0) break;
             prop = readers[ix]; // elem #2
-            value = prop.getReader().readNext(r, p);
-            prop.setValueFor(bean, value);
+            valueBuf[0] = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, valueBuf);
 
 /*
             if ((ix = p.nextName(_fieldMatcher)) < 0) break;
             prop = readers[ix]; // elem #3
-            value = prop.getReader().readNext(r, p);
-            prop.setValueFor(bean, value);
+            valueBuf[0] = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, valueBuf);
 
             if ((ix = p.nextName(_fieldMatcher)) < 0) break;
             prop = readers[ix]; // elem #4
-            value = prop.getReader().readNext(r, p);
-            prop.setValueFor(bean, value);
-
-            if ((ix = p.nextName(_fieldMatcher)) < 0) break;
-            prop = readers[ix]; // elem #5
-            value = prop.getReader().readNext(r, p);
-            prop.setValueFor(bean, value);
-
-            if ((ix = p.nextName(_fieldMatcher)) < 0) break;
-            prop = readers[ix]; // elem #6
-            value = prop.getReader().readNext(r, p);
-            prop.setValueFor(bean, value);
-
-            if ((ix = p.nextName(_fieldMatcher)) < 0) break;
-            prop = readers[ix]; // elem #7
-            value = prop.getReader().readNext(r, p);
-            prop.setValueFor(bean, value);
-
-            if ((ix = p.nextName(_fieldMatcher)) < 0) break;
-            prop = readers[ix]; // elem #8
-            value = prop.getReader().readNext(r, p);
-            prop.setValueFor(bean, value);
+            valueBuf[0] = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, valueBuf);
 */
             // and then for next loop
             ix = p.nextNameMatch(_propNameMatcher);
@@ -340,6 +321,8 @@ public class BeanReader
     {
         // first, skip current property
         handleUnknown(r, p, propName);
+
+        final Object[] valueBuf = r._setterBuffer;
         // then do the rest with looping
         for (; (propName = p.nextName()) != null; ) {
             BeanPropertyReader prop = findProperty(propName);
@@ -347,7 +330,8 @@ public class BeanReader
                 handleUnknown(r, p, propName);
                 continue;
             }
-            prop.setValueFor(bean, prop.getReader().readNext(r, p));
+            valueBuf[0] = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, valueBuf);
         }
         if (!p.hasToken(JsonToken.END_OBJECT)) {
             throw _reportProblem(p);
@@ -360,7 +344,7 @@ public class BeanReader
         if (_defaultCtor == null) {
             throw new IllegalStateException("Class `"+_valueType.getName()+"` does not have default constructor to use");
         }
-        return _defaultCtor.newInstance();
+        return _defaultCtor.newInstance((Object[]) null);
     }
     
     protected Object create(String str) throws Exception {

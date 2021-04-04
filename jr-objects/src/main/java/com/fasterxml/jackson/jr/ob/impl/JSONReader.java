@@ -39,7 +39,7 @@ public class JSONReader
      * Handler that takes care of constructing {@link java.util.Map}s as needed
      */
     protected final CollectionBuilder _collectionBuilder;
-    
+
     /*
     /**********************************************************************
     /* Instance config, state
@@ -64,6 +64,14 @@ public class JSONReader
      */
     protected final JsonParser _parser;
 
+    /**
+     * Minor performance optimization: {@code Object[1]} reused to avoid
+     * Reflection having to allocate it for every "setter" call.
+     *
+     * @since 2.13
+     */
+    protected final Object[] _setterBuffer;
+
     /*
     /**********************************************************************
     /* Blueprint construction
@@ -81,6 +89,7 @@ public class JSONReader
         _collectionBuilder = lb;
         _mapBuilder = mb;
         _parser = null;
+        _setterBuffer = null; // should NOT  be used on blueprint
     }
 
     /**
@@ -96,6 +105,7 @@ public class JSONReader
         _collectionBuilder = base._collectionBuilder.newBuilder(features);
         _mapBuilder = base._mapBuilder.newBuilder(features);
         _parser = p;
+        _setterBuffer = new Object[1];
     }
 
     /*

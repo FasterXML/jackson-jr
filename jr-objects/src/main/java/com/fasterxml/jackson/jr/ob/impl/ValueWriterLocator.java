@@ -24,7 +24,7 @@ import com.fasterxml.jackson.jr.ob.api.ValueWriter;
  */
 public class ValueWriterLocator extends ValueLocatorBase
 {
-    protected final BeanPropertyWriter[] NO_PROPS_FOR_WRITE = new BeanPropertyWriter[0];
+    protected final static BeanPropertyWriter[] NO_PROPS_FOR_WRITE = new BeanPropertyWriter[0];
 
     /*
     /**********************************************************************
