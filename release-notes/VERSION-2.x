@@ -15,6 +15,7 @@ Modules:
 
 #79: Reuse of ClassKey in ValueWriterLocator not working
 
+2.12.3 (12-Apr-2021)
 2.12.2 (03-Mar-2021)
 
 No changes since 2.12.1
