@@ -251,7 +251,7 @@ public class ValueWriterLocator extends ValueLocatorBase
         }
         return _registerWriter(rawType, w);
     }
-    
+
     private int _registerWriter(Class<?> rawType, ValueWriter valueWriter) {
         // Due to concurrent access, possible that someone might have added it
         synchronized (_knownWriters) {
@@ -269,7 +269,7 @@ public class ValueWriterLocator extends ValueLocatorBase
             return typeId;
         }
     }
-    
+
     protected BeanPropertyWriter[] _resolveBeanForSer(Class<?> raw, POJODefinition beanDef)
     {
         final List<POJODefinition.Prop> rawProps = beanDef.getProperties();
@@ -310,6 +310,16 @@ public class ValueWriterLocator extends ValueLocatorBase
                 }
             }
             int typeId = _findSimpleType(type, true);
+            // Give plugin the opportunity to override standard value writer
+            if (_writerModifier != null && typeId != 0) {
+                Integer I = _knownSerTypes.get(new ClassKey(type, _features));
+                if (I == null) {
+                    ValueWriter w = _writerModifier.overrideStandardValueWriter(_writeContext, type, typeId);
+                    if (w != null) {
+                        typeId = _registerWriter(type, w);
+                    }
+                }
+            }
             props.add(new BeanPropertyWriter(typeId, rawProp.name, rawProp.field, m));
         }
         int plen = props.size();

@@ -2,6 +2,7 @@ package com.fasterxml.jackson.jr.annotationsupport;
 
 import java.util.Arrays;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.jr.ob.JSON;
 
 import junit.framework.TestCase;
@@ -9,6 +10,8 @@ import junit.framework.TestCase;
 public abstract class ASTestBase extends TestCase
 {
     protected enum ABC { A, B, C; }
+
+    protected enum ABCRename { @JsonProperty("A1") A, @JsonProperty("B1") B, C; }
 
     protected static class NameBean {
         protected String first, last;
@@ -25,7 +28,7 @@ public abstract class ASTestBase extends TestCase
         public void setFirst(String n) { first = n; }
         public void setLast(String n) { last = n; }
     }
-    
+
     protected void verifyException(Throwable e, String... matches)
     {
         String msg = e.getMessage();

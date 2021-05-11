@@ -31,9 +31,9 @@ public class AnnotationBasedIntrospector
      * Visibility settings to use for auto-detecting accessors.
      */
     protected final JsonAutoDetect.Value _visibility;
-    
+
     // // // State (collected properties, related)
-    
+
     protected final Map<String, APropBuilder> _props = new HashMap<String, APropBuilder>();
 
     // // // State only for deserialization:
@@ -237,7 +237,7 @@ public class AnnotationBasedIntrospector
         for (Field f : currType.getDeclaredFields()) {
             // Does not include static fields, but there are couple of things we do
             // not include regardless:
-            if (f.isEnumConstant() || f.isSynthetic()) {
+            if (f.isSynthetic()) {
                 continue;
             }
             // otherwise, first things first; explicit ignoral?
@@ -273,7 +273,7 @@ public class AnnotationBasedIntrospector
 
     protected void _findMethods(final Class<?> currType)
     {
-        if (currType == null || currType == Object.class) {
+        if (currType == null || currType == Object.class || currType == Enum.class) {
             return;
         }
         // Start with base type methods (so overrides work)
@@ -350,7 +350,7 @@ public class AnnotationBasedIntrospector
                     acc = APropAccessor.createVisible(implName, m);
                 } else {
                     acc = APropAccessor.createExplicit(explName, m);
-                }                    
+                }
             }
         }
         _propBuilder(implName).getter = acc;
@@ -397,7 +397,7 @@ public class AnnotationBasedIntrospector
                     acc = APropAccessor.createVisible(implName, m);
                 } else {
                     acc = APropAccessor.createExplicit(explName, m);
-                }                    
+                }
             }
         }
         _propBuilder(implName).setter = acc;
@@ -426,7 +426,7 @@ public class AnnotationBasedIntrospector
     protected boolean _isSetterVisible(Method m) {
         return _visibility.getSetterVisibility().isVisible(m);
     }
-    
+
     /*
     /**********************************************************************
     /* Internal methods, annotation introspection
@@ -449,7 +449,7 @@ public class AnnotationBasedIntrospector
      * Lookup method for finding possible annotated order of property names
      * for the type this introspector is to introspect
      *
-     * @return List of property names that defines order (possibly partial); if 
+     * @return List of property names that defines order (possibly partial); if
      *   none, empty List (but never null)
      */
     protected List<String> _findNameSortOrder() {
@@ -465,7 +465,7 @@ public class AnnotationBasedIntrospector
      * for the type this introspector is to introspect that should be ignored
      * (both for serialization and deserialization).
      *
-     * @return List of property names that defines order (possibly partial); if 
+     * @return List of property names that defines order (possibly partial); if
      *   none, empty List (but never null)
      */
     protected Collection<String> _findIgnorableNames() {
@@ -480,13 +480,13 @@ public class AnnotationBasedIntrospector
     protected <ANN extends Annotation> ANN _find(AnnotatedElement elem, Class<ANN> annotationType) {
         return elem.getAnnotation(annotationType);
     }
-    
+
     /*
     /**********************************************************************
     /* Internal methods, other
     /**********************************************************************
      */
-    
+
     protected APropBuilder _propBuilder(String name) {
         APropBuilder b = _props.get(name);
         if (b == null) {
@@ -546,7 +546,7 @@ public class AnnotationBasedIntrospector
     /* Helper classes
     /**********************************************************************
      */
-    
+
     protected static class APropBuilder
         implements Comparable<APropBuilder>
     {
@@ -615,7 +615,7 @@ public class AnnotationBasedIntrospector
             // should be fine to take first one
             return a1;
         }
-        
+
         public APropBuilder withName(String newName) {
             APropBuilder newB = new APropBuilder(this, newName);
             newB.field = field;
@@ -676,7 +676,7 @@ public class AnnotationBasedIntrospector
             }
             return collectedAliases;
         }
-        
+
         private String _firstExplicit(APropAccessor<?> acc1,
                 APropAccessor<?> acc2,
                 APropAccessor<?> acc3) {
