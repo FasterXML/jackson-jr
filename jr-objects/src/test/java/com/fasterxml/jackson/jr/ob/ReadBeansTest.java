@@ -9,24 +9,36 @@ public class ReadBeansTest extends TestBase
     static class TestBean {
         protected int x;
         protected NameBean name;
-        
+        protected Option option;
+
+        public void setOption(Option o) {
+            option = o;
+        }
         public void setName(NameBean n) { name = n; }
         public void setX(int x) { this.x = x; }
 
+        public Option getOption() {
+            return option;
+        }
         public int getX() { return x; }
         public NameBean getName() { return name; }
     }
 
+    private enum Option {
+        Option1,
+        Option2
+    }
+
     static class MapBean {
         protected Map<String,Integer> stuff;
-        
+
         public Map<String,Integer> getStuff() { return stuff; }
         public void setStuff(Map<String,Integer> s) { stuff = s; }
     }
 
     static class NameListBean {
         protected List<NameBean> names;
-        
+
         public List<NameBean> getNames() { return names; }
         public void setNames(List<NameBean> n) { names = n; }
     }
@@ -34,7 +46,7 @@ public class ReadBeansTest extends TestBase
     interface Bean<T> {
         public void setValue(T t);
     }
-    
+
     static class LongBean implements Bean<Long> {
         Long value;
 
@@ -47,7 +59,7 @@ public class ReadBeansTest extends TestBase
     static class URLBean {
         String url;
 
-        public void setURL(String s) { url = s; } 
+        public void setURL(String s) { url = s; }
     }
 
     /*
@@ -58,7 +70,7 @@ public class ReadBeansTest extends TestBase
 
     public void testSimpleBean() throws Exception
     {
-        final String INPUT = aposToQuotes("{'name':{'first':'Bob','last':'Burger'},'x':13}");
+        final String INPUT = aposToQuotes("{'name':{'first':'Bob','last':'Burger'},'x':13, 'option': 'Option1'}");
         TestBean bean = JSON.std.beanFrom(TestBean.class, INPUT);
 
         assertNotNull(bean);
@@ -66,6 +78,25 @@ public class ReadBeansTest extends TestBase
         assertNotNull(bean.name);
         assertEquals("Bob", bean.name.first);
         assertEquals("Burger", bean.name.last);
+        assertEquals(Option.Option1, bean.option);
+    }
+
+    public void testSimpleBeanCaseInsensitive() throws Exception
+    {
+        final String INPUT = aposToQuotes("{'NaMe':{'FIRST':'Bob','last':'Burger'},'x':13, 'optioN': 'opTIOn1'}");
+        TestBean bean =
+                JSON.builder()
+                        .enable(JSON.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
+                        .enable(JSON.Feature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+                        .build()
+                        .beanFrom(TestBean.class, INPUT);
+
+        assertNotNull(bean);
+        assertEquals(13, bean.x);
+        assertNotNull(bean.name);
+        assertEquals("Bob", bean.name.first);
+        assertEquals("Burger", bean.name.last);
+        assertEquals(Option.Option1, bean.option);
     }
 
     public void testUnknownProps() throws Exception
@@ -103,7 +134,7 @@ public class ReadBeansTest extends TestBase
         NameBean name = list.names.get(1);
         assertEquals("Burger", name.getLast());
     }
-    
+
     public void testPOJOWithMap() throws Exception
     {
         final String INPUT = aposToQuotes("{'stuff': { 'a':3, 'b':4 } }");
@@ -173,7 +204,7 @@ public class ReadBeansTest extends TestBase
         assertEquals("Billy", bean2.name.first);
         assertEquals("Bacon", bean2.name.last);
     }
-    
+
     public void testJvmSerializersPOJO() throws Exception
     {
         MediaItem.Content content = new MediaItem.Content();

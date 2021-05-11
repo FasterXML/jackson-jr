@@ -281,7 +281,30 @@ public class JSON implements Versioned
          * @since 2.13
          */
         INCLUDE_STATIC_FIELDS(false, true),
-        ;
+
+        /**
+         * Feature that will allow for more forgiving deserialization of incoming JSON. If enabled,
+         * the bean properties will be matched using their lower-case equivalents, meaning that any
+         * case-combination (incoming and matching names are canonicalized by lower-casing) should work.
+         * <p>
+         * Note that there is additional performance overhead since incoming property names need to be lower-cased
+         * before comparison, for cases where there are upper-case letters. Overhead for names that are already
+         * lower-case should be negligible however.
+         *<p>
+         * Feature is <b>disabled</b> by default.
+         */
+        ACCEPT_CASE_INSENSITIVE_PROPERTIES(false, true),
+
+        /**
+         * Feature that determines if Enum deserialization should be case sensitive or not. If enabled,
+         * Enum deserialization will ignore case, that is, case of incoming String value and enum id
+         * (dependant on other settings, either `name()`, `toString()`, or explicit override) do not need to
+         * match.
+         *<p>
+         * Feature is <b>disabled</b> by default.
+         */
+        ACCEPT_CASE_INSENSITIVE_ENUMS(false, true)
+       ;
 
         /*
         /**********************************************************************
