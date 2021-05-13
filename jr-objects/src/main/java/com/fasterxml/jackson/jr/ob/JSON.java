@@ -31,7 +31,7 @@ import com.fasterxml.jackson.jr.ob.impl.*;
  * <li>{@link URL}</li>
  * <li>{@link File}</li>
  * </ul>
- * 
+ *
  */
 @SuppressWarnings("resource")
 public class JSON implements Versioned
@@ -167,7 +167,7 @@ public class JSON implements Versioned
         * @since 2.7
         */
        WRITE_DATES_AS_TIMESTAMP(false),
-       
+
        /**
         * Feature that can be enabled to use "pretty-printing", basic indentation
         * to make resulting JSON easier to read by humans by adding white space
@@ -241,7 +241,7 @@ public class JSON implements Versioned
         * so that all Bean properties are serialized.
         */
        WRITE_READONLY_BEAN_PROPERTIES(true, true),
-       
+
        /**
         * Feature that determines whether access to {@link java.lang.reflect.Method}s and
         * {@link java.lang.reflect.Constructor}s that are used with dynamically
@@ -260,7 +260,7 @@ public class JSON implements Versioned
         * @since 2.5
         */
        USE_IS_GETTERS(true, true),
-       
+
        /**
         * Feature that enables use of public fields instead of setters and getters,
         * in cases where no setter/getter is available.
@@ -271,6 +271,16 @@ public class JSON implements Versioned
         * @since 2.8 (enabled by default since 2.10)
         */
        USE_FIELDS(true, true),
+
+        /**
+         * Feature that enables serialization and deserialization of non-final static fields.
+         *<p>
+         * Feature did not exist, but was implicitly <b>enabled</b> by default. <b>disabled</b> for
+         * 2.13).
+         *
+         * @since 2.13
+         */
+        INCLUDE_STATIC_FIELDS(false, true),
        ;
 
        /*
@@ -422,7 +432,7 @@ public class JSON implements Versioned
         protected PrettyPrinter _prettyPrinter;
 
         // Configuration, helper objects
-        
+
         protected final JsonFactory _streamFactory;
         protected TreeCodec _treeCodec;
 
@@ -502,7 +512,7 @@ public class JSON implements Versioned
         }
 
         // // // Mutators, helper objects
-        
+
         /**
          * Method for specifying {@link PrettyPrinter} {@link JSON} to be built
          * should use on serialization.
@@ -732,7 +742,7 @@ public class JSON implements Versioned
     public ObjectCodec asCodec() {
         return new JSONAsObjectCodec(this);
     }
-    
+
     /*
     /**********************************************************************
     /* Versioned
@@ -785,7 +795,7 @@ public class JSON implements Versioned
         }
         return _with(f);
     }
-    
+
     /**
      * Mutant factory for constructing an instance with specified features
      * enabled.
@@ -825,7 +835,7 @@ public class JSON implements Versioned
         //    changes
         JSONReader r = _reader.withCacheCheck(features);
         JSONWriter w = _writer.withCacheCheck(features);
-        
+
         return _with(features, _jsonFactory, _treeCodec,
                 r, w, _prettyPrinter);
     }
@@ -839,14 +849,14 @@ public class JSON implements Versioned
     /**
      * Mutant factory method for constructing new instance with specified {@link JsonFactory}
      * if different from currently configured one (if not, return {@code this} as-is)
-     * 
+     *
      * @param f Jackson core format factory to use for low-level decoding/encoding
      *
      * @return New instance with specified factory (if not same as currently configured);
      *   {@code this} otherwise.
      *
      * @deprecated Since 2.11 should not try changing underlying stream factory but create
-     *   a new instance if necessary: method will be removed from 3.0 at latest 
+     *   a new instance if necessary: method will be removed from 3.0 at latest
      */
     @Deprecated
     public JSON with(JsonFactory f) {
@@ -966,7 +976,7 @@ public class JSON implements Versioned
     /* Methods sub-classes must override
     /**********************************************************************
      */
-    
+
     protected JSON _with(int features,
             JsonFactory jsonF, TreeCodec trees,
             JSONReader reader, JSONWriter writer,
@@ -992,7 +1002,7 @@ public class JSON implements Versioned
     public final boolean isEnabled(Feature f) {
         return (f.mask() & _features) != 0;
     }
-    
+
     /*
     /**********************************************************************
     /* Public factory methods for parsers, generators
@@ -1122,7 +1132,7 @@ public class JSON implements Versioned
     public <C extends Collection<Object>> CollectionComposer<?,C> composeCollection(C collection) {
         return new CollectionComposer<ComposerBase,C>(collection);
     }
-    
+
     public MapComposer<?> composeMap() {
         return composeMap(new LinkedHashMap<String,Object>());
     }
@@ -1294,7 +1304,7 @@ public class JSON implements Versioned
             return _closeWithError(p, e);
         }
     }
-    
+
     /**
      * Read method that will take given JSON Source (of one of supported types),
      * read contents and map it to one of simple mappings ({@link java.util.Map}
@@ -1476,7 +1486,7 @@ public class JSON implements Versioned
           }
          return (T) _treeCodec.createArrayNode();
     }
-    
+
     /**
      * Convenience method, equivalent to:
      *<pre>
@@ -1527,7 +1537,7 @@ public class JSON implements Versioned
     /* Internal methods, reading
     /**********************************************************************
      */
-    
+
     protected JSONReader _readerForOperation(JsonParser p) {
         return _reader.perOperationInstance(_features, _valueReaderLocator, _treeCodec, p);
     }
@@ -1585,7 +1595,7 @@ public class JSON implements Versioned
     /* Internal methods, other
     /**********************************************************************
      */
-    
+
     protected JsonGenerator _config(JsonGenerator g)
     {
         // First, possible pretty printing
@@ -1629,7 +1639,7 @@ public class JSON implements Versioned
         }
         throw new IOException(e); // should never occur
     }
-    
+
     protected void _noTreeCodec(String msg) {
          throw new IllegalStateException("JSON instance does not have configured `TreeCodec` to "+msg);
     }
@@ -1641,7 +1651,7 @@ public class JSON implements Versioned
      */
 
     /**
-     * Extension context implementation used when 
+     * Extension context implementation used when
      */
     private static class ExtContextImpl extends ExtensionContext {
         final Builder _builder;

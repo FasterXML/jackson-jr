@@ -20,7 +20,7 @@ import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
  * and uses delegation for only some special cases.
  *<p>
  * Life-cycle is such that initial instance (called blueprint)
- * is constructed first (including possible configuration 
+ * is constructed first (including possible configuration
  * using mutant factory methods). This blueprint object
  * acts as a factory, and is never used for direct writing;
  * instead, per-call instance is created by calling
@@ -56,7 +56,7 @@ public class JSONWriter
     protected final int _features;
 
     protected final boolean _writeNullValues;
-    
+
     /*
     /**********************************************************************
     /* Blueprint construction
@@ -137,6 +137,13 @@ public class JSONWriter
      */
     public boolean isEnabled(JSON.Feature f) {
         return f.isEnabled(_features);
+    }
+
+    /**
+     * @since 2.13
+     */
+    public int features() {
+        return _features;
     }
 
     /*
@@ -252,7 +259,7 @@ public class JSONWriter
             return;
 
         // Others
-            
+
         case SER_ITERABLE:
             writeIterableField(fieldName, (Iterable<?>) value);
             return;
@@ -318,7 +325,7 @@ public class JSONWriter
             return;
 
         // Number types:
-            
+
         case SER_NUMBER_FLOAT: // fall through
         case SER_NUMBER_DOUBLE:
             writeDoubleValue(((Number) value).doubleValue());
@@ -392,7 +399,7 @@ public class JSONWriter
     /* Overridable concrete typed write methods, structured types
     /**********************************************************************
      */
-    
+
     protected void writeCollectionValue(Collection<?> v) throws IOException
     {
         _generator.writeStartArray();
@@ -407,7 +414,7 @@ public class JSONWriter
         _generator.writeFieldName(fieldName);
         writeCollectionValue(v);
     }
-    
+
     protected void writeIterableValue(Iterable<?> v) throws IOException
     {
         _generator.writeStartArray();
@@ -422,7 +429,7 @@ public class JSONWriter
         _generator.writeFieldName(fieldName);
         writeIterableValue(v);
     }
-    
+
     protected void writeListValue(List<?> list) throws IOException
     {
         _generator.writeStartArray();
@@ -442,7 +449,7 @@ public class JSONWriter
         _generator.writeFieldName(fieldName);
         writeListValue(v);
     }
-    
+
     protected void writeMapValue(Map<?,?> v) throws IOException
     {
         _generator.writeStartObject();
@@ -496,7 +503,7 @@ public class JSONWriter
         _generator.writeFieldName(fieldName);
         writeIntArrayValue(v);
     }
-    
+
     protected void writeLongArrayValue(long[] v) throws IOException {
         _generator.writeStartArray();
         for (int i = 0, len = v.length; i < len; ++i) {
@@ -509,7 +516,7 @@ public class JSONWriter
         _generator.writeFieldName(fieldName);
         writeLongArrayValue(v);
     }
-    
+
     protected void writeBooleanArrayValue(boolean[] v) throws IOException {
         _generator.writeStartArray();
         for (int i = 0, len = v.length; i < len; ++i) {
@@ -535,7 +542,7 @@ public class JSONWriter
         _generator.writeFieldName(fieldName);
         writeTreeNodeValue(v);
     }
-    
+
     /*
     /**********************************************************************
     /* Overridable concrete typed write methods, primitives
@@ -570,11 +577,11 @@ public class JSONWriter
         _generator.writeFieldName(fieldName);
         writeBigIntegerValue(v);
     }
-    
+
     protected void writeLongField(String fieldName, long v) throws IOException {
         _generator.writeNumberField(fieldName, v);
     }
-    
+
     protected void writeDoubleValue(double v) throws IOException {
         _generator.writeNumber(v);
     }
@@ -612,7 +619,7 @@ public class JSONWriter
     protected void writeStringLikeField(String fieldName, String v, int actualType) throws IOException {
         _generator.writeStringField(fieldName, v);
     }
-    
+
     protected void writeBinaryValue(byte[] data) throws IOException {
         _generator.writeBinary(data);
     }
@@ -750,7 +757,7 @@ public class JSONWriter
     /* Other internal methods
     /**********************************************************************
      */
-    
+
     private void _badType(int type, Object value)
     {
         if (type < 0) {
