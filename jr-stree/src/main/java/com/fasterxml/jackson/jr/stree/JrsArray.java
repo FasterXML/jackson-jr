@@ -83,7 +83,7 @@ public class JrsArray extends JrsValue
             return _values.iterator();
         }
         // ensure caller can not modify values this way
-        return Collections.unmodifiableList(_values).iterator();            
+        return Collections.unmodifiableList(_values).iterator();
     }
 
     /*
@@ -100,5 +100,24 @@ public class JrsArray extends JrsValue
             codec.writeTree(g, _values.get(i));
         }
         g.writeEndArray();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        JrsArray jrsArray = (JrsArray) o;
+
+        return _values != null ? _values.equals(jrsArray._values) : jrsArray._values == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return _values != null ? _values.hashCode() : 0;
     }
 }
