@@ -105,7 +105,7 @@ public class BeanPropertyIntrospector
             // Only include static members if (a) inclusion feature enabled and
             // (b) not final (cannot deserialize final fields)
             if (Modifier.isStatic(f.getModifiers())
-                    && (noStatics || Modifier.isStatic(f.getModifiers()))) {
+                    && (noStatics || Modifier.isFinal(f.getModifiers()))) {
                 continue;
             }
             _propFrom(props, f.getName()).withField(f);
