@@ -57,9 +57,10 @@ Following Jackson annotations are supported either partially or completely:
 * `@JsonIgnore` (complete: accessor)
 * `@JsonIgnoreProperties` (partial: class, NOT on accessors)
 * `@JsonProperty` (partial: accessor, only for inclusion/renaming (other properties ignored)
+    * In 2.13, will also support renaming of `Enum` constants
 * `@JsonPropertyOrder` (complete: class)
 
-Support for additional properties is possible in future versions: this list is for initial 2.11 release.
+Support for additional properties is possible in future versions.
 
 ### General annotation limitations
 

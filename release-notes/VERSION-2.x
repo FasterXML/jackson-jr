@@ -16,6 +16,8 @@ Modules:
 #79: Reuse of ClassKey in ValueWriterLocator not working
 #81: `JsrValue` should implement `equals()`
  (contributed by Mike D)
+#83: Support `@JsonProperty` annotation on enum values
+ (contributed by Mike D)
 #84: Public static fields are included in serialized output
  (contributed by Mike D)
 
