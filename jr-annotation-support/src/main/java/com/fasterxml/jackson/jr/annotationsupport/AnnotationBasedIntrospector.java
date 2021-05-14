@@ -283,7 +283,7 @@ public class AnnotationBasedIntrospector
             final int flags = m.getModifiers();
             // 13-Jun-2015, tatu: Skip synthetic, bridge methods altogether, for now
             //    at least (add more complex handling only if absolutely necessary)
-            if ((JSON.Feature.INCLUDE_STATIC_FIELDS.isDisabled(_features) && Modifier.isStatic(flags))
+            if (Modifier.isStatic(flags)
                     || m.isSynthetic() || m.isBridge()) {
                 continue;
             }
