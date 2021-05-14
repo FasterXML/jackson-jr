@@ -14,11 +14,12 @@ import com.fasterxml.jackson.jr.ob.api.ValueWriter;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
+import com.fasterxml.jackson.jr.ob.impl.ValueLocatorBase;
 
 public class AnnotationBasedValueRWModifier extends ReaderWriterModifier
 {
-    // Matches SER_ENUM code in ValueLocatorBase
-    protected static final int SER_ENUM = 23;
+    // Has to match SER_ENUM code in ValueLocatorBase
+    protected static final int SER_ENUM_ID = ValueLocatorBase.SER_ENUM;
 
     /**
      * Visibility settings to use for auto-detecting accessors.
@@ -41,7 +42,7 @@ public class AnnotationBasedValueRWModifier extends ReaderWriterModifier
 
     @Override
     public ValueWriter overrideStandardValueWriter(JSONWriter writeContext, Class<?> type, int stdTypeId) {
-        if (stdTypeId == SER_ENUM) {
+        if (stdTypeId == SER_ENUM_ID) {
             return new EnumWriter(type);
         }
         return null;

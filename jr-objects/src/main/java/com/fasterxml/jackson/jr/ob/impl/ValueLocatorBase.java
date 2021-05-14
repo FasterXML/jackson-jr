@@ -10,7 +10,7 @@ import java.util.*;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.jr.ob.JSON;
 
-abstract class ValueLocatorBase
+public abstract class ValueLocatorBase
 {
     /*
     /**********************************************************************
