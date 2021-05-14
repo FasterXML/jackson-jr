@@ -60,4 +60,23 @@ public class JrsEmbeddedObject extends JrsValue.Scalar
             g.writePOJO(_value);
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        JrsEmbeddedObject that = (JrsEmbeddedObject) o;
+
+        return _value != null ? _value.equals(that._value) : that._value == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return _value != null ? _value.hashCode() : 0;
+    }
 }

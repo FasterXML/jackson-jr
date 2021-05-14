@@ -58,7 +58,7 @@ public class JrsObject
     public JrsValue get(int i) {
         return null;
     }
-    
+
     @Override
     public JrsValue get(String name) {
         return _values.get(name);
@@ -112,5 +112,24 @@ public class JrsObject
             }
         }
         g.writeEndObject();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        JrsObject jrsObject = (JrsObject) o;
+
+        return _values != null ? _values.equals(jrsObject._values) : jrsObject._values == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return _values != null ? _values.hashCode() : 0;
     }
 }

@@ -71,7 +71,7 @@ public class JrsNumber extends JrsValue.Scalar
     public String asText() {
         return String.valueOf(_value);
     }
-    
+
     @Override
     public JsonParser.NumberType numberType() {
         return _numberType;
@@ -82,7 +82,7 @@ public class JrsNumber extends JrsValue.Scalar
     /* Extended API
     /**********************************************************************
      */
-    
+
     public BigInteger asBigInteger() {
         if (_value instanceof BigInteger) {
             return (BigInteger) _value;
@@ -148,5 +148,29 @@ public class JrsNumber extends JrsValue.Scalar
             g.writeNumber(_value.doubleValue());
             break;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        JrsNumber jrsNumber = (JrsNumber) o;
+
+        if (_value != null ? !_value.equals(jrsNumber._value) : jrsNumber._value != null) {
+            return false;
+        }
+        return _numberType == jrsNumber._numberType;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = _value != null ? _value.hashCode() : 0;
+        result = 31 * result + (_numberType != null ? _numberType.hashCode() : 0);
+        return result;
     }
 }

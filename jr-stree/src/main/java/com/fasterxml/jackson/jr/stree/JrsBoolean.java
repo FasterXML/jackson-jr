@@ -47,4 +47,23 @@ public class JrsBoolean extends JrsValue.Scalar
     protected void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws JacksonException {
         g.writeBoolean(_value);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        JrsBoolean that = (JrsBoolean) o;
+
+        return _value == that._value;
+    }
+
+    @Override
+    public int hashCode() {
+        return (_value ? 1 : 0);
+    }
 }
