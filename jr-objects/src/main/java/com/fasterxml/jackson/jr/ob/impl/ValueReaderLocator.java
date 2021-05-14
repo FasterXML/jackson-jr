@@ -471,8 +471,6 @@ public class ValueReaderLocator
                 longCtor.setAccessible(true);
             }
         }
-        final boolean caseInsensitive = JSON.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES.isEnabled(_features);
-
         final List<POJODefinition.Prop> rawProps = beanDef.getProperties();
         final int len = rawProps.size();
         final Map<String, BeanPropertyReader> propMap;
@@ -481,10 +479,7 @@ public class ValueReaderLocator
         if (len == 0) {
             propMap = Collections.emptyMap();
         } else {
-            propMap = caseInsensitive
-                    ? new TreeMap<String, BeanPropertyReader>(String.CASE_INSENSITIVE_ORDER)
-                    // 13-May-2021, tatu: Let's retain ordering here:
-                    : new LinkedHashMap<String, BeanPropertyReader>();
+            propMap = new LinkedHashMap<String, BeanPropertyReader>();
             final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
             for (int i = 0; i < len; ++i) {
                 POJODefinition.Prop rawProp = rawProps.get(i);
@@ -519,9 +514,7 @@ public class ValueReaderLocator
                 //   we must link via name of primary property, unfortunately:
                 if (rawProp.hasAliases()) {
                     if (aliasMapping == null) {
-                        aliasMapping = caseInsensitive
-                                ? new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER)
-                                : new HashMap<String, String>();
+                        aliasMapping = new LinkedHashMap<String, String>();
                     }
                     for (String alias : rawProp.aliases()) {
                         aliasMapping.put(alias, rawProp.name);
@@ -529,8 +522,9 @@ public class ValueReaderLocator
                 }
             }
         }
+        final boolean caseInsensitive = JSON.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES.isEnabled(_features);
         return BeanReader.construct(raw, propMap, defaultCtor, stringCtor, longCtor,
-                beanDef.getIgnorableNames(), aliasMapping);
+                beanDef.getIgnorableNames(), aliasMapping, caseInsensitive);
     }
 
     private TypeBindings _bindings(Class<?> ctxt) {

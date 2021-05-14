@@ -83,7 +83,8 @@ public class ReadBeansTest extends TestBase
 
     public void testSimpleBeanCaseInsensitive() throws Exception
     {
-        final String INPUT = aposToQuotes("{'NaMe':{'FIRST':'Bob','last':'Burger'},'x':13, 'optioN': 'opTIOn1'}");
+        final String INPUT = aposToQuotes(
+                "{'NaMe':{'FIRST':'Bob','last':'Burger'},'x':13, 'optioN': 'opTIOn1'}");
         TestBean bean =
                 JSON.builder()
                         .enable(JSON.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
@@ -93,10 +94,10 @@ public class ReadBeansTest extends TestBase
 
         assertNotNull(bean);
         assertEquals(13, bean.x);
+        assertEquals(Option.Option1, bean.option);
         assertNotNull(bean.name);
         assertEquals("Bob", bean.name.first);
         assertEquals("Burger", bean.name.last);
-        assertEquals(Option.Option1, bean.option);
     }
 
     public void testUnknownProps() throws Exception

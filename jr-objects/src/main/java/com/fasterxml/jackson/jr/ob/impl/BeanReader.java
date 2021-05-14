@@ -32,6 +32,7 @@ public class BeanReader
     protected final Map<String, String> _aliasMapping;
 
     protected final Set<String> _ignorableNames;
+    protected final boolean _caseInsensitive;
 
     protected final Constructor<?> _defaultCtor;
     protected final Constructor<?> _stringCtor;
@@ -49,7 +50,8 @@ public class BeanReader
      */
     protected BeanReader(Class<?> type, Map<String,BeanPropertyReader> propsByName,
             Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,
-            Set<String> ignorableNames, Map<String, String> aliasMapping)
+            Set<String> ignorableNames, Map<String, String> aliasMapping,
+            boolean caseInsensitive)
     {
         super(type);
         _propsByName = propsByName;
@@ -58,6 +60,7 @@ public class BeanReader
         _longCtor = longCtor;
         _ignorableNames = ignorableNames;
         _aliasMapping = aliasMapping;
+        _caseInsensitive = caseInsensitive;
     }
 
     /**
@@ -69,7 +72,6 @@ public class BeanReader
         // 26-Jan-2020, tatu: One complication are aliases, if any
         Map<String,BeanPropertyReader> byName = _aliasMapping.isEmpty()
                 ? _propsByName : _mixInAliases(_propsByName, _aliasMapping);
-
         final int size = byName.size();
         List<Named> names = new ArrayList<>(size);
         _propValueReaders = new BeanPropertyReader[size];
@@ -82,14 +84,14 @@ public class BeanReader
         //    except for one problem: when we cache readers we cache matcher... so would
         //    need to figure out what to do with that -- can not support dynamic change
         //    easily.
-        /*
+        // 14-May-2021, tatu: Global case-insensitivity added via [jackson-jr#80], so:
         if (_caseInsensitive) {
-            _propNameMatcher = streamFactory.constructCINameMatcher(names, true);
+            // false -> Strings not already intern()ed
+            _propNameMatcher = streamFactory.constructCINameMatcher(names, false,
+                    Locale.getDefault());
         } else {
-            _propNameMatcher = streamFactory.constructNameMatcher(names, true);
+            _propNameMatcher = streamFactory.constructNameMatcher(names, false);
         }
-        */
-        _propNameMatcher = streamFactory.constructNameMatcher(names, true);
     }
 
     private final Map<String,BeanPropertyReader> _mixInAliases(Map<String,BeanPropertyReader> props,
@@ -116,7 +118,8 @@ public class BeanReader
      */
     public static BeanReader construct(Class<?> type, Map<String, BeanPropertyReader> props,
             Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,
-            Set<String> ignorableProps, Map<String, String> aliasMapping)
+            Set<String> ignorableProps, Map<String, String> aliasMapping,
+            boolean caseInsensitive)
     {
         if (ignorableProps == null) {
             ignorableProps = Collections.<String>emptySet();
@@ -125,7 +128,7 @@ public class BeanReader
             aliasMapping = Collections.emptyMap();
         }
         return new BeanReader(type, props, defaultCtor, stringCtor, longCtor,
-                ignorableProps, aliasMapping);
+                ignorableProps, aliasMapping, caseInsensitive);
     }
 
     public Map<String,BeanPropertyReader> propertiesByName() { return _propsByName; }
@@ -319,13 +322,21 @@ public class BeanReader
             final Object bean, String propName)
         throws JacksonException
     {
-        // first, skip current property
-        handleUnknown(r, p, propName);
-
         final Object[] valueBuf = r._setterBuffer;
+
+        // first, check if current property still found (can this
+        // really occur?)
+        BeanPropertyReader prop = findProperty(propName);
+        if (prop == null) {
+            handleUnknown(r, p, propName);
+        } else {
+            valueBuf[0] = prop.getReader().readNext(r, p);
+            prop.setValueFor(bean, valueBuf);
+        }
+
         // then do the rest with looping
         for (; (propName = p.nextName()) != null; ) {
-            BeanPropertyReader prop = findProperty(propName);
+            prop = findProperty(propName);
             if (prop == null) {
                 handleUnknown(r, p, propName);
                 continue;
