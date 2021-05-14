@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
@@ -31,20 +32,22 @@ public class AnnotationBasedIntrospector
      * Visibility settings to use for auto-detecting accessors.
      */
     protected final JsonAutoDetect.Value _visibility;
-    
+
     // // // State (collected properties, related)
-    
+
     protected final Map<String, APropBuilder> _props = new HashMap<String, APropBuilder>();
 
     // // // State only for deserialization:
 
     protected Set<String> _ignorableNames;
+    protected int _features;
 
     protected AnnotationBasedIntrospector(Class<?> type, boolean serialization,
-            JsonAutoDetect.Value visibility) {
+                                          JsonAutoDetect.Value visibility, int features) {
         _type = type;
         _forSerialization = serialization;
         _ignorableNames = serialization ? null : new HashSet<String>();
+        _features = features;
 
         // First things first: find possible `@JsonAutoDetect` to override
         // default visibility settings
@@ -58,13 +61,13 @@ public class AnnotationBasedIntrospector
 
     public static POJODefinition pojoDefinitionForDeserialization(JSONReader r,
             Class<?> pojoType, JsonAutoDetect.Value visibility) {
-        return new AnnotationBasedIntrospector(pojoType, false, visibility)
+        return new AnnotationBasedIntrospector(pojoType, false, visibility, r.features())
                 .introspectDefinition();
     }
 
     public static POJODefinition pojoDefinitionForSerialization(JSONWriter w,
             Class<?> pojoType, JsonAutoDetect.Value visibility) {
-        return new AnnotationBasedIntrospector(pojoType, true, visibility)
+        return new AnnotationBasedIntrospector(pojoType, true, visibility, w.features())
                 .introspectDefinition();
     }
 
@@ -235,9 +238,9 @@ public class AnnotationBasedIntrospector
 
         // then get fields from within class itself
         for (Field f : currType.getDeclaredFields()) {
-            // Does not include static fields, but there are couple of things we do
-            // not include regardless:
-            if (f.isEnumConstant() || f.isSynthetic()) {
+            // skip static fields and synthetic fields except for enum constants
+            if ((JSON.Feature.INCLUDE_STATIC_FIELDS.isDisabled(_features) && Modifier.isStatic(f.getModifiers())
+                    && !f.isEnumConstant()) || f.isSynthetic()) {
                 continue;
             }
             // otherwise, first things first; explicit ignoral?
@@ -284,7 +287,7 @@ public class AnnotationBasedIntrospector
             final int flags = m.getModifiers();
             // 13-Jun-2015, tatu: Skip synthetic, bridge methods altogether, for now
             //    at least (add more complex handling only if absolutely necessary)
-            if (Modifier.isStatic(flags)
+            if ((JSON.Feature.INCLUDE_STATIC_FIELDS.isDisabled(_features) && Modifier.isStatic(flags))
                     || m.isSynthetic() || m.isBridge()) {
                 continue;
             }
@@ -350,7 +353,7 @@ public class AnnotationBasedIntrospector
                     acc = APropAccessor.createVisible(implName, m);
                 } else {
                     acc = APropAccessor.createExplicit(explName, m);
-                }                    
+                }
             }
         }
         _propBuilder(implName).getter = acc;
@@ -397,7 +400,7 @@ public class AnnotationBasedIntrospector
                     acc = APropAccessor.createVisible(implName, m);
                 } else {
                     acc = APropAccessor.createExplicit(explName, m);
-                }                    
+                }
             }
         }
         _propBuilder(implName).setter = acc;
@@ -410,9 +413,10 @@ public class AnnotationBasedIntrospector
      */
 
     protected boolean _isFieldVisible(Field f) {
-        // Consider transient to be non-visible
+        // Consider transient and static-final to be non-visible
         // TODO: (maybe?) final
-        return !Modifier.isTransient(f.getModifiers())
+        return !(Modifier.isFinal(f.getModifiers()) && Modifier.isStatic(f.getModifiers()))
+                && !Modifier.isTransient(f.getModifiers())
                 && _visibility.getFieldVisibility().isVisible(f);
     }
 
@@ -426,7 +430,7 @@ public class AnnotationBasedIntrospector
     protected boolean _isSetterVisible(Method m) {
         return _visibility.getSetterVisibility().isVisible(m);
     }
-    
+
     /*
     /**********************************************************************
     /* Internal methods, annotation introspection
@@ -449,7 +453,7 @@ public class AnnotationBasedIntrospector
      * Lookup method for finding possible annotated order of property names
      * for the type this introspector is to introspect
      *
-     * @return List of property names that defines order (possibly partial); if 
+     * @return List of property names that defines order (possibly partial); if
      *   none, empty List (but never null)
      */
     protected List<String> _findNameSortOrder() {
@@ -465,7 +469,7 @@ public class AnnotationBasedIntrospector
      * for the type this introspector is to introspect that should be ignored
      * (both for serialization and deserialization).
      *
-     * @return List of property names that defines order (possibly partial); if 
+     * @return List of property names that defines order (possibly partial); if
      *   none, empty List (but never null)
      */
     protected Collection<String> _findIgnorableNames() {
@@ -480,13 +484,13 @@ public class AnnotationBasedIntrospector
     protected <ANN extends Annotation> ANN _find(AnnotatedElement elem, Class<ANN> annotationType) {
         return elem.getAnnotation(annotationType);
     }
-    
+
     /*
     /**********************************************************************
     /* Internal methods, other
     /**********************************************************************
      */
-    
+
     protected APropBuilder _propBuilder(String name) {
         APropBuilder b = _props.get(name);
         if (b == null) {
@@ -546,7 +550,7 @@ public class AnnotationBasedIntrospector
     /* Helper classes
     /**********************************************************************
      */
-    
+
     protected static class APropBuilder
         implements Comparable<APropBuilder>
     {
@@ -615,7 +619,7 @@ public class AnnotationBasedIntrospector
             // should be fine to take first one
             return a1;
         }
-        
+
         public APropBuilder withName(String newName) {
             APropBuilder newB = new APropBuilder(this, newName);
             newB.field = field;
@@ -676,7 +680,7 @@ public class AnnotationBasedIntrospector
             }
             return collectedAliases;
         }
-        
+
         private String _firstExplicit(APropAccessor<?> acc1,
                 APropAccessor<?> acc2,
                 APropAccessor<?> acc3) {

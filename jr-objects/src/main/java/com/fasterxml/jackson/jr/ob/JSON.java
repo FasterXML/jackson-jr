@@ -38,7 +38,7 @@ import com.fasterxml.jackson.jr.ob.impl.*;
  * <li>{@link URL}</li>
  * <li>{@link File}</li>
  * </ul>
- * 
+ *
  */
 @SuppressWarnings("resource")
 public class JSON
@@ -52,295 +52,295 @@ public class JSON
      */
     public enum Feature
     {
-       /*
-       /**********************************************************************
-       /* Read-related features that do not affect caching
-       /**********************************************************************
-        */
+        /*
+        /**********************************************************************
+        /* Read-related features that do not affect caching
+        /**********************************************************************
+         */
 
-       /**
-        * When reading JSON Numbers, should {@link java.math.BigDecimal} be used
-        * for floating-point numbers; or should {@link java.lang.Double} be used.
-        * Trade-off is between accuracy -- only {@link java.math.BigDecimal} is
-        * guaranteed to store the EXACT decimal value parsed -- and performance
-        * ({@link java.lang.Double} is typically faster to parse).
-        *<p>
-        * Default setting is <code>false</code>, meaning that {@link java.lang.Double}
-        * is used.
-        */
-       USE_BIG_DECIMAL_FOR_FLOATS(false),
+        /**
+         * When reading JSON Numbers, should {@link java.math.BigDecimal} be used
+         * for floating-point numbers; or should {@link java.lang.Double} be used.
+         * Trade-off is between accuracy -- only {@link java.math.BigDecimal} is
+         * guaranteed to store the EXACT decimal value parsed -- and performance
+         * ({@link java.lang.Double} is typically faster to parse).
+         *<p>
+         * Default setting is <code>false</code>, meaning that {@link java.lang.Double}
+         * is used.
+         */
+        USE_BIG_DECIMAL_FOR_FLOATS(false),
 
-       /**
-        * When reading JSON Arrays, should matching Java value be of type
-        * <code>Object[]</code> (true) or {@link java.util.List} (false)?
-        *<p>
-        * Default setting is <code>false</code>, meaning that JSON Arrays
-        * are bound to {@link java.util.List}s.
-        */
-       READ_JSON_ARRAYS_AS_JAVA_ARRAYS(false),
+        /**
+         * When reading JSON Arrays, should matching Java value be of type
+         * <code>Object[]</code> (true) or {@link java.util.List} (false)?
+         *<p>
+         * Default setting is <code>false</code>, meaning that JSON Arrays
+         * are bound to {@link java.util.List}s.
+         */
+        READ_JSON_ARRAYS_AS_JAVA_ARRAYS(false),
 
-       /**
-        * This feature can be enabled to reduce memory usage for use cases where
-        * resulting container objects ({@link java.util.Map}s and {@link java.util.Collection}s)
-        * do not need to mutable (that is, their contents can not changed).
-        * If set, reader is allowed to construct immutable (read-only)
-        * container objects; and specifically empty {@link java.util.Map}s and
-        * {@link java.util.Collection}s can be used to reduce number of
-        * objects allocated. In addition, sizes of non-empty containers can
-        * be trimmed to exact size.
-        *<p>
-        * Default setting is <code>false</code>, meaning that reader will have to
-        * construct mutable container instance when reading.
-        */
-       READ_ONLY(false),
+        /**
+         * This feature can be enabled to reduce memory usage for use cases where
+         * resulting container objects ({@link java.util.Map}s and {@link java.util.Collection}s)
+         * do not need to mutable (that is, their contents can not changed).
+         * If set, reader is allowed to construct immutable (read-only)
+         * container objects; and specifically empty {@link java.util.Map}s and
+         * {@link java.util.Collection}s can be used to reduce number of
+         * objects allocated. In addition, sizes of non-empty containers can
+         * be trimmed to exact size.
+         *<p>
+         * Default setting is <code>false</code>, meaning that reader will have to
+         * construct mutable container instance when reading.
+         */
+        READ_ONLY(false),
 
-       /**
-        * This feature can be used to indicate that the reader should preserve
-        * order of the properties same as what input document has.
-        * Note that it is up to {@link com.fasterxml.jackson.jr.ob.api.MapBuilder}
-        * to support this feature; custom implementations may ignore the setting.
-        *<p>
-        * Default setting is <code>true</code>, meaning that reader is expected to try to
-        * preserve ordering of fields read.
-        */
-       PRESERVE_FIELD_ORDERING(true),
+        /**
+         * This feature can be used to indicate that the reader should preserve
+         * order of the properties same as what input document has.
+         * Note that it is up to {@link com.fasterxml.jackson.jr.ob.api.MapBuilder}
+         * to support this feature; custom implementations may ignore the setting.
+         *<p>
+         * Default setting is <code>true</code>, meaning that reader is expected to try to
+         * preserve ordering of fields read.
+         */
+        PRESERVE_FIELD_ORDERING(true),
 
-       /**
-        * This feature determines whether {@link Map} instances constructed use
-        * deferred materialization (as implemented by {@link DeferredMap}), in case
-        * user has not specified custom {@link Map} implementation.
-        * Enabling feature typically reduces initial value read time and moves
-        * overhead to actual access of contents (materialization occurs when first
-        * key or value access happens); this makes sense when only a subset of
-        * data is accessed. Conversely, when traversing full object hierarchy, it
-        * makes sense to disable this feature.
-        *<p>
-        * Default setting is <code>true</code>, meaning that reader is expected to try to
-        */
-       USE_DEFERRED_MAPS(true),
+        /**
+         * This feature determines whether {@link Map} instances constructed use
+         * deferred materialization (as implemented by {@link DeferredMap}), in case
+         * user has not specified custom {@link Map} implementation.
+         * Enabling feature typically reduces initial value read time and moves
+         * overhead to actual access of contents (materialization occurs when first
+         * key or value access happens); this makes sense when only a subset of
+         * data is accessed. Conversely, when traversing full object hierarchy, it
+         * makes sense to disable this feature.
+         *<p>
+         * Default setting is <code>true</code>, meaning that reader is expected to try to
+         */
+        USE_DEFERRED_MAPS(true),
 
-       /**
-        * When encountering duplicate keys for JSON Objects, should an exception
-        * be thrown or not? If exception is not thrown, <b>the last</b> instance
-        * from input document will be used.
-        *<p>
-        * Default setting is <code>true</code>, meaning that a
-        * {@link JSONObjectException} will be thrown if duplicates are encountered.
-        */
-       FAIL_ON_DUPLICATE_MAP_KEYS(true),
+        /**
+         * When encountering duplicate keys for JSON Objects, should an exception
+         * be thrown or not? If exception is not thrown, <b>the last</b> instance
+         * from input document will be used.
+         *<p>
+         * Default setting is <code>true</code>, meaning that a
+         * {@link JSONObjectException} will be thrown if duplicates are encountered.
+         */
+        FAIL_ON_DUPLICATE_MAP_KEYS(true),
 
-       /**
-        * When encountering a JSON Object property name for which there is no
-        * matching Bean property, should an exception be thrown (true),
-        * or should JSON Property value be quietly skipped (false)?
-        *<p>
-        * Default setting is <code>false</code>, meaning that unmappable
-        * JSON Object properties will simply be ignored.
-        */
-       FAIL_ON_UNKNOWN_BEAN_PROPERTY(false),
-
-       /*
-       /**********************************************************************
-       /* Write-related features that do not affect caching
-       /**********************************************************************
-        */
-
-       /**
-        * Feature that defines what to do with {@link java.util.Map} entries and Java Bean
-        * properties that have null as value: if enabled, they will be written out normally;
-        * if disabled, such entries and properties will be ignored.
-        *<p>
-        * Default setting is <code>false</code> so that any null-valued properties
-        * are ignored during serialization.
-        */
-       WRITE_NULL_PROPERTIES(false),
-
-       /**
-        * Feature that determines whether Enum values are written using
-        * numeric index (true), or String representation from calling
-        * {@link Enum#toString()} (false).
-        *<p>
-        * Feature is disabled by default,
-        * so that Enums are serialized as JSON Strings.
-        */
-       WRITE_ENUMS_USING_INDEX(false),
-
-       /**
-        * Feature that determines whether Date (and date/time) values
-        * (and Date-based things like {@link java.util.Calendar}s) are to be
-        * serialized as numeric timestamps (true),
-        * or using a textual representation (false)
-        *<p>
-        * Feature is disabled by default, so that date/time values are
-        * serialized as text, NOT timestamp.
-        */
-       WRITE_DATES_AS_TIMESTAMP(false),
-       
-       /**
-        * Feature that can be enabled to use "pretty-printing", basic indentation
-        * to make resulting JSON easier to read by humans by adding white space
-        * such as line feeds and indentation.
-        *<p>
-        * Default setting is <code>false</code> so that no pretty-printing is done
-        * (unless explicitly constructed with a pretty printer object)
-        */
-       PRETTY_PRINT_OUTPUT(false),
-
-       /**
-        * Feature that determines whether <code>JsonGenerator.flush()</code> is
-        * called after <code>write()</code> method <b>that takes JsonGenerator
-        * as an argument</b> completes (that is, does NOT affect methods
-        * that use other destinations).
-        * This usually makes sense; but there are cases where flushing
-        * should not be forced: for example when underlying stream is
-        * compressing and flush() causes compression state to be flushed
-        * (which occurs with some compression codecs).
-        *<p>
-        * Feature is enabled by default.
-        */
-       FLUSH_AFTER_WRITE_VALUE(true),
-
-       /**
-        * Feature that determines what happens when we encounter a value of
-        * unrecognized type for which we do not have standard handler: if enabled,
-        * will throw a {@link JSONObjectException}, if disabled simply
-        * calls {@link Object#toString} and uses that JSON String as serialization.
-        *<p>
-        * NOTE: if {@link #HANDLE_JAVA_BEANS} is enabled, this setting typically
-        * has no effect, since otherwise unknown types are recognized as
-        * Bean types.
-        *
-        *<p>
-        * Feature is disabled by default
-        * so that no exceptions are thrown.
-        */
-       FAIL_ON_UNKNOWN_TYPE_WRITE(false),
-
-       /*
-       /**********************************************************************
-       /* Features that affect introspection and thereby affect caching
-       /**********************************************************************
-        */
-
-       /**
-        * Feature that determines whether Bean types (Java objects with
-        * getters and setters that expose state to serialize) will be
-        * recognized and handled or not.
-        * When enabled, any types that are not recognized as standard JDK
-        * data structures, primitives or wrapper values will be introspected
-        * and handled as Java Beans (can be read/written as long as JSON
-        * matches properties discovered); when disabled, they may only be serialized
-        * (using {@link Object#toString} method), and can not be deserialized.
-        *<p>
-        * Feature is enabled by default, but can be disabled do avoid use
-        * of Bean reflection for cases where it is not desired.
-        */
-       HANDLE_JAVA_BEANS(true, true),
-
-       /**
-        * Feature that determines whether "read-only" properties of Beans
-        * (properties that only have a getter but no matching setter) are
-        * to be included in Bean serialization or not; if disabled,
-        * only properties have have both setter and getter are serialized.
-        * Note that feature is only used if {@link #HANDLE_JAVA_BEANS}
-        * is also enabled.
-        *<p>
-        * Feature is enabled by default,
-        * so that all Bean properties are serialized.
-        */
-       WRITE_READONLY_BEAN_PROPERTIES(true, true),
-       
-       /**
-        * Feature that determines whether access to {@link java.lang.reflect.Method}s and
-        * {@link java.lang.reflect.Constructor}s that are used with dynamically
-        * introspected Beans may be forced using
-        * {@link java.lang.reflect.AccessibleObject#setAccessible} or not.
-        *<p>
-        * Feature is enabled by default, so that access may be forced.
-        */
-       FORCE_REFLECTION_ACCESS(true, true),
-
-       /**
-        * Whether "is-getters" (like <code>public boolean isValuable()</code>) are detected
-        * for use or not. Note that in addition to naming, and lack of arguments, return
-        * value also has to be <code>boolean</code> or <code>java.lang.Boolean</code>.
-        *<p>
-        * Feature is enabled by default.
-        */
-       USE_IS_GETTERS(true, true),
-       
-       /**
-        * Feature that enables use of public fields instead of setters and getters,
-        * in cases where no setter/getter is available.
-        *<p>
-        * Feature is <b>enabled</b> by default, so public fields are discovered by default.
-        */
-       USE_FIELDS(true, true),
-       ;
+        /**
+         * When encountering a JSON Object property name for which there is no
+         * matching Bean property, should an exception be thrown (true),
+         * or should JSON Property value be quietly skipped (false)?
+         *<p>
+         * Default setting is <code>false</code>, meaning that unmappable
+         * JSON Object properties will simply be ignored.
+         */
+        FAIL_ON_UNKNOWN_BEAN_PROPERTY(false),
 
         /*
-       /**********************************************************************
-       /* Enum impl
-       /**********************************************************************
-        */
+        /**********************************************************************
+        /* Write-related features that do not affect caching
+        /**********************************************************************
+         */
 
-       private final boolean _defaultState;
+        /**
+         * Feature that defines what to do with {@link java.util.Map} entries and Java Bean
+         * properties that have null as value: if enabled, they will be written out normally;
+         * if disabled, such entries and properties will be ignored.
+         *<p>
+         * Default setting is <code>false</code> so that any null-valued properties
+         * are ignored during serialization.
+         */
+        WRITE_NULL_PROPERTIES(false),
 
-       /**
-        * Flag for features that affect caching of readers, writers,
-        * and changing of which needs to result in flushing.
-        */
-       private final boolean _affectsCaching;
+        /**
+         * Feature that determines whether Enum values are written using
+         * numeric index (true), or String representation from calling
+         * {@link Enum#toString()} (false).
+         *<p>
+         * Feature is disabled by default,
+         * so that Enums are serialized as JSON Strings.
+         */
+        WRITE_ENUMS_USING_INDEX(false),
 
-       private final int _mask;
+        /**
+         * Feature that determines whether Date (and date/time) values
+         * (and Date-based things like {@link java.util.Calendar}s) are to be
+         * serialized as numeric timestamps (true),
+         * or using a textual representation (false)
+         *<p>
+         * Feature is disabled by default, so that date/time values are
+         * serialized as text, NOT timestamp.
+         */
+        WRITE_DATES_AS_TIMESTAMP(false),
+       
+        /**
+         * Feature that can be enabled to use "pretty-printing", basic indentation
+         * to make resulting JSON easier to read by humans by adding white space
+         * such as line feeds and indentation.
+         *<p>
+         * Default setting is <code>false</code> so that no pretty-printing is done
+         * (unless explicitly constructed with a pretty printer object)
+         */
+        PRETTY_PRINT_OUTPUT(false),
 
-       private Feature(boolean defaultState) {
-           this(defaultState, false);
-       }
+        /**
+         * Feature that determines whether <code>JsonGenerator.flush()</code> is
+         * called after <code>write()</code> method <b>that takes JsonGenerator
+         * as an argument</b> completes (that is, does NOT affect methods
+         * that use other destinations).
+         * This usually makes sense; but there are cases where flushing
+         * should not be forced: for example when underlying stream is
+         * compressing and flush() causes compression state to be flushed
+         * (which occurs with some compression codecs).
+         *<p>
+         * Feature is enabled by default.
+         */
+        FLUSH_AFTER_WRITE_VALUE(true),
 
-       private Feature(boolean defaultState, boolean affectsCaching) {
-           _defaultState = defaultState;
-           _affectsCaching = affectsCaching;
-           _mask = (1 << ordinal());
-       }
+        /**
+         * Feature that determines what happens when we encounter a value of
+         * unrecognized type for which we do not have standard handler: if enabled,
+         * will throw a {@link JSONObjectException}, if disabled simply
+         * calls {@link Object#toString} and uses that JSON String as serialization.
+         *<p>
+         * NOTE: if {@link #HANDLE_JAVA_BEANS} is enabled, this setting typically
+         * has no effect, since otherwise unknown types are recognized as
+         * Bean types.
+         *
+         *<p>
+         * Feature is disabled by default
+         * so that no exceptions are thrown.
+         */
+        FAIL_ON_UNKNOWN_TYPE_WRITE(false),
 
-       public static int defaults()
-       {
-           int flags = 0;
-           for (Feature value : values()) {
-               if (value.enabledByDefault()) {
-                   flags |= value.mask();
-               }
-           }
-           return flags;
-       }
+        /*
+        /**********************************************************************
+        /* Features that affect introspection and thereby affect caching
+        /**********************************************************************
+         */
 
-       /**
-        * Method for calculating bitset of features that force flushing of
-        * POJO handler caches.
-        */
-       public static int cacheBreakers()
-       {
-           int flags = 0;
-           for (Feature value : values()) {
-               if (value.affectsCaching()) {
-                   flags |= value.mask();
-               }
-           }
-           return flags;
-       }
+        /**
+         * Feature that determines whether Bean types (Java objects with
+         * getters and setters that expose state to serialize) will be
+         * recognized and handled or not.
+         * When enabled, any types that are not recognized as standard JDK
+         * data structures, primitives or wrapper values will be introspected
+         * and handled as Java Beans (can be read/written as long as JSON
+         * matches properties discovered); when disabled, they may only be serialized
+         * (using {@link Object#toString} method), and can not be deserialized.
+         *<p>
+         * Feature is enabled by default, but can be disabled do avoid use
+         * of Bean reflection for cases where it is not desired.
+         */
+        HANDLE_JAVA_BEANS(true, true),
 
-       public final boolean enabledByDefault() { return _defaultState; }
-       public final boolean affectsCaching() { return _affectsCaching; }
+        /**
+         * Feature that determines whether "read-only" properties of Beans
+         * (properties that only have a getter but no matching setter) are
+         * to be included in Bean serialization or not; if disabled,
+         * only properties have have both setter and getter are serialized.
+         * Note that feature is only used if {@link #HANDLE_JAVA_BEANS}
+         * is also enabled.
+         *<p>
+         * Feature is enabled by default,
+         * so that all Bean properties are serialized.
+         */
+        WRITE_READONLY_BEAN_PROPERTIES(true, true),
 
-       public final int mask() { return _mask; }
+        /**
+         * Feature that determines whether access to {@link java.lang.reflect.Method}s and
+         * {@link java.lang.reflect.Constructor}s that are used with dynamically
+         * introspected Beans may be forced using
+         * {@link java.lang.reflect.AccessibleObject#setAccessible} or not.
+         *<p>
+         * Feature is enabled by default, so that access may be forced.
+         */
+        FORCE_REFLECTION_ACCESS(true, true),
 
-       public final boolean isDisabled(int flags) {
-           return (flags & _mask) == 0;
-       }
-       public final boolean isEnabled(int flags) {
-           return (flags & _mask) != 0;
-       }
+        /**
+         * Whether "is-getters" (like <code>public boolean isValuable()</code>) are detected
+         * for use or not. Note that in addition to naming, and lack of arguments, return
+         * value also has to be <code>boolean</code> or <code>java.lang.Boolean</code>.
+         *<p>
+         * Feature is enabled by default.
+         */
+        USE_IS_GETTERS(true, true),
+
+        /**
+         * Feature that enables use of public fields instead of setters and getters,
+         * in cases where no setter/getter is available.
+         *<p>
+         * Feature is <b>enabled</b> by default, so public fields are discovered by default.
+         */
+        USE_FIELDS(true, true),
+        ;
+
+        /*
+        /**********************************************************************
+        /* Enum impl
+        /**********************************************************************
+         */
+
+        private final boolean _defaultState;
+
+        /**
+         * Flag for features that affect caching of readers, writers,
+         * and changing of which needs to result in flushing.
+         */
+        private final boolean _affectsCaching;
+
+        private final int _mask;
+
+        private Feature(boolean defaultState) {
+            this(defaultState, false);
+        }
+
+        private Feature(boolean defaultState, boolean affectsCaching) {
+            _defaultState = defaultState;
+            _affectsCaching = affectsCaching;
+            _mask = (1 << ordinal());
+        }
+
+        public static int defaults()
+        {
+            int flags = 0;
+            for (Feature value : values()) {
+                if (value.enabledByDefault()) {
+                    flags |= value.mask();
+                }
+            }
+            return flags;
+        }
+
+        /**
+         * Method for calculating bitset of features that force flushing of
+         * POJO handler caches.
+         */
+        public static int cacheBreakers()
+        {
+            int flags = 0;
+            for (Feature value : values()) {
+                if (value.affectsCaching()) {
+                    flags |= value.mask();
+                }
+            }
+            return flags;
+        }
+
+        public final boolean enabledByDefault() { return _defaultState; }
+        public final boolean affectsCaching() { return _affectsCaching; }
+
+        public final int mask() { return _mask; }
+
+        public final boolean isDisabled(int flags) {
+            return (flags & _mask) == 0;
+        }
+        public final boolean isEnabled(int flags) {
+            return (flags & _mask) != 0;
+        }
     }
 
     // Important: has to come before 'std' instance, since it refers to it
@@ -423,6 +423,7 @@ public class JSON
         // Configuration, helper objects
         
         protected final TokenStreamFactory _streamFactory;
+
         protected TreeCodec _treeCodec;
 
         protected JSONReader _reader;
@@ -501,7 +502,7 @@ public class JSON
         }
 
         // // // Mutators, helper objects
-        
+
         /**
          * Method for specifying {@link PrettyPrinter} {@link JSON} to be built
          * should use on serialization.
@@ -777,7 +778,7 @@ public class JSON
         }
         return _with(f);
     }
-    
+
     /**
      * Mutant factory for constructing an instance with specified features
      * enabled.
@@ -816,7 +817,6 @@ public class JSON
         //    changes
         JSONReader r = _reader.withCacheCheck(features);
         JSONWriter w = _writer.withCacheCheck(features);
-        
         return _with(features, _streamFactory, _treeCodec,
                 r, w, _prettyPrinter);
     }
@@ -992,7 +992,7 @@ public class JSON
     public <C extends Collection<Object>> CollectionComposer<?,C> composeCollection(C collection) {
         return new CollectionComposer<ComposerBase,C>(collection);
     }
-    
+
     public MapComposer<?> composeMap() {
         return composeMap(new LinkedHashMap<String,Object>());
     }
@@ -1407,7 +1407,7 @@ public class JSON
           }
          return _treeCodec.createArrayNode();
     }
-    
+
     /**
      * Convenience method, equivalent to:
      *<pre>
@@ -1455,7 +1455,7 @@ public class JSON
     /* Internal methods, reading
     /**********************************************************************
      */
-    
+
     protected JSONReader _readerForOperation(JsonParser p) {
         return _reader.perOperationInstance(_features, _valueReaderLocator, _treeCodec, p);
     }
@@ -1538,7 +1538,7 @@ public class JSON
      */
 
     /**
-     * Extension context implementation used when 
+     * Extension context implementation used when
      */
     private static class ExtContextImpl extends ExtensionContext {
         final Builder _builder;

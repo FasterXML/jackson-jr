@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition.Prop;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition.PropBuilder;
 
@@ -29,11 +30,11 @@ public class BeanPropertyIntrospector
     public static BeanPropertyIntrospector instance() { return INSTANCE; }
 
     public POJODefinition pojoDefinitionForDeserialization(JSONReader r, Class<?> pojoType) {
-        return _construct(pojoType);
+        return _construct(pojoType, r.features());
     }
 
     public POJODefinition pojoDefinitionForSerialization(JSONWriter w, Class<?> pojoType) {
-        return _construct(pojoType);
+        return _construct(pojoType, w.features());
     }
 
     /*
@@ -42,10 +43,10 @@ public class BeanPropertyIntrospector
     /**********************************************************************
      */
 
-    private POJODefinition _construct(Class<?> beanType)
+    private POJODefinition _construct(Class<?> beanType, int features)
     {
         Map<String,PropBuilder> propsByName = new TreeMap<String,PropBuilder>();
-        _introspect(beanType, propsByName);
+        _introspect(beanType, propsByName, features);
 
         Constructor<?> defaultCtor = null;
         Constructor<?> stringCtor = null;
@@ -82,19 +83,27 @@ public class BeanPropertyIntrospector
         return new POJODefinition(beanType, props, defaultCtor, stringCtor, longCtor);
     }
 
-    private static void _introspect(Class<?> currType, Map<String,PropBuilder> props)
+    private static void _introspect(Class<?> currType, Map<String, PropBuilder> props,
+            int features)
     {
         if (currType == null || currType == Object.class) {
             return;
         }
         // First, check base type
-        _introspect(currType.getSuperclass(), props);
+        _introspect(currType.getSuperclass(), props, features);
 
+        final boolean noStatics = JSON.Feature.INCLUDE_STATIC_FIELDS.isDisabled(features);
         // then public fields (since 2.8); may or may not be ultimately included
         // but at this point still possible
         for (Field f : currType.getDeclaredFields()) {
             if (!Modifier.isPublic(f.getModifiers())
                     || f.isEnumConstant() || f.isSynthetic()) {
+                continue;
+            }
+            // Only include static members if (a) inclusion feature enabled and
+            // (b) not final (cannot deserialize final fields)
+            if (Modifier.isStatic(f.getModifiers())
+                    && (noStatics || Modifier.isFinal(f.getModifiers()))) {
                 continue;
             }
             _propFrom(props, f.getName()).withField(f);
@@ -115,7 +124,7 @@ public class BeanPropertyIntrospector
                 if (!Modifier.isPublic(flags)) {
                     continue;
                 }
-                
+
                 Class<?> resultType = m.getReturnType();
                 if (resultType == Void.class) {
                     continue;
@@ -154,7 +163,7 @@ public class BeanPropertyIntrospector
         }
         return prop;
     }
-    
+
     private static String decap(String name) {
         char c = name.charAt(0);
         char lowerC = Character.toLowerCase(c);

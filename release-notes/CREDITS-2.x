@@ -8,5 +8,7 @@ Contributors:
 
 Michael Dombrowski (MikeDombo@github)
 
-#81: `JsrValue` should implement `equals()`
+* Contributed #81: `JsrValue` should implement `equals()`
+ (2.13.0)
+* Contributed #84: Public static fields are included in serialized output
  (2.13.0)

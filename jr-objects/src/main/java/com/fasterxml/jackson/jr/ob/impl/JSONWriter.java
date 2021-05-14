@@ -20,7 +20,7 @@ import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
  * and uses delegation for only some special cases.
  *<p>
  * Life-cycle is such that initial instance (called blueprint)
- * is constructed first (including possible configuration 
+ * is constructed first (including possible configuration
  * using mutant factory methods). This blueprint object
  * acts as a factory, and is never used for direct writing;
  * instead, per-call instance is created by calling
@@ -56,7 +56,7 @@ public class JSONWriter
     protected final int _features;
 
     protected final boolean _writeNullValues;
-    
+
     /*
     /**********************************************************************
     /* Blueprint construction
@@ -134,6 +134,13 @@ public class JSONWriter
 
     public boolean isEnabled(JSON.Feature f) {
         return f.isEnabled(_features);
+    }
+
+    /**
+     * @since 2.13
+     */
+    public int features() {
+        return _features;
     }
 
     /*
@@ -254,7 +261,7 @@ public class JSONWriter
             return;
 
         // Others
-            
+
         case SER_ITERABLE:
             writeIterableProperty(propName, (Iterable<?>) value);
             return;
@@ -323,7 +330,7 @@ public class JSONWriter
             return;
 
         // Number types:
-            
+
         case SER_NUMBER_FLOAT: // fall through
         case SER_NUMBER_DOUBLE:
             writeDoubleValue(((Number) value).doubleValue());
@@ -397,7 +404,7 @@ public class JSONWriter
     /* Overridable concrete typed write methods, structured types
     /**********************************************************************
      */
-    
+
     protected void writeCollectionValue(Collection<?> v) throws JacksonException
     {
         _generator.writeStartArray();
@@ -412,7 +419,7 @@ public class JSONWriter
         _generator.writeName(propName);
         writeCollectionValue(v);
     }
-    
+
     protected void writeIterableValue(Iterable<?> v) throws JacksonException
     {
         _generator.writeStartArray();
@@ -427,7 +434,7 @@ public class JSONWriter
         _generator.writeName(propName);
         writeIterableValue(v);
     }
-    
+
     protected void writeListValue(List<?> list) throws JacksonException
     {
         final int len = list.size();
@@ -448,7 +455,7 @@ public class JSONWriter
         _generator.writeName(propName);
         writeListValue(v);
     }
-    
+
     protected void writeMapValue(Map<?,?> v) throws JacksonException
     {
         _generator.writeStartObject(v);
@@ -520,7 +527,7 @@ public class JSONWriter
         _generator.writeName(propName);
         writeIntArrayValue(v);
     }
-    
+
     protected void writeLongArrayValue(long[] v) throws JacksonException {
         final int len = v.length;
         _generator.writeStartArray(v, len);
@@ -534,7 +541,7 @@ public class JSONWriter
         _generator.writeName(propName);
         writeLongArrayValue(v);
     }
-    
+
     protected void writeBooleanArrayValue(boolean[] v) throws JacksonException {
         final int len = v.length;
         _generator.writeStartArray(v, len);
@@ -561,7 +568,7 @@ public class JSONWriter
         _generator.writeName(propName);
         writeTreeNodeValue(v);
     }
-    
+
     /*
     /**********************************************************************
     /* Overridable concrete typed write methods, primitives
@@ -596,7 +603,7 @@ public class JSONWriter
         _generator.writeName(propName);
         writeBigIntegerValue(v);
     }
-    
+
     protected void writeLongProperty(String propName, long v) throws JacksonException {
         _generator.writeNumberProperty(propName, v);
     }
@@ -638,7 +645,7 @@ public class JSONWriter
     protected void writeStringLikeProperty(String propName, String v, int actualType) throws JacksonException {
         _generator.writeStringProperty(propName, v);
     }
-    
+
     protected void writeBinaryValue(byte[] data) throws JacksonException {
         _generator.writeBinary(data);
     }
@@ -875,7 +882,7 @@ public class JSONWriter
     /* Other internal methods
     /**********************************************************************
      */
-    
+
     private void _badType(int type, Object value)
     {
         if (type < 0) {

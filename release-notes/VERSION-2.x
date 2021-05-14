@@ -15,6 +15,9 @@ Modules:
 
 #79: Reuse of ClassKey in ValueWriterLocator not working
 #81: `JsrValue` should implement `equals()`
+ (contributed by Mike D)
+#84: Public static fields are included in serialized output
+ (contributed by Mike D)
 
 2.12.3 (12-Apr-2021)
 2.12.2 (03-Mar-2021)

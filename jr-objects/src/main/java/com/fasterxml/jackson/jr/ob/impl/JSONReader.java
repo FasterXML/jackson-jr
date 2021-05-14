@@ -16,7 +16,7 @@ import com.fasterxml.jackson.jr.ob.api.ValueReader;
  * any of reading itself (despite name).
  *<p>
  * Life-cycle is such that initial instance (called blueprint)
- * is constructed first (including possible configuration 
+ * is constructed first (including possible configuration
  * using mutant factory methods). This blueprint object
  * acts as a factory, and is never used for direct reading;
  * instead, per-call instance is created by calling
@@ -169,6 +169,13 @@ public class JSONReader
 
     public boolean isEnabled(JSON.Feature f) {
         return f.isEnabled(_features);
+    }
+
+    /**
+     * @since 2.13
+     */
+    public int features() {
+        return _features;
     }
 
     /*
