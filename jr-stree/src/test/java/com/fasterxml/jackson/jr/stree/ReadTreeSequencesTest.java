@@ -14,7 +14,7 @@ public class ReadTreeSequencesTest extends JacksonJrTreeTestBase
 
     public void testBeanSequence() throws Exception
     {
-        final String INPUT = aposToQuotes("{'id':1, 'msg':'foo'} [1, 2, 3] null   ");
+        final String INPUT = a2q("{'id':1, 'msg':'foo'} [1, 2, 3] null   ");
 
         // First, managed
         ValueIterator<JrsValue> it = treeJSON.treeSequenceFrom(INPUT);

@@ -42,4 +42,23 @@ public class JrsString extends JrsValue.Scalar
     protected void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws IOException {
         g.writeString(_value);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        JrsString jrsString = (JrsString) o;
+
+        return _value.equals(jrsString._value);
+    }
+
+    @Override
+    public int hashCode() {
+        return _value.hashCode();
+    }
 }

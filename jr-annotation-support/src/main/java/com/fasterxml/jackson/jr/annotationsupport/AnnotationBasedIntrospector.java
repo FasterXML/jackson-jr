@@ -39,12 +39,14 @@ public class AnnotationBasedIntrospector
     // // // State only for deserialization:
 
     protected Set<String> _ignorableNames;
+    protected int _features;
 
     protected AnnotationBasedIntrospector(Class<?> type, boolean serialization,
-            JsonAutoDetect.Value visibility) {
+                                          JsonAutoDetect.Value visibility, int features) {
         _type = type;
         _forSerialization = serialization;
         _ignorableNames = serialization ? null : new HashSet<String>();
+        _features = features;
 
         // First things first: find possible `@JsonAutoDetect` to override
         // default visibility settings
@@ -58,13 +60,13 @@ public class AnnotationBasedIntrospector
 
     public static POJODefinition pojoDefinitionForDeserialization(JSONReader r,
             Class<?> pojoType, JsonAutoDetect.Value visibility) {
-        return new AnnotationBasedIntrospector(pojoType, false, visibility)
+        return new AnnotationBasedIntrospector(pojoType, false, visibility, r.features())
                 .introspectDefinition();
     }
 
     public static POJODefinition pojoDefinitionForSerialization(JSONWriter w,
             Class<?> pojoType, JsonAutoDetect.Value visibility) {
-        return new AnnotationBasedIntrospector(pojoType, true, visibility)
+        return new AnnotationBasedIntrospector(pojoType, true, visibility, w.features())
                 .introspectDefinition();
     }
 
@@ -235,9 +237,9 @@ public class AnnotationBasedIntrospector
 
         // then get fields from within class itself
         for (Field f : currType.getDeclaredFields()) {
-            // Does not include static fields, but there are couple of things we do
-            // not include regardless:
-            if (f.isSynthetic()) {
+            // skip static fields and synthetic fields except for enum constants
+            if ((JSON.Feature.INCLUDE_STATIC_FIELDS.isDisabled(_features) && Modifier.isStatic(f.getModifiers())
+                    && !f.isEnumConstant()) || f.isSynthetic()) {
                 continue;
             }
             // otherwise, first things first; explicit ignoral?
@@ -284,7 +286,7 @@ public class AnnotationBasedIntrospector
             final int flags = m.getModifiers();
             // 13-Jun-2015, tatu: Skip synthetic, bridge methods altogether, for now
             //    at least (add more complex handling only if absolutely necessary)
-            if (Modifier.isStatic(flags)
+            if ((JSON.Feature.INCLUDE_STATIC_FIELDS.isDisabled(_features) && Modifier.isStatic(flags))
                     || m.isSynthetic() || m.isBridge()) {
                 continue;
             }
@@ -410,9 +412,10 @@ public class AnnotationBasedIntrospector
      */
 
     protected boolean _isFieldVisible(Field f) {
-        // Consider transient to be non-visible
+        // Consider transient and static-final to be non-visible
         // TODO: (maybe?) final
-        return !Modifier.isTransient(f.getModifiers())
+        return !(Modifier.isFinal(f.getModifiers()) && Modifier.isStatic(f.getModifiers()))
+                && !Modifier.isTransient(f.getModifiers())
                 && _visibility.getFieldVisibility().isVisible(f);
     }
 

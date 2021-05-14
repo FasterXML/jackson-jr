@@ -14,6 +14,7 @@ Modules:
 2.13.0 (not yet released)
 
 #79: Reuse of ClassKey in ValueWriterLocator not working
+#81: `JsrValue` should implement `equals()`
 
 2.12.3 (12-Apr-2021)
 2.12.2 (03-Mar-2021)

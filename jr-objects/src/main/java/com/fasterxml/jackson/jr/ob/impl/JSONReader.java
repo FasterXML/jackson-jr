@@ -16,7 +16,7 @@ import com.fasterxml.jackson.jr.ob.api.ValueReader;
  * any of reading itself (despite name).
  *<p>
  * Life-cycle is such that initial instance (called blueprint)
- * is constructed first (including possible configuration 
+ * is constructed first (including possible configuration
  * using mutant factory methods). This blueprint object
  * acts as a factory, and is never used for direct reading;
  * instead, per-call instance is created by calling
@@ -177,6 +177,13 @@ public class JSONReader
         return f.isEnabled(_features);
     }
 
+    /**
+     * @since 2.13
+     */
+    public int features() {
+        return _features;
+    }
+
     /*
     /**********************************************************************
     /* Public entry points for reading Simple objects from JSON
@@ -226,7 +233,7 @@ public class JSONReader
         }
         return (List<Object>) AnyReader.std.readCollectionFromArray(this, _parser, _collectionBuilder);
     }
-    
+
     /**
      * Method for reading a JSON Array from input and building a <code>Object[]</code>
      * out of it. Note that if input does NOT contain a

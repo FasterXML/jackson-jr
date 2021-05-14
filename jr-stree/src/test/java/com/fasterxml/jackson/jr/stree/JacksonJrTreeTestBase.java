@@ -36,11 +36,11 @@ public abstract class JacksonJrTreeTestBase extends TestCase
         fail("Expected an exception with one of substrings ("+Arrays.asList(matches)+"): got one with message \""+msg+"\"");
     }
 
-    protected String quote(String str) {
+    protected String q(String str) {
         return "\"" + str + "\"";
     }
 
-    protected String aposToQuotes(String json) {
+    protected String a2q(String json) {
         return json.replace("'", "\"");
     }
 

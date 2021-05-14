@@ -7,6 +7,8 @@ import com.fasterxml.jackson.jr.ob.JSON;
 public class BasicIgnoralTest extends ASTestBase
 {
     static class XY {
+        public static int DEFAULT = 123;
+        public static final int DEFAULT_FINAL = 123;
         @JsonIgnore
         public int x;
         public int y;
@@ -42,13 +44,16 @@ public class BasicIgnoralTest extends ASTestBase
     }
 
     private final JSON JSON_WITH_ANNO = jsonWithAnnotationSupport();
+    private final JSON JSON_WITH_ANNO_WITH_STATIC =
+            JSON.builder().register(JacksonAnnotationExtension.std).enable(JSON.Feature.INCLUDE_STATIC_FIELDS).build();
+    private final JSON JSON_WITH_STATIC = JSON.builder().enable(JSON.Feature.INCLUDE_STATIC_FIELDS).build();
 
     /*
     /**********************************************************************
     /* Tests for basic @JsonIgnore
     /**********************************************************************
      */
-    
+
     public void testPropertyIgnoralOnSerialize() throws Exception
     {
         final XY input = new XY(1, 2);
@@ -60,26 +65,41 @@ public class BasicIgnoralTest extends ASTestBase
 
         // and ensure no leakage to default one:
         assertEquals(a2q("{'x':1,'y':2}"), JSON.std.asString(input));
+
+        // Verify serialization of static fields when the INCLUDE_STATIC_FIELDS option is enabled
+        assertEquals(a2q("{'DEFAULT':123,'x':1,'y':2}"), JSON_WITH_STATIC.asString(input));
+        assertEquals(a2q("{'DEFAULT':123,'y':2}"), JSON_WITH_ANNO_WITH_STATIC.asString(input));
     }
 
     public void testPropertyIgnoralOnDeserialize() throws Exception
     {
-        final String json = a2q("{'x':1,'y':2}");
+        final String json = a2q("{'DEFAULT':125,'x':1,'y':2}");
 
         // default: no filtering by ignorals
         XY result = JSON.std.beanFrom(XY.class, json);
         assertEquals(1, result.x);
         assertEquals(2, result.y);
+        assertEquals(XY.DEFAULT_FINAL, XY.DEFAULT);
 
         // but with ignore, should skip
         result = JSON_WITH_ANNO.beanFrom(XY.class, json);
         assertEquals(0, result.x);
         assertEquals(2, result.y);
+        assertEquals(XY.DEFAULT_FINAL, XY.DEFAULT);
 
         // and once again verify non-stickiness
         result = JSON.std.beanFrom(XY.class, json);
         assertEquals(1, result.x);
         assertEquals(2, result.y);
+        assertEquals(XY.DEFAULT_FINAL, XY.DEFAULT);
+
+        // Verify setting static field from serialized data when the INCLUDE_STATIC_FIELDS option is enabled
+        JSON_WITH_STATIC.beanFrom(XY.class, json);
+        assertEquals(125, XY.DEFAULT);
+        XY.DEFAULT = XY.DEFAULT_FINAL;
+        JSON_WITH_ANNO_WITH_STATIC.beanFrom(XY.class, json);
+        assertEquals(125, XY.DEFAULT);
+        XY.DEFAULT = XY.DEFAULT_FINAL;
     }
 
     public void testPropertyIgnoreWithUnknown() throws Exception
