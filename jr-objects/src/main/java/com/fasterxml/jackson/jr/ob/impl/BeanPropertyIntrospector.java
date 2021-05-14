@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition.Prop;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition.PropBuilder;
 
@@ -84,7 +85,8 @@ public class BeanPropertyIntrospector
         return new POJODefinition(beanType, props, defaultCtor, stringCtor, longCtor);
     }
 
-    private static void _introspect(Class<?> currType, Map<String, PropBuilder> props, int features)
+    private static void _introspect(Class<?> currType, Map<String, PropBuilder> props,
+            int features)
     {
         if (currType == null || currType == Object.class) {
             return;
@@ -92,18 +94,21 @@ public class BeanPropertyIntrospector
         // First, check base type
         _introspect(currType.getSuperclass(), props, features);
 
+        final boolean noStatics = JSON.Feature.INCLUDE_STATIC_FIELDS.isDisabled(features);
         // then public fields (since 2.8); may or may not be ultimately included
         // but at this point still possible
         for (Field f : currType.getDeclaredFields()) {
             if (!Modifier.isPublic(f.getModifiers())
-                    || (JSON.Feature.INCLUDE_STATIC_FIELDS.isDisabled(features) && Modifier.isStatic(f.getModifiers()))
                     || f.isEnumConstant() || f.isSynthetic()) {
                 continue;
             }
-            // If the field is static-final, we won't be able to set it, so do not create the prop
-            if (!(Modifier.isFinal(f.getModifiers()) && Modifier.isStatic(f.getModifiers()))) {
-                _propFrom(props, f.getName()).withField(f);
+            // Only include static members if (a) inclusion feature enabled and
+            // (b) not final (cannot deserialize final fields)
+            if (Modifier.isStatic(f.getModifiers())
+                    && (noStatics || Modifier.isStatic(f.getModifiers()))) {
+                continue;
             }
+            _propFrom(props, f.getName()).withField(f);
         }
 
         // then get methods from within this class
