@@ -6,16 +6,20 @@ import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.fasterxml.jackson.core.JsonGenerator;
+
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ValueWriter;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
+import com.fasterxml.jackson.jr.ob.impl.ValueLocatorBase;
 
-public class AnnotationBasedValueRWModifier extends ReaderWriterModifier {
-    // Matches SER_ENUM code in ValueLocatorBase
-    protected static final int SER_ENUM = 23;
+public class AnnotationBasedValueRWModifier extends ReaderWriterModifier
+{
+    // Has to match SER_ENUM code in ValueLocatorBase
+    protected static final int SER_ENUM_ID = ValueLocatorBase.SER_ENUM;
 
     /**
      * Visibility settings to use for auto-detecting accessors.
@@ -38,7 +42,7 @@ public class AnnotationBasedValueRWModifier extends ReaderWriterModifier {
 
     @Override
     public ValueWriter overrideStandardValueWriter(JSONWriter writeContext, Class<?> type, int stdTypeId) {
-        if (stdTypeId == SER_ENUM) {
+        if (stdTypeId == SER_ENUM_ID) {
             return new EnumWriter(type);
         }
         return null;
@@ -63,7 +67,7 @@ public class AnnotationBasedValueRWModifier extends ReaderWriterModifier {
 
         @Override
         public void writeValue(JSONWriter context, JsonGenerator g, Object value) throws IOException {
-            context.writeValue(enumMap.get(((Enum) value).name()));
+            context.writeValue(enumMap.get(((Enum<?>) value).name()));
         }
 
         @Override
