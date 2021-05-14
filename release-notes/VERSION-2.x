@@ -14,6 +14,8 @@ Modules:
 2.13.0 (not yet released)
 
 #79: Reuse of ClassKey in ValueWriterLocator not working
+#80: Case-insensitive property, enum deserialization should be supported
+ (contributed by Mike D)
 #81: `JsrValue` should implement `equals()`
  (contributed by Mike D)
 #83: Support `@JsonProperty` annotation on enum values

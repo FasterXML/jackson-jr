@@ -8,6 +8,9 @@ Contributors:
 
 Michael Dombrowski (MikeDombo@github)
 
+* Contributed #80: Case-insensitive property, enum deserialization
+  should be supported
+ (2.13.0)
 * Contributed #81: `JsrValue` should implement `equals()`
  (2.13.0)
 * Contributed #83: Support `@JsonProperty` annotation on enum values
