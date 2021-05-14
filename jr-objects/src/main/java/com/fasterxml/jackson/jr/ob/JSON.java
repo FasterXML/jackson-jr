@@ -292,6 +292,8 @@ public class JSON implements Versioned
          * lower-case should be negligible however.
          *<p>
          * Feature is <b>disabled</b> by default.
+         *
+         * @since 2.13
          */
         ACCEPT_CASE_INSENSITIVE_PROPERTIES(false, true),
 
@@ -302,6 +304,8 @@ public class JSON implements Versioned
          * match.
          *<p>
          * Feature is <b>disabled</b> by default.
+         *
+         * @since 2.13
          */
         ACCEPT_CASE_INSENSITIVE_ENUMS(false, true)
        ;

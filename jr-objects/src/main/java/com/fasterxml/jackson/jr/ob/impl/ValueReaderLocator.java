@@ -302,8 +302,11 @@ public class ValueReaderLocator
             def = _readerModifier.pojoDefinitionForDeserialization(_readContext, enumType);
         }
         Map<String, Object> byName =
-                JSON.Feature.ACCEPT_CASE_INSENSITIVE_ENUMS.isEnabled(_features) ? new TreeMap<String, Object>(
-                        String.CASE_INSENSITIVE_ORDER) : new HashMap<String, Object>();
+                JSON.Feature.ACCEPT_CASE_INSENSITIVE_ENUMS.isEnabled(_features)
+                    ? new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER)
+                    // Note: we might want to retain declaration order with LHM in future
+                    // for error reporting; but not needed yet
+                    : new HashMap<String, Object>();
         Object[] enums = enumType.getEnumConstants();
         if (def == null) {
             for (Object e : enums) {
@@ -453,6 +456,7 @@ public class ValueReaderLocator
                 longCtor.setAccessible(true);
             }
         }
+        final boolean caseInsensitive = JSON.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES.isEnabled(_features);
 
         final List<POJODefinition.Prop> rawProps = beanDef.getProperties();
         final int len = rawProps.size();
@@ -462,8 +466,10 @@ public class ValueReaderLocator
         if (len == 0) {
             propMap = Collections.emptyMap();
         } else {
-            propMap = JSON.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES.isEnabled(_features) ? new TreeMap<String,
-                BeanPropertyReader>(String.CASE_INSENSITIVE_ORDER) : new HashMap<String, BeanPropertyReader>();
+            propMap = caseInsensitive
+                    ? new TreeMap<String, BeanPropertyReader>(String.CASE_INSENSITIVE_ORDER)
+                    // 13-May-2021, tatu: Let's retain ordering here:
+                    : new LinkedHashMap<String, BeanPropertyReader>();
             final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
             for (int i = 0; i < len; ++i) {
                 POJODefinition.Prop rawProp = rawProps.get(i);
@@ -498,8 +504,9 @@ public class ValueReaderLocator
                 //   we must link via name of primary property, unfortunately:
                 if (rawProp.hasAliases()) {
                     if (aliasMapping == null) {
-                        aliasMapping = JSON.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES.isEnabled(_features) ? new TreeMap<String,
-                                String>(String.CASE_INSENSITIVE_ORDER) : new HashMap<String, String>();
+                        aliasMapping = caseInsensitive
+                                ? new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER)
+                                : new HashMap<String, String>();
                     }
                     for (String alias : rawProp.aliases()) {
                         aliasMapping.put(alias, rawProp.name);
