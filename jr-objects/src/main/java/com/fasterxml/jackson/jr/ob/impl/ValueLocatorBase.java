@@ -10,6 +10,7 @@ import java.util.*;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.jr.ob.JSON;
 
+// Only public for reference by `AnnotationBasedValueRWModifier`
 public abstract class ValueLocatorBase
 {
     /*
