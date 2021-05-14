@@ -1,20 +1,22 @@
 package com.fasterxml.jackson.jr.annotationsupport;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonGenerator;
+
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ValueWriter;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
 
-public class AnnotationBasedValueRWModifier extends ReaderWriterModifier {
+public class AnnotationBasedValueRWModifier extends ReaderWriterModifier
+{
     // Matches SER_ENUM code in ValueLocatorBase
     protected static final int SER_ENUM = 23;
 
