@@ -276,6 +276,13 @@ public class JSON
          * Feature is <b>enabled</b> by default, so public fields are discovered by default.
          */
         USE_FIELDS(true, true),
+
+        /**
+         * Feature that enables serialization and deserialization of non-final static fields.
+         *<p>
+         * Feature is <b>disabled</b> by default, so static fields are not discovered by default.
+         */
+        INCLUDE_STATIC_FIELDS(false, true),       
         ;
 
         /*
