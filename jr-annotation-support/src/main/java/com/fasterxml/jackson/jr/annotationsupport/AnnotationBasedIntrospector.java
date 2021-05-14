@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
@@ -414,7 +415,7 @@ public class AnnotationBasedIntrospector
     protected boolean _isFieldVisible(Field f) {
         // Consider transient and static-final to be non-visible
         // TODO: (maybe?) final
-        return !(Modifier.isFinal(f.getModifiers()) && Modifier.isStatic(f.getModifiers()))
+        return !(Modifier.isFinal(f.getModifiers()) && Modifier.isStatic(f.getModifiers()) && !f.isEnumConstant())
                 && !Modifier.isTransient(f.getModifiers())
                 && _visibility.getFieldVisibility().isVisible(f);
     }

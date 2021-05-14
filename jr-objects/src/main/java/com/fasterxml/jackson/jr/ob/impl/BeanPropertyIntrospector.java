@@ -7,6 +7,7 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition.Prop;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition.PropBuilder;
 
