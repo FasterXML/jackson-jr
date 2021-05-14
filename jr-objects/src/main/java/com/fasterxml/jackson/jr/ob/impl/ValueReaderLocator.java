@@ -73,7 +73,7 @@ public class ValueReaderLocator
     /* Caching
     /**********************************************************************
      */
-    
+
     /**
      * Set of {@link ValueReader}s that we have resolved
      */
@@ -109,7 +109,7 @@ public class ValueReaderLocator
     /* Instance state, caching
     /**********************************************************************
      */
-    
+
     /**
      * Reusable lookup key; only used by per-thread instances.
      */
@@ -155,7 +155,7 @@ public class ValueReaderLocator
         // create new cache as there may be custom writers:
         _knownReaders = new ConcurrentHashMap<ClassKey, ValueReader>(10, 0.75f, 2);
         _readerLock = new Object();
-        
+
         _features = base._features;
         _readContext = base._readContext;
         _readerProvider = rwp;
@@ -181,7 +181,7 @@ public class ValueReaderLocator
         }
         return new ValueReaderLocator(this, _readerProvider, rwm);
     }
-    
+
     public ValueReaderLocator perOperationInstance(JSONReader r, int features) {
         return new ValueReaderLocator(this, features & CACHE_FLAGS, r);
     }
@@ -201,7 +201,7 @@ public class ValueReaderLocator
     /* Public API, operations
     /**********************************************************************
      */
-    
+
     /**
      * Method used during deserialization to find handler for given
      * non-generic type: will first check for already resolved (and cached) readers
@@ -308,10 +308,29 @@ public class ValueReaderLocator
     }
 
     protected ValueReader enumReader(Class<?> enumType) {
+        // Call pojoDefinitionForDeserialization so that the annotation support extension can get custom names for
+        // enum values
+        POJODefinition def = null;
+        if (_readerModifier != null) {
+            def = _readerModifier.pojoDefinitionForDeserialization(_readContext, enumType);
+        }
+        Map<String, Object> byName = new HashMap<String, Object>();
         Object[] enums = enumType.getEnumConstants();
-        Map<String,Object> byName = new HashMap<String,Object>();
-        for (Object e : enums) {
-            byName.put(e.toString(), e);
+        if (def == null) {
+            for (Object e : enums) {
+                byName.put(e.toString(), e);
+            }
+        } else {
+            for (POJODefinition.Prop e : def.getProperties()) {
+                if (e.field != null && e.field.isEnumConstant()) {
+                    try {
+                        byName.put(e.name, e.field.get(null));
+                    } catch (IllegalAccessException ex) {
+                        // Don't believe that this should be possible, but raise it up just in case
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
         }
         return new EnumReader(enumType, enums, byName);
     }

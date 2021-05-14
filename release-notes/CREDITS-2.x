@@ -10,5 +10,7 @@ Michael Dombrowski (MikeDombo@github)
 
 * Contributed #81: `JsrValue` should implement `equals()`
  (2.13.0)
+* Contributed #83: Support `@JsonProperty` annotation on enum values
+ (2.13.0)
 * Contributed #84: Public static fields are included in serialized output
  (2.13.0)

@@ -60,4 +60,40 @@ public class BasicRenameTest extends ASTestBase
         assertEquals("Bob", result._first);
         assertEquals("Burger", result._last);
     }
+
+    public void testEnumRenameOnSerialize() throws Exception
+    {
+        ABCRename inputA = ABCRename.A;
+        // default
+        assertEquals(a2q("\"A\""), JSON.std.asString(inputA));
+        // with annotations
+        assertEquals(a2q("\"A1\""), JSON_WITH_ANNO.asString(inputA));
+
+        ABCRename inputB = ABCRename.B;
+        // default
+        assertEquals(a2q("\"B\""), JSON.std.asString(inputB));
+        // with annotations
+        assertEquals(a2q("\"B1\""), JSON_WITH_ANNO.asString(inputB));
+
+        ABCRename inputC = ABCRename.C;
+        // default
+        assertEquals(a2q("\"C\""), JSON.std.asString(inputC));
+        // with annotations
+        assertEquals(a2q("\"C\""), JSON_WITH_ANNO.asString(inputC));
+    }
+
+    public void testEnumRenameOnDeserialize() throws Exception
+    {
+        String jsonA = a2q("\"A1\"");
+        ABCRename resultA = JSON_WITH_ANNO.beanFrom(ABCRename.class, jsonA);
+        assertEquals(ABCRename.A, resultA);
+
+        String jsonB = a2q("\"B1\"");
+        ABCRename resultB = JSON_WITH_ANNO.beanFrom(ABCRename.class, jsonB);
+        assertEquals(ABCRename.B, resultB);
+
+        String jsonC = a2q("\"C\"");
+        ABCRename resultC = JSON_WITH_ANNO.beanFrom(ABCRename.class, jsonC);
+        assertEquals(ABCRename.C, resultC);
+    }
 }

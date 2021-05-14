@@ -16,10 +16,6 @@ import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
 
-/**
- *
- * @since 2.11
- */
 public class AnnotationBasedIntrospector
 {
     // // // Configuration
@@ -276,7 +272,7 @@ public class AnnotationBasedIntrospector
 
     protected void _findMethods(final Class<?> currType)
     {
-        if (currType == null || currType == Object.class) {
+        if (currType == null || currType == Object.class || currType == Enum.class) {
             return;
         }
         // Start with base type methods (so overrides work)
@@ -415,7 +411,7 @@ public class AnnotationBasedIntrospector
     protected boolean _isFieldVisible(Field f) {
         // Consider transient and static-final to be non-visible
         // TODO: (maybe?) final
-        return !(Modifier.isFinal(f.getModifiers()) && Modifier.isStatic(f.getModifiers()))
+        return !(Modifier.isFinal(f.getModifiers()) && Modifier.isStatic(f.getModifiers()) && !f.isEnumConstant())
                 && !Modifier.isTransient(f.getModifiers())
                 && _visibility.getFieldVisibility().isVisible(f);
     }
