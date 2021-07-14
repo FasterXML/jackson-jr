@@ -22,6 +22,7 @@ Modules:
  (contributed by Mike D)
 #84: Public static fields are included in serialized output
  (contributed by Mike D)
+- Update retrofit dependency to 2.7.2 (and okhttp to 3.14.9)
 
 2.12.4 (06-Jul-2021)
 2.12.3 (12-Apr-2021)
