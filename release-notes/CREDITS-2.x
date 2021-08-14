@@ -1,5 +1,5 @@
 Here are people who have contributed to the development of Jackson JSON processor
-jackson-jr component, version 2.x
+jackson-jr component(s), version 2.x
 (version numbers in brackets indicate release in which the problem was fixed)
 
 Tatu Saloranta, tatu.saloranta@iki.fi: author
@@ -16,4 +16,9 @@ Michael Dombrowski (MikeDombo@github)
 * Contributed #83: Support `@JsonProperty` annotation on enum values
  (2.13.0)
 * Contributed #84: Public static fields are included in serialized output
+ (2.13.0)
+
+Jonas Konrad (yawkat@github)
+
+* Suggested #88: Make `jr-stree` dependency to `jr-objects` optional
  (2.13.0)

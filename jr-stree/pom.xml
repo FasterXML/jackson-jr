@@ -32,11 +32,15 @@ has no other dependencies.
       <artifactId>jackson-core</artifactId>
     </dependency>
 
-    <!-- Since 2.11, strict dependency, not just test one -->
+    <!-- Since 2.11, strict dependency, not just test one
+         As of 2.13, let's instead make optional: only needed by `JrSimpleTreeExtension`
+      -->
     <dependency>
       <groupId>com.fasterxml.jackson.jr</groupId>
       <artifactId>jackson-jr-objects</artifactId>
       <version>${project.version}</version>
+      <scope>compile</scope>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 
