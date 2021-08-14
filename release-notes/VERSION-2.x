@@ -22,6 +22,8 @@ Modules:
  (contributed by Mike D)
 #84: Public static fields are included in serialized output
  (contributed by Mike D)
+#88: Make `jr-stree` dependency to `jr-objects` optional
+ (suggested by Jonas K)
 - Update retrofit dependency to 2.7.2 (and okhttp to 3.14.9)
 
 2.12.4 (06-Jul-2021)
