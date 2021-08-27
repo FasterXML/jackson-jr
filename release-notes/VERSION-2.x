@@ -26,6 +26,7 @@ Modules:
  (suggested by Jonas K)
 - Update retrofit dependency to 2.7.2 (and okhttp to 3.14.9)
 
+2.12.5 (27-Aug-2021)
 2.12.4 (06-Jul-2021)
 2.12.3 (12-Apr-2021)
 2.12.2 (03-Mar-2021)
