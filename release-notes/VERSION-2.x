@@ -11,7 +11,7 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
-2.13.0 (not yet released)
+2.13.0 (30-Sep-2021)
 
 #79: Reuse of ClassKey in ValueWriterLocator not working
 #80: Case-insensitive property, enum deserialization should be supported
