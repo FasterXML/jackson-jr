@@ -10,7 +10,7 @@ In addition to basic datatypes (core JDK types like `List`s, `Map`s, wrapper typ
 package supports reading and writing of standard Java Beans (implementation that mimics standard
 JDK Bean Introspection): that is,
 subset of POJOs that define setters/getters and/or `public` fields.
-And with 2.11 there is even optional support for a subset of Jackson annotations
+And starting with 2.11 there is even optional support for a subset of Jackson annotations
 via optional `jackson-jr-annotatin-support` extension.
 
 Jackson-jr also adds  `composer` implementation that can be used to
@@ -240,7 +240,7 @@ You can use Maven dependency like:
 <dependency>
   <groupId>com.fasterxml.jackson.jr</groupId>
   <artifactId>jackson-jr-objects</artifactId>
-  <version>2.12.0</version>
+  <version>2.13.0</version>
 </dependency>
 ```
 
