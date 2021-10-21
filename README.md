@@ -11,7 +11,7 @@ package supports reading and writing of standard Java Beans (implementation that
 JDK Bean Introspection): that is,
 subset of POJOs that define setters/getters and/or `public` fields.
 And starting with 2.11 there is even optional support for a subset of Jackson annotations
-via optional `jackson-jr-annotatin-support` extension.
+via optional `jackson-jr-annotation-support` extension.
 
 Jackson-jr also adds  `composer` implementation that can be used to
 construct JSON output with builder-style API, but without necessarily having
