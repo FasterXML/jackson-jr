@@ -11,6 +11,10 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
+2.13.1 (19-Dec-2021)
+
+No changes since 2.13.0
+
 2.13.0 (30-Sep-2021)
 
 #79: Reuse of ClassKey in ValueWriterLocator not working
@@ -25,6 +29,10 @@ Modules:
 #88: Make `jr-stree` dependency to `jr-objects` optional
  (suggested by Jonas K)
 - Update retrofit dependency to 2.7.2 (and okhttp to 3.14.9)
+
+2.12.6 (15-Dec-2021)
+
+* Update `okhttp` dep: 3.12.0 -> 3.14.9
 
 2.12.5 (27-Aug-2021)
 2.12.4 (06-Jul-2021)
