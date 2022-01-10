@@ -59,6 +59,7 @@ Following Jackson annotations are supported either partially or completely:
 * `@JsonProperty` (partial: accessor, only for inclusion/renaming (other properties ignored)
     * In 2.13, will also support renaming of `Enum` constants
 * `@JsonPropertyOrder` (complete: class)
+* `@JsonValue`/`@JsonCreator` (partial: enum only)
 
 Support for additional properties is possible in future versions.
 
@@ -71,6 +72,56 @@ limited in some ways for all annotations:
   Methods) are applied. Jackson-databind will scan the whole inheritance hierarchy
     * In future handling of Class annotations may be improved if this seems feasible
 * No support for "mix-in" annotations
+
+### Enum Support
+
+An `enum` can be tagged with `@JsonProperty` on its values to alias them
+for serialization and deserialization:
+
+```java
+enum ABCRename {
+  // first two are aliased, the last is not
+  @JsonProperty("A1") A, 
+  @JsonProperty("B1") B, 
+  C; 
+}
+```
+
+If an `enum` contains a method annotated with `@JsonValue` that returns a `String`
+then it will be used to serialize. Similarly, if it has a `@JsonCreator`
+method that can be used to deserialize, then that will be used:
+
+```java
+enum ABCJsonValueJsonCreator
+{
+    A("A1"),
+    B("B1"),
+    C("C");
+
+    private String label;
+
+    ABCJsonValueJsonCreator(String label) {
+      this.label = label;
+    }
+
+    // will be used for serialization
+    @JsonValue
+    public String serialize() {
+        return label;
+    }
+
+    // will be used for deserialization
+    @JsonCreator
+    public static ABCJsonValueJsonCreator fromLabel(String label) {
+      for (ABCJsonValueJsonCreator value : ABCJsonValueJsonCreator.values()) {
+          if (value.label.equals(label)) {
+              return value;
+          }
+      }
+      throw new IllegalArgumentException("Unexpected label '" + label + "'");
+    }
+}
+```
 
 ### Other configuration
 
