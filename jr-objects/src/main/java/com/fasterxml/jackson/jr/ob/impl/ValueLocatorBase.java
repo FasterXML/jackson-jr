@@ -10,6 +10,8 @@ import java.util.*;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.jr.ob.JSON;
 
+import static com.fasterxml.jackson.jr.ob.impl.Types.isEnum;
+
 // Only public for reference by `AnnotationBasedValueRWModifier`
 public abstract class ValueLocatorBase
 {
@@ -191,7 +193,7 @@ public abstract class ValueLocatorBase
         if (raw == Character.class) {
             return SER_CHAR;
         }
-        if (raw.isEnum()) {
+        if (isEnum(raw)) {
             return SER_ENUM;
         }
         if (Map.class.isAssignableFrom(raw)) {
