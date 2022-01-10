@@ -23,8 +23,6 @@ import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
 import com.fasterxml.jackson.jr.ob.impl.ValueLocatorBase;
 
-import static com.fasterxml.jackson.jr.ob.impl.Types.isEnum;
-
 public class AnnotationBasedValueRWModifier extends ReaderWriterModifier
 {
     // Has to match SER_ENUM code in ValueLocatorBase
@@ -64,7 +62,7 @@ public class AnnotationBasedValueRWModifier extends ReaderWriterModifier
         return null;
     }
 
-    @Override
+    @Override // since 2.14
     public ValueReader modifyValueReader(JSONReader readContext, Class<?> type, ValueReader defaultReader) {
         if (type.isEnum()) {
             ValueReader readUsingJsonCreator = EnumJsonCreatorReader.of(type);
@@ -104,9 +102,12 @@ public class AnnotationBasedValueRWModifier extends ReaderWriterModifier
     }
 
     /**
-     * Serialize an enum using the {@link JsonValue} tagged method
+     * Serialize an enum using the {@link JsonValue} tagged method.
+     *
+     * @since 2.14
      */
-    private static class EnumJsonValueWriter implements ValueWriter {
+    private static class EnumJsonValueWriter implements ValueWriter
+    {
         private final Class<?> _valueType;
         private final Method _jsonValueMethod;
 
@@ -137,7 +138,7 @@ public class AnnotationBasedValueRWModifier extends ReaderWriterModifier
          * @return either a {@link EnumJsonValueWriter} to write this enum with, or <code>null</code> if no suitable
          * method found
          */
-        private static EnumJsonValueWriter of(Class<?> type) {
+        public static EnumJsonValueWriter of(Class<?> type) {
             return getJsonValueFunction(type, type);
         }
 
@@ -180,9 +181,11 @@ public class AnnotationBasedValueRWModifier extends ReaderWriterModifier
 
     /**
      * Deserialize into an enum using the {@link JsonCreator} tagged method
+     *
+     * @since 2.14
      */
-    private static class EnumJsonCreatorReader extends ValueReader {
-
+    private static class EnumJsonCreatorReader extends ValueReader
+    {
         private final Method _jsonCreatorMethod;
 
         private EnumJsonCreatorReader(Class<?> valueType, Method jsonCreatorMethod) {
@@ -207,7 +210,7 @@ public class AnnotationBasedValueRWModifier extends ReaderWriterModifier
          * @return a new {@link EnumJsonCreatorReader} to deserialize with, or <code>null</code> if there
          * is no {@link JsonCreator} method to use
          */
-        private static EnumJsonCreatorReader of(Class<?> type) {
+        public static EnumJsonCreatorReader of(Class<?> type) {
             for (Method method : type.getDeclaredMethods()) {
                 if (Modifier.isStatic(method.getModifiers()) &&
                         method.getDeclaredAnnotation(JsonCreator.class) != null &&
