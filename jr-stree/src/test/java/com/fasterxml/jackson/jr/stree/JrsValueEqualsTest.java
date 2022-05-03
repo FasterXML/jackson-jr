@@ -41,13 +41,16 @@ public class JrsValueEqualsTest extends JacksonJrTreeTestBase
 
     public void testScalarEquality() throws Exception
     {
-        assertEquals(treeJSON.treeFrom("12"), treeJSON.treeFrom("12"));
+        TreeNode tree = treeJSON.treeFrom("12");
+        assertEquals(tree, treeJSON.treeFrom("12"));
         assertFalse(treeJSON.treeFrom("12").equals(treeJSON.treeFrom("-12")));
 
-        assertEquals(treeJSON.treeFrom("true"), treeJSON.treeFrom("true"));
+        tree = treeJSON.treeFrom("true");
+        assertEquals(tree, treeJSON.treeFrom("true"));
         assertFalse(treeJSON.treeFrom("true").equals(treeJSON.treeFrom("137")));
 
-        assertEquals(treeJSON.treeFrom(q("name")), treeJSON.treeFrom(q("name")));
+        tree = treeJSON.treeFrom(q("name"));
+        assertEquals(tree, treeJSON.treeFrom(q("name")));
         assertFalse(treeJSON.treeFrom(q("true")).equals(treeJSON.treeFrom("true")));
     }
 }
