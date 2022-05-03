@@ -14,7 +14,8 @@ Modules:
 2.14.0 (not yet released)
 
 #91: Annotation support should allow `@JsonValue`/`JsonCreator` on `enum`
- (contributed by 
+ (contributed by Ashley F)
+#95: Increase minimum Java baseline from 6 to 8 for version 2.14
 
 2.13.2 (06-Mar-2022)
 2.13.1 (19-Dec-2021)

@@ -31,19 +31,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- 04-May-2016, tatu: This should still work with 2.8, as jackson-core
-        only requires Java 6 (unlike databind and other modules)
-      -->
-    <javac.src.version>1.6</javac.src.version>
-    <javac.target.version>1.6</javac.target.version>
-
-    <!-- 04-May-2016, tatu: Bundle-plugin 3.x seems to require Java 7, so to
-           build for Java 6 need to downgrade here to last working 2.x version
-          (2.5.4 had some issues wrt shading)
-      -->
-    <!-- 30-Jul-2020, tatu: But 4.2.0 seems to have worked for `jackson-annotations`
-           for a while now (since 2.10.x) so remove version lock
-    <version.plugin.bundle>4.2.1</version.plugin.bundle>
+    <!-- 03-May-2022: Change Java compatibility for Jackson-Core 2.14 from Java6 to Java8,
+       still use Moditect to get JDK9+ module info support; need newer bundle plugin as well
+       (can just defaults from `jackson-parent`)
       -->
 
     <!-- Aggressively minimize jar size; drop 'lines' and 'vars' -->
@@ -68,7 +58,6 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.4</version>
         <executions>
           <execution>
             <goals>
