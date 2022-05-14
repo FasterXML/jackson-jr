@@ -11,8 +11,6 @@ on:
     branches:
     - master
     - "3.0"
-    - "2.14"
-    - "2.13"
     paths-ignore:
     - "README.md"
     - "release-notes/*"
@@ -22,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java_version: ['8', '14']
+        java_version: ['8', '11','17']
         os: ['ubuntu-20.04']
     env:
       JAVA_OPTS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
