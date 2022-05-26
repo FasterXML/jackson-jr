@@ -38,6 +38,10 @@ No changes since 2.13.0
  (suggested by Jonas K)
 - Update retrofit dependency to 2.7.2 (and okhttp to 3.14.9)
 
+2.12.7 (26-May-2022)
+
+No changes since 2.12.6
+
 2.12.6 (15-Dec-2021)
 
 * Update `okhttp` dep: 3.12.0 -> 3.14.9
