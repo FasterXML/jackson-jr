@@ -6,7 +6,6 @@ import tools.jackson.core.*;
 import tools.jackson.core.JsonParser.NumberType;
 import tools.jackson.core.tree.ArrayTreeNode;
 import tools.jackson.core.tree.ObjectTreeNode;
-import tools.jackson.jr.ob.JSON;
 
 public class TreeApiTest extends TestBase
 {

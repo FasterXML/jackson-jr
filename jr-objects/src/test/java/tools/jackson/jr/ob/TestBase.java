@@ -4,11 +4,11 @@ import java.util.Arrays;
 
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.ObjectReadContext;
-import tools.jackson.jr.ob.JSON;
-import tools.jackson.jr.ob.JacksonJrExtension;
+
 import tools.jackson.jr.ob.api.ExtensionContext;
 import tools.jackson.jr.ob.api.ReaderWriterModifier;
 import tools.jackson.jr.ob.api.ReaderWriterProvider;
+
 import junit.framework.TestCase;
 
 public abstract class TestBase extends TestCase

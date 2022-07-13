@@ -3,8 +3,7 @@ package tools.jackson.jr.ob;
 import java.util.*;
 
 import tools.jackson.core.JsonParser;
-import tools.jackson.jr.ob.JSON;
-import tools.jackson.jr.ob.JSONObjectException;
+
 import tools.jackson.jr.ob.api.MapBuilder;
 
 // for [jackson-jr#49], where `DeferredMap` explodes

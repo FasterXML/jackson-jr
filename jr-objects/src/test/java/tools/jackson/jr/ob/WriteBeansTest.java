@@ -2,7 +2,6 @@ package tools.jackson.jr.ob;
 
 import java.util.*;
 
-import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.JSON.Feature;
 
 public class WriteBeansTest extends TestBase

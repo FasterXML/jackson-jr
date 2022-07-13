@@ -7,7 +7,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
-import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.JSON.Feature;
 
 public class WriteSimpleTest extends TestBase

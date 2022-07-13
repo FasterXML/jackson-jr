@@ -3,8 +3,7 @@ package tools.jackson.jr.ob;
 import java.util.*;
 
 import tools.jackson.core.JsonParser;
-import tools.jackson.jr.ob.JSON;
-import tools.jackson.jr.ob.JSONObjectException;
+
 import tools.jackson.jr.ob.api.CollectionBuilder;
 
 public class ReadListTest extends TestBase

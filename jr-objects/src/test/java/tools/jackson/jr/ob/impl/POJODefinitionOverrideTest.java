@@ -4,10 +4,6 @@ import java.util.*;
 
 import tools.jackson.jr.ob.*;
 import tools.jackson.jr.ob.api.ReaderWriterModifier;
-import tools.jackson.jr.ob.impl.BeanPropertyIntrospector;
-import tools.jackson.jr.ob.impl.JSONReader;
-import tools.jackson.jr.ob.impl.JSONWriter;
-import tools.jackson.jr.ob.impl.POJODefinition;
 
 public class POJODefinitionOverrideTest extends TestBase
 {

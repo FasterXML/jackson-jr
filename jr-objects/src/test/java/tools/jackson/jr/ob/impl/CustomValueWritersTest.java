@@ -3,9 +3,9 @@ package tools.jackson.jr.ob.impl;
 import java.util.Collections;
 
 import tools.jackson.core.JsonGenerator;
+
 import tools.jackson.jr.ob.*;
 import tools.jackson.jr.ob.api.*;
-import tools.jackson.jr.ob.impl.JSONWriter;
 
 public class CustomValueWritersTest extends TestBase
 {

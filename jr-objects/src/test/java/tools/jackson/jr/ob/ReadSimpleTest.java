@@ -9,8 +9,7 @@ import java.util.*;
 
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.TreeNode;
-import tools.jackson.jr.ob.JSON;
-import tools.jackson.jr.ob.JSONObjectException;
+
 import tools.jackson.jr.ob.JSON.Feature;
 
 public class ReadSimpleTest extends TestBase

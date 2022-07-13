@@ -3,7 +3,6 @@ package tools.jackson.jr.ob.impl;
 import java.util.*;
 
 import tools.jackson.jr.ob.TestBase;
-import tools.jackson.jr.ob.impl.ValueWriterLocator;
 
 public class ValueWriterLocatorTest extends TestBase
 {

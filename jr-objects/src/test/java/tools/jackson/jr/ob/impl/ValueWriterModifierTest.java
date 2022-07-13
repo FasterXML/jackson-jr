@@ -1,11 +1,11 @@
 package tools.jackson.jr.ob.impl;
 
 import tools.jackson.core.JsonGenerator;
+
 import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.TestBase;
 import tools.jackson.jr.ob.api.ReaderWriterModifier;
 import tools.jackson.jr.ob.api.ValueWriter;
-import tools.jackson.jr.ob.impl.JSONWriter;
 
 public class ValueWriterModifierTest extends TestBase
 {

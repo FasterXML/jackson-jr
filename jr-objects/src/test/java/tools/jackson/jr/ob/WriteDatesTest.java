@@ -2,7 +2,6 @@ package tools.jackson.jr.ob;
 
 import java.util.Date;
 
-import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.JSON.Feature;
 
 public class WriteDatesTest extends TestBase

@@ -2,13 +2,9 @@ package tools.jackson.jr.annotationsupport;
 
 import java.util.Arrays;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+import tools.jackson.jr.ob.JSON;
 
 import junit.framework.TestCase;
-import tools.jackson.jr.annotationsupport.JacksonAnnotationExtension;
-import tools.jackson.jr.ob.JSON;
 
 public abstract class ASTestBase extends TestCase
 {

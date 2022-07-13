@@ -5,8 +5,6 @@ import java.util.*;
 
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.exc.StreamReadException;
-import tools.jackson.jr.ob.JSON;
-import tools.jackson.jr.ob.ValueIterator;
 
 public class ReadSequencesTest extends TestBase
 {

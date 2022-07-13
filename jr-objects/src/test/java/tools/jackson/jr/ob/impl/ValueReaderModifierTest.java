@@ -3,11 +3,11 @@ package tools.jackson.jr.ob.impl;
 import java.util.Map;
 
 import tools.jackson.core.JsonParser;
+
 import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.TestBase;
 import tools.jackson.jr.ob.api.ReaderWriterModifier;
 import tools.jackson.jr.ob.api.ValueReader;
-import tools.jackson.jr.ob.impl.JSONReader;
 
 public class ValueReaderModifierTest extends TestBase
 {

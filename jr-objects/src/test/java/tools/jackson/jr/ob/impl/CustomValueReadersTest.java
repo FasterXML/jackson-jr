@@ -8,7 +8,6 @@ import tools.jackson.jr.ob.JSONObjectException;
 import tools.jackson.jr.ob.TestBase;
 import tools.jackson.jr.ob.api.ReaderWriterProvider;
 import tools.jackson.jr.ob.api.ValueReader;
-import tools.jackson.jr.ob.impl.JSONReader;
 
 public class CustomValueReadersTest extends TestBase
 {

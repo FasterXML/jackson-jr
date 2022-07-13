@@ -2,8 +2,6 @@ package tools.jackson.jr.ob;
 
 import java.io.*;
 
-import tools.jackson.jr.ob.JSON;
-
 public class RoundtripTest extends TestBase
 {
     public void testSimple() throws Exception

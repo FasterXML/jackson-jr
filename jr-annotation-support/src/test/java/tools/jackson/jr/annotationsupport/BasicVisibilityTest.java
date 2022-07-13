@@ -2,7 +2,6 @@ package tools.jackson.jr.annotationsupport;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-import tools.jackson.jr.annotationsupport.JacksonAnnotationExtension;
 import tools.jackson.jr.ob.JSON;
 
 public class BasicVisibilityTest extends ASTestBase

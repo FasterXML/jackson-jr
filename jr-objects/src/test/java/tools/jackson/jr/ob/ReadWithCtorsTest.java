@@ -1,7 +1,5 @@
 package tools.jackson.jr.ob;
 
-import tools.jackson.jr.ob.JSON;
-
 public class ReadWithCtorsTest extends TestBase
 {
     static class FromString {

@@ -3,7 +3,6 @@ package tools.jackson.jr.annotationsupport;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import tools.jackson.jr.annotationsupport.JacksonAnnotationExtension;
 import tools.jackson.jr.ob.JSON;
 
 public class BasicIgnoralTest extends ASTestBase

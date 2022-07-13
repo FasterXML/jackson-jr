@@ -1,8 +1,5 @@
 package tools.jackson.jr.ob;
 
-import tools.jackson.jr.ob.JSON;
-import tools.jackson.jr.ob.JSONObjectException;
-
 public class ReadFeaturesTest extends TestBase
 {
     static class IsBean {

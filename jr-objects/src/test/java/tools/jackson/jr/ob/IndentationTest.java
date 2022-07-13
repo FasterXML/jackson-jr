@@ -2,8 +2,6 @@ package tools.jackson.jr.ob;
 
 import java.util.*;
 
-import tools.jackson.jr.ob.JSON;
-
 public class IndentationTest extends TestBase
 {
     public void testSimpleList() throws Exception
