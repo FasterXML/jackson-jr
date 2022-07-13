@@ -1,9 +1,8 @@
-// Generated using Moditect maven plugin
-module com.fasterxml.jackson.jr.stree {
+module tools.jackson.jr.stree {
     requires transitive tools.jackson.core;
-    requires com.fasterxml.jackson.jr.ob;
-    requires com.fasterxml.jackson.jr.ob.api;
+    requires tools.jackson.jr.ob;
+    requires tools.jackson.jr.ob.api;
 
-    exports com.fasterxml.jackson.jr.stree;
-    exports com.fasterxml.jackson.jr.stree.util;
+    exports tools.jackson.jr.stree;
+    exports tools.jackson.jr.stree.util;
 }
