@@ -3,8 +3,8 @@ package com.fasterxml.jackson.jr.ob;
 import java.io.*;
 import java.util.*;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.exc.StreamReadException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.exc.StreamReadException;
 
 public class ReadSequencesTest extends TestBase
 {

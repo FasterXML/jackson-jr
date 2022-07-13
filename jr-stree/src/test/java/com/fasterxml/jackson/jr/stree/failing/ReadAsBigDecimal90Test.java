@@ -2,7 +2,7 @@ package com.fasterxml.jackson.jr.stree.failing;
 
 import java.math.BigDecimal;
 
-import com.fasterxml.jackson.core.TreeNode;
+import tools.jackson.core.TreeNode;
 
 import com.fasterxml.jackson.jr.ob.*;
 import com.fasterxml.jackson.jr.stree.*;

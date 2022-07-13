@@ -2,15 +2,15 @@ package com.fasterxml.jackson.jr.stree;
 
 import java.io.StringWriter;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.ObjectReadContext;
-import com.fasterxml.jackson.core.ObjectWriteContext;
-import com.fasterxml.jackson.core.TreeCodec;
-import com.fasterxml.jackson.core.TreeNode;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.ObjectReadContext;
+import tools.jackson.core.ObjectWriteContext;
+import tools.jackson.core.TreeCodec;
+import tools.jackson.core.TreeNode;
 
 /**
  * Tests for reading content directly using codec, and not
- * through <code>JSON</code>
+ * through {@code JSON}
  */
 public class ReadViaCodecTest extends JacksonJrTreeTestBase
 {

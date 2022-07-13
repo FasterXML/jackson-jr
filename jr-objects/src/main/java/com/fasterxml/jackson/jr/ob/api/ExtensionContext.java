@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.jr.ob.api;
 
-import com.fasterxml.jackson.core.TreeCodec;
+import tools.jackson.core.TreeCodec;
 
 /**
  * API that lets {@link com.fasterxml.jackson.jr.ob.JacksonJrExtension}s to register handlers

@@ -1,18 +1,18 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import static com.fasterxml.jackson.core.JsonTokenId.*;
-
 import java.util.*;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.JsonParser.NumberType;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.core.JsonParser.NumberType;
 
 import com.fasterxml.jackson.jr.ob.*;
 import com.fasterxml.jackson.jr.ob.api.CollectionBuilder;
 import com.fasterxml.jackson.jr.ob.api.MapBuilder;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
+
+import static tools.jackson.core.JsonTokenId.*;
 
 /**
  * {@link ValueReader} used for "untyped" values; ones that are bound

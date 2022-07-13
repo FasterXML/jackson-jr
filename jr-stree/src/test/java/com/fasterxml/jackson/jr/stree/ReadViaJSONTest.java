@@ -2,7 +2,7 @@ package com.fasterxml.jackson.jr.stree;
 
 import java.io.StringWriter;
 
-import com.fasterxml.jackson.core.*;
+import tools.jackson.core.*;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 

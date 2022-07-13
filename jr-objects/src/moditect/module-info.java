@@ -1,6 +1,6 @@
 // Generated 11-Mar-2019 using Moditect maven plugin
 module com.fasterxml.jackson.jr.ob {
-    requires transitive com.fasterxml.jackson.core;
+    requires transitive tools.jackson.core;
 
     exports com.fasterxml.jackson.jr.ob;
     exports com.fasterxml.jackson.jr.ob.api;

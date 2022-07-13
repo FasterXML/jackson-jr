@@ -8,8 +8,6 @@ import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
  * implementation ({@link JacksonJrsTreeCodec}).
  *
  * @see JacksonJrsTreeCodec
- *
- * @since 2.11
  */
 public class JrSimpleTreeExtension
     extends JacksonJrExtension

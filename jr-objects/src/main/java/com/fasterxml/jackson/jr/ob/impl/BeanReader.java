@@ -3,13 +3,9 @@ package com.fasterxml.jackson.jr.ob.impl;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.JsonTokenId;
-import com.fasterxml.jackson.core.TokenStreamFactory;
-import com.fasterxml.jackson.core.sym.PropertyNameMatcher;
-import com.fasterxml.jackson.core.util.Named;
+import tools.jackson.core.*;
+import tools.jackson.core.sym.PropertyNameMatcher;
+import tools.jackson.core.util.Named;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;

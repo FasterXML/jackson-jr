@@ -1,7 +1,7 @@
 package com.fasterxml.jackson.jr.ob.comp;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.SerializableString;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.SerializableString;
 
 public class ObjectComposer<PARENT extends ComposerBase>
     extends ComposerBase

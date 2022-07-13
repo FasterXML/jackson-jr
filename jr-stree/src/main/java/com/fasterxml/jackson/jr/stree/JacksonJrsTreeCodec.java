@@ -2,7 +2,7 @@ package com.fasterxml.jackson.jr.stree;
 
 import java.util.*;
 
-import com.fasterxml.jackson.core.*;
+import tools.jackson.core.*;
 
 /**
  * {@link TreeCodec} implementation that can build "simple", immutable

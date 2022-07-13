@@ -4,17 +4,17 @@ import java.io.*;
 import java.net.URL;
 import java.util.*;
 
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.core.io.CharacterEscapes;
-import com.fasterxml.jackson.core.io.SegmentedStringWriter;
-import com.fasterxml.jackson.core.json.JsonFactory;
-import com.fasterxml.jackson.core.tree.ArrayTreeNode;
-import com.fasterxml.jackson.core.tree.ObjectTreeNode;
-import com.fasterxml.jackson.core.type.ResolvedType;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.core.util.ByteArrayBuilder;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.core.util.Instantiatable;
+import tools.jackson.core.*;
+import tools.jackson.core.io.CharacterEscapes;
+import tools.jackson.core.io.SegmentedStringWriter;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.core.tree.ArrayTreeNode;
+import tools.jackson.core.tree.ObjectTreeNode;
+import tools.jackson.core.type.ResolvedType;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.core.util.ByteArrayBuilder;
+import tools.jackson.core.util.DefaultPrettyPrinter;
+import tools.jackson.core.util.Instantiatable;
 
 import com.fasterxml.jackson.jr.ob.api.*;
 import com.fasterxml.jackson.jr.ob.comp.CollectionComposer;

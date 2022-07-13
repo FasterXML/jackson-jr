@@ -3,8 +3,9 @@ package com.fasterxml.jackson.jr.ob.impl;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.io.SerializedString;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.io.SerializedString;
+
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 /**

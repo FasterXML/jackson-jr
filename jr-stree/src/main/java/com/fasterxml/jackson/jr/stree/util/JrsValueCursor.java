@@ -2,7 +2,8 @@ package com.fasterxml.jackson.jr.stree.util;
 
 import java.util.*;
 
-import com.fasterxml.jackson.core.*;
+import tools.jackson.core.*;
+
 import com.fasterxml.jackson.jr.stree.JrsArray;
 import com.fasterxml.jackson.jr.stree.JrsObject;
 import com.fasterxml.jackson.jr.stree.JrsValue;

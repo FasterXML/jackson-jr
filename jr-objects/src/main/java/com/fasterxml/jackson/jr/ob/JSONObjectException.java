@@ -3,9 +3,9 @@ package com.fasterxml.jackson.jr.ob;
 import java.io.Serializable;
 import java.util.*;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.core.JsonParser;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonLocation;
+import tools.jackson.core.JsonParser;
 
 /**
  * Standard exception exposed by this package; equivalent of

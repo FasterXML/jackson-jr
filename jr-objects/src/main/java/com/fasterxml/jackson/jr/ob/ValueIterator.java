@@ -3,7 +3,8 @@ package com.fasterxml.jackson.jr.ob;
 import java.io.Closeable;
 import java.util.*;
 
-import com.fasterxml.jackson.core.*;
+import tools.jackson.core.*;
+
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 
 /**

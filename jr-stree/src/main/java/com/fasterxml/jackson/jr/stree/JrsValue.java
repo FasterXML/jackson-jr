@@ -2,13 +2,13 @@ package com.fasterxml.jackson.jr.stree;
 
 import java.util.Iterator;
 
-import com.fasterxml.jackson.core.*;
+import tools.jackson.core.*;
 import com.fasterxml.jackson.jr.stree.util.JrsTreeTraversingParser;
 
 /**
  * Shared base class for all "simple" node types of Jackson Jr
  * "simple tree" package; implements {@link TreeNode} and is usable
- * via matching {@link com.fasterxml.jackson.core.TreeCodec}
+ * via matching {@link tools.jackson.core.TreeCodec}
  * implementation (see {@link JacksonJrsTreeCodec}).
  */
 public abstract class JrsValue implements TreeNode

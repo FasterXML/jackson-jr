@@ -7,7 +7,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
-import com.fasterxml.jackson.core.TreeNode;
+import tools.jackson.core.TreeNode;
+
 import com.fasterxml.jackson.jr.ob.JSON;
 
 import static com.fasterxml.jackson.jr.ob.impl.Types.isEnum;
@@ -67,7 +68,7 @@ public abstract class ValueLocatorBase
     public final static int SER_BOOLEAN_ARRAY = 8;
     
     /**
-     * An implementation of {@link com.fasterxml.jackson.core.TreeNode}
+     * An implementation of {@link tools.jackson.core.TreeNode}
      */
     public final static int SER_TREE_NODE = 9;
     

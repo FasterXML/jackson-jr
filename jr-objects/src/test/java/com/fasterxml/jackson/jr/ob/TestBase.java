@@ -2,8 +2,8 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.util.Arrays;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectReadContext;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.ObjectReadContext;
 
 import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;

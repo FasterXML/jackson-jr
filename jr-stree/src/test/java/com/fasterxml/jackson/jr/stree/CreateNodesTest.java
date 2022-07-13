@@ -1,7 +1,7 @@
 package com.fasterxml.jackson.jr.stree;
 
-import com.fasterxml.jackson.core.tree.ArrayTreeNode;
-import com.fasterxml.jackson.core.tree.ObjectTreeNode;
+import tools.jackson.core.tree.ArrayTreeNode;
+import tools.jackson.core.tree.ObjectTreeNode;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 

@@ -7,8 +7,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.TreeNode;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.TreeNode;
 
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
 

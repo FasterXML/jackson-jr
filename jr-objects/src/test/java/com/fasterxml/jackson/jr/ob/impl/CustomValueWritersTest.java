@@ -2,7 +2,8 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.util.Collections;
 
-import com.fasterxml.jackson.core.JsonGenerator;
+import tools.jackson.core.JsonGenerator;
+
 import com.fasterxml.jackson.jr.ob.*;
 import com.fasterxml.jackson.jr.ob.api.*;
 

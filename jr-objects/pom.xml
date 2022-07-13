@@ -15,7 +15,7 @@
   <description>Simple data-binding that builds directly on jackson-core (streaming),
 has no other dependencies, and provides additional builder-style content generator
 </description>
-  <url>http://wiki.fasterxml.com/JacksonHome</url>
+  <url>https://github.com/FasterXML/jackson-jr</url>
   <properties>
     <!-- 01-Dec-2015, tatu: OSGi imports, exports should be fine with defaults from parent -->
     <packageVersion.dir>com/fasterxml/jackson/jr/ob</packageVersion.dir>
@@ -26,7 +26,7 @@ has no other dependencies, and provides additional builder-style content generat
 
   <dependencies>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
+      <groupId>tools.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
     </dependency>
   </dependencies>

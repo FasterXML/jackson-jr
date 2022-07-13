@@ -1,9 +1,9 @@
 package com.fasterxml.jackson.jr.stree;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.core.JsonToken;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.JsonPointer;
+import tools.jackson.core.JsonToken;
 
 /**
  * Virtual node used instead of `null`, when an operation does not match an

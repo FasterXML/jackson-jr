@@ -2,8 +2,9 @@ package com.fasterxml.jackson.jr.stree;
 
 import java.util.Arrays;
 
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.core.json.JsonFactory;
+import tools.jackson.core.*;
+import tools.jackson.core.json.JsonFactory;
+
 import com.fasterxml.jackson.jr.ob.JSON;
 
 import junit.framework.TestCase;

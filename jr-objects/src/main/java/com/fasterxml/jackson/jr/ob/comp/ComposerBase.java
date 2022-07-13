@@ -3,7 +3,7 @@ package com.fasterxml.jackson.jr.ob.comp;
 import java.io.Flushable;
 import java.util.Collection;
 
-import com.fasterxml.jackson.core.JsonGenerator;
+import tools.jackson.core.JsonGenerator;
 
 /**
  * Base class for all composer implementations.

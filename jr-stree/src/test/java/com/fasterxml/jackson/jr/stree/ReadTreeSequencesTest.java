@@ -2,8 +2,8 @@ package com.fasterxml.jackson.jr.stree;
 
 import java.io.StringReader;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonParser.NumberType;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonParser.NumberType;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.ValueIterator;

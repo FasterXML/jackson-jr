@@ -3,10 +3,10 @@ package com.fasterxml.jackson.jr.stree;
 import java.io.StringWriter;
 import java.util.*;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.ObjectWriteContext;
-import com.fasterxml.jackson.core.TreeCodec;
-import com.fasterxml.jackson.core.TreeNode;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.ObjectWriteContext;
+import tools.jackson.core.TreeCodec;
+import tools.jackson.core.TreeNode;
 
 public class WriteViaCodecTest extends JacksonJrTreeTestBase
 {

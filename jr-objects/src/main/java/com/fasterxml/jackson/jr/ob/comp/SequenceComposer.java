@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.jr.ob.comp;
 
-import com.fasterxml.jackson.core.JsonGenerator;
+import tools.jackson.core.JsonGenerator;
 
 public abstract class SequenceComposer<THIS extends SequenceComposer<THIS>>
     extends ComposerBase

@@ -1,8 +1,8 @@
 package com.fasterxml.jackson.jr.stree;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonToken;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.JsonToken;
 
 public class JrsBoolean extends JrsValue.Scalar
 {

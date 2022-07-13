@@ -13,8 +13,6 @@ import com.fasterxml.jackson.jr.ob.api.ValueWriter;
  * and writers ({@link ValueWriter}) (via {@link ReaderWriterProvider}), and
  * modifers ({@link ReaderWriterModifier}) that allow customizing aspects of
  * JSON reading and writing.
- *
- * @since 2.11
  */
 public abstract class JacksonJrExtension
 {

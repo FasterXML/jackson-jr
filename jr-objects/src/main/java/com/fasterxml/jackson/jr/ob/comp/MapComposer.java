@@ -2,7 +2,7 @@ package com.fasterxml.jackson.jr.ob.comp;
 
 import java.util.*;
 
-import com.fasterxml.jackson.core.SerializableString;
+import tools.jackson.core.SerializableString;
 
 public class MapComposer<PARENT extends ComposerBase>
     extends ComposerBase

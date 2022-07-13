@@ -2,7 +2,7 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.util.*;
 
-import com.fasterxml.jackson.core.JsonParser;
+import tools.jackson.core.JsonParser;
 
 public class ReadBeansTest extends TestBase
 {

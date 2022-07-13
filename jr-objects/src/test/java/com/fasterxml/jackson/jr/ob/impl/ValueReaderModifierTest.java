@@ -2,7 +2,7 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonParser;
+import tools.jackson.core.JsonParser;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.TestBase;
