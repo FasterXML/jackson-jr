@@ -1,9 +1,8 @@
 package tools.jackson.jr.ob.api;
 
-import com.fasterxml.jackson.jr.type.ResolvedType;
-
 import tools.jackson.jr.ob.impl.JSONReader;
 import tools.jackson.jr.ob.impl.JSONWriter;
+import tools.jackson.jr.type.ResolvedType;
 
 /**
  * API to implement to provide custom {@link ValueReader}s and

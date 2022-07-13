@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.jr.stree;
+package tools.jackson.jr.stree;
 
 import java.io.StringWriter;
 import java.util.*;
@@ -7,13 +7,6 @@ import tools.jackson.core.JsonGenerator;
 import tools.jackson.core.ObjectWriteContext;
 import tools.jackson.core.TreeCodec;
 import tools.jackson.core.TreeNode;
-import tools.jackson.jr.stree.JacksonJrsTreeCodec;
-import tools.jackson.jr.stree.JrsArray;
-import tools.jackson.jr.stree.JrsBoolean;
-import tools.jackson.jr.stree.JrsNumber;
-import tools.jackson.jr.stree.JrsObject;
-import tools.jackson.jr.stree.JrsString;
-import tools.jackson.jr.stree.JrsValue;
 
 public class WriteViaCodecTest extends JacksonJrTreeTestBase
 {

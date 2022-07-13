@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.jr.stree;
+package tools.jackson.jr.stree;
 
 import tools.jackson.core.TreeNode;
 import tools.jackson.jr.ob.JSON;

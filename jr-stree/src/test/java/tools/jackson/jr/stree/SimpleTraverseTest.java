@@ -1,7 +1,6 @@
-package com.fasterxml.jackson.jr.stree;
+package tools.jackson.jr.stree;
 
 import tools.jackson.core.*;
-import tools.jackson.jr.stree.JacksonJrsTreeCodec;
 
 public class SimpleTraverseTest extends JacksonJrTreeTestBase
 {

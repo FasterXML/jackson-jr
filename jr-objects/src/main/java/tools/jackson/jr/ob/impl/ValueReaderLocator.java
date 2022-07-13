@@ -9,10 +9,9 @@ import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.api.ReaderWriterModifier;
 import tools.jackson.jr.ob.api.ReaderWriterProvider;
 import tools.jackson.jr.ob.api.ValueReader;
-
-import com.fasterxml.jackson.jr.type.ResolvedType;
-import com.fasterxml.jackson.jr.type.TypeBindings;
-import com.fasterxml.jackson.jr.type.TypeResolver;
+import tools.jackson.jr.type.ResolvedType;
+import tools.jackson.jr.type.TypeBindings;
+import tools.jackson.jr.type.TypeResolver;
 
 /**
  * Helper object used for efficient detection of type information relevant

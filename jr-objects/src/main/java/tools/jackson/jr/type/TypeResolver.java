@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.jr.type;
+package tools.jackson.jr.type;
 
 import java.io.Serializable;
 import java.lang.reflect.*;
