@@ -4,9 +4,8 @@ import java.util.Arrays;
 
 import tools.jackson.core.*;
 import tools.jackson.core.json.JsonFactory;
-
-import com.fasterxml.jackson.jr.ob.JSON;
-
+import tools.jackson.jr.ob.JSON;
+import tools.jackson.jr.stree.JrSimpleTreeExtension;
 import junit.framework.TestCase;
 
 public abstract class JacksonJrTreeTestBase extends TestCase

@@ -6,7 +6,7 @@
   <!-- do_not_remove: published-with-gradle-metadata -->
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.fasterxml.jackson.jr</groupId>
+    <groupId>tools.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
     <version>3.0.0-SNAPSHOT</version>
   </parent>
@@ -18,7 +18,7 @@ has no other dependencies, and provides additional builder-style content generat
   <url>https://github.com/FasterXML/jackson-jr</url>
   <properties>
     <!-- 01-Dec-2015, tatu: OSGi imports, exports should be fine with defaults from parent -->
-    <packageVersion.dir>com/fasterxml/jackson/jr/ob</packageVersion.dir>
+    <packageVersion.dir>tools/jackson/jr/ob</packageVersion.dir>
     <packageVersion.package>${project.groupId}.ob</packageVersion.package>
     <packageVersion.template.input>${basedir}/src/main/java/${packageVersion.dir}/PackageVersion.java.in</packageVersion.template.input>
     <packageVersion.template.output>${generatedSourcesDir}/${packageVersion.dir}/PackageVersion.java</packageVersion.template.output>

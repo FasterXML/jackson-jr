@@ -2,8 +2,7 @@ package com.fasterxml.jackson.jr.stree;
 
 import tools.jackson.core.tree.ArrayTreeNode;
 import tools.jackson.core.tree.ObjectTreeNode;
-
-import com.fasterxml.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.JSON;
 
 /**
  * Trivial tests for wiring; not particularly useful as STree instances are immutable

@@ -6,7 +6,7 @@
   <!-- do_not_remove: published-with-gradle-metadata -->
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.fasterxml.jackson.jr</groupId>
+    <groupId>tools.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
     <version>3.0.0-SNAPSHOT</version>
   </parent>
@@ -22,7 +22,7 @@
       -->
     <osgi.export>${project.groupId}.annotationsupport;version=${project.version}</osgi.export>
 
-    <packageVersion.dir>com/fasterxml/jackson/jr/annotationsupport</packageVersion.dir>
+    <packageVersion.dir>tools/jackson/jr/annotationsupport</packageVersion.dir>
     <packageVersion.package>${project.groupId}.annotationsupport</packageVersion.package>
   </properties>
 
@@ -37,7 +37,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.fasterxml.jackson.jr</groupId>
+      <groupId>tools.jackson.jr</groupId>
       <artifactId>jackson-jr-objects</artifactId>
       <version>${project.version}</version>
     </dependency>

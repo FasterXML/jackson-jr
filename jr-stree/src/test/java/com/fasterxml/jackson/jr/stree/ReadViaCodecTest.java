@@ -7,6 +7,12 @@ import tools.jackson.core.ObjectReadContext;
 import tools.jackson.core.ObjectWriteContext;
 import tools.jackson.core.TreeCodec;
 import tools.jackson.core.TreeNode;
+import tools.jackson.jr.stree.JacksonJrsTreeCodec;
+import tools.jackson.jr.stree.JrsArray;
+import tools.jackson.jr.stree.JrsBoolean;
+import tools.jackson.jr.stree.JrsNumber;
+import tools.jackson.jr.stree.JrsObject;
+import tools.jackson.jr.stree.JrsValue;
 
 /**
  * Tests for reading content directly using codec, and not

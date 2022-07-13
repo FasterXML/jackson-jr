@@ -1,8 +1,9 @@
 package com.fasterxml.jackson.jr.stree.failing;
 
-import com.fasterxml.jackson.jr.ob.JSON;
-import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.stree.JacksonJrTreeTestBase;
+
+import tools.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.JSONObjectException;
 
 /**
  * Tests for reading content using {@link JSON} with proper

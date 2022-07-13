@@ -3,8 +3,10 @@ package com.fasterxml.jackson.jr.stree;
 import java.io.StringWriter;
 
 import tools.jackson.core.*;
-
-import com.fasterxml.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.JSON;
+import tools.jackson.jr.stree.JacksonJrsTreeCodec;
+import tools.jackson.jr.stree.JrsArray;
+import tools.jackson.jr.stree.JrsObject;
 
 /**
  * Tests for reading content using {@link JSON} with proper

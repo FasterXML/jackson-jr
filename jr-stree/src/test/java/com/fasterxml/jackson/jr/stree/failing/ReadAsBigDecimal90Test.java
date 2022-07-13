@@ -3,9 +3,10 @@ package com.fasterxml.jackson.jr.stree.failing;
 import java.math.BigDecimal;
 
 import tools.jackson.core.TreeNode;
+import tools.jackson.jr.ob.*;
+import tools.jackson.jr.stree.*;
 
-import com.fasterxml.jackson.jr.ob.*;
-import com.fasterxml.jackson.jr.stree.*;
+import com.fasterxml.jackson.jr.stree.JacksonJrTreeTestBase;
 
 public class ReadAsBigDecimal90Test extends JacksonJrTreeTestBase
 {

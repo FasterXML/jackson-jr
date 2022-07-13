@@ -6,7 +6,7 @@
   <!-- do_not_remove: published-with-gradle-metadata -->
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.fasterxml.jackson.jr</groupId>
+    <groupId>tools.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
     <version>3.0.0-SNAPSHOT</version>
   </parent>
@@ -22,7 +22,7 @@ has no other dependencies.
       -->
     <osgi.export>${project.groupId}.stree.*;version=${project.version}</osgi.export>
 
-    <packageVersion.dir>com/fasterxml/jackson/jr/stree</packageVersion.dir>
+    <packageVersion.dir>tools/jackson/jr/stree</packageVersion.dir>
     <packageVersion.package>${project.groupId}.stree</packageVersion.package>
   </properties>
 
@@ -32,7 +32,7 @@ has no other dependencies.
       <artifactId>jackson-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.jr</groupId>
+      <groupId>tools.jackson.jr</groupId>
       <artifactId>jackson-jr-objects</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>

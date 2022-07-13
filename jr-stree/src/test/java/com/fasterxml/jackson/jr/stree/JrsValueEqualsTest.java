@@ -1,8 +1,7 @@
 package com.fasterxml.jackson.jr.stree;
 
 import tools.jackson.core.TreeNode;
-
-import com.fasterxml.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.JSON;
 
 public class JrsValueEqualsTest extends JacksonJrTreeTestBase
 {

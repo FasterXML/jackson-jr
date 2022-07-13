@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.fasterxml.jackson.jr</groupId>
+    <groupId>tools.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
     <version>3.0.0-SNAPSHOT</version>
   </parent>
@@ -20,12 +20,12 @@ Streaming, in a single jar.
   <dependencies>
     <!-- Cross-module deps -->
     <dependency>
-        <groupId>com.fasterxml.jackson.jr</groupId>
+        <groupId>tools.jackson.jr</groupId>
         <artifactId>jackson-jr-objects</artifactId>
         <version>${project.version}</version>
     </dependency>
     <dependency>
-        <groupId>com.fasterxml.jackson.jr</groupId>
+        <groupId>tools.jackson.jr</groupId>
         <artifactId>jackson-jr-stree</artifactId>
         <version>${project.version}</version>
     </dependency>
@@ -63,8 +63,8 @@ Streaming, in a single jar.
           -->
         <relocations>
           <relocation>
-            <pattern>com.fasterxml.jackson.core</pattern>
-            <shadedPattern>com.fasterxml.jackson.jr.private_</shadedPattern>
+            <pattern>tools.jackson.core</pattern>
+            <shadedPattern>tools.jackson.jr.private_</shadedPattern>
           </relocation>
         </relocations>
       </configuration>
@@ -94,9 +94,9 @@ Streaming, in a single jar.
             <configuration> 
               <includeDependencySources>true</includeDependencySources> 
               <dependencySourceIncludes> 
-		<dependencySourceInclude>com.fasterxml.jackson.jr:*</dependencySourceInclude> 
+		<dependencySourceInclude>tools.jackson.jr:*</dependencySourceInclude> 
               </dependencySourceIncludes> 
-              <excludePackageNames>com.fasterxml.jackson.jr.private_.*</excludePackageNames> 
+              <excludePackageNames>tools.jackson.jr.private_.*</excludePackageNames> 
             </configuration> 
 	  </execution> 
 	</executions> 

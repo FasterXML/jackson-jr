@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.*;
 import java.util.*;
 
-import com.fasterxml.jackson.jr.ob.impl.ClassKey;
+import tools.jackson.jr.ob.impl.ClassKey;
 
 /**
  * Object that is used for resolving generic type information of a class

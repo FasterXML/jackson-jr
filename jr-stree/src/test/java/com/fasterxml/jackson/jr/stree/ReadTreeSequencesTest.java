@@ -4,9 +4,9 @@ import java.io.StringReader;
 
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.JsonParser.NumberType;
-
-import com.fasterxml.jackson.jr.ob.JSON;
-import com.fasterxml.jackson.jr.ob.ValueIterator;
+import tools.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.ValueIterator;
+import tools.jackson.jr.stree.JrsValue;
 
 public class ReadTreeSequencesTest extends JacksonJrTreeTestBase
 {
