@@ -12,7 +12,14 @@
   <description>"Uber" jar that contains all Jackson jr components as well as underlying Jackson core
 Streaming, in a single jar.
 </description>
-  <url>http://wiki.fasterxml.com/JacksonHome</url>
+  <url>https://wiki.fasterxml.com/JacksonHome</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
   <properties>
   </properties>
