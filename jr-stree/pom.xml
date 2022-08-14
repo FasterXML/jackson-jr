@@ -16,6 +16,14 @@
 has no other dependencies.
 </description>
   <url>https://github.com/FasterXML/jackson-jr</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
   <properties>
     <!-- Looks like we need to be bit careful on OSGi exports, to avoid
         accidentally double-exporting jr-objects types

@@ -23,12 +23,12 @@ Main Jackson-jr artifact (`jackson-jr-objects`) itself is currently about 120 kB
 [Jackson Streaming API](../../../jackson-core) package.
 Combined size, for "all" jar, is bit over 500 kB (of which streaming API is about 350 kB),
 for use cases where a single jar is preferred over more modular approach.
-Finally, use of jar minimizers like [ProGuard](http://proguard.sourceforge.net/) can bring the jar
+Finally, use of jar minimizers like [ProGuard](https://proguard.sourceforge.net/) can bring the jar
 size down even further, by renaming and removing debug information.
 
 ## License
 
-Good old [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+Good old [Apache License](https://www.apache.org/licenses/LICENSE-2.0).
 
 ## Packaging
 
@@ -37,7 +37,7 @@ Project is composed of multiple Maven sub-modules, each corresponding to a jar:
 * [jr-objects](../../tree/master/jr-objects) contains the "core" databinding implementation, and is commonly the only dependency to use
     * Depends on `jackson-core` for low-level reading/writing
 * [jr-stree](../../tree/master/jr-stree) contains a simple `TreeCodec` implementation, with which it is possible to read JSON as `TreeNode`s (see more below)
-* [jr-retrofit2](../../tree/master/jr-retrofit2) contains `jackson-jr` - based handlers for [Retrofit 2](http://square.github.io/retrofit/) library
+* [jr-retrofit2](../../tree/master/jr-retrofit2) contains `jackson-jr` - based handlers for [Retrofit 2](https://square.github.io/retrofit/) library
     * Depends on `jackson-jr` and `Retrofit` API jars, and indirectly on `jackson-core`
 * [jr-annotation-support](../../tree/master/jr-annotation-support) contains extension with support for a subset of core [Jackson annotations](../../../jackson-annotations)
 * jr-all creates an "uber-jar" that contains individual modules along with all their dependencies:
@@ -52,7 +52,7 @@ If you are not sure which package to use, the answer is usually `jr-objects`, an
 
 [![Build Status](https://travis-ci.org/FasterXML/jackson-jr.svg)](https://travis-ci.org/FasterXML/jackson-jr)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.fasterxml.jackson.jr/jackson-jr-objects/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.fasterxml.jackson.jr/jackson-jr-objects/)
-[![Javadoc](https://javadoc.io/badge/com.fasterxml.jackson.jr/jackson-jr-objects.svg)](http://www.javadoc.io/doc/com.fasterxml.jackson.jr/jackson-jr-objects)
+[![Javadoc](https://javadoc.io/badge/com.fasterxml.jackson.jr/jackson-jr-objects.svg)](https://www.javadoc.io/doc/com.fasterxml.jackson.jr/jackson-jr-objects)
 
 ## Usage
 
@@ -244,14 +244,14 @@ You can use Maven dependency like:
 </dependency>
 ```
 
-and then you can also download jars via [Central Maven repository](http://repo1.maven.org/maven2/com/fasterxml/jackson/jr/jackson-jr-objects/).
+and then you can also download jars via [Central Maven repository](https://repo1.maven.org/maven2/com/fasterxml/jackson/jr/jackson-jr-objects/).
 
 Or you can also clone the project and build it locally with `mvn clean install`.
 
 Alternatively if you want a single jar deployment, you can use `jackson-jr-all` jar which embeds `jackson-core`
 (repackaged using Shade plug-in, so as not to conflict with "vanilla" `jackson-core`):
 
-    http://repo1.maven.org/maven2/com/fasterxml/jackson/jr/jackson-jr-all/
+    https://repo1.maven.org/maven2/com/fasterxml/jackson/jr/jackson-jr-all/
 
 ## Performance
 
