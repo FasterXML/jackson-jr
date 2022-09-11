@@ -17,6 +17,12 @@ Modules:
  (contributed by Ashley F)
 #95: Increase minimum Java baseline from 6 to 8 for version 2.14
 
+Not yet released:
+
+#98: `module-info.java` of `jr-stree` refers to module `com.fasterxml.jackson.jr.ob.api`,
+  which is not defined
+ (reported by Gerben O)
+
 2.13.4 (03-Sep-2022)
 2.13.3 (14-May-2022)
 2.13.2 (06-Mar-2022)
