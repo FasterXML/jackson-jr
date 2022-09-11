@@ -22,3 +22,9 @@ Jonas Konrad (yawkat@github)
 
 * Suggested #88: Make `jr-stree` dependency to `jr-objects` optional
  (2.13.0)
+
+Gerben Oolbekkink (qurben@github)
+
+* Reported #98: `module-info.java` of `jr-stree` refers to module `com.fasterxml.jackson.jr.ob.api`,
+  which is not defined
+ (2.13.5)
