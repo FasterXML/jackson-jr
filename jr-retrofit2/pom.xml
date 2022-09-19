@@ -31,6 +31,9 @@ ${project.groupId}.retrofit2;version=${project.version}
 
     <!-- No PackageVersion defined or needed, since N/A for this package
       -->
+
+    <!-- for Reproducible Builds -->
+    <project.build.outputTimestamp>2022-09-18T00:00:00Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>

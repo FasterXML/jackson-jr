@@ -32,6 +32,9 @@ has no other dependencies.
 
     <packageVersion.dir>com/fasterxml/jackson/jr/stree</packageVersion.dir>
     <packageVersion.package>${project.groupId}.stree</packageVersion.package>
+
+    <!-- for Reproducible Builds -->
+    <project.build.outputTimestamp>2022-09-18T00:00:00Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
