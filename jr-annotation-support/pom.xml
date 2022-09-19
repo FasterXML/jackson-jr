@@ -24,6 +24,9 @@
 
     <packageVersion.dir>tools/jackson/jr/annotationsupport</packageVersion.dir>
     <packageVersion.package>${project.groupId}.annotationsupport</packageVersion.package>
+
+    <!-- for Reproducible Builds -->
+    <project.build.outputTimestamp>2022-09-18T00:00:00Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>

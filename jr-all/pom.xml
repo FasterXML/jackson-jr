@@ -15,6 +15,8 @@ Streaming, in a single jar.
   <url>https://github.com/FasterXML/jackson-jr</url>
 
   <properties>
+    <!-- for Reproducible Builds -->
+    <project.build.outputTimestamp>2022-09-18T00:00:00Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>

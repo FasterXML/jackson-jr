@@ -22,6 +22,9 @@ has no other dependencies, and provides additional builder-style content generat
     <packageVersion.package>${project.groupId}.ob</packageVersion.package>
     <packageVersion.template.input>${basedir}/src/main/java/${packageVersion.dir}/PackageVersion.java.in</packageVersion.template.input>
     <packageVersion.template.output>${generatedSourcesDir}/${packageVersion.dir}/PackageVersion.java</packageVersion.template.output>
+
+    <!-- for Reproducible Builds -->
+    <project.build.outputTimestamp>2022-09-18T00:00:00Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
