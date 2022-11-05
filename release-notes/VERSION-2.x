@@ -11,16 +11,11 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
-2.14.0-rc3 (28-Oct-2022)
-2.14.0-rc2 (10-Oct-2022)
-2.14.0-rc1 (25-Sep-2022)
+2.14.0 (05-Nov-2022)
 
 #91: Annotation support should allow `@JsonValue`/`JsonCreator` on `enum`
  (contributed by Ashley F)
 #95: Increase minimum Java baseline from 6 to 8 for version 2.14
-
-Not yet released:
-
 #98: `module-info.java` of `jr-stree` refers to module `com.fasterxml.jackson.jr.ob.api`,
   which is not defined
  (reported by Gerben O)
