@@ -11,6 +11,14 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
+2.15.0 (not yet released)
+
+No changes since 2.14
+
+2.14.1 (21-Nov-2022)
+
+No changes since 2.14.0
+
 2.14.0 (05-Nov-2022)
 
 #91: Annotation support should allow `@JsonValue`/`JsonCreator` on `enum`
