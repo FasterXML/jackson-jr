@@ -8,7 +8,7 @@
   <groupId>com.fasterxml.jackson.jr</groupId>
   <artifactId>jackson-jr-parent</artifactId>
   <name>Parent pom for Jackson jr components</name>
-  <version>2.14.2</version>
+  <version>2.14.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>Parent pom for Jackson jr components
   </description>
@@ -33,7 +33,7 @@
     <connection>scm:git:git@github.com:FasterXML/jackson-jr.git</connection>
     <developerConnection>scm:git:git@github.com:FasterXML/jackson-jr.git</developerConnection>
     <url>https://github.com/FasterXML/jackson-jr</url>
-    <tag>jackson-jr-parent-2.14.2</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
@@ -47,7 +47,7 @@
     <javac.debuglevel>source</javac.debuglevel>
 
     <!-- for Reproducible Builds -->
-    <project.build.outputTimestamp>2023-01-29T00:59:05Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2023-01-29T00:59:37Z</project.build.outputTimestamp>
   </properties>
 
   <!-- Alas, need to include snapshot reference since otherwise can not find
