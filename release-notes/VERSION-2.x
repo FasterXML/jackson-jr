@@ -15,6 +15,11 @@ Modules:
 
 No changes since 2.14
 
+2.14.3 (not yet released)
+
+#102: Missing module-info dependency from `jackson-jr-annotation-support`
+
+2.14.2 (28-Jan-2023)
 2.14.1 (21-Nov-2022)
 
 No changes since 2.14.0

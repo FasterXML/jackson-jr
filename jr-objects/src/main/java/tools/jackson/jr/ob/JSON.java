@@ -900,10 +900,6 @@ public class JSON
         return _treeCodec;
     }
 
-    public TokenStreamFactory streamingFactory() {
-        return _streamFactory;
-    }
-
     public final boolean isEnabled(Feature f) {
         return (f.mask() & _features) != 0;
     }
@@ -1298,10 +1294,15 @@ public class JSON
     }
 
     @Override
-    public TokenStreamFactory getParserFactory() {
+    public TokenStreamFactory tokenStreamFactory() {
         return _streamFactory;
     }
-    
+
+    @Override
+    public StreamReadConstraints streamReadConstraints() {
+        return _streamFactory.streamReadConstraints();
+    }
+
     /*
     /**********************************************************************
     /* ObjectReadContext: TreeNode construction
@@ -1389,11 +1390,6 @@ public class JSON
     @Override
     public int getFormatWriteFeatures(int defaults) {
         return defaults;
-    }
-
-    @Override
-    public TokenStreamFactory getGeneratorFactory() {
-        return _streamFactory;
     }
 
     /*

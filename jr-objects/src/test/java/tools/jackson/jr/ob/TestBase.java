@@ -49,7 +49,7 @@ public abstract class TestBase extends TestCase
     }
 
     protected JsonParser parserFor(JSON json, String source) {
-        return json.streamingFactory().createParser(ObjectReadContext.empty(), source.toCharArray());
+        return json.tokenStreamFactory().createParser(ObjectReadContext.empty(), source.toCharArray());
     }
 
     protected String quote(String str) {
