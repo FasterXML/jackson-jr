@@ -1,4 +1,5 @@
 module com.fasterxml.jackson.jr.annotationsupport {
+    requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.core;
 
     requires com.fasterxml.jackson.jr.ob;
