@@ -11,6 +11,10 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
+Unreleased
+
+#103: Some artifacts missing `NOTICE`, `LICENSE` files
+
 2.13.5 (23-Jan-2023)
 
 #98: `module-info.java` of `jr-stree` refers to module `com.fasterxml.jackson.jr.ob.api`,
