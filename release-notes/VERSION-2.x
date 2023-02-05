@@ -11,6 +11,10 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
+Not yet released
+
+* 103: Some artifacts missing `NOTICE`, `LICENSE` files
+
 2.12.7 (26-May-2022)
 
 No changes since 2.12.6
