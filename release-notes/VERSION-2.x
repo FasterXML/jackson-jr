@@ -15,7 +15,7 @@ Modules:
 
 No changes since 2.14
 
-2.14.3 (not yet released)
+2.14.3 (05-May-2023)
 
 #102: Missing module-info dependency from `jackson-jr-annotation-support`
 #103: Some artifacts missing `NOTICE`, `LICENSE` files
