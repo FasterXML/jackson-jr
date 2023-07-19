@@ -1466,7 +1466,6 @@ public class JSON
         try (JsonGenerator g = g0) {
             _config(g);
             _writerForOperation(g).writeValue(value);
-            g.close();
         }
     }
 
