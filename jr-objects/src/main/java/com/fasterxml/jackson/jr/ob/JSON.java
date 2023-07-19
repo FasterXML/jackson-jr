@@ -1538,20 +1538,15 @@ public class JSON implements Versioned
     /**********************************************************************
      */
 
-    protected final void _writeAndClose(Object value, JsonGenerator g)
+    protected final void _writeAndClose(Object value, JsonGenerator g0)
         throws IOException
     {
-        boolean closed = false;
-        try {
+        // Changed in 2.16 to use auto-close
+        try (JsonGenerator g = g0) {
             _config(g);
             _writerForOperation(g).writeValue(value);
-            closed = true;
-            g.close();
-        } finally {
-            if (!closed) {
-                _close(g);
-            }
         }
+
     }
 
     protected JSONWriter _writerForOperation(JsonGenerator gen) {
