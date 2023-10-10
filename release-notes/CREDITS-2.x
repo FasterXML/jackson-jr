@@ -6,7 +6,7 @@ Tatu Saloranta, tatu.saloranta@iki.fi: author
 
 Contributors:
 
-Michael Dombrowski (MikeDombo@github)
+Michael Dombrowski (@MikeDombo)
 
 * Contributed #80: Case-insensitive property, enum deserialization
   should be supported
@@ -18,13 +18,18 @@ Michael Dombrowski (MikeDombo@github)
 * Contributed #84: Public static fields are included in serialized output
  (2.13.0)
 
-Jonas Konrad (yawkat@github)
+Jonas Konrad (@yawkat)
 
 * Suggested #88: Make `jr-stree` dependency to `jr-objects` optional
  (2.13.0)
 
-Gerben Oolbekkink (qurben@github)
+Gerben Oolbekkink (@github)
 
 * Reported #98: `module-info.java` of `jr-stree` refers to module `com.fasterxml.jackson.jr.ob.api`,
   which is not defined
  (2.13.5)
+
+Reed Passaretti (@reed53)
+
+* Reported #107: Cannot deserialize `byte[]` from JSON `null` value
+ (2.15.3)
