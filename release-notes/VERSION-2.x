@@ -11,6 +11,11 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
+2.15.3 (not yet released)
+
+#107: Cannot deserialize `byte[]` from JSON `null` value
+ (reported by Reed P)
+
 2.15.2 (30-May-2023)
 2.15.1 (16-May-2023)
 2.15.0 (23-Apr-2023)

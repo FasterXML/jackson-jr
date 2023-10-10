@@ -239,9 +239,13 @@ public class SimpleValueReader extends ValueReader
      */
 
     protected byte[] _readBinary(JsonParser p) throws IOException {
+        // [jackson-jr#107]: should allow null
+        if (p.hasToken(JsonToken.VALUE_NULL)) {
+            return null;
+        }
         return p.getBinaryValue();
     }
-    
+
     protected int[] _readIntArray(JsonParser p) throws IOException
     {
         // !!! TODO
