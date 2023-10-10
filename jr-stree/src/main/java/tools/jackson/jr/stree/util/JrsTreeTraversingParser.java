@@ -1,5 +1,6 @@
 package tools.jackson.jr.stree.util;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -71,7 +72,7 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
 
     public JrsTreeTraversingParser(ObjectReadContext readCtxt, JrsValue n)
     {
-        super(readCtxt, 0);
+        super(readCtxt);
         _source = n;
         if (n.isArray()) {
             _nextToken = JsonToken.START_ARRAY;
@@ -121,6 +122,12 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
             _currToken = null;
         }
     }
+
+    @Override
+    protected void _closeInput() { }
+
+    @Override
+    protected void _releaseBuffers() { }
 
     /*
     /**********************************************************************

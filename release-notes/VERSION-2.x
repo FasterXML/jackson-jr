@@ -16,6 +16,11 @@ Modules:
 * Upgrade `retrofit` dependency to 2.9.0 (from 2.7.2)
 * Upgrade `okhttp` dependency (of retrofit) to 4.11.0 (from 3.14.9)
 
+2.15.3 (not yet released)
+
+#107: Cannot deserialize `byte[]` from JSON `null` value
+ (reported by Reed P)
+
 2.15.2 (30-May-2023)
 2.15.1 (16-May-2023)
 2.15.0 (23-Apr-2023)
@@ -26,6 +31,7 @@ No changes since 2.14
 
 #102: Missing module-info dependency from `jackson-jr-annotation-support`
 #103: Some artifacts missing `NOTICE`, `LICENSE` files
+- Java/JDK baseline raised to Java 8
 
 2.14.2 (28-Jan-2023)
 2.14.1 (21-Nov-2022)
