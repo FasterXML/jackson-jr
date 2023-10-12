@@ -16,7 +16,7 @@ Modules:
 * Upgrade `retrofit` dependency to 2.9.0 (from 2.7.2)
 * Upgrade `okhttp` dependency (of retrofit) to 4.11.0 (from 3.14.9)
 
-2.15.3 (not yet released)
+2.15.3 (12-Oct-2023)
 
 #107: Cannot deserialize `byte[]` from JSON `null` value
  (reported by Reed P)
