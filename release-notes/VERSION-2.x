@@ -11,7 +11,11 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
-2.16.0-rc1 (20-Oct-2023)
+2.17.0 (not yet released)
+
+-
+
+2.16.0 (15-Nov-2023)
 
 * Upgrade `retrofit` dependency to 2.9.0 (from 2.7.2)
 * Upgrade `okhttp` dependency (of retrofit) to 4.11.0 (from 3.14.9)
