@@ -15,6 +15,10 @@ Modules:
 
 -
 
+2.16.1 (24-Dec-2023)
+
+No changes since 2.16.0
+
 2.16.0 (15-Nov-2023)
 
 * Upgrade `retrofit` dependency to 2.9.0 (from 2.7.2)
