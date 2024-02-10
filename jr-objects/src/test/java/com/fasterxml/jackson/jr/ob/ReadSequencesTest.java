@@ -26,7 +26,7 @@ public class ReadSequencesTest extends TestBase
         // First, managed
         ValueIterator<Object> it = JSON.std.anySequenceFrom(INPUT);
         assertNotNull(it.getParser());
-        assertNotNull(it.getCurrentLocation());
+        assertNotNull(it.currentLocation());
 
         _verifyAnySequence(it);
         it.close();

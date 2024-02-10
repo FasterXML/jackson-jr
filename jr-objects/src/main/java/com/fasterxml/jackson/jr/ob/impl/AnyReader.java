@@ -95,7 +95,7 @@ public class AnyReader extends ValueReader
             return b.emptyMap();
         }
         // and another for singletons...
-        String key = fromKey(p.getCurrentName());
+        String key = fromKey(p.currentName());
         Object value = read(r, p);
 
         if (p.nextValue() == JsonToken.END_OBJECT) {
@@ -106,7 +106,7 @@ public class AnyReader extends ValueReader
         try {
             b = b.start().put(key, value);
             do {
-                b = b.put(fromKey(p.getCurrentName()), read(r, p));
+                b = b.put(fromKey(p.currentName()), read(r, p));
             } while (p.nextValue() != JsonToken.END_OBJECT);
         } catch (IllegalArgumentException e) {
             throw JSONObjectException.from(p, e.getMessage());

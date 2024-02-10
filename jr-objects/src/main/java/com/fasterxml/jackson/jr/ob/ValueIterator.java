@@ -366,9 +366,19 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
      *</code>
      * 
      * @return Location of the input stream of the underlying parser
+     *
+     * @since 2.17
      */
+    public JsonLocation currentLocation() {
+        return _parser.currentLocation();
+    }
+
+    /**
+     * @deprecated Since 2.17 use {@link #currentLocation()} instead
+     */
+    @Deprecated
     public JsonLocation getCurrentLocation() {
-        return _parser.getCurrentLocation();
+        return currentLocation();
     }
 
     /*
