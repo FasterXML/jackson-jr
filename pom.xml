@@ -25,8 +25,8 @@
     <module>jr-retrofit2</module>
     <module>jr-stree</module>
     <module>jr-annotation-support</module>
-    <module>jr-all</module>
     <module>jr-extension-datetime</module>
+    <module>jr-all</module>
   </modules>
 
   <url>https://github.com/FasterXML/jackson-jr</url>
