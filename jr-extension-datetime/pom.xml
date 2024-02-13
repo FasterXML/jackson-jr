@@ -9,13 +9,9 @@
         <version>2.17.0-rc1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>jr-extension-datetime</artifactId>
+    <artifactId>jackson-jr-extension-datetime</artifactId>
+    <packaging>bundle</packaging>
 
-    <properties>
-        <maven.compiler.source>20</maven.compiler.source>
-        <maven.compiler.target>20</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.jr</groupId>
