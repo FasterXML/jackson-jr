@@ -40,6 +40,7 @@ Project is composed of multiple Maven sub-modules, each corresponding to a jar:
 * [jr-retrofit2](../../tree/master/jr-retrofit2) contains `jackson-jr` - based handlers for [Retrofit 2](https://square.github.io/retrofit/) library
     * Depends on `jackson-jr` and `Retrofit` API jars, and indirectly on `jackson-core`
 * [jr-annotation-support](../../tree/master/jr-annotation-support) contains extension with support for a subset of core [Jackson annotations](../../../jackson-annotations)
+* [jr-extension-datetime](../../tree/master/jr-extension-datetime) contains extension with support for `LocalDateTime`
 * jr-all creates an "uber-jar" that contains individual modules along with all their dependencies:
     * `jr-objects` classes as-is, without relocating
     * `jr-stree` classes as-is, without relocating
