@@ -11,6 +11,10 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
+2.15.4
+
+No changes since 2.15.3
+
 2.15.3 (12-Oct-2023)
 
 #107: Cannot deserialize `byte[]` from JSON `null` value
