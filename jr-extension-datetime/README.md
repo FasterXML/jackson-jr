@@ -1,6 +1,6 @@
 ## Overview
 
-This module extends the functionalities of jackson-jr adding support for LocalDateTime.
+This module extends the functionalities of jackson-jr adding support for a subset of Java 8 Date & Time objects such as `LocalDateTime` & `DateTime`.
 
 ### Example
 
@@ -26,3 +26,9 @@ class Application {
 
 }
 ```
+
+### Extension List
+- LocalDateTime (`JacksonLocalDateTimeExtension`)
+
+### Plans for Future
+- Other Java 8 DateTime classes
