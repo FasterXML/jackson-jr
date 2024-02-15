@@ -46,6 +46,9 @@
     <!-- Aggressively minimize jar size; drop 'lines' and 'vars' -->
     <javac.debuglevel>source</javac.debuglevel>
 
+    <!-- 15-Feb-2024, tatu: Need to locally update to get jackson-core shading to work -->
+    <version.plugin.shade>3.5.1</version.plugin.shade>
+
     <!-- for Reproducible Builds -->
     <project.build.outputTimestamp>2023-10-12T22:52:57Z</project.build.outputTimestamp>
   </properties>
