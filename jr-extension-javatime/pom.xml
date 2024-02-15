@@ -12,7 +12,7 @@
         <version>2.17.0-rc1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>jackson-jr-extension-datetime</artifactId>
+    <artifactId>jackson-jr-extension-javatime</artifactId>
     <packaging>bundle</packaging>
     <description>Additional package that adds support for LocalDate time and other Time Related Fields</description>
     <url>https://github.com/FasterXML/jackson-jr</url>
@@ -29,7 +29,7 @@
         <!-- Looks like we need to be bit careful on OSGi exports, to avoid
             accidentally double-exporting jr-objects types
           -->
-        <osgi.export>${project.groupId}.extension.datetime;version=${project.version}</osgi.export>
+        <osgi.export>${project.groupId}.extension.javatime;version=${project.version}</osgi.export>
 
         <!-- for Reproducible Builds -->
         <project.build.outputTimestamp>2023-11-15T22:39:39Z</project.build.outputTimestamp>
