@@ -8,11 +8,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
-import tools.jackson.core.JacksonException;
-import tools.jackson.core.JsonParser;
-import tools.jackson.core.JsonToken;
-import tools.jackson.core.JsonTokenId;
-import tools.jackson.core.exc.WrappedIOException;
+import tools.jackson.core.*;
+
 import tools.jackson.jr.ob.JSONObjectException;
 import tools.jackson.jr.ob.api.ValueReader;
 
@@ -193,7 +190,7 @@ public class SimpleValueReader extends ValueReader
             try {
                 return Class.forName(v);
             } catch (Exception e) {
-                throw new JSONObjectException("Failed to bind java.lang.Class from value '"+v+"'");
+                throw new JSONObjectException("Failed to bind `java.lang.Class` from value '"+v+"'");
             }
         }
         case SER_FILE:
@@ -213,10 +210,11 @@ public class SimpleValueReader extends ValueReader
             if (p.hasToken(JsonToken.VALUE_NULL)) {
                 return null;
             }
+            final String v = p.getValueAsString();
             try {
-                return new URL(p.getValueAsString());
+                return new URL(v);
             } catch (IOException e) {
-                throw WrappedIOException.construct(e);
+                throw new JSONObjectException("Failed to bind `java.net.URL` from value '"+v+"'");
             }
         case SER_URI:
             // [jackson-jr#73]: should allow null

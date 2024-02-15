@@ -53,7 +53,7 @@ public class WriteSimpleTest extends TestBase
 
     public void testSimpleMap() throws Exception
     {
-        Map<String,Object> stuff = new LinkedHashMap<String,Object>();
+        Map<String,Object> stuff = new LinkedHashMap<>();
         stuff.put("a", 15);
         stuff.put("b", Boolean.TRUE);
         stuff.put("c", "foobar");
@@ -61,15 +61,17 @@ public class WriteSimpleTest extends TestBase
         stuff.put("e", new URL("https://github.com/FasterXML/jackson-jr?a=x&b=y"));
         stuff.put("f", URI.create("https://github.com/FasterXML/jackson-jr?c=x&c=y"));
 
-        assertEquals("{\"a\":15,\"b\":true,\"c\":\"foobar\",\"d\":\"8f88e079-7dc6-46f8-abfb-a533130f4ea0\"," +
-                        "\"e\":\"https://github.com/FasterXML/jackson-jr?a=x&b=y\",\"f\":\"https://github.com/FasterXML/jackson-jr?c=x&c=y\"}",
+        assertEquals(a2q(
+                "{'a':15,'b':true,'c':'foobar','d':'8f88e079-7dc6-46f8-abfb-a533130f4ea0',"
+                +"'e':'https:\\/\\/github.com\\/FasterXML\\/jackson-jr?a=x&b=y',"
+                +"'f':'https:\\/\\/github.com\\/FasterXML\\/jackson-jr?c=x&c=y'}"),
                 JSON.std.asString(stuff));
     }
 
     public void testSimpleIntContainers() throws Exception {
         assertEquals("[1,2,3]", JSON.std.asString(new int[] { 1, 2, 3 }));
         assertEquals("[1,2,3]", JSON.std.asString(new Integer[] { 1, 2, 3 }));
-        List<Integer> list = new ArrayList<Integer>();
+        List<Integer> list = new ArrayList<>();
         list.add(4);
         list.add(-8);
         assertEquals("[4,-8]", JSON.std.asString(list));
@@ -103,10 +105,10 @@ public class WriteSimpleTest extends TestBase
     public void testKnownSimpleTypes() throws Exception
     {
         final String URL_STR = "http://fasterxml.com";
-        assertEquals(quote(URL_STR),
+        assertEquals(quote("http:\\/\\/fasterxml.com"),
                 JSON.std.asString(new URI(URL_STR)));
         final String PATH = "/foo/bar.txt";
-        assertEquals(quote(PATH),
+        assertEquals(quote("\\/foo\\/bar.txt"),
                 JSON.std.asString(new File(PATH)));
 
         assertEquals(quote("B"), JSON.std.asString(ABC.B));
