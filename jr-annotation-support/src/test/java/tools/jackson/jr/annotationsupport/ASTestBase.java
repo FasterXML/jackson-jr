@@ -1,10 +1,10 @@
 package tools.jackson.jr.annotationsupport;
 
+import junit.framework.TestCase;
+
 import java.util.Arrays;
 
 import tools.jackson.jr.ob.JSON;
-
-import junit.framework.TestCase;
 
 public abstract class ASTestBase extends TestCase
 {
