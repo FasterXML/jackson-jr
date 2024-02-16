@@ -136,7 +136,7 @@ public class ValueWriterModifierTest extends TestBase
         String json = jsonWithModifier(mod).asString(input);
         assertEquals(quote("Foo-Bar"), json);
         // but also verify that no caching occurs wrt global standard variant:
-        assertEquals(aposToQuotes("{'first':'Foo','last':'Bar'}"),
+        assertEquals(a2q("{'first':'Foo','last':'Bar'}"),
                 JSON.std.asString(input));
     }
 
@@ -145,10 +145,10 @@ public class ValueWriterModifierTest extends TestBase
         final NameBean input = new NameBean("Foo", "Bar");
         String json = jsonWithModifier(new ArrayingWriterModifier())
             .asString(input);
-        assertEquals(aposToQuotes("[{'first':'Foo','last':'Bar'}]"), json);
+        assertEquals(a2q("[{'first':'Foo','last':'Bar'}]"), json);
 
         // but also verify that no caching occurs wrt global standard variant:
-        assertEquals(aposToQuotes("{'first':'Foo','last':'Bar'}"),
+        assertEquals(a2q("{'first':'Foo','last':'Bar'}"),
                 JSON.std.asString(input));
     }
 }
