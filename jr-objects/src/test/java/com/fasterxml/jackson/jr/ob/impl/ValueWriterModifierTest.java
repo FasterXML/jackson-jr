@@ -74,6 +74,15 @@ public class ValueWriterModifierTest extends TestBase
         }
     }
 
+    static class Name {
+        public String first, last;
+
+        public Name(String f, String l) {
+            first = f;
+            last = l;
+        }
+    }
+    
     /*
     /**********************************************************************
     /* Tests for wholesale replacement of `ValueReader`
@@ -96,10 +105,15 @@ public class ValueWriterModifierTest extends TestBase
                     }
         });
         final String input = "foobar";
-        String result = jsonWithModifier(mod).asString(input);
+        final JSON jsonWithMod = jsonWithModifier(mod);
+        String result = jsonWithMod.asString(input);
         assertEquals(quote("FOOBAR"), result);
         // but also verify that no caching occurs wrt global standard variant:
         assertEquals(quote("foobar"), JSON.std.asString(input));
+
+        // And then also applicable for multiple POJO properties
+        assertEquals(a2q("{'first':'Bob','last':'Hope'}"),
+                jsonWithMod.asString(new Name("Bob", "Hope")));
     }
 
     public void testPOJOWriterReplacement() throws Exception
