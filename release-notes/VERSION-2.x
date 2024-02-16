@@ -44,7 +44,6 @@ No changes since 2.14
 
 #102: Missing module-info dependency from `jackson-jr-annotation-support`
 #103: Some artifacts missing `NOTICE`, `LICENSE` files
-- Java/JDK baseline raised to Java 8
 
 2.14.2 (28-Jan-2023)
 2.14.1 (21-Nov-2022)
