@@ -220,13 +220,13 @@ public class ReadSimpleTest extends TestBase
 
     // Testing that `null` will not cause an exception, for now at least
     public void testNullForPrimitiveProperties() throws Exception {
-        BooleanWrapper w = JSON.std.beanFrom(BooleanWrapper.class, aposToQuotes("{'value':null}"));
+        BooleanWrapper w = JSON.std.beanFrom(BooleanWrapper.class, a2q("{'value':null}"));
         assertNotNull(w);
         assertFalse(w.value);
     }
 
     public void testNullForScalarProperties() throws Exception {
-        DateWrapper w = JSON.std.beanFrom(DateWrapper.class, aposToQuotes("{'value':null}"));
+        DateWrapper w = JSON.std.beanFrom(DateWrapper.class, a2q("{'value':null}"));
         assertNotNull(w);
         assertNull(w.value);
     }

@@ -81,7 +81,7 @@ public class WriteSimpleTest extends TestBase
     }
     
     public void testSimpleStringArray() throws Exception {
-        assertEquals(aposToQuotes("['abc','def']"), JSON.std.asString(new String[] { "abc", "def" }));
+        assertEquals(a2q("['abc','def']"), JSON.std.asString(new String[] { "abc", "def" }));
     }
     
     public void testNest() throws Exception

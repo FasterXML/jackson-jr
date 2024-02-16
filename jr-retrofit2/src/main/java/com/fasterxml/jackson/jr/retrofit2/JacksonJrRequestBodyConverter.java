@@ -9,9 +9,6 @@ import retrofit2.Converter;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 
-/**
- * Created by Gulajava Ministudio on 11/18/15.
- */
 public class JacksonJrRequestBodyConverter<T> implements Converter<T, RequestBody>
 {
     private static final MediaType MEDIA_TYPE = MediaType.parse("application/json; charset=UTF-8");

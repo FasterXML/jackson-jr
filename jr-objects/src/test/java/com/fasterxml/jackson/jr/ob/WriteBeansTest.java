@@ -105,7 +105,7 @@ public class WriteBeansTest extends TestBase
         }
 
         BaseImpl result = JSON.std.beanFrom(BaseImpl.class,
-                aposToQuotes("{ 'extra':5, 'value':-245 }"));
+                a2q("{ 'extra':5, 'value':-245 }"));
         assertEquals(5, result.getExtra());
         assertEquals(-245, result.getValue());
     }

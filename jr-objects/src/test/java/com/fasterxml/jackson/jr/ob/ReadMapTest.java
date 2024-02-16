@@ -55,7 +55,7 @@ public class ReadMapTest extends TestBase
 
     public void testMapOfLists() throws Exception
     {
-        final String INPUT = aposToQuotes("{'stuff':{'a':[1, 2, 3], 'b' : [7, 2]}}");
+        final String INPUT = a2q("{'stuff':{'a':[1, 2, 3], 'b' : [7, 2]}}");
         final JSON j = JSON.std
                 .with(JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY)
                 .with(JSON.Feature.USE_FIELDS);
@@ -82,7 +82,7 @@ public class ReadMapTest extends TestBase
                 .with(JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY)
                 .with(JSON.Feature.USE_FIELDS)
                 .beanFrom(MapHolder.class,
-                        aposToQuotes("{'stuff':[ 1 ]}"));
+                        a2q("{'stuff':[ 1 ]}"));
         } catch (JSONObjectException e) {
             verifyException(e, "Unexpected token START_ARRAY");
         }
