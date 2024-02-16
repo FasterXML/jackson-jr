@@ -219,16 +219,24 @@ public class JSONWriter
             writeBigIntegerProperty(propName, (BigInteger) value);
             return;
         case SER_NUMBER_FLOAT: // fall through
+        case SER_NUMBER_FLOAT_WRAPPER:
+            writeFloatProperty(propName, ((Float) value).floatValue());
+            return;
         case SER_NUMBER_DOUBLE:
-            writeDoubleProperty(propName, ((Number) value).doubleValue());
+        case SER_NUMBER_DOUBLE_WRAPPER:
+            writeDoubleProperty(propName, ((Double) value).doubleValue());
             return;
         case SER_NUMBER_BYTE: // fall through
         case SER_NUMBER_SHORT: // fall through
-        case SER_NUMBER_INTEGER:
             writeIntProperty(propName, ((Number) value).intValue());
             return;
+        case SER_NUMBER_INTEGER:
+        case SER_NUMBER_INTEGER_WRAPPER:
+            writeIntProperty(propName, ((Integer) value).intValue());
+            return;
         case SER_NUMBER_LONG:
-            writeLongProperty(propName, ((Number) value).longValue());
+        case SER_NUMBER_LONG_WRAPPER:
+            writeLongProperty(propName, ((Long) value).longValue());
             return;
 
         // Scalar types:
@@ -333,16 +341,24 @@ public class JSONWriter
         // Number types:
 
         case SER_NUMBER_FLOAT: // fall through
+        case SER_NUMBER_FLOAT_WRAPPER: // fall through
+            writeFloatValue(((Float) value).floatValue());
+            return;
         case SER_NUMBER_DOUBLE:
-            writeDoubleValue(((Number) value).doubleValue());
+        case SER_NUMBER_DOUBLE_WRAPPER:
+            writeDoubleValue(((Double) value).doubleValue());
             return;
         case SER_NUMBER_BYTE: // fall through
         case SER_NUMBER_SHORT: // fall through
-        case SER_NUMBER_INTEGER:
             writeIntValue(((Number) value).intValue());
             return;
+        case SER_NUMBER_INTEGER:
+        case SER_NUMBER_INTEGER_WRAPPER:
+            writeIntValue(((Integer) value).intValue());
+            return;
         case SER_NUMBER_LONG:
-            writeLongValue(((Number) value).longValue());
+        case SER_NUMBER_LONG_WRAPPER:
+            writeLongValue(((Long) value).longValue());
             return;
         case SER_NUMBER_BIG_DECIMAL:
             writeBigDecimalValue((BigDecimal) value);
@@ -609,7 +625,15 @@ public class JSONWriter
     protected void writeLongProperty(String propName, long v) throws JacksonException {
         _generator.writeNumberProperty(propName, v);
     }
-    
+
+    protected void writeFloatValue(float v) throws JacksonException {
+        _generator.writeNumber(v);
+    }
+
+    protected void writeFloatProperty(String fieldName, float v) throws JacksonException {
+        _generator.writeNumberProperty(fieldName, v);
+    }
+
     protected void writeDoubleValue(double v) throws JacksonException {
         _generator.writeNumber(v);
     }

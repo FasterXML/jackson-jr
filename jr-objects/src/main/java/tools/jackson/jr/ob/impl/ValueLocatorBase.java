@@ -85,33 +85,37 @@ public abstract class ValueLocatorBase
     public final static int SER_NUMBER_SHORT = 15;
 
     public final static int SER_NUMBER_INTEGER = 16;
+    public final static int SER_NUMBER_INTEGER_WRAPPER = 17;
 
-    public final static int SER_NUMBER_LONG = 17;
+    public final static int SER_NUMBER_LONG = 18;
+    public final static int SER_NUMBER_LONG_WRAPPER = 19;
 
-    public final static int SER_NUMBER_FLOAT = 18;
+    public final static int SER_NUMBER_FLOAT = 20;
+    public final static int SER_NUMBER_FLOAT_WRAPPER = 21;
 
-    public final static int SER_NUMBER_DOUBLE = 19;
+    public final static int SER_NUMBER_DOUBLE = 22;
+    public final static int SER_NUMBER_DOUBLE_WRAPPER = 23;
 
-    public final static int SER_NUMBER_BIG_INTEGER = 20;
+    public final static int SER_NUMBER_BIG_INTEGER = 24;
 
-    public final static int SER_NUMBER_BIG_DECIMAL = 21;
+    public final static int SER_NUMBER_BIG_DECIMAL = 25;
 
     // // // Other specific scalar types
 
-    public final static int SER_BOOLEAN = 22;
-    public final static int SER_BOOLEAN_WRAPPER = 23;
-    public final static int SER_CHAR = 24;
+    public final static int SER_BOOLEAN = 26;
+    public final static int SER_BOOLEAN_WRAPPER = 27;
+    public final static int SER_CHAR = 28;
 
-    public final static int SER_ENUM = 25;
+    public final static int SER_ENUM = 29;
 
-    public final static int SER_DATE = 26;
-    public final static int SER_CALENDAR = 27;
+    public final static int SER_DATE = 30;
+    public final static int SER_CALENDAR = 31;
 
-    public final static int SER_CLASS = 28;
-    public final static int SER_FILE = 29;
-    public final static int SER_UUID = 30;
-    public final static int SER_URL = 31;
-    public final static int SER_URI = 32;
+    public final static int SER_CLASS = 32;
+    public final static int SER_FILE = 33;
+    public final static int SER_UUID = 34;
+    public final static int SER_URL = 35;
+    public final static int SER_URI = 36;
 
     // // // Iterate-able types
 
@@ -119,7 +123,7 @@ public abstract class ValueLocatorBase
      * Anything that implements {@link java.lang.Iterable}, but not
      * {@link java.util.Collection}.
      */
-    public final static int SER_ITERABLE = 33;
+    public final static int SER_ITERABLE = 37;
 
     /*
     /**********************************************************************
@@ -178,16 +182,16 @@ public abstract class ValueLocatorBase
             return SER_BOOLEAN_WRAPPER;
         }
         if (Number.class.isAssignableFrom(raw)) {
-            if (raw == Integer.class) return SER_NUMBER_INTEGER;
-            if (raw == Long.class) return SER_NUMBER_LONG;
-            if (raw == Byte.class) return SER_NUMBER_BYTE;
-            if (raw == Short.class) return SER_NUMBER_SHORT;
-            if (raw == Double.class) return SER_NUMBER_DOUBLE;
-            if (raw == Float.class) return SER_NUMBER_FLOAT;
+            if (raw == Integer.class) return SER_NUMBER_INTEGER_WRAPPER;
+            if (raw == Long.class) return SER_NUMBER_LONG_WRAPPER;
+            if (raw == Double.class) return SER_NUMBER_DOUBLE_WRAPPER;
+            if (raw == Float.class) return SER_NUMBER_FLOAT_WRAPPER;
             if (raw == BigDecimal.class) return SER_NUMBER_BIG_DECIMAL;
             if (raw == BigInteger.class) {
                 return SER_NUMBER_BIG_INTEGER;
             }
+            if (raw == Byte.class) return SER_NUMBER_BYTE;
+            if (raw == Short.class) return SER_NUMBER_SHORT;
             // What numeric type is this? Could consider "string-like" but...
             return SER_UNKNOWN;
         }

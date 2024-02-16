@@ -59,6 +59,7 @@ public class SimpleValueReader extends ValueReader
         // cases default to "standard" handling which does range checks etc
 
         case SER_NUMBER_INTEGER:
+        case SER_NUMBER_INTEGER_WRAPPER:
             {
                 int i = p.nextIntValue(-2);
                 if (i != -2) {
@@ -68,6 +69,7 @@ public class SimpleValueReader extends ValueReader
             }
 
         case SER_NUMBER_LONG:
+        case SER_NUMBER_LONG_WRAPPER:
             {
                 long l = p.nextLongValue(-2L);
                 if (l != -2L) {
@@ -115,8 +117,16 @@ public class SimpleValueReader extends ValueReader
 
         // Number types:
             
-        case SER_NUMBER_FLOAT: // fall through
+        case SER_NUMBER_FLOAT_WRAPPER:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
+        case SER_NUMBER_FLOAT:
             return Float.valueOf((float) p.getValueAsDouble());
+        case SER_NUMBER_DOUBLE_WRAPPER:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
         case SER_NUMBER_DOUBLE:
             return p.getValueAsDouble();
 
@@ -125,8 +135,16 @@ public class SimpleValueReader extends ValueReader
             
         case SER_NUMBER_SHORT: // fall through
             return (short) p.getValueAsInt();
+        case SER_NUMBER_INTEGER_WRAPPER:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
         case SER_NUMBER_INTEGER:
             return p.getValueAsInt();
+        case SER_NUMBER_LONG_WRAPPER:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
         case SER_NUMBER_LONG:
             return p.getValueAsLong();
 
