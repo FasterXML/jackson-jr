@@ -13,7 +13,8 @@ Modules:
 
 2.17.0 (not yet released)
 
--
+#78: Deserializes "null" to "0.0" for `java.lang.Double` (wrapper)
+ (reported by @bill-phast)
 
 2.16.1 (24-Dec-2023)
 
