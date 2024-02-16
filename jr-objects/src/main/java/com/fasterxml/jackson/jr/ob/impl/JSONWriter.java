@@ -217,16 +217,24 @@ public class JSONWriter
             writeBigIntegerField(fieldName, (BigInteger) value);
             return;
         case SER_NUMBER_FLOAT: // fall through
+        case SER_NUMBER_FLOAT_WRAPPER:
+            writeFloatField(fieldName, ((Float) value).floatValue());
+            return;
         case SER_NUMBER_DOUBLE:
-            writeDoubleField(fieldName, ((Number) value).doubleValue());
+        case SER_NUMBER_DOUBLE_WRAPPER:
+            writeDoubleField(fieldName, ((Double) value).doubleValue());
             return;
         case SER_NUMBER_BYTE: // fall through
         case SER_NUMBER_SHORT: // fall through
-        case SER_NUMBER_INTEGER:
             writeIntField(fieldName, ((Number) value).intValue());
             return;
+        case SER_NUMBER_INTEGER:
+        case SER_NUMBER_INTEGER_WRAPPER:
+            writeIntField(fieldName, ((Integer) value).intValue());
+            return;
         case SER_NUMBER_LONG:
-            writeLongField(fieldName, ((Number) value).longValue());
+        case SER_NUMBER_LONG_WRAPPER:
+            writeLongField(fieldName, ((Long) value).longValue());
             return;
 
         // Scalar types:
@@ -328,16 +336,24 @@ public class JSONWriter
         // Number types:
 
         case SER_NUMBER_FLOAT: // fall through
+        case SER_NUMBER_FLOAT_WRAPPER: // fall through
+            writeFloatValue(((Float) value).floatValue());
+            return;
         case SER_NUMBER_DOUBLE:
-            writeDoubleValue(((Number) value).doubleValue());
+        case SER_NUMBER_DOUBLE_WRAPPER:
+            writeDoubleValue(((Double) value).doubleValue());
             return;
         case SER_NUMBER_BYTE: // fall through
         case SER_NUMBER_SHORT: // fall through
-        case SER_NUMBER_INTEGER:
             writeIntValue(((Number) value).intValue());
             return;
+        case SER_NUMBER_INTEGER:
+        case SER_NUMBER_INTEGER_WRAPPER:
+            writeIntValue(((Integer) value).intValue());
+            return;
         case SER_NUMBER_LONG:
-            writeLongValue(((Number) value).longValue());
+        case SER_NUMBER_LONG_WRAPPER:
+            writeLongValue(((Long) value).longValue());
             return;
         case SER_NUMBER_BIG_DECIMAL:
             writeBigDecimalValue((BigDecimal) value);
@@ -581,6 +597,14 @@ public class JSONWriter
     }
 
     protected void writeLongField(String fieldName, long v) throws IOException {
+        _generator.writeNumberField(fieldName, v);
+    }
+
+    protected void writeFloatValue(float v) throws IOException {
+        _generator.writeNumber(v);
+    }
+
+    protected void writeFloatField(String fieldName, float v) throws IOException {
         _generator.writeNumberField(fieldName, v);
     }
 
