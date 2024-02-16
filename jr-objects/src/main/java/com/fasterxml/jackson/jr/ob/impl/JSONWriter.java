@@ -232,6 +232,7 @@ public class JSONWriter
         // Scalar types:
 
         case SER_BOOLEAN:
+        case SER_BOOLEAN_WRAPPER:
             writeBooleanField(fieldName, ((Boolean) value).booleanValue());
             return;
         case SER_CHAR:
@@ -348,6 +349,7 @@ public class JSONWriter
         // Other scalar types:
 
         case SER_BOOLEAN:
+        case SER_BOOLEAN_WRAPPER:
             writeBooleanValue(((Boolean) value).booleanValue());
             return;
         case SER_CHAR:

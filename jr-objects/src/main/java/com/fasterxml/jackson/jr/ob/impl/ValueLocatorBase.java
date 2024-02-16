@@ -94,18 +94,19 @@ public abstract class ValueLocatorBase
     // // // Other specific scalar types
 
     public final static int SER_BOOLEAN = 21;
-    public final static int SER_CHAR = 22;
+    public final static int SER_BOOLEAN_WRAPPER = 22;
+    public final static int SER_CHAR = 23;
 
-    public final static int SER_ENUM = 23;
+    public final static int SER_ENUM = 24;
 
-    public final static int SER_DATE = 24;
-    public final static int SER_CALENDAR = 25;
+    public final static int SER_DATE = 25;
+    public final static int SER_CALENDAR = 26;
 
-    public final static int SER_CLASS = 26;
-    public final static int SER_FILE = 27;
-    public final static int SER_UUID = 28;
-    public final static int SER_URL = 29;
-    public final static int SER_URI = 30;
+    public final static int SER_CLASS = 27;
+    public final static int SER_FILE = 28;
+    public final static int SER_UUID = 29;
+    public final static int SER_URL = 30;
+    public final static int SER_URI = 31;
 
 
     // // // Iterate-able types
@@ -114,7 +115,7 @@ public abstract class ValueLocatorBase
      * Anything that implements {@link java.lang.Iterable}, but not
      * {@link java.util.Collection}.
      */
-    public final static int SER_ITERABLE = 31;
+    public final static int SER_ITERABLE = 32;
 
     /*
     /**********************************************************************
@@ -170,7 +171,7 @@ public abstract class ValueLocatorBase
             throw new IllegalArgumentException("Unrecognized primitive type: "+raw.getName());
         }
         if (raw == Boolean.class) {
-            return SER_BOOLEAN;
+            return SER_BOOLEAN_WRAPPER;
         }
         if (Number.class.isAssignableFrom(raw)) {
             if (raw == Integer.class) return SER_NUMBER_INTEGER;
