@@ -124,7 +124,7 @@ public class SimpleComposerTest extends TestBase
                     .end()
                 .end()
                 .finish();
-        assertEquals(aposToQuotes("[{'first':'Bob'},{'name':{'first':'Bill'}}]"), json);
+        assertEquals(a2q("[{'first':'Bob'},{'name':{'first':'Bill'}}]"), json);
     }
 
     public void testComposerWithIndent() throws Exception
@@ -136,7 +136,7 @@ public class SimpleComposerTest extends TestBase
                     .put("name", "Bill")
                 .end()
                 .finish();
-        assertEquals(aposToQuotes("{\n"
+        assertEquals(a2q("{\n"
                 +"  'name' : 'Bill'\n"
                 +"}"),
                 json);

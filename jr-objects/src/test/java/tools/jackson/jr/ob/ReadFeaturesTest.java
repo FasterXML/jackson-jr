@@ -22,26 +22,26 @@ public class ReadFeaturesTest extends TestBase
 
         json = JSON.std.asString(new IsBean());
         // by default, will use 'is-getter':
-        assertEquals(aposToQuotes("{'enabled':true,'value':42}"), json);
+        assertEquals(a2q("{'enabled':true,'value':42}"), json);
 
         // but can disable
         json = JSON.std
                 .without(JSON.Feature.USE_IS_GETTERS)
                 .asString(new IsBean());
-        assertEquals(aposToQuotes("{'value':42}"), json);
+        assertEquals(a2q("{'value':42}"), json);
 
         // .... as well as using alternative
         json = JSON.builder()
                 .disable(JSON.Feature.USE_IS_GETTERS)
                 .build()
                 .asString(new IsBean());
-        assertEquals(aposToQuotes("{'value':42}"), json);
+        assertEquals(a2q("{'value':42}"), json);
         
         // and go back as well
         json = JSON.std
                 .with(JSON.Feature.USE_IS_GETTERS)
                 .asString(new IsBean());
-        assertEquals(aposToQuotes("{'enabled':true,'value':42}"), json);
+        assertEquals(a2q("{'enabled':true,'value':42}"), json);
     }
 
     public void testFailOnDupMapKeys() throws Exception

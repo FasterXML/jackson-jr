@@ -197,7 +197,7 @@ public class CustomValueReadersTest extends TestBase
 
         // similarly with wrapper
         CustomValueBean bean = json.beanFrom(CustomValueBean.class,
-                aposToQuotes("{ 'custom' : 137 }"));
+                a2q("{ 'custom' : 137 }"));
         assertEquals(138, bean.custom.value);
 
         // but also ensure we can change registered handler(s)

@@ -97,7 +97,7 @@ public class ValueReaderModifierTest extends TestBase
                         String.valueOf(map.get("last")).toUpperCase());
             };
         });
-        final String input = aposToQuotes("{'first':'foo', 'last':'bar'}");
+        final String input = a2q("{'first':'foo', 'last':'bar'}");
         NameBean result = jsonWithModifier(mod).beanFrom(NameBean.class, input);
         assertEquals("FOO", result.getFirst());
         assertEquals("BAR", result.getLast());
@@ -110,7 +110,7 @@ public class ValueReaderModifierTest extends TestBase
 
     public void testPOJOReaderDelegation() throws Exception
     {
-        final String input = aposToQuotes("{'first':'Foo', 'last':'Bar'}");
+        final String input = a2q("{'first':'Foo', 'last':'Bar'}");
         NameBean result = jsonWithModifier(new LowerCasingReaderModifier())
                 .beanFrom(NameBean.class, input);
         assertEquals("foo", result.getFirst());

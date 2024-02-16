@@ -25,20 +25,20 @@ public class SimpleFieldTest extends TestBase
     {
         String json = JSON.std.without(JSON.Feature.USE_FIELDS)
                 .asString(new XY(1, 2));
-        assertEquals(aposToQuotes("{'y':2}"), json);
+        assertEquals(a2q("{'y':2}"), json);
     }
 
     public void testSerializeWithField() throws Exception
     {
         String json = JSON.std.with(JSON.Feature.USE_FIELDS)
                 .asString(new XY(1, 2));
-        assertEquals(aposToQuotes("{'x':1,'y':2}"), json);
+        assertEquals(a2q("{'x':1,'y':2}"), json);
     }
 
     public void testDeserializeWithField() throws Exception
     {
         XY result = JSON.std.with(JSON.Feature.USE_FIELDS)
-                .beanFrom(XY.class, aposToQuotes("{'x':3,'y':4}"));
+                .beanFrom(XY.class, a2q("{'x':3,'y':4}"));
         assertEquals(4, result.getY());
         assertEquals(3, result.x);
     }

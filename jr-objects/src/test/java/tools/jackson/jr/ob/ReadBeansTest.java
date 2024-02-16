@@ -70,7 +70,7 @@ public class ReadBeansTest extends TestBase
 
     public void testSimpleBean() throws Exception
     {
-        final String INPUT = aposToQuotes("{'name':{'first':'Bob','last':'Burger'},'x':13, 'option': 'Option1'}");
+        final String INPUT = a2q("{'name':{'first':'Bob','last':'Burger'},'x':13, 'option': 'Option1'}");
         TestBean bean = JSON.std.beanFrom(TestBean.class, INPUT);
 
         assertNotNull(bean);
@@ -83,7 +83,7 @@ public class ReadBeansTest extends TestBase
 
     public void testSimpleBeanCaseInsensitive() throws Exception
     {
-        final String INPUT = aposToQuotes(
+        final String INPUT = a2q(
                 "{'NaMe':{'FIRST':'Bob','last':'Burger'},'x':13, 'optioN': 'opTIOn1'}");
         TestBean bean =
                 JSON.builder()
@@ -102,7 +102,7 @@ public class ReadBeansTest extends TestBase
 
     public void testUnknownProps() throws Exception
     {
-        final String INPUT = aposToQuotes("{'first':'Bob','middle':'Eugene', 'last':'Smith'}");
+        final String INPUT = a2q("{'first':'Bob','middle':'Eugene', 'last':'Smith'}");
 
         // First: fine if marked as such
         NameBean name = JSON.std
@@ -126,7 +126,7 @@ public class ReadBeansTest extends TestBase
 
     public void testPOJOWithList() throws Exception
     {
-        final String INPUT = aposToQuotes("{'names': [ { 'first':'John','last':'Smith' },"
+        final String INPUT = a2q("{'names': [ { 'first':'John','last':'Smith' },"
                 +"{'first':'Bob','last':'Burger' } ] }");
         NameListBean list = JSON.std.beanFrom(NameListBean.class, INPUT);
         assertNotNull(list);
@@ -138,7 +138,7 @@ public class ReadBeansTest extends TestBase
 
     public void testPOJOWithMap() throws Exception
     {
-        final String INPUT = aposToQuotes("{'stuff': { 'a':3, 'b':4 } }");
+        final String INPUT = a2q("{'stuff': { 'a':3, 'b':4 } }");
         MapBean map = JSON.std.beanFrom(MapBean.class, INPUT);
         assertNotNull(map);
         assertNotNull(map.stuff);
@@ -148,7 +148,7 @@ public class ReadBeansTest extends TestBase
 
     public void testSimpleBeanCollections() throws Exception
     {
-        final String INPUT = aposToQuotes("["
+        final String INPUT = a2q("["
                 +"{'name':{'first':'Bob','last':'Burger'},'x':13}"
                 +",{'x':-145,'name':{'first':'Billy','last':'Bacon'}}"
                 +"]");
@@ -183,7 +183,7 @@ public class ReadBeansTest extends TestBase
     // @since 2.10
     public void testSimpleBeanMaps() throws Exception
     {
-        final String INPUT = aposToQuotes("{ 'first':"
+        final String INPUT = a2q("{ 'first':"
                 +"{'name':{'first':'Bob','last':'Burger'},'x':13}"
                 +", 'second':{'x':-145,'name':{'first':'Billy','last':'Bacon'}}"
                 +"}");
@@ -278,7 +278,7 @@ public class ReadBeansTest extends TestBase
         final String expURL = "http://foo";
         URLBean bean = JSON.std
                 .with(JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY)
-                .beanFrom(URLBean.class, aposToQuotes("{'URL':'"+expURL+"'}"));
+                .beanFrom(URLBean.class, a2q("{'URL':'"+expURL+"'}"));
         assertEquals(expURL, bean.url);
     }
 }
