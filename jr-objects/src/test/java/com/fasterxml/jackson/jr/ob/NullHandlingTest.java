@@ -13,6 +13,13 @@ public class NullHandlingTest extends TestBase
         public String str = "a";
     }
 
+    static class BooleanWrapper {
+        public Boolean value;
+    }
+    static class BooleanPrimitiveWrapper {
+        public boolean value;
+    }
+
     // Test to verify that outputting of nulls is configurable
     public void testMapNullEntries() throws Exception
     {
@@ -42,4 +49,29 @@ public class NullHandlingTest extends TestBase
         Bean107 bean = JSON.std.beanFrom(Bean107.class, a2q("{'b':null}"));
         assertNull(bean.b);
     }
+
+    // [jackson-jr#78], boolean/Boolean
+
+    public void testBooleanPrimitive() throws Exception
+    {
+        BooleanPrimitiveWrapper w = JSON.std.beanFrom(BooleanPrimitiveWrapper.class,
+                a2q("{'value':true}"));
+        assertTrue(w.value);
+
+        w = JSON.std.beanFrom(BooleanPrimitiveWrapper.class,
+                a2q("{'value':null}"));
+        assertFalse(w.value);
+    }
+
+    public void testBooleanWrapper() throws Exception
+    {
+        BooleanWrapper w = JSON.std.beanFrom(BooleanWrapper.class,
+                a2q("{'value':true}"));
+        assertEquals(Boolean.TRUE, w.value);
+
+        w = JSON.std.beanFrom(BooleanWrapper.class,
+                a2q("{'value':null}"));
+        assertNull(w.value);
+    }
+
 }

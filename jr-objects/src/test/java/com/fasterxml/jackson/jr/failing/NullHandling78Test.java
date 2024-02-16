@@ -1,8 +1,5 @@
 package com.fasterxml.jackson.jr.failing;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.TestBase;
 
@@ -21,30 +18,11 @@ public class NullHandling78Test extends TestBase
     static class LongPrimitiveWrapper {
         public long value;
     }
-    static class BooleanWrapper {
-        public Boolean value;
-    }
-    static class BooleanPrimitiveWrapper {
-        public boolean value;
-    }
     static class DoubleWrapper {
         public Double value;
     }
     static class DoublePrimitiveWrapper {
         public double value;
-    }
-
-    // Test to verify that outputting of nulls is configurable
-    public void testMapNullEntries() throws Exception
-    {
-        Map<String,Object> map = new LinkedHashMap<String,Object>();
-        map.put("a", 1);
-        map.put("b", null);
-        // By default we do NOT write null-valued entries:
-        assertEquals("{\"a\":1}", JSON.std.asString(map));
-        // but we can disable it easily
-        assertEquals("{\"a\":1,\"b\":null}",
-                JSON.std.with(JSON.Feature.WRITE_NULL_PROPERTIES).asString(map));
     }
 
     // [jackson-jr#78], int/Integer
@@ -91,30 +69,6 @@ public class NullHandling78Test extends TestBase
         assertEquals(Long.valueOf(2L), w.value);
 
         w = JSON.std.beanFrom(LongWrapper.class,
-                a2q("{'value':null}"));
-        assertNull(w.value);
-    }
-
-    // [jackson-jr#78], boolean/Boolean
-
-    public void testBooleanPrimitive() throws Exception
-    {
-        BooleanPrimitiveWrapper w = JSON.std.beanFrom(BooleanPrimitiveWrapper.class,
-                a2q("{'value':true}"));
-        assertTrue(w.value);
-
-        w = JSON.std.beanFrom(BooleanPrimitiveWrapper.class,
-                a2q("{'value':null}"));
-        assertFalse(w.value);
-    }
-
-    public void testBooleanWrapper() throws Exception
-    {
-        BooleanWrapper w = JSON.std.beanFrom(BooleanWrapper.class,
-                a2q("{'value':true}"));
-        assertEquals(Boolean.TRUE, w.value);
-
-        w = JSON.std.beanFrom(BooleanWrapper.class,
                 a2q("{'value':null}"));
         assertNull(w.value);
     }

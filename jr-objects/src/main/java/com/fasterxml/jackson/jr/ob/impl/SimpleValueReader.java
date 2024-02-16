@@ -80,6 +80,7 @@ public class SimpleValueReader extends ValueReader
         // Other scalar types:
 
         case SER_BOOLEAN:
+        case SER_BOOLEAN_WRAPPER:
             {
                 Boolean b = p.nextBooleanValue();
                 if (b != null) {
@@ -139,14 +140,16 @@ public class SimpleValueReader extends ValueReader
         // Other scalar types:
 
         case SER_BOOLEAN:
+        case SER_BOOLEAN_WRAPPER:
             switch (p.currentTokenId()) {
             case JsonTokenId.ID_TRUE:
                 return Boolean.TRUE;
             case JsonTokenId.ID_FALSE:
                 return Boolean.FALSE;
             case JsonTokenId.ID_NULL:
-                // 07-Jul-2020, tatu: since `boolean` and `java.lang.Boolean` both handled
-                //   here, can not (alas!) separate yet
+                if (_typeId == SER_BOOLEAN_WRAPPER) {
+                    return null;
+                }
                 return Boolean.FALSE;
 
             case JsonTokenId.ID_STRING:
