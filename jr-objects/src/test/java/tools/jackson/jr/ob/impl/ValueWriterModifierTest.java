@@ -72,6 +72,15 @@ public class ValueWriterModifierTest extends TestBase
         }
     }
 
+    static class Name {
+        public String first, last;
+
+        public Name(String f, String l) {
+            first = f;
+            last = l;
+        }
+    }
+    
     /*
     /**********************************************************************
     /* Tests for wholesale replacement of `ValueReader`
@@ -94,10 +103,15 @@ public class ValueWriterModifierTest extends TestBase
                     }
         });
         final String input = "foobar";
-        String result = jsonWithModifier(mod).asString(input);
+        final JSON jsonWithMod = jsonWithModifier(mod);
+        String result = jsonWithMod.asString(input);
         assertEquals(quote("FOOBAR"), result);
         // but also verify that no caching occurs wrt global standard variant:
         assertEquals(quote("foobar"), JSON.std.asString(input));
+
+        // And then also applicable for multiple POJO properties
+        assertEquals(a2q("{'first':'Bob','last':'Hope'}"),
+                jsonWithMod.asString(new Name("Bob", "Hope")));
     }
 
     public void testPOJOWriterReplacement() throws Exception
@@ -120,7 +134,7 @@ public class ValueWriterModifierTest extends TestBase
         String json = jsonWithModifier(mod).asString(input);
         assertEquals(quote("Foo-Bar"), json);
         // but also verify that no caching occurs wrt global standard variant:
-        assertEquals(aposToQuotes("{'first':'Foo','last':'Bar'}"),
+        assertEquals(a2q("{'first':'Foo','last':'Bar'}"),
                 JSON.std.asString(input));
     }
 
@@ -129,10 +143,10 @@ public class ValueWriterModifierTest extends TestBase
         final NameBean input = new NameBean("Foo", "Bar");
         String json = jsonWithModifier(new ArrayingWriterModifier())
             .asString(input);
-        assertEquals(aposToQuotes("[{'first':'Foo','last':'Bar'}]"), json);
+        assertEquals(a2q("[{'first':'Foo','last':'Bar'}]"), json);
 
         // but also verify that no caching occurs wrt global standard variant:
-        assertEquals(aposToQuotes("{'first':'Foo','last':'Bar'}"),
+        assertEquals(a2q("{'first':'Foo','last':'Bar'}"),
                 JSON.std.asString(input));
     }
 }

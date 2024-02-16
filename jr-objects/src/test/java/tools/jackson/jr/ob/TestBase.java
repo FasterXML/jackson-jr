@@ -57,11 +57,12 @@ public abstract class TestBase extends TestCase
     }
 
     protected String a2q(String json) {
-        return aposToQuotes(json);
+        return json.replace('\'', '"');
     }
 
+    @Deprecated
     protected String aposToQuotes(String json) {
-        return json.replace("'", "\"");
+        return a2q(json);
     }
 
     protected JSON jsonWithModifier(final ReaderWriterModifier modifier) {
