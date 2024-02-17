@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -177,6 +179,17 @@ public class ReadSimpleTest extends TestBase
         assertEquals(Object.class, JSON.std.beanFrom(Class.class, q(Object.class.getName())));
     }
 
+    public void testMiscUriTypes() throws Exception
+    {
+        final String URL_STR = "http://fasterxml.com";
+        final URL url = new URL(URL_STR);
+        assertEquals(url, JSON.std.beanFrom(URL.class, q(URL_STR)));
+
+        Path p = Paths.get(new URI("file:///foo/bar.txt"));
+        assertEquals(p,
+                JSON.std.beanFrom(Path.class, q("file:///foo/bar.txt")));
+    }
+    
     public void testMiscScalarFail() throws Exception {
         for (String input : new String[] { " false ",  "true", "[ ]", "{ }" } ) {
             try {
