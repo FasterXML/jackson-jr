@@ -3,6 +3,7 @@ package com.fasterxml.jackson.jr.ob.impl;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.file.Path;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
@@ -266,6 +267,9 @@ public class JSONWriter
         case SER_URI:
             writeStringLikeField(fieldName, value.toString(), type);
             return;
+        case SER_PATH:
+            writeStringLikeField(fieldName, ((Path) value).toUri().toString(), type);
+            return;
 
         // Others
 
@@ -392,6 +396,9 @@ public class JSONWriter
         case SER_URL:
         case SER_URI:
             writeStringLikeValue(value.toString(), type);
+            return;
+        case SER_PATH:
+            writeStringLikeValue(((Path) value).toUri().toString(), type);
             return;
 
         case SER_ITERABLE:

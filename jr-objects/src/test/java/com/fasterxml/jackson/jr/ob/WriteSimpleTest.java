@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
@@ -103,11 +105,14 @@ public class WriteSimpleTest extends TestBase
     public void testKnownSimpleTypes() throws Exception
     {
         final String URL_STR = "http://fasterxml.com";
-        assertEquals(q(URL_STR),
-                JSON.std.asString(new URI(URL_STR)));
+        final URI uri = new URI(URL_STR);
+        assertEquals(q(URL_STR), JSON.std.asString(uri));
         final String PATH = "/foo/bar.txt";
         assertEquals(q(PATH),
                 JSON.std.asString(new File(PATH)));
+
+        Path p = Paths.get(new URI("file:///foo/bar.txt"));
+        assertEquals(q("file:///foo/bar.txt"), JSON.std.asString(p));
 
         assertEquals(q("B"), JSON.std.asString(ABC.B));
         assertEquals("1", JSON.std.with(Feature.WRITE_ENUMS_USING_INDEX).asString(ABC.B));
