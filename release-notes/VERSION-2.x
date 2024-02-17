@@ -15,6 +15,9 @@ Modules:
 
 #78: Deserializes "null" to "0.0" for `java.lang.Double` (wrapper)
  (reported by @bill-phast)
+#112: `overrideStandardValueWriter` only applied to first `java.nio.file.Path`
+  valued field of bean
+ (reported by Julian H)
 
 2.16.1 (24-Dec-2023)
 

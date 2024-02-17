@@ -1,4 +1,4 @@
-package tools.jackson.jr.failing;
+package tools.jackson.jr.ob.impl;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -8,7 +8,6 @@ import tools.jackson.core.JsonGenerator;
 
 import tools.jackson.jr.ob.*;
 import tools.jackson.jr.ob.api.*;
-import tools.jackson.jr.ob.impl.JSONWriter;
 
 public class ValueWriterModifier112Test extends TestBase
 {
@@ -61,6 +60,6 @@ public class ValueWriterModifier112Test extends TestBase
                 }
             }).build();
         String json = writer.asString(input);
-        assertEquals(a2q("{'p1':'some/path','p2':'some/other/path'}"), json);
+        assertEquals(a2q("{'p1':'some\\/path','p2':'some\\/other\\/path'}"), json);
     }
 }

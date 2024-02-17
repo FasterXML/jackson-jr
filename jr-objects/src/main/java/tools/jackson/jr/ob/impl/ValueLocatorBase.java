@@ -240,21 +240,22 @@ public abstract class ValueLocatorBase
         if (UUID.class.isAssignableFrom(raw)) {
             return SER_UUID;
         }
-        /* May or may not help with deser, but recognized nonetheless;
-         * on assumption that Beans should rarely implement `CharSequence`
-         */
+        // May or may not help with deser, but recognized nonetheless;
+        // on assumption that Beans should rarely implement `CharSequence`
         if (CharSequence.class.isAssignableFrom(raw)) {
             return SER_CHARACTER_SEQUENCE;
         }
-        /* `Iterable` can be added on all kinds of things, and it won't
-         * help at all with deserialization; hence only use for serialization.
-         */
+        // `Iterable` can be added on all kinds of things, and it won't
+        // help at all with deserialization; hence only use for serialization.
         if (forSer && Iterable.class.isAssignableFrom(raw)) {
-            return SER_ITERABLE;
+            // 16-Feb-2024, tatu: [jackson-jr#112] java.nio.file.Path is not really Iterable
+            if (!java.nio.file.Path.class.isAssignableFrom(raw)) {
+                return SER_ITERABLE;
+            }
+            System.err.println("Iterable? "+raw.getName()+" -> NO");
         }
         
         // Ok. I give up, no idea!
         return SER_UNKNOWN;
     }
-    
 }
