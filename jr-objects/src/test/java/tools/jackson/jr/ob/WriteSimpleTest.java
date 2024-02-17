@@ -105,13 +105,13 @@ public class WriteSimpleTest extends TestBase
     public void testKnownSimpleTypes() throws Exception
     {
         final String URL_STR = "http://fasterxml.com";
-        assertEquals(quote("http:\\/\\/fasterxml.com"),
+        assertEquals(q("http:\\/\\/fasterxml.com"),
                 JSON.std.asString(new URI(URL_STR)));
         final String PATH = "/foo/bar.txt";
-        assertEquals(quote("\\/foo\\/bar.txt"),
+        assertEquals(q("\\/foo\\/bar.txt"),
                 JSON.std.asString(new File(PATH)));
 
-        assertEquals(quote("B"), JSON.std.asString(ABC.B));
+        assertEquals(q("B"), JSON.std.asString(ABC.B));
         assertEquals("1", JSON.std.with(Feature.WRITE_ENUMS_USING_INDEX).asString(ABC.B));
     }
 

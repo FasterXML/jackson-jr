@@ -85,7 +85,7 @@ public class CustomValueWritersTest extends TestBase
         assertEquals("{\"wrapped\":{}}", JSON.std.asString(new CustomBeanWrapper()));
 
         final JSON withCustom = jsonWithProvider(new CustomWriters());
-        assertEquals(quote("xxx"), withCustom.asString(new CustomBean()));
+        assertEquals(q("xxx"), withCustom.asString(new CustomBean()));
         assertEquals("{\"wrapped\":\"xxx\"}", withCustom.asString(new CustomBeanWrapper()));
         assertEquals("[\"xxx\"]", withCustom.asString(new CustomBean[] { new CustomBean() }));
         assertEquals("{\"value\":\"xxx\"}",
@@ -100,18 +100,18 @@ public class CustomValueWritersTest extends TestBase
 
     public void testChainedBeanWriters() throws Exception
     {
-        assertEquals(quote("abc"),
+        assertEquals(q("abc"),
                 jsonWithProviders(new CustomWriters("abc"), new CustomWriters("def"))
                 .asString(new CustomBean()));
-        assertEquals(quote("def"),
+        assertEquals(q("def"),
                 jsonWithProviders(new BogusProvider(), new CustomWriters("def"))
                 .asString(new CustomBean()));
 
         // as well as passing `null`
-        assertEquals(quote("xxx"),
+        assertEquals(q("xxx"),
                 jsonWithProviders(null, new CustomWriters("xxx"))
                 .asString(new CustomBean()));
-        assertEquals(quote("yyy"),
+        assertEquals(q("yyy"),
                 jsonWithProviders(new CustomWriters("yyy"), null)
                 .asString(new CustomBean()));
     }

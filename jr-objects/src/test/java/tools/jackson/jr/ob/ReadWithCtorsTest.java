@@ -25,7 +25,7 @@ public class ReadWithCtorsTest extends TestBase
 
     public void testStringCtor() throws Exception
     {
-        FromString output = JSON.std.beanFrom(FromString.class, quote("abc"));
+        FromString output = JSON.std.beanFrom(FromString.class, q("abc"));
         assertNotNull(output);
         assertEquals("abc", output.value);
     }
