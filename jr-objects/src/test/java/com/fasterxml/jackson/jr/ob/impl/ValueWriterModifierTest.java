@@ -107,9 +107,9 @@ public class ValueWriterModifierTest extends TestBase
         final String input = "foobar";
         final JSON jsonWithMod = jsonWithModifier(mod);
         String result = jsonWithMod.asString(input);
-        assertEquals(quote("FOOBAR"), result);
+        assertEquals(q("FOOBAR"), result);
         // but also verify that no caching occurs wrt global standard variant:
-        assertEquals(quote("foobar"), JSON.std.asString(input));
+        assertEquals(q("foobar"), JSON.std.asString(input));
 
         // And then also applicable for multiple POJO properties
         assertEquals(a2q("{'first':'BOB','last':'HOPE'}"),
@@ -138,7 +138,7 @@ public class ValueWriterModifierTest extends TestBase
         });
         final NameBean input = new NameBean("Foo", "Bar");
         String json = jsonWithModifier(mod).asString(input);
-        assertEquals(quote("Foo-Bar"), json);
+        assertEquals(q("Foo-Bar"), json);
         // but also verify that no caching occurs wrt global standard variant:
         assertEquals(a2q("{'first':'Foo','last':'Bar'}"),
                 JSON.std.asString(input));

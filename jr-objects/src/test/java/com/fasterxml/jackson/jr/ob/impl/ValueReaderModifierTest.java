@@ -69,7 +69,7 @@ public class ValueReaderModifierTest extends TestBase
     
     public void testStringReaderReplacement() throws Exception
     {
-        final String input = quote("foobar");
+        final String input = q("foobar");
         assertEquals("foobar", JSON.std.beanFrom(String.class, input));
 
         // but then with modifier

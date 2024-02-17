@@ -52,17 +52,12 @@ public abstract class TestBase extends TestCase
         return json.getStreamingFactory().createParser(source.toCharArray());
     }
 
-    protected String quote(String str) {
+    protected String q(String str) {
         return "\"" + str + "\"";
     }
 
     protected String a2q(String json) {
         return json.replace('\'', '"');
-    }
-
-    @Deprecated
-    protected String aposToQuotes(String json) {
-        return a2q(json);
     }
 
     protected JSON jsonWithModifier(final ReaderWriterModifier modifier) {

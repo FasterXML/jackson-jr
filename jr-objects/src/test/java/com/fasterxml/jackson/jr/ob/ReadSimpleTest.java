@@ -36,12 +36,12 @@ public class ReadSimpleTest extends TestBase
      */
 
     public void testByteArray() throws Exception {
-        byte[] result = JSON.std.beanFrom(byte[].class, quote("YWJj"));
+        byte[] result = JSON.std.beanFrom(byte[].class, q("YWJj"));
         assertEquals("abc", new String(result, "UTF-8"));
     }
 
     public void testCharArray() throws Exception {
-        char[] result = JSON.std.beanFrom(char[].class, quote("abc"));
+        char[] result = JSON.std.beanFrom(char[].class, q("abc"));
         assertEquals("abc", new String(result));
     }
 
@@ -174,7 +174,7 @@ public class ReadSimpleTest extends TestBase
 
     public void testMiscScalars() throws Exception {
         assertEquals(new Date(123456L), JSON.std.beanFrom(Date.class,"123456"));
-        assertEquals(Object.class, JSON.std.beanFrom(Class.class, quote(Object.class.getName())));
+        assertEquals(Object.class, JSON.std.beanFrom(Class.class, q(Object.class.getName())));
     }
 
     public void testMiscScalarFail() throws Exception {
@@ -264,7 +264,7 @@ public class ReadSimpleTest extends TestBase
         assertEquals(ABC.B, abc);
 
         // then from name
-        abc = JSON.std.beanFrom(ABC.class, quote("C"));
+        abc = JSON.std.beanFrom(ABC.class, q("C"));
         assertEquals(ABC.C, abc);
 
         // `null`s ok too
@@ -303,7 +303,7 @@ public class ReadSimpleTest extends TestBase
         }
 
         try {
-            JSON.std.beanFrom(TreeNode.class, quote("abc"));
+            JSON.std.beanFrom(TreeNode.class, q("abc"));
             fail("Should not pass");
         } catch (JSONObjectException e) {
             verifyException(e, "No `TreeCodec` specified");

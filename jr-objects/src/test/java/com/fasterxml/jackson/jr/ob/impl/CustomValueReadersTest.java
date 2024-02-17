@@ -224,7 +224,7 @@ public class CustomValueReadersTest extends TestBase
     {
         // First: without handler, will fail to map
         try {
-            JSON.std.beanFrom(ABC.class, quote("n/a"));
+            JSON.std.beanFrom(ABC.class, q("n/a"));
             fail("Should not pass");
         } catch (JSONObjectException e) {
             verifyException(e, "Failed to find Enum of type");
@@ -232,13 +232,13 @@ public class CustomValueReadersTest extends TestBase
 
         // then with custom, should be fine
         JSON json = jsonWithProvider(new CustomReaders(0));
-        ABC v = json.beanFrom(ABC.class, quote("n/a"));
+        ABC v = json.beanFrom(ABC.class, q("n/a"));
         assertEquals(ABC.DEF, v);
 
         // but if we remove, again error
         JSON json2 = jsonWithProvider((ReaderWriterProvider) null);
         try {
-            json2.beanFrom(ABC.class, quote("n/a"));
+            json2.beanFrom(ABC.class, q("n/a"));
             fail("Should not pass");
         } catch (JSONObjectException e) {
             verifyException(e, "Failed to find Enum of type");
@@ -249,31 +249,31 @@ public class CustomValueReadersTest extends TestBase
     public void testCustomStringReader() throws Exception
     {
         String allCaps = jsonWithProvider(new CapStringReaderProvider())
-                .beanFrom(String.class, quote("Some text"));
+                .beanFrom(String.class, q("Some text"));
         assertEquals("SOME TEXT", allCaps);
     }
 
     public void testChainedStringReaders() throws Exception {
         String result = jsonWithProviders(new CapStringReaderProvider(),
                 new OverrideStringReaderProvider("foo"))
-                .beanFrom(String.class, quote("Some text"));
+                .beanFrom(String.class, q("Some text"));
         assertEquals("SOME TEXT", result);
 
         result = jsonWithProviders(new NoOpProvider(), new OverrideStringReaderProvider("foo"))
-            .beanFrom(String.class, quote("Some text"));
+            .beanFrom(String.class, q("Some text"));
         assertEquals("foo", result);
 
         // and ok not to have anything, too
         result = jsonWithProviders(new NoOpProvider(), new NoOpProvider())
-                .beanFrom(String.class, quote("Some text"));
+                .beanFrom(String.class, q("Some text"));
         assertEquals("Some text", result);
 
         // Plus nulls fine too
         result = jsonWithProviders(null, new OverrideStringReaderProvider("foo"))
-                .beanFrom(String.class, quote("Some text"));
+                .beanFrom(String.class, q("Some text"));
         assertEquals("foo", result);
         result = jsonWithProviders(new OverrideStringReaderProvider("foo"), null)
-                .beanFrom(String.class, quote("Some text"));
+                .beanFrom(String.class, q("Some text"));
         assertEquals("foo", result);
     }
     
