@@ -88,7 +88,7 @@ public class BeanPropertyIntrospector
     private static void _introspect(Class<?> currType, Map<String, PropBuilder> props,
             int features)
     {
-        if (currType == null || currType == Object.class) {
+        if (currType == null || currType == Object.class || isGroovyMetaClass(currType)) {
             return;
         }
         // First, check base type
@@ -158,12 +158,7 @@ public class BeanPropertyIntrospector
     }
 
     private static PropBuilder _propFrom(Map<String,PropBuilder> props, String name) {
-        PropBuilder prop = props.get(name);
-        if (prop == null) {
-            prop = Prop.builder(name);
-            props.put(name, prop);
-        }
-        return prop;
+        return props.computeIfAbsent(name, Prop::builder);
     }
 
     private static String decap(String name) {
@@ -182,4 +177,13 @@ public class BeanPropertyIntrospector
         return name;
     }
 
+    /**
+     * Another helper method to deal with Groovy's problematic metadata accessors
+     *
+     * @implNote Groovy MetaClass have cyclic reference, and hence the class containing it should not be serialised without
+     * either removing that reference, or skipping over such references.
+     */
+    protected static boolean isGroovyMetaClass(Class<?> clazz) {
+        return clazz.getName().startsWith("groovy.lang");
+    }
 }

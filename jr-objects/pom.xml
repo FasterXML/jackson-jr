@@ -40,6 +40,12 @@ has no other dependencies, and provides additional builder-style content generat
       <artifactId>jackson-core</artifactId>
       <version>${jackson.version.core}</version>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy</artifactId>
+      <version>3.0.18</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -64,9 +70,6 @@ has no other dependencies, and provides additional builder-style content generat
                 <goal>replace</goal>
             </goals>
             <phase>generate-sources</phase>
-<!--
-            <phase>process-sources</phase>
--->
           </execution>
         </executions>
           <configuration>
