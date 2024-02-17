@@ -309,6 +309,27 @@ public class ValueWriterLocator extends ValueLocatorBase
                     f.setAccessible(true);
                 }
             }
+            // NOTE: cannot just call `findSerializationType()` due to
+            // cyclic type definitions.
+
+            int typeId;
+            Integer I = _knownSerTypes.get(new ClassKey(type, _features));
+
+            if (I != null) {
+                typeId = I.intValue();
+            } else {
+                typeId = _findSimpleType(type, true);
+                if ((_writerModifier != null) && typeId != 0) {
+                    ValueWriter w = _writerModifier.overrideStandardValueWriter(_writeContext, type, typeId);
+                    if (w != null) {
+                        typeId = _registerWriter(type, w);
+                    }
+                }
+                // But what if none found? Discovered dynamically later on?
+            }
+
+            // 16-Feb-2024, tatu: Code pre-2.17 -- remove from 2.18 if not needed
+            /*
             int typeId = _findSimpleType(type, true);
             // Give plugin the opportunity to override standard value writer
             if (_writerModifier != null && typeId != 0) {
@@ -318,8 +339,11 @@ public class ValueWriterLocator extends ValueLocatorBase
                     if (w != null) {
                         typeId = _registerWriter(type, w);
                     }
+                } else {
+                    typeId = I.intValue();
                 }
             }
+            */
             props.add(new BeanPropertyWriter(typeId, rawProp.name, rawProp.field, m));
         }
         int plen = props.size();

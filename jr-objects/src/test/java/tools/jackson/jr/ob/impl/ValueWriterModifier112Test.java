@@ -16,6 +16,12 @@ public class ValueWriterModifier112Test extends TestBase
         public Path p2;
     }
 
+    static class StringBean112 {
+        public String s1;
+        public String s2;
+        public String s3;
+    }
+
     static class PathWriter implements ValueWriter {
         @Override
         public void writeValue(JSONWriter context, JsonGenerator g, Object value) {
@@ -28,24 +34,32 @@ public class ValueWriterModifier112Test extends TestBase
         }
     }
 
-    // [jackson-jr#112]
-    public void testMultipleFieldOverrides() throws Exception
-    {
-        TestBean112 input = new TestBean112();
-        input.p1 = Paths.get("some/path");
-        input.p2 = Paths.get("some/other/path");
+    static class UpperCaseWriter implements ValueWriter {
+        @Override
+        public void writeValue(JSONWriter context, JsonGenerator g, Object value) {
+            g.writeString(String.valueOf(value).toUpperCase());
+        }
 
-        JSON writer = JSON.builder()
+        @Override
+        public Class<?> valueType() {
+            return String.class;
+        }
+    }
+
+    private final JSON WRITER = JSON.builder()
             .register(new JacksonJrExtension() {
                 @Override
                 protected void register(ExtensionContext ctxt) {
                     ctxt.insertModifier(new ReaderWriterModifier() {
                         @Override
                         public ValueWriter overrideStandardValueWriter(JSONWriter writeContext, Class<?> type, int stdTypeId) {
-                            if (type == Path.class) {
+                            if (Path.class.isAssignableFrom(type)) {
                                 return new PathWriter();
                             }
-                            return super.overrideStandardValueWriter(writeContext, type, stdTypeId);
+                            if (type == String.class) {
+                                return new UpperCaseWriter();
+                            }
+                            return null;
                         }
                     });
                     ctxt.insertProvider(new ReaderWriterProvider() {
@@ -54,12 +68,29 @@ public class ValueWriterModifier112Test extends TestBase
                             if (Path.class.isAssignableFrom(type)) {
                                 return new PathWriter();
                             }
-                            return super.findValueWriter(writeContext, type);
+                            return null;
                         }
                     });
                 }
             }).build();
-        String json = writer.asString(input);
+
+    // [jackson-jr#112]
+    public void testMultipleFieldOverrides() throws Exception
+    {
+        TestBean112 input = new TestBean112();
+        input.p1 = Paths.get("some/path");
+        input.p2 = Paths.get("some/other/path");
+        String json = WRITER.asString(input);
         assertEquals(a2q("{'p1':'some\\/path','p2':'some\\/other\\/path'}"), json);
+    }
+
+    public void testMultipleStringFieldOverrides() throws Exception
+    {
+        StringBean112 input = new StringBean112();
+        input.s1 = "abc";
+        input.s2 = "def";
+        input.s3 = "g";
+        String json = WRITER.asString(input);
+        assertEquals(a2q("{'s1':'ABC','s2':'DEF','s3':'G'}"), json);
     }
 }
