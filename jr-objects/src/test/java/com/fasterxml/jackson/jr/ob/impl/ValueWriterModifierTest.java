@@ -112,8 +112,12 @@ public class ValueWriterModifierTest extends TestBase
         assertEquals(quote("foobar"), JSON.std.asString(input));
 
         // And then also applicable for multiple POJO properties
-        assertEquals(a2q("{'first':'Bob','last':'Hope'}"),
+        assertEquals(a2q("{'first':'BOB','last':'HOPE'}"),
                 jsonWithMod.asString(new Name("Bob", "Hope")));
+
+        // .. and not global standard variant
+        assertEquals(a2q("{'first':'Bob','last':'Hope'}"),
+                JSON.std.asString(new Name("Bob", "Hope")));
     }
 
     public void testPOJOWriterReplacement() throws Exception

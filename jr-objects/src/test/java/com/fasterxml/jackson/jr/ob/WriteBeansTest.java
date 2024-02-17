@@ -55,6 +55,24 @@ public class WriteBeansTest extends TestBase
             bean = b;
         }
     }
+
+    static class TreeNodeBean {
+        public int id;
+        public String name;
+
+        public TreeNodeBean nextLeft, nextRight;
+
+        public TreeNodeBean(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
+    /*
+    /**********************************************************************
+    /* Test methods
+    /**********************************************************************
+     */
     
     public void testBinary() throws Exception
     {
@@ -127,5 +145,20 @@ public class WriteBeansTest extends TestBase
                 withNulls.asString(new StringBeanBean(null)));
         assertEquals(a2q("{'bean':{'value':null}}"),
                 withNulls.asString(new StringBeanBean(new StringBean(null))));
+    }
+
+    public void testBeanWithRecursiveType() throws Exception
+    {
+        TreeNodeBean root = new TreeNodeBean(1, "root");
+        TreeNodeBean left = new TreeNodeBean(2, "left");
+        TreeNodeBean right = new TreeNodeBean(3, "right");
+        root.nextLeft = left;
+        root.nextRight = right;
+
+        assertEquals(a2q("{'id':1,'name':'root',"
+                +"'nextLeft':{'id':2,'name':'left'},"
+                +"'nextRight':{'id':3,'name':'right'}"
+                +"}"),
+                JSON.std.asString(root));
     }
 }
