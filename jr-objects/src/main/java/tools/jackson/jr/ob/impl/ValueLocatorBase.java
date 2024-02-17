@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.*;
 
 import tools.jackson.core.TreeNode;
@@ -116,6 +117,7 @@ public abstract class ValueLocatorBase
     public final static int SER_UUID = 34;
     public final static int SER_URL = 35;
     public final static int SER_URI = 36;
+    public final static int SER_PATH = 37; // since 2.17
 
     // // // Iterate-able types
 
@@ -123,7 +125,7 @@ public abstract class ValueLocatorBase
      * Anything that implements {@link java.lang.Iterable}, but not
      * {@link java.util.Collection}.
      */
-    public final static int SER_ITERABLE = 37;
+    public final static int SER_ITERABLE = 38;
 
     /*
     /**********************************************************************
@@ -239,6 +241,9 @@ public abstract class ValueLocatorBase
         }
         if (UUID.class.isAssignableFrom(raw)) {
             return SER_UUID;
+        }
+        if (Path.class.isAssignableFrom(raw)) {
+            return SER_PATH;
         }
         // May or may not help with deser, but recognized nonetheless;
         // on assumption that Beans should rarely implement `CharSequence`

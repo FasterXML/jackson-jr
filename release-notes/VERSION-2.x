@@ -18,6 +18,7 @@ Modules:
 #112: `overrideStandardValueWriter` only applied to first `java.nio.file.Path`
   valued field of bean
  (reported by Julian H)
+#116: Add read/write support for `java.nio.file.Path`
 
 2.16.1 (24-Dec-2023)
 

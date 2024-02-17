@@ -5,6 +5,7 @@ import static tools.jackson.jr.ob.impl.ValueWriterLocator.*;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.file.Path;
 import java.util.*;
 
 import tools.jackson.core.*;
@@ -268,6 +269,9 @@ public class JSONWriter
         case SER_URI:
             writeStringLikeProperty(propName, value.toString(), type);
             return;
+        case SER_PATH:
+            writeStringLikeProperty(propName, ((Path) value).toUri().toString(), type);
+            return;
 
         // Others
 
@@ -397,6 +401,9 @@ public class JSONWriter
         case SER_URL:
         case SER_URI:
             writeStringLikeValue(value.toString(), type);
+            return;
+        case SER_PATH:
+            writeStringLikeValue(((Path) value).toUri().toString(), type);
             return;
 
         case SER_ITERABLE:

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.*;
 
 import tools.jackson.core.*;
@@ -243,6 +244,16 @@ public class SimpleValueReader extends ValueReader
                 return null;
             }
             return URI.create(p.getValueAsString());
+        case SER_PATH:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
+            String pathStr = p.getValueAsString();
+            try {
+                return Paths.get(new URI(pathStr));
+            } catch (Exception e) {
+                throw new JSONObjectException("Failed to bind `java.nio.file.Path` from value '"+pathStr+"'");
+            }
 
 //        case SER_MAP:
 //        case SER_LIST:
