@@ -9,20 +9,20 @@ import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class JacksonJavaTimeReaderWriterProvider extends ReaderWriterProvider {
+public class JavaTimeReaderWriterProvider extends ReaderWriterProvider {
     private DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     @Override
     public ValueReader findValueReader(JSONReader readContext, Class<?> type) {
-        return type.equals(LocalDateTime.class) ? new JacksonJavaTimeValueReader(formatter) : null;
+        return type.equals(LocalDateTime.class) ? new JavaTimeValueReader(formatter) : null;
     }
 
     @Override
     public ValueWriter findValueWriter(JSONWriter writeContext, Class<?> type) {
-        return type.equals(LocalDateTime.class) ? new JacksonJavaTimeValueWriter(formatter) : null;
+        return type.equals(LocalDateTime.class) ? new JavaTimeValueWriter(formatter) : null;
     }
 
-    public JacksonJavaTimeReaderWriterProvider withFormatter(DateTimeFormatter formatter) {
+    public JavaTimeReaderWriterProvider withFormatter(DateTimeFormatter formatter) {
         this.formatter = formatter;
         return this;
     }
