@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class JavaTimeValueWriter implements ValueWriter {
+public class LocalDateTimeValueWriter implements ValueWriter {
     private final DateTimeFormatter formatter;
 
-    public JavaTimeValueWriter(DateTimeFormatter formatter) {
+    public LocalDateTimeValueWriter(DateTimeFormatter formatter) {
         this.formatter = formatter;
     }
 

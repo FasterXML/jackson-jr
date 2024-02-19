@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class JavaTimeValueReader extends ValueReader {
+public class LocalDateTimeValueReader extends ValueReader {
     private final DateTimeFormatter formatter;
 
-    public JavaTimeValueReader(DateTimeFormatter formatter) {
+    public LocalDateTimeValueReader(DateTimeFormatter formatter) {
         super(LocalDateTime.class);
         this.formatter = formatter;
     }
