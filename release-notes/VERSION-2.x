@@ -13,7 +13,12 @@ Modules:
 
 2.17.0 (not yet released)
 
--
+#78: Deserializes "null" to "0.0" for `java.lang.Double` (wrapper)
+ (reported by @bill-phast)
+#112: `overrideStandardValueWriter` only applied to first `java.nio.file.Path`
+  valued field of bean
+ (reported by Julian H)
+#116: Add read/write support for `java.nio.file.Path`
 
 2.16.1 (24-Dec-2023)
 
@@ -23,6 +28,10 @@ No changes since 2.16.0
 
 * Upgrade `retrofit` dependency to 2.9.0 (from 2.7.2)
 * Upgrade `okhttp` dependency (of retrofit) to 4.11.0 (from 3.14.9)
+
+2.15.4
+
+No changes since 2.15.3
 
 2.15.3 (12-Oct-2023)
 
@@ -39,7 +48,6 @@ No changes since 2.14
 
 #102: Missing module-info dependency from `jackson-jr-annotation-support`
 #103: Some artifacts missing `NOTICE`, `LICENSE` files
-- Java/JDK baseline raised to Java 8
 
 2.14.2 (28-Jan-2023)
 2.14.1 (21-Nov-2022)

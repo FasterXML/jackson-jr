@@ -48,7 +48,7 @@ public class POJODefinitionOverrideTest extends TestBase
     public void testReadIgnoreProperty() throws Exception
     {
         // verify default read first
-        final String INPUT = aposToQuotes("{'first':'Bob','last':'Burger'}");
+        final String INPUT = a2q("{'first':'Bob','last':'Burger'}");
         NameBean bean = JSON.std.beanFrom(NameBean.class, INPUT);
         assertEquals("Bob", bean.getFirst());
         assertEquals("Burger", bean.getLast());
@@ -67,7 +67,7 @@ public class POJODefinitionOverrideTest extends TestBase
 
     public void testModifierPairForReading() throws Exception
     {
-        final String INPUT = aposToQuotes("{'first':'Bob','last':'Burger'}");
+        final String INPUT = a2q("{'first':'Bob','last':'Burger'}");
         NameBean bean = jsonWithModifiers(new NoOpModifier(), new MyPropertyModifier("last"))
                 .beanFrom(NameBean.class, INPUT);
         assertEquals("Bob", bean.getFirst());
@@ -84,14 +84,14 @@ public class POJODefinitionOverrideTest extends TestBase
     {
         // verify default write first
         final NameBean input = new NameBean("Bob", "Burger");
-        final String EXP_DEFAULT = aposToQuotes("{'first':'Bob','last':'Burger'}");
+        final String EXP_DEFAULT = a2q("{'first':'Bob','last':'Burger'}");
 
         assertEquals(EXP_DEFAULT, JSON.std.asString(input));
 
         // but then use customized POJO introspection
         String json = jsonWithModifier(new MyPropertyModifier("xxx"))
                 .asString(input);
-        assertEquals(aposToQuotes("{'last':'Burger','first':'Bob'}"), json);
+        assertEquals(a2q("{'last':'Burger','first':'Bob'}"), json);
         
         // and last, to ensure no leakage of customizations
         assertEquals(EXP_DEFAULT, JSON.std.asString(input));
@@ -103,11 +103,11 @@ public class POJODefinitionOverrideTest extends TestBase
 
         String json = jsonWithModifiers(new NoOpModifier(), new MyPropertyModifier("xxx"))
                 .asString(input);
-        assertEquals(aposToQuotes("{'last':'Burger','first':'Bill'}"), json);
+        assertEquals(a2q("{'last':'Burger','first':'Bill'}"), json);
 
         // and nulls fine too wrt chaining
         json = jsonWithModifiers(null, new MyPropertyModifier("xxx"))
                 .asString(input);
-        assertEquals(aposToQuotes("{'last':'Burger','first':'Bill'}"), json);
+        assertEquals(a2q("{'last':'Burger','first':'Bill'}"), json);
     }
 }

@@ -59,7 +59,7 @@ public class JacksonJrsTreeCodec extends TreeCodec
             {
                 Map<String, JrsValue> values = _map();
                 while (p.nextToken() != JsonToken.END_OBJECT) {
-                    final String currentName = p.getCurrentName();
+                    final String currentName = p.currentName();
                     p.nextToken();
                     values.put(currentName, nodeFrom(p));
                 }

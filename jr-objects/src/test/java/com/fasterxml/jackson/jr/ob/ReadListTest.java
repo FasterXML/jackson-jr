@@ -85,7 +85,7 @@ public class ReadListTest extends TestBase
                 .with(JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY)
                 .with(JSON.Feature.USE_FIELDS)
                 .beanFrom(ListHolder.class,
-                        aposToQuotes("{'stuff':[{'a':4}, {'a':6}]}"));
+                        a2q("{'stuff':[{'a':4}, {'a':6}]}"));
         List<Map<String, Integer>> list = h.stuff;
         assertNotNull(list);
         assertEquals(2, list.size());
@@ -99,7 +99,7 @@ public class ReadListTest extends TestBase
                 .with(JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY)
                 .with(JSON.Feature.USE_FIELDS)
                 .beanFrom(ListHolder.class,
-                        aposToQuotes("{'stuff':{ 'a' : 3 }}"));
+                        a2q("{'stuff':{ 'a' : 3 }}"));
         } catch (JSONObjectException e) {
             verifyException(e, "Unexpected token START_OBJECT");
         }

@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -36,12 +38,12 @@ public class ReadSimpleTest extends TestBase
      */
 
     public void testByteArray() throws Exception {
-        byte[] result = JSON.std.beanFrom(byte[].class, quote("YWJj"));
+        byte[] result = JSON.std.beanFrom(byte[].class, q("YWJj"));
         assertEquals("abc", new String(result, "UTF-8"));
     }
 
     public void testCharArray() throws Exception {
-        char[] result = JSON.std.beanFrom(char[].class, quote("abc"));
+        char[] result = JSON.std.beanFrom(char[].class, q("abc"));
         assertEquals("abc", new String(result));
     }
 
@@ -174,9 +176,20 @@ public class ReadSimpleTest extends TestBase
 
     public void testMiscScalars() throws Exception {
         assertEquals(new Date(123456L), JSON.std.beanFrom(Date.class,"123456"));
-        assertEquals(Object.class, JSON.std.beanFrom(Class.class, quote(Object.class.getName())));
+        assertEquals(Object.class, JSON.std.beanFrom(Class.class, q(Object.class.getName())));
     }
 
+    public void testMiscUriTypes() throws Exception
+    {
+        final String URL_STR = "http://fasterxml.com";
+        final URL url = new URL(URL_STR);
+        assertEquals(url, JSON.std.beanFrom(URL.class, q(URL_STR)));
+
+        Path p = Paths.get(new URI("file:///foo/bar.txt"));
+        assertEquals(p,
+                JSON.std.beanFrom(Path.class, q("file:///foo/bar.txt")));
+    }
+    
     public void testMiscScalarFail() throws Exception {
         for (String input : new String[] { " false ",  "true", "[ ]", "{ }" } ) {
             try {
@@ -220,13 +233,13 @@ public class ReadSimpleTest extends TestBase
 
     // Testing that `null` will not cause an exception, for now at least
     public void testNullForPrimitiveProperties() throws Exception {
-        BooleanWrapper w = JSON.std.beanFrom(BooleanWrapper.class, aposToQuotes("{'value':null}"));
+        BooleanWrapper w = JSON.std.beanFrom(BooleanWrapper.class, a2q("{'value':null}"));
         assertNotNull(w);
         assertFalse(w.value);
     }
 
     public void testNullForScalarProperties() throws Exception {
-        DateWrapper w = JSON.std.beanFrom(DateWrapper.class, aposToQuotes("{'value':null}"));
+        DateWrapper w = JSON.std.beanFrom(DateWrapper.class, a2q("{'value':null}"));
         assertNotNull(w);
         assertNull(w.value);
     }
@@ -264,7 +277,7 @@ public class ReadSimpleTest extends TestBase
         assertEquals(ABC.B, abc);
 
         // then from name
-        abc = JSON.std.beanFrom(ABC.class, quote("C"));
+        abc = JSON.std.beanFrom(ABC.class, q("C"));
         assertEquals(ABC.C, abc);
 
         // `null`s ok too
@@ -303,7 +316,7 @@ public class ReadSimpleTest extends TestBase
         }
 
         try {
-            JSON.std.beanFrom(TreeNode.class, quote("abc"));
+            JSON.std.beanFrom(TreeNode.class, q("abc"));
             fail("Should not pass");
         } catch (JSONObjectException e) {
             verifyException(e, "No `TreeCodec` specified");

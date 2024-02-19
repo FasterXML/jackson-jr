@@ -21,7 +21,7 @@ public class ReadSequencesTest extends TestBase
 
     public void testAnySequence() throws Exception
     {
-        final String INPUT = aposToQuotes("'hello world!' 127 true [ 1, 2, 3]\nnull { 'msg':'none'}   ");
+        final String INPUT = a2q("'hello world!' 127 true [ 1, 2, 3]\nnull { 'msg':'none'}   ");
 
         // First, managed
         ValueIterator<Object> it = JSON.std.anySequenceFrom(INPUT);
@@ -104,7 +104,7 @@ public class ReadSequencesTest extends TestBase
 
     public void testBeanSequence() throws Exception
     {
-        final String INPUT = aposToQuotes("{'id':1, 'msg':'foo'} {'id':2, 'msg':'Same'} null   ");
+        final String INPUT = a2q("{'id':1, 'msg':'foo'} {'id':2, 'msg':'Same'} null   ");
 
         // First, managed
         ValueIterator<Bean> it = JSON.std.beanSequenceFrom(Bean.class, INPUT);
