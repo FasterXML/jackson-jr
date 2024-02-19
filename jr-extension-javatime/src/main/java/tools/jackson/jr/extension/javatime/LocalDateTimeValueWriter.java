@@ -1,12 +1,12 @@
-package com.fasterxml.jackson.jr.extension.javatime;
+package tools.jackson.jr.extension.javatime;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.jr.ob.api.ValueWriter;
-import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
-
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.jr.ob.api.ValueWriter;
+import tools.jackson.jr.ob.impl.JSONWriter;
 
 public class LocalDateTimeValueWriter implements ValueWriter {
     private final DateTimeFormatter formatter;
@@ -16,7 +16,7 @@ public class LocalDateTimeValueWriter implements ValueWriter {
     }
 
     @Override
-    public void writeValue(JSONWriter context, JsonGenerator g, Object value) throws IOException {
+    public void writeValue(JSONWriter context, JsonGenerator g, Object value) throws JacksonException {
         String localDateTimeString = ((LocalDateTime) value).format(formatter);
         context.writeValue(localDateTimeString);
     }

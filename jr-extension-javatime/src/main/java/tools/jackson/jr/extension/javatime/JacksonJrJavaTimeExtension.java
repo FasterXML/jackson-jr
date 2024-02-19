@@ -1,7 +1,7 @@
-package com.fasterxml.jackson.jr.extension.javatime;
+package tools.jackson.jr.extension.javatime;
 
-import com.fasterxml.jackson.jr.ob.JacksonJrExtension;
-import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
+import tools.jackson.jr.ob.JacksonJrExtension;
+import tools.jackson.jr.ob.api.ExtensionContext;
 
 public class JacksonJrJavaTimeExtension extends JacksonJrExtension {
     final static JavaTimeReaderWriterProvider DEFAULT_RW_PROVIDER = new JavaTimeReaderWriterProvider();

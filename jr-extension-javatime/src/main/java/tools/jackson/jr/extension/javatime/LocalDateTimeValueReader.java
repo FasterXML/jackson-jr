@@ -1,12 +1,13 @@
-package com.fasterxml.jackson.jr.extension.javatime;
+package tools.jackson.jr.extension.javatime;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.jr.ob.api.ValueReader;
-import com.fasterxml.jackson.jr.ob.impl.JSONReader;
-
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+
+import tools.jackson.jr.ob.api.ValueReader;
+import tools.jackson.jr.ob.impl.JSONReader;
 
 public class LocalDateTimeValueReader extends ValueReader {
     private final DateTimeFormatter formatter;
@@ -17,7 +18,7 @@ public class LocalDateTimeValueReader extends ValueReader {
     }
 
     @Override
-    public Object read(JSONReader reader, JsonParser p) throws IOException {
+    public Object read(JSONReader reader, JsonParser p) throws JacksonException {
         return LocalDateTime.parse(p.getText(), formatter);
     }
 }

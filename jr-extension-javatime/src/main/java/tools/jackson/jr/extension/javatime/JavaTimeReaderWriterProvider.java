@@ -1,10 +1,8 @@
-package com.fasterxml.jackson.jr.extension.javatime;
+package tools.jackson.jr.extension.javatime;
 
-import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
-import com.fasterxml.jackson.jr.ob.api.ValueReader;
-import com.fasterxml.jackson.jr.ob.api.ValueWriter;
-import com.fasterxml.jackson.jr.ob.impl.JSONReader;
-import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
+import tools.jackson.jr.ob.api.*;
+import tools.jackson.jr.ob.impl.JSONReader;
+import tools.jackson.jr.ob.impl.JSONWriter;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

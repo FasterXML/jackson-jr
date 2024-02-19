@@ -1,6 +1,6 @@
-module com.fasterxml.jackson.jr.extension.javatime {
-    requires com.fasterxml.jackson.core;
-    requires com.fasterxml.jackson.jr.ob;
+module tools.jackson.jr.extension.javatime {
+    requires tools.jackson.core;
+    requires tools.jackson.jr.ob;
 
-    exports com.fasterxml.jackson.jr.extension.javatime;
+    exports tools.jackson.jr.extension.javatime;
 }
