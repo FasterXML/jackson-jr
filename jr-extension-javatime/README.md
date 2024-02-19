@@ -10,7 +10,7 @@ Added in Jackson 2.17.
 To be able to use supported annotations, you need to register extension like so:
 ```java
     private static final JSON JACKSON = JSON.builder()
-        .register(new JacksonJavaTimeExtension())
+        .register(new JacksonJrJavaTimeExtension())
         .build();
 ```
 after which you can use normal read and write operations as usual:
@@ -45,7 +45,7 @@ public class MyClass {
 }
 ```
 
-### Date Classes currently supported by `JacksonJavaTimeExtension`
+### Date Classes currently supported by `JacksonJrJavaTimeExtension`
 
 - `java.util.LocalDateTime`
 
