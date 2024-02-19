@@ -25,6 +25,7 @@
     <module>jr-retrofit2</module>
     <module>jr-stree</module>
     <module>jr-annotation-support</module>
+    <module>jr-extension-javatime</module>
     <module>jr-all</module>
   </modules>
 
