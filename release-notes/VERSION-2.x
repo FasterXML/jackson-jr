@@ -15,6 +15,9 @@ Modules:
 
 #78: Deserializes "null" to "0.0" for `java.lang.Double` (wrapper)
  (reported by @bill-phast)
+#100: Add support for `java.time` (Java 8 date/time) types
+ (requested by @sebastian-zero)
+ (contributed by @Shounaks) 
 #112: `overrideStandardValueWriter` only applied to first `java.nio.file.Path`
   valued field of bean
  (reported by Julian H)
