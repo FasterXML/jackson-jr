@@ -789,7 +789,8 @@ public class JSONWriter
      * @since 2.17
      */
     protected String pathToString(Path value) {
-        return value.toUri().toString();
+//        return value.toUri().toString();
+        return value.toString();
     }
 
     /*
