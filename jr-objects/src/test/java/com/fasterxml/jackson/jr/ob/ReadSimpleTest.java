@@ -186,8 +186,9 @@ public class ReadSimpleTest extends TestBase
         assertEquals(url, JSON.std.beanFrom(URL.class, q(URL_STR)));
 
         Path p = Paths.get(new URI("file:///foo/bar.txt"));
+        String json = JSON.std.asString(p);
         assertEquals(p,
-                JSON.std.beanFrom(Path.class, q("file:///foo/bar.txt")));
+                JSON.std.beanFrom(Path.class, json));
     }
     
     public void testMiscScalarFail() throws Exception {
