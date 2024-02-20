@@ -117,7 +117,7 @@ public class BeanPropertyIntrospector
             // 13-Jun-2015, tatu: Skip synthetic, bridge methods altogether, for now
             //    at least (add more complex handling only if absolutely necessary)
             if (Modifier.isStatic(flags)
-                    || m.isSynthetic() || m.isBridge()) {
+                    || m.isSynthetic() || m.isBridge() || isGroovyMetaClass(m.getReturnType())) {
                 continue;
             }
             Class<?> argTypes[] = m.getParameterTypes();
