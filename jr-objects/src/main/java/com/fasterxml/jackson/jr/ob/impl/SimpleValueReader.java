@@ -278,8 +278,7 @@ public class SimpleValueReader extends ValueReader
         }
         String v = p.getValueAsString();
         try {
-//            return Paths.get(new URI(v));
-            return Paths.get(new File(v).toURI());
+            return Paths.get(v);
         } catch (Exception e) {
             throw new JSONObjectException("Failed to bind `java.nio.file.Path` from value '"+v+"'");
         }
