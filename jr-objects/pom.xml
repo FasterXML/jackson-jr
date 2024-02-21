@@ -40,6 +40,12 @@ has no other dependencies, and provides additional builder-style content generat
       <artifactId>jackson-core</artifactId>
       <version>${jackson.version.core}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.groovy</groupId>
+      <artifactId>groovy</artifactId>
+      <version>4.0.18</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -53,6 +59,21 @@ has no other dependencies, and provides additional builder-style content generat
           </links>
         </configuration>
 
+      </plugin>
+
+      <!-- 20-Feb-2024, tatu: Need Groovy compilation for one test
+	-->
+      <plugin>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>gmaven-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+           <goals>
+             <goal>testCompile</goal>
+           </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>com.google.code.maven-replacer-plugin</groupId>

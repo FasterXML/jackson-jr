@@ -23,6 +23,12 @@ Jonas Konrad (@yawkat)
 * Suggested #88: Make `jr-stree` dependency to `jr-objects` optional
  (2.13.0)
 
+Nikolay Chashnikov (@chashnikov)
+
+* Requested #93: Skip serialization of `groovy.lang.MetaClass`
+  values to avoid `StackOverflowError`
+ (2.17.0)
+
 Gerben Oolbekkink (@github)
 
 * Reported #98: `module-info.java` of `jr-stree` refers to module `com.fasterxml.jackson.jr.ob.api`,
@@ -42,5 +48,8 @@ Julian Honnen (@jhonnen)
 
 @Shounaks
 
-* Contributed implf ro #100: Add support for `java.time` (Java 8 date/time) types
+* Contributed fix for #93: Skip serialization of `groovy.lang.MetaClass` values
+  to avoid `StackOverflowError`
+ (2.17.0)
+* Contributed impl for #100: Add support for `java.time` (Java 8 date/time) types
  (2.17.0)
