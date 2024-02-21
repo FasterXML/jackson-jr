@@ -152,9 +152,15 @@ public class SimpleValueReader extends ValueReader
             return p.getValueAsLong();
 
         case SER_NUMBER_BIG_DECIMAL:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             return p.getDecimalValue();
 
         case SER_NUMBER_BIG_INTEGER:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             return p.getBigIntegerValue();
 
         // Other scalar types:
