@@ -43,7 +43,7 @@ has no other dependencies, and provides additional builder-style content generat
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy</artifactId>
-      <version>3.0.18</version>
+      <version>3.0.20</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
