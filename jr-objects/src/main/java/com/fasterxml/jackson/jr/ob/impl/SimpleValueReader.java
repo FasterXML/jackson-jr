@@ -133,10 +133,10 @@ public class SimpleValueReader extends ValueReader
         case SER_NUMBER_DOUBLE:
             return p.getValueAsDouble();
 
-        case SER_NUMBER_BYTE: // fall through
+        case SER_NUMBER_BYTE:
             return (byte) p.getValueAsInt();
             
-        case SER_NUMBER_SHORT: // fall through
+        case SER_NUMBER_SHORT:
             return (short) p.getValueAsInt();
         case SER_NUMBER_INTEGER_WRAPPER:
             if (p.hasToken(JsonToken.VALUE_NULL)) {
