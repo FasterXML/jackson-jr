@@ -54,9 +54,15 @@ public class ValueWriterLocatorTest extends TestBase
         assertEquals(ValueWriterLocator.SER_COLLECTION, td.findSerializationType(LinkedHashSet.class));
         assertEquals(ValueWriterLocator.SER_LIST, td.findSerializationType(ArrayList.class));
 
-        assertEquals(ValueWriterLocator.SER_NUMBER_INTEGER, td.findSerializationType(Integer.class));
         assertEquals(ValueWriterLocator.SER_NUMBER_INTEGER, td.findSerializationType(Integer.TYPE));
+        assertEquals(ValueWriterLocator.SER_NUMBER_INTEGER_WRAPPER, td.findSerializationType(Integer.class));
+
+        assertEquals(ValueWriterLocator.SER_NUMBER_LONG, td.findSerializationType(Long.TYPE));
+        assertEquals(ValueWriterLocator.SER_NUMBER_LONG_WRAPPER, td.findSerializationType(Long.class));
         
+        assertEquals(ValueWriterLocator.SER_NUMBER_DOUBLE, td.findSerializationType(Double.TYPE));
+        assertEquals(ValueWriterLocator.SER_NUMBER_DOUBLE_WRAPPER, td.findSerializationType(Double.class));
+
         // more specific types
         assertEquals(ValueWriterLocator.SER_CALENDAR, td.findSerializationType(Calendar.class));
         assertEquals(ValueWriterLocator.SER_CALENDAR, td.findSerializationType(GregorianCalendar.class));

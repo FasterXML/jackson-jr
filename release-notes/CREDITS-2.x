@@ -33,3 +33,14 @@ Reed Passaretti (@reed53)
 
 * Reported #107: Cannot deserialize `byte[]` from JSON `null` value
  (2.15.3)
+
+Julian Honnen (@jhonnen)
+
+* Reported #112: `overrideStandardValueWriter` only applied to first `java.nio.file.Path`
+  valued field of bean
+ (2.17.0)
+
+@Shounaks
+
+* Contributed implf ro #100: Add support for `java.time` (Java 8 date/time) types
+ (2.17.0)

@@ -29,7 +29,7 @@ public class ReadEnumMap21Test extends TestBase
         WithEnumMap input = new WithEnumMap(DEF.E, "bar");
         // verify serialization, should be ok:
         String json = JSON.std.asString(input);
-        assertEquals(aposToQuotes("{'values':{'E':'bar'}}"), json);
+        assertEquals(a2q("{'values':{'E':'bar'}}"), json);
 
         // and then get it back too
         WithEnumMap result = JSON.std.beanFrom(WithEnumMap.class, json);

@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -60,6 +62,7 @@ public class SimpleValueReader extends ValueReader
         // cases default to "standard" handling which does range checks etc
 
         case SER_NUMBER_INTEGER:
+        case SER_NUMBER_INTEGER_WRAPPER:
             {
                 int i = p.nextIntValue(-2);
                 if (i != -2) {
@@ -69,6 +72,7 @@ public class SimpleValueReader extends ValueReader
             }
 
         case SER_NUMBER_LONG:
+        case SER_NUMBER_LONG_WRAPPER:
             {
                 long l = p.nextLongValue(-2L);
                 if (l != -2L) {
@@ -80,6 +84,7 @@ public class SimpleValueReader extends ValueReader
         // Other scalar types:
 
         case SER_BOOLEAN:
+        case SER_BOOLEAN_WRAPPER:
             {
                 Boolean b = p.nextBooleanValue();
                 if (b != null) {
@@ -115,38 +120,62 @@ public class SimpleValueReader extends ValueReader
 
         // Number types:
             
-        case SER_NUMBER_FLOAT: // fall through
+        case SER_NUMBER_FLOAT_WRAPPER:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
+        case SER_NUMBER_FLOAT:
             return Float.valueOf((float) p.getValueAsDouble());
+        case SER_NUMBER_DOUBLE_WRAPPER:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
         case SER_NUMBER_DOUBLE:
             return p.getValueAsDouble();
 
-        case SER_NUMBER_BYTE: // fall through
+        case SER_NUMBER_BYTE:
             return (byte) p.getValueAsInt();
             
-        case SER_NUMBER_SHORT: // fall through
+        case SER_NUMBER_SHORT:
             return (short) p.getValueAsInt();
+        case SER_NUMBER_INTEGER_WRAPPER:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
         case SER_NUMBER_INTEGER:
             return p.getValueAsInt();
+        case SER_NUMBER_LONG_WRAPPER:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
         case SER_NUMBER_LONG:
             return p.getValueAsLong();
 
         case SER_NUMBER_BIG_DECIMAL:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             return p.getDecimalValue();
 
         case SER_NUMBER_BIG_INTEGER:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             return p.getBigIntegerValue();
 
         // Other scalar types:
 
         case SER_BOOLEAN:
+        case SER_BOOLEAN_WRAPPER:
             switch (p.currentTokenId()) {
             case JsonTokenId.ID_TRUE:
                 return Boolean.TRUE;
             case JsonTokenId.ID_FALSE:
                 return Boolean.FALSE;
             case JsonTokenId.ID_NULL:
-                // 07-Jul-2020, tatu: since `boolean` and `java.lang.Boolean` both handled
-                //   here, can not (alas!) separate yet
+                if (_typeId == SER_BOOLEAN_WRAPPER) {
+                    return null;
+                }
                 return Boolean.FALSE;
 
             case JsonTokenId.ID_STRING:
@@ -191,7 +220,7 @@ public class SimpleValueReader extends ValueReader
             try {
                 return Class.forName(v);
             } catch (Exception e) {
-                throw new JSONObjectException("Failed to bind java.lang.Class from value '"+v+"'");
+                throw new JSONObjectException("Failed to bind `java.lang.Class` from value '"+v+"'");
             }
         }
         case SER_FILE:
@@ -218,6 +247,8 @@ public class SimpleValueReader extends ValueReader
                 return null;
             }
             return URI.create(p.getValueAsString());
+        case SER_PATH:
+            return _readPath(p);
 
 //        case SER_MAP:
 //        case SER_LIST:
@@ -244,6 +275,19 @@ public class SimpleValueReader extends ValueReader
             return null;
         }
         return p.getBinaryValue();
+    }
+
+    // @since 2.17
+    protected Path _readPath(JsonParser p) throws IOException {
+        if (p.hasToken(JsonToken.VALUE_NULL)) {
+            return null;
+        }
+        String v = p.getValueAsString();
+        try {
+            return Paths.get(v);
+        } catch (Exception e) {
+            throw new JSONObjectException("Failed to bind `java.nio.file.Path` from value '"+v+"'");
+        }
     }
 
     protected int[] _readIntArray(JsonParser p) throws IOException
