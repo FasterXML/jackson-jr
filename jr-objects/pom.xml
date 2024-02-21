@@ -55,10 +55,25 @@ has no other dependencies, and provides additional builder-style content generat
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
           <links combine.children="append">
-            <link>https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.13/</link>
+            <link>https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/2.17/</link>
           </links>
         </configuration>
 
+      </plugin>
+
+      <!-- 20-Feb-2024, tatu: Need Groovy compilation for one test
+	-->
+      <plugin>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>gmaven-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+           <goals>
+             <goal>testCompile</goal>
+           </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>com.google.code.maven-replacer-plugin</groupId>

@@ -1,17 +1,22 @@
 package com.fasterxml.jackson.jr
 
+import org.junit.Test
+import org.junit.Assert
+
 import com.fasterxml.jackson.jr.ob.JSON
 import com.fasterxml.jackson.jr.ob.TestBase
 
-class GroovyTest extends TestBase {
-
+class GroovyTest
+{
+    @Test
     void testSimpleObject() throws Exception {
-        var data = JSON.std.asString(new MyClass())
-        var expected = """{"AAAAA_A_Field_Starting_With_Two_Capital_Letters":"XYZ","aDouble":0.0,"aPublicInitializedInteger":56,"aPublicInitializedIntegerObject":1516,"aPublicUninitializedInteger":0,"anInitializedIntegerObject":1112,"anInitializedPublicString":"stringData","anInitializedString":"ABC","anInteger":0,"anIntegerWithValue":12}"""
-        assertEquals(data, expected)
+        def json = JSON.std.asString(new GroovyOb())
+        def expected = """{"AAAAA_A_Field_Starting_With_Two_Capital_Letters":"XYZ","aDouble":0.0,"aPublicInitializedInteger":56,"aPublicInitializedIntegerObject":1516,"aPublicUninitializedInteger":0,"anInitializedIntegerObject":1112,"anInitializedPublicString":"stringData","anInitializedString":"ABC","anInteger":0,"anIntegerWithValue":12}"""
+        Assert.assertEquals(json, expected)
     }
+}
 
-    private class MyClass {
+class GroovyOb {
         int anInteger
         int anIntegerWithValue = 12
 
@@ -54,5 +59,4 @@ class GroovyTest extends TestBase {
         public double aDouble                               // uninitialized primitive
         public Double aDoubleObject                         // testing boxing object
         private int hiddenvalue = 123                       // private value
-    }
 }
