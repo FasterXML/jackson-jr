@@ -209,9 +209,6 @@ public class ReadSimpleTest extends TestBase
     /**********************************************************************
      */
 
-    // 07-Jul-2020, tatu: Should be able to check but as of 2.11 same reader used
-    //    for wrapper and primitives.
-    /*
     public void testNullForMiscNumbers() throws Exception {
         assertNull(JSON.std.beanFrom(Integer.class," null "));
         assertNull(JSON.std.beanFrom(Long.class," null "));
@@ -220,7 +217,6 @@ public class ReadSimpleTest extends TestBase
         assertNull(JSON.std.beanFrom(BigInteger.class," null "));
         assertNull(JSON.std.beanFrom(BigDecimal.class," null "));
     }
-    */
 
     public void testNullForMiscScalars() throws Exception {
         assertNull(JSON.std.beanFrom(Date.class," null "));

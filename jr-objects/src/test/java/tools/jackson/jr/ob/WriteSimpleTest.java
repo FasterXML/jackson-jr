@@ -130,9 +130,9 @@ public class WriteSimpleTest extends TestBase
     public void testKnownSimpleTypePath() throws Exception
     {
         Path p = Paths.get(new URI("file:///foo/bar.txt"));
-        assertEquals(q("file:\\/\\/\\/foo\\/bar.txt"), JSON.std.asString(p));
+        assertEquals(q("\\/foo\\/bar.txt"), JSON.std.asString(p));
 
-        assertEquals(a2q("{'path':'file:\\/\\/\\/foo\\/bar.txt'}"), JSON.std.asString(new PathWrapper(p)));
+        assertEquals(a2q("{'path':'\\/foo\\/bar.txt'}"), JSON.std.asString(new PathWrapper(p)));
     }
 
     public void testSimpleEnumTypes() throws Exception
