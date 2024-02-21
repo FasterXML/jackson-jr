@@ -88,7 +88,7 @@ public class BeanPropertyIntrospector
     private static void _introspect(Class<?> currType, Map<String, PropBuilder> props,
             int features)
     {
-        if (currType == null || currType == Object.class || isGroovyMetaClass(currType)) {
+        if (currType == null || currType == Object.class) {
             return;
         }
         // First, check base type
@@ -116,8 +116,7 @@ public class BeanPropertyIntrospector
             final int flags = m.getModifiers();
             // 13-Jun-2015, tatu: Skip synthetic, bridge methods altogether, for now
             //    at least (add more complex handling only if absolutely necessary)
-            if (Modifier.isStatic(flags)
-                    || m.isSynthetic() || m.isBridge() || isGroovyMetaClass(m.getReturnType())) {
+            if (Modifier.isStatic(flags) || m.isSynthetic() || m.isBridge() || isGroovyMetaClass(m.getReturnType())) {
                 continue;
             }
             Class<?> argTypes[] = m.getParameterTypes();
@@ -184,6 +183,6 @@ public class BeanPropertyIntrospector
      * either removing that reference, or skipping over such references.
      */
     protected static boolean isGroovyMetaClass(Class<?> clazz) {
-        return clazz.getName().startsWith("groovy.lang");
+        return clazz.getName().startsWith("groovy.lang") && clazz.getSimpleName().equals("MetaClass");
     }
 }
