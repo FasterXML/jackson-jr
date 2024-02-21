@@ -152,9 +152,15 @@ public class SimpleValueReader extends ValueReader
             return p.getValueAsLong();
 
         case SER_NUMBER_BIG_DECIMAL:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             return p.getDecimalValue();
 
         case SER_NUMBER_BIG_INTEGER:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             return p.getBigIntegerValue();
 
         // Other scalar types:
@@ -278,7 +284,7 @@ public class SimpleValueReader extends ValueReader
         }
         String v = p.getValueAsString();
         try {
-            return Paths.get(new URI(v));
+            return Paths.get(v);
         } catch (Exception e) {
             throw new JSONObjectException("Failed to bind `java.nio.file.Path` from value '"+v+"'");
         }
