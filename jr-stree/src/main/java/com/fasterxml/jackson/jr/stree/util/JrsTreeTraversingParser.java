@@ -193,8 +193,14 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
      */
 
     @Override
-    public String getCurrentName() {
+    public String currentName() {
         return (_nodeCursor == null) ? null : _nodeCursor.getCurrentName();
+    }
+
+    @Override
+    @Deprecated // since 2.17
+    public String getCurrentName() {
+        return currentName();
     }
 
     @Override
@@ -211,13 +217,25 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
 
     @Override
-    public JsonLocation getTokenLocation() {
+    public JsonLocation currentTokenLocation() {
         return JsonLocation.NA;
     }
 
     @Override
-    public JsonLocation getCurrentLocation() {
+    @Deprecated // since 2.17
+    public JsonLocation getTokenLocation() {
+        return currentTokenLocation();
+    }
+
+    @Override
+    public JsonLocation currentLocation() {
         return JsonLocation.NA;
+    }
+
+    @Override
+    @Deprecated // since 2.17
+    public JsonLocation getCurrentLocation() {
+        return currentLocation();
     }
 
     /*

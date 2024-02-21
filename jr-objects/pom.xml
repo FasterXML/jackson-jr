@@ -41,9 +41,9 @@ has no other dependencies, and provides additional builder-style content generat
       <version>${jackson.version.core}</version>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
+      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy</artifactId>
-      <version>3.0.20</version>
+      <version>4.0.18</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

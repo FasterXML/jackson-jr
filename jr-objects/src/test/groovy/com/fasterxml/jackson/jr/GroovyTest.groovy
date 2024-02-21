@@ -9,7 +9,7 @@ import com.fasterxml.jackson.jr.ob.TestBase
 class GroovyTest
 {
     @Test
-    void testSimpleObject() throws Exception {
+    void testSimpleGroovyObject() throws Exception {
         def json = JSON.std.asString(new GroovyOb())
         def expected = """{"AAAAA_A_Field_Starting_With_Two_Capital_Letters":"XYZ","aDouble":0.0,"aPublicInitializedInteger":56,"aPublicInitializedIntegerObject":1516,"aPublicUninitializedInteger":0,"anInitializedIntegerObject":1112,"anInitializedPublicString":"stringData","anInitializedString":"ABC","anInteger":0,"anIntegerWithValue":12}"""
         Assert.assertEquals(json, expected)
