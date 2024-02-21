@@ -114,8 +114,7 @@ public class BeanPropertyIntrospector
             final int flags = m.getModifiers();
             // 13-Jun-2015, tatu: Skip synthetic, bridge methods altogether, for now
             //    at least (add more complex handling only if absolutely necessary)
-            if (Modifier.isStatic(flags)
-                    || m.isSynthetic() || m.isBridge()) {
+            if (Modifier.isStatic(flags) || m.isSynthetic() || m.isBridge() || isGroovyMetaClass(m.getReturnType())) {
                 continue;
             }
             Class<?> argTypes[] = m.getParameterTypes();
@@ -156,12 +155,7 @@ public class BeanPropertyIntrospector
     }
 
     private static PropBuilder _propFrom(Map<String,PropBuilder> props, String name) {
-        PropBuilder prop = props.get(name);
-        if (prop == null) {
-            prop = Prop.builder(name);
-            props.put(name, prop);
-        }
-        return prop;
+        return props.computeIfAbsent(name, Prop::builder);
     }
 
     private static String decap(String name) {
@@ -180,4 +174,13 @@ public class BeanPropertyIntrospector
         return name;
     }
 
+    /**
+     * Helper method to detect Groovy's problematic metadata accessor type.
+     *
+     * @implNote Groovy MetaClass have cyclic reference, and hence the class containing it should not be serialised without
+     * either removing that reference, or skipping over such references.
+     */
+    protected static boolean isGroovyMetaClass(Class<?> clazz) {
+        return "groovy.lang.MetaClass".equals(clazz.getName());
+    }
 }

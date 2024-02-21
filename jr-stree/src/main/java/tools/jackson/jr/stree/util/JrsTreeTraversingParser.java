@@ -1,6 +1,5 @@
 package tools.jackson.jr.stree.util;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
