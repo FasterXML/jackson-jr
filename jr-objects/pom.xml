@@ -74,6 +74,10 @@ has no other dependencies, and provides additional builder-style content generat
             <version>4.0.18</version>
           </dependency>
         </dependencies>
+        <configuration>
+          <providerSelection>2.0</providerSelection>
+          <source>2.0</source>
+        </configuration>
         <executions>
           <execution>
            <goals>
