@@ -67,6 +67,13 @@ has no other dependencies, and provides additional builder-style content generat
         <groupId>org.codehaus.gmaven</groupId>
         <artifactId>gmaven-plugin</artifactId>
         <version>1.5</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>4.0.18</version>
+          </dependency>
+        </dependencies>
         <executions>
           <execution>
            <goals>
