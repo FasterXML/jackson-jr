@@ -6,12 +6,12 @@ import com.fasterxml.jackson.jr.ob.TestBase;
 // for [jackson-jr#25], allowing single-int constructors
 public class ReadWithCtors25Test extends TestBase
 {
-    static class FromInt1 {
+    public static class FromInt1 {
         protected int value;
         public FromInt1(int v) { value = v; }
     }
 
-    static class FromInt2 {
+    public static class FromInt2 {
         protected int value;
         public FromInt2(Integer v) { value = v.intValue(); }
     }

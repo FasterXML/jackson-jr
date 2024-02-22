@@ -85,6 +85,7 @@ public class AnnotationBasedIntrospector
         Constructor<?> defaultCtor = null;
         Constructor<?> stringCtor = null;
         Constructor<?> longCtor = null;
+        Constructor<?> intCtor = null;
 
         // A few things only matter during deserialization: constructors,
         // secondary ignoral information:
@@ -99,18 +100,16 @@ public class AnnotationBasedIntrospector
                         stringCtor = ctor;
                     } else if (argType == Long.class || argType == Long.TYPE) {
                         longCtor = ctor;
-                    } else {
-                        continue;
+                    } else if(argType == Integer.class || argType == Integer.TYPE) {
+                        intCtor = ctor;
                     }
-                } else {
-                    continue;
                 }
             }
         }
 
         POJODefinition def = new POJODefinition(_type,
                 _pruneProperties(_forSerialization),
-                defaultCtor, stringCtor, longCtor);
+                defaultCtor, stringCtor, longCtor, intCtor);
         if (_ignorableNames != null) {
             def = def.withIgnorals(_ignorableNames);
         }
@@ -492,12 +491,7 @@ public class AnnotationBasedIntrospector
      */
 
     protected APropBuilder _propBuilder(String name) {
-        APropBuilder b = _props.get(name);
-        if (b == null) {
-            b = new APropBuilder(name);
-            _props.put(name, b);
-        }
-        return b;
+        return _props.computeIfAbsent(name,APropBuilder::new);
     }
 
     protected void _addIgnoral(String name) {

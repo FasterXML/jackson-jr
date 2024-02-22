@@ -443,6 +443,7 @@ public class ValueReaderLocator
         Constructor<?> defaultCtor = beanDef.defaultCtor;
         Constructor<?> stringCtor = beanDef.stringCtor;
         Constructor<?> longCtor = beanDef.longCtor;
+        Constructor<?> intCtor = beanDef.intCtor;
 
         final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
         if (forceAccess) {
@@ -514,7 +515,7 @@ public class ValueReaderLocator
                 }
             }
         }
-        return new BeanReader(raw, propMap, defaultCtor, stringCtor, longCtor,
+        return new BeanReader(raw, propMap, defaultCtor, stringCtor, longCtor,intCtor,
                 beanDef.getIgnorableNames(), aliasMapping);
     }
 

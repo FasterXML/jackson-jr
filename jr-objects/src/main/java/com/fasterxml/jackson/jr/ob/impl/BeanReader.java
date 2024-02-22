@@ -34,12 +34,13 @@ public class BeanReader
     protected final Constructor<?> _defaultCtor;
     protected final Constructor<?> _stringCtor;
     protected final Constructor<?> _longCtor;
+    protected final Constructor<?> _intCtor;
 
     /**
      * Constructors used for deserialization use case
      */
     public BeanReader(Class<?> type, Map<String, BeanPropertyReader> props,
-            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,
+            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor, Constructor<?> intCtor,
             Set<String> ignorableNames, Map<String, String> aliasMapping)
     {
         super(type);
@@ -47,6 +48,8 @@ public class BeanReader
         _defaultCtor = defaultCtor;
         _stringCtor = stringCtor;
         _longCtor = longCtor;
+        _intCtor = intCtor;
+
         if (ignorableNames == null) {
             ignorableNames = Collections.<String>emptySet();
         }
@@ -59,8 +62,8 @@ public class BeanReader
 
     @Deprecated // since 2.11
     public BeanReader(Class<?> type, Map<String, BeanPropertyReader> props,
-            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor) {
-        this(type, props, defaultCtor, stringCtor, longCtor, null, null);
+            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,Constructor<?> intCtor) {
+        this(type, props, defaultCtor, stringCtor, longCtor,intCtor, null, null);
     }
 
     public Map<String,BeanPropertyReader> propertiesByName() { return _propsByName; }
@@ -191,10 +194,13 @@ public class BeanReader
     }
 
     protected Object create(long l) throws Exception {
-        if (_longCtor == null) {
-            throw new IllegalStateException("Class "+_valueType.getName()+" does not have single-long constructor to use");
+        if (_longCtor != null) {
+            return _longCtor.newInstance(l);
+        } else if(_intCtor != null) {
+            return _intCtor.newInstance((int) l);
+        } else {
+            throw new IllegalStateException("Class "+_valueType.getName()+" does not have single-long or single-int constructor to use");
         }
-        return _longCtor.newInstance(l);
     }
 
     protected void handleUnknown(JSONReader reader, JsonParser parser, String fieldName) throws IOException {

@@ -47,12 +47,13 @@ public class BeanPropertyIntrospector
 
     private POJODefinition _construct(Class<?> beanType, int features)
     {
-        Map<String,PropBuilder> propsByName = new TreeMap<String,PropBuilder>();
+        Map<String,PropBuilder> propsByName = new TreeMap<>();
         _introspect(beanType, propsByName, features);
 
         Constructor<?> defaultCtor = null;
         Constructor<?> stringCtor = null;
         Constructor<?> longCtor = null;
+        Constructor<?> intCtor = null;
 
         for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
             Class<?>[] argTypes = ctor.getParameterTypes();
@@ -64,11 +65,9 @@ public class BeanPropertyIntrospector
                     stringCtor = ctor;
                 } else if (argType == Long.class || argType == Long.TYPE) {
                     longCtor = ctor;
-                } else {
-                    continue;
+                } else if (argType == Integer.class || argType == Integer.TYPE) {
+                    intCtor = ctor;
                 }
-            } else {
-                continue;
             }
         }
         final int len = propsByName.size();
@@ -82,7 +81,7 @@ public class BeanPropertyIntrospector
                 props[i++] = builder.build();
             }
         }
-        return new POJODefinition(beanType, props, defaultCtor, stringCtor, longCtor);
+        return new POJODefinition(beanType, props, defaultCtor, stringCtor, longCtor, intCtor);
     }
 
     private static void _introspect(Class<?> currType, Map<String, PropBuilder> props,
@@ -98,8 +97,7 @@ public class BeanPropertyIntrospector
         // then public fields (since 2.8); may or may not be ultimately included
         // but at this point still possible
         for (Field f : currType.getDeclaredFields()) {
-            if (!Modifier.isPublic(f.getModifiers())
-                    || f.isEnumConstant() || f.isSynthetic()) {
+            if (!Modifier.isPublic(f.getModifiers()) || f.isEnumConstant() || f.isSynthetic()) {
                 continue;
             }
             // Only include static members if (a) inclusion feature enabled and

@@ -29,15 +29,17 @@ public class POJODefinition
     public final Constructor<?> defaultCtor;
     public final Constructor<?> stringCtor;
     public final Constructor<?> longCtor;
+    public final Constructor<?> intCtor;
 
     public POJODefinition(Class<?> type, Prop[] props,
-            Constructor<?> defaultCtor0, Constructor<?> stringCtor0, Constructor<?> longCtor0)
+            Constructor<?> defaultCtor0, Constructor<?> stringCtor0, Constructor<?> longCtor0,Constructor<?> intCtor0)
     {
         _type = type;
         _properties = props;
         defaultCtor = defaultCtor0;
         stringCtor = stringCtor0;
         longCtor = longCtor0;
+        intCtor = intCtor0;
         _ignorableNames = null;
     }
 
@@ -49,6 +51,7 @@ public class POJODefinition
         defaultCtor = base.defaultCtor;
         stringCtor = base.stringCtor;
         longCtor = base.longCtor;
+        intCtor = base.intCtor;
         _ignorableNames = ignorableN;
     }
 
