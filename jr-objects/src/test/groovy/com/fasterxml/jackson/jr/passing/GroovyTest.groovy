@@ -14,7 +14,7 @@ class GroovyTest {
 
     @Test
     void testRecord() throws Exception {
-        def json = JSON.std.asString(new Cow("foo", Map.of("foo", "bar")))
+        def json = JSON.std.asString(new Cow("foo", Map<String,String>.of("foo", "bar")))
         def expected = """{"message":"foo","object":{"foo":"bar"}}"""
         Assert.assertEquals(json, expected)
     }
