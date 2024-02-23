@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.jr.passing
+package com.fasterxml.jackson.jr
 
 import com.fasterxml.jackson.jr.ob.JSON
 import org.junit.Assert

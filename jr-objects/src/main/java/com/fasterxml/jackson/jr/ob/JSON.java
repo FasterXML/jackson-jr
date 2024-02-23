@@ -260,6 +260,7 @@ public class JSON implements Versioned
          * @since 2.5
          */
         USE_IS_GETTERS(true, true),
+        USE_FIELD_NAME_GETTERS(true,true),
 
         /**
          * Feature that enables use of public fields instead of setters and getters,
