@@ -13,7 +13,7 @@ import com.fasterxml.jackson.jr.ob.JSON.Feature;
 
 public class WriteSimpleTest extends TestBase
 {
-    final static class POJO {
+    static class POJO {
         public int value = 3;
 
         public POJO() { }
@@ -22,12 +22,20 @@ public class WriteSimpleTest extends TestBase
 
     enum ABC { A, B, C; }
 
-    final static class Address {
+    static class Address {
         public String name;
 
         public Address(String n) { name = n; }
     }
-    
+
+    static class PathWrapper {
+        public Path path;
+
+        public PathWrapper(Path p) {
+            path = p;
+        }
+    }
+
     /*
     /**********************************************************************
     /* Test methdods
@@ -102,18 +110,30 @@ public class WriteSimpleTest extends TestBase
                 JSON.std.asString(stuff));
     }
 
-    public void testKnownSimpleTypes() throws Exception
+    public void testKnownSimpleTypeURI() throws Exception
     {
         final String URL_STR = "http://fasterxml.com";
         final URI uri = new URI(URL_STR);
         assertEquals(q(URL_STR), JSON.std.asString(uri));
+    }
+
+    public void testKnownSimpleTypeFile() throws Exception
+    {
         final String PATH = "/foo/bar.txt";
         assertEquals(q(PATH),
                 JSON.std.asString(new File(PATH)));
+    }
 
+    public void testKnownSimpleTypePath() throws Exception
+    {
         Path p = Paths.get(new URI("file:///foo/bar.txt"));
-        assertEquals(q("file:///foo/bar.txt"), JSON.std.asString(p));
+        assertEquals(q("/foo/bar.txt"), JSON.std.asString(p));
 
+        assertEquals(a2q("{'path':'/foo/bar.txt'}"), JSON.std.asString(new PathWrapper(p)));
+    }
+
+    public void testSimpleEnumTypes() throws Exception
+    {
         assertEquals(q("B"), JSON.std.asString(ABC.B));
         assertEquals("1", JSON.std.with(Feature.WRITE_ENUMS_USING_INDEX).asString(ABC.B));
     }
