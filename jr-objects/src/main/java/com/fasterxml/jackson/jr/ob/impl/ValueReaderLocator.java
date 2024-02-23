@@ -440,21 +440,10 @@ public class ValueReaderLocator
 
     protected BeanReader _resolveBeanForDeser(Class<?> raw, POJODefinition beanDef)
     {
-        Constructor<?> defaultCtor = beanDef.defaultCtor;
-        Constructor<?> stringCtor = beanDef.stringCtor;
-        Constructor<?> longCtor = beanDef.longCtor;
-
+        final BeanConstructors constructors = beanDef.constructors();
         final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
         if (forceAccess) {
-            if (defaultCtor != null) {
-                defaultCtor.setAccessible(true);
-            }
-            if (stringCtor != null) {
-                stringCtor.setAccessible(true);
-            }
-            if (longCtor != null) {
-                longCtor.setAccessible(true);
-            }
+            constructors.forceAccess();
         }
         final boolean caseInsensitive = JSON.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES.isEnabled(_features);
 
@@ -514,7 +503,7 @@ public class ValueReaderLocator
                 }
             }
         }
-        return new BeanReader(raw, propMap, defaultCtor, stringCtor, longCtor,
+        return new BeanReader(raw, propMap, constructors,
                 beanDef.getIgnorableNames(), aliasMapping);
     }
 
