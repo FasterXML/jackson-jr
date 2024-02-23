@@ -45,7 +45,7 @@ public class BeanPropertyIntrospector
 
     private POJODefinition _construct(Class<?> beanType, int features)
     {
-        Map<String,PropBuilder> propsByName = new TreeMap<String,PropBuilder>();
+        Map<String,PropBuilder> propsByName = new TreeMap<>();
         _introspect(beanType, propsByName, features);
 
         Constructor<?> defaultCtor = null;
@@ -62,11 +62,7 @@ public class BeanPropertyIntrospector
                     stringCtor = ctor;
                 } else if (argType == Long.class || argType == Long.TYPE) {
                     longCtor = ctor;
-                } else {
-                    continue;
                 }
-            } else {
-                continue;
             }
         }
         final int len = propsByName.size();
