@@ -1,6 +1,5 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -26,32 +25,19 @@ public class POJODefinition
      */
     protected final Set<String> _ignorableNames;
 
-    public final Constructor<?> defaultCtor;
-    public final Constructor<?> stringCtor;
-    public final Constructor<?> longCtor;
-    public final Constructor<?> intCtor;
+    ConstructorDefinition _ctorDef;
 
-    public POJODefinition(Class<?> type, Prop[] props,
-            Constructor<?> defaultCtor0, Constructor<?> stringCtor0, Constructor<?> longCtor0,Constructor<?> intCtor0)
-    {
+    public POJODefinition(Class<?> type, Prop[] props, ConstructorDefinition ctorDef) {
         _type = type;
         _properties = props;
-        defaultCtor = defaultCtor0;
-        stringCtor = stringCtor0;
-        longCtor = longCtor0;
-        intCtor = intCtor0;
+        _ctorDef=ctorDef;
         _ignorableNames = null;
     }
 
-    protected POJODefinition(POJODefinition base,
-            Prop[] props, Set<String> ignorableN)
-    {
+    protected POJODefinition(POJODefinition base, Prop[] props, Set<String> ignorableN) {
         _type = base._type;
         _properties = props;
-        defaultCtor = base.defaultCtor;
-        stringCtor = base.stringCtor;
-        longCtor = base.longCtor;
-        intCtor = base.intCtor;
+        _ctorDef = base._ctorDef;
         _ignorableNames = ignorableN;
     }
 

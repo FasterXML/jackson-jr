@@ -50,23 +50,20 @@ public class BeanPropertyIntrospector
         Map<String,PropBuilder> propsByName = new TreeMap<>();
         _introspect(beanType, propsByName, features);
 
-        Constructor<?> defaultCtor = null;
-        Constructor<?> stringCtor = null;
-        Constructor<?> longCtor = null;
-        Constructor<?> intCtor = null;
+        ConstructorDefinition ctorDef = new ConstructorDefinition();
 
         for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
             Class<?>[] argTypes = ctor.getParameterTypes();
             if (argTypes.length == 0) {
-                defaultCtor = ctor;
+                ctorDef.register(null,ctor);
             } else if (argTypes.length == 1) {
                 Class<?> argType = argTypes[0];
                 if (argType == String.class) {
-                    stringCtor = ctor;
+                    ctorDef.register(String.class,ctor);
                 } else if (argType == Long.class || argType == Long.TYPE) {
-                    longCtor = ctor;
+                    ctorDef.register(Long.class,ctor);
                 } else if (argType == Integer.class || argType == Integer.TYPE) {
-                    intCtor = ctor;
+                    ctorDef.register(Integer.class,ctor);
                 }
             }
         }
@@ -81,7 +78,7 @@ public class BeanPropertyIntrospector
                 props[i++] = builder.build();
             }
         }
-        return new POJODefinition(beanType, props, defaultCtor, stringCtor, longCtor, intCtor);
+        return new POJODefinition(beanType, props, ctorDef);
     }
 
     private static void _introspect(Class<?> currType, Map<String, PropBuilder> props,

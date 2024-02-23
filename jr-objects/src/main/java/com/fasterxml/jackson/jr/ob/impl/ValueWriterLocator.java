@@ -92,8 +92,8 @@ public class ValueWriterLocator extends ValueLocatorBase
             ReaderWriterProvider rwp, ReaderWriterModifier rwm)
     {
         _features = features;
-        _knownSerTypes = new ConcurrentHashMap<ClassKey, Integer>(20, 0.75f, 2);
-        _knownWriters = new CopyOnWriteArrayList<ValueWriter>();
+        _knownSerTypes = new ConcurrentHashMap<>(20, 0.75f, 2);
+        _knownWriters = new CopyOnWriteArrayList<>();
         _writeContext = null;
         _writerProvider = rwp;
         _writerModifier = rwm;

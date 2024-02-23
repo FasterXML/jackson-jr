@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.impl.ConstructorDefinition;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
@@ -82,34 +83,29 @@ public class AnnotationBasedIntrospector
         _findFields();
         _findMethods();
 
-        Constructor<?> defaultCtor = null;
-        Constructor<?> stringCtor = null;
-        Constructor<?> longCtor = null;
-        Constructor<?> intCtor = null;
+        ConstructorDefinition ctorDef = new ConstructorDefinition();
 
-        // A few things only matter during deserialization: constructors,
+        // A few things only matter during deserialization: ctorDef,
         // secondary ignoral information:
         if (!_forSerialization) {
             for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
                 Class<?>[] argTypes = ctor.getParameterTypes();
                 if (argTypes.length == 0) {
-                    defaultCtor = ctor;
+                    ctorDef.register(null,ctor);
                 } else if (argTypes.length == 1) {
                     Class<?> argType = argTypes[0];
                     if (argType == String.class) {
-                        stringCtor = ctor;
+                        ctorDef.register(String.class,ctor);
                     } else if (argType == Long.class || argType == Long.TYPE) {
-                        longCtor = ctor;
+                        ctorDef.register(Long.class,ctor);
                     } else if(argType == Integer.class || argType == Integer.TYPE) {
-                        intCtor = ctor;
+                        ctorDef.register(Integer.class,ctor);
                     }
                 }
             }
         }
 
-        POJODefinition def = new POJODefinition(_type,
-                _pruneProperties(_forSerialization),
-                defaultCtor, stringCtor, longCtor, intCtor);
+        POJODefinition def = new POJODefinition(_type, _pruneProperties(_forSerialization), ctorDef);
         if (_ignorableNames != null) {
             def = def.withIgnorals(_ignorableNames);
         }

@@ -440,10 +440,10 @@ public class ValueReaderLocator
 
     protected BeanReader _resolveBeanForDeser(Class<?> raw, POJODefinition beanDef)
     {
-        Constructor<?> defaultCtor = beanDef.defaultCtor;
-        Constructor<?> stringCtor = beanDef.stringCtor;
-        Constructor<?> longCtor = beanDef.longCtor;
-        Constructor<?> intCtor = beanDef.intCtor;
+        Constructor<?> defaultCtor = beanDef._ctorDef.getConstructor(null);
+        Constructor<?> stringCtor = beanDef._ctorDef.getConstructor(String.class);
+        Constructor<?> longCtor = beanDef._ctorDef.getConstructor(Long.class);
+        Constructor<?> intCtor = beanDef._ctorDef.getConstructor(Integer.class);
 
         final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
         if (forceAccess) {
@@ -455,6 +455,9 @@ public class ValueReaderLocator
             }
             if (longCtor != null) {
                 longCtor.setAccessible(true);
+            }
+            if(intCtor != null) {
+                intCtor.setAccessible(true);
             }
         }
         final boolean caseInsensitive = JSON.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES.isEnabled(_features);
@@ -468,9 +471,9 @@ public class ValueReaderLocator
             propMap = Collections.emptyMap();
         } else {
             propMap = caseInsensitive
-                    ? new TreeMap<String, BeanPropertyReader>(String.CASE_INSENSITIVE_ORDER)
+                    ? new TreeMap<>(String.CASE_INSENSITIVE_ORDER)
                     // 13-May-2021, tatu: Let's retain ordering here:
-                    : new LinkedHashMap<String, BeanPropertyReader>();
+                    : new LinkedHashMap<>();
             final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
             for (int i = 0; i < len; ++i) {
                 POJODefinition.Prop rawProp = rawProps.get(i);
@@ -515,8 +518,7 @@ public class ValueReaderLocator
                 }
             }
         }
-        return new BeanReader(raw, propMap, defaultCtor, stringCtor, longCtor,intCtor,
-                beanDef.getIgnorableNames(), aliasMapping);
+        return new BeanReader(raw, propMap, beanDef._ctorDef, beanDef.getIgnorableNames(), aliasMapping);
     }
 
     private TypeBindings _bindings(Class<?> ctxt) {
