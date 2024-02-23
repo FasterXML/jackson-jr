@@ -99,11 +99,7 @@ public class AnnotationBasedIntrospector
                         stringCtor = ctor;
                     } else if (argType == Long.class || argType == Long.TYPE) {
                         longCtor = ctor;
-                    } else {
-                        continue;
                     }
-                } else {
-                    continue;
                 }
             }
         }
@@ -492,12 +488,7 @@ public class AnnotationBasedIntrospector
      */
 
     protected APropBuilder _propBuilder(String name) {
-        APropBuilder b = _props.get(name);
-        if (b == null) {
-            b = new APropBuilder(name);
-            _props.put(name, b);
-        }
-        return b;
+        return _props.computeIfAbsent(name,APropBuilder::new);
     }
 
     protected void _addIgnoral(String name) {
