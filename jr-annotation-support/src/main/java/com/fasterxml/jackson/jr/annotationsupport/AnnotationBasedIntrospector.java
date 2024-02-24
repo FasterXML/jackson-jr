@@ -44,7 +44,7 @@ public class AnnotationBasedIntrospector
     protected int _features;
 
     protected AnnotationBasedIntrospector(Class<?> type, boolean serialization,
-                                          JsonAutoDetect.Value visibility, int features) {
+            JsonAutoDetect.Value visibility, int features) {
         _type = type;
         _forSerialization = serialization;
         _ignorableNames = serialization ? null : new HashSet<String>();

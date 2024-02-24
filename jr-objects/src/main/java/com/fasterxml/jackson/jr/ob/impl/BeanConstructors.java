@@ -3,9 +3,10 @@ package com.fasterxml.jackson.jr.ob.impl;
 import java.lang.reflect.Constructor;
 
 /**
- * Container class added in 2.17 to encapsulate collection and use
- * of various Constructors for User-defined (non-JDK) types (aka
- * "Beans").
+ * Container class added to encapsulate details of collection and use of
+ * Constructors for User-defined (non-JDK) types (aka "Beans").
+ * 
+ * @since 2.17
  */
 public class BeanConstructors
 {
