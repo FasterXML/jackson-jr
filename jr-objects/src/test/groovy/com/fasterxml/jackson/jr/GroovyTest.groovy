@@ -18,6 +18,13 @@ class GroovyTest {
         def expected = """{"message":"foo","object":{"foo":"bar"}}"""
         Assert.assertEquals(json, expected)
     }
+
+    @Test
+    void testRecordEquivalentObjects() throws Exception {
+        def json = JSON.std.asString(new SurrogateCowObject("foo", Map<String,String>.of("foo", "bar")))
+        def expected = """{"message":"foo","object":{"foo":"bar"}}"""
+        Assert.assertEquals(json, expected)
+    }
 }
 
 class GroovyOb {
@@ -63,6 +70,16 @@ class GroovyOb {
     public double aDouble                               // uninitialized primitive
     public Double aDoubleObject                         // testing boxing object
     private int hiddenvalue = 123                       // private value
+}
+
+class SurrogateCowObject{
+    public final String message;
+    public final Map<String,String> object;
+
+    SurrogateCowObject(String message,Map<String,String> object) {
+        this.message = message
+        this.object = object
+    }
 }
 
 record Cow(String message, Map<String, String> object) {}
