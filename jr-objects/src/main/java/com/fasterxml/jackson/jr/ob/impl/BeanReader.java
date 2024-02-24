@@ -58,7 +58,7 @@ public class BeanReader
         _aliasMapping = aliasMapping;
     }
 
-    @Deprecated // since 2.18
+    @Deprecated // since 2.17
     public BeanReader(Class<?> type, Map<String, BeanPropertyReader> props,
             Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,
             Set<String> ignorableNames, Map<String, String> aliasMapping)

@@ -83,7 +83,7 @@ public class AnnotationBasedIntrospector
         _findFields();
         _findMethods();
 
-        BeanConstructors constructors = null;
+        final BeanConstructors constructors;
 
         // A few things only matter during deserialization: constructors,
         // secondary ignoral information:
