@@ -22,19 +22,32 @@ public class POJODefinition
      */
     protected final Set<String> _ignorableNames;
 
-    public final Constructor<?> defaultCtor;
-    public final Constructor<?> stringCtor;
-    public final Constructor<?> longCtor;
+    /**
+     * @since 2.17
+     */
+    protected final BeanConstructors _constructors;
 
+    /**
+     * @since 2.17
+     */
     public POJODefinition(Class<?> type, Prop[] props,
-            Constructor<?> defaultCtor0, Constructor<?> stringCtor0, Constructor<?> longCtor0)
+            BeanConstructors constructors)
     {
         _type = type;
         _properties = props;
-        defaultCtor = defaultCtor0;
-        stringCtor = stringCtor0;
-        longCtor = longCtor0;
+        _constructors = constructors;
         _ignorableNames = null;
+    }
+
+    @Deprecated // Since 2.17
+    public POJODefinition(Class<?> type, Prop[] props,
+            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor)
+    {
+        this(type, props,
+                new BeanConstructors(type)
+                .addNoArgsConstructor(defaultCtor)
+                .addStringConstructor(stringCtor)
+                .addLongConstructor(longCtor));
     }
 
     protected POJODefinition(POJODefinition base,
@@ -42,9 +55,7 @@ public class POJODefinition
     {
         _type = base._type;
         _properties = props;
-        defaultCtor = base.defaultCtor;
-        stringCtor = base.stringCtor;
-        longCtor = base.longCtor;
+        _constructors = base._constructors;
         _ignorableNames = ignorableN;
     }
 
@@ -71,6 +82,13 @@ public class POJODefinition
             return Collections.emptySet();
         }
         return _ignorableNames;
+    }
+
+    /**
+     * @since 2.17
+     */
+    public BeanConstructors constructors() {
+        return _constructors;
     }
 
     /*

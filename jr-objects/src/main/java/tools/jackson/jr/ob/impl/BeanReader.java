@@ -1,11 +1,11 @@
 package tools.jackson.jr.ob.impl;
 
-import java.lang.reflect.Constructor;
 import java.util.*;
 
 import tools.jackson.core.*;
 import tools.jackson.core.sym.PropertyNameMatcher;
 import tools.jackson.core.util.Named;
+
 import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.JSONObjectException;
 import tools.jackson.jr.ob.api.ValueReader;
@@ -29,9 +29,7 @@ public class BeanReader
     protected final Set<String> _ignorableNames;
     protected final boolean _caseInsensitive;
 
-    protected final Constructor<?> _defaultCtor;
-    protected final Constructor<?> _stringCtor;
-    protected final Constructor<?> _longCtor;
+    protected final BeanConstructors _constructors;
 
     // // 13-Dec-2017, tatu: NOTE! These will be constructed right after construction, but
     // //    not during it (due to need to resolve possible cyclic deps). So they are
@@ -44,15 +42,13 @@ public class BeanReader
      * Constructors used for deserialization use case
      */
     protected BeanReader(Class<?> type, Map<String,BeanPropertyReader> propsByName,
-            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,
+            BeanConstructors constructors,
             Set<String> ignorableNames, Map<String, String> aliasMapping,
             boolean caseInsensitive)
     {
         super(type);
         _propsByName = propsByName;
-        _defaultCtor = defaultCtor;
-        _stringCtor = stringCtor;
-        _longCtor = longCtor;
+        _constructors = constructors;
         _ignorableNames = ignorableNames;
         _aliasMapping = aliasMapping;
         _caseInsensitive = caseInsensitive;
@@ -112,7 +108,7 @@ public class BeanReader
      * @since 3.0
      */
     public static BeanReader construct(Class<?> type, Map<String, BeanPropertyReader> props,
-            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,
+            BeanConstructors constructors,
             Set<String> ignorableProps, Map<String, String> aliasMapping,
             boolean caseInsensitive)
     {
@@ -122,7 +118,7 @@ public class BeanReader
         if (aliasMapping == null) {
             aliasMapping = Collections.emptyMap();
         }
-        return new BeanReader(type, props, defaultCtor, stringCtor, longCtor,
+        return new BeanReader(type, props, constructors,
                 ignorableProps, aliasMapping, caseInsensitive);
     }
 
@@ -142,7 +138,7 @@ public class BeanReader
         if (p.isExpectedStartObjectToken()) {
             final Object bean;
             try {
-                bean = create();
+                bean = _constructors.create();
             } catch (Exception e) {
                 return _reportFailureToCreate(p, e);
             }
@@ -154,9 +150,9 @@ public class BeanReader
             case JsonTokenId.ID_NULL:
                 return null;
             case JsonTokenId.ID_STRING:
-                return create(p.getText());
+                return _constructors.create(p.getText());
             case JsonTokenId.ID_NUMBER_INT:
-                return create(p.getLongValue());
+                return _constructors.create(p.getLongValue());
             default:
             }
         } catch (Exception e) {
@@ -173,7 +169,7 @@ public class BeanReader
         if (t == JsonToken.START_OBJECT) {
             final Object bean;
             try {
-                bean = create();
+                bean = _constructors.create();
             } catch (Exception e) {
                 return _reportFailureToCreate(p, e);
             }
@@ -186,9 +182,9 @@ public class BeanReader
                 case VALUE_NULL:
                     return null;
                 case VALUE_STRING:
-                    return create(p.getText());
+                    return _constructors.create(p.getText());
                 case VALUE_NUMBER_INT:
-                    return create(p.getLongValue());
+                    return _constructors.create(p.getLongValue());
                 default:
                 }
             } catch (Exception e) {
@@ -344,27 +340,6 @@ public class BeanReader
         }                    
         
         return bean;
-    }
-
-    protected Object create() throws Exception {
-        if (_defaultCtor == null) {
-            throw new IllegalStateException("Class `"+_valueType.getName()+"` does not have default constructor to use");
-        }
-        return _defaultCtor.newInstance((Object[]) null);
-    }
-    
-    protected Object create(String str) throws Exception {
-        if (_stringCtor == null) {
-            throw new IllegalStateException("Class `"+_valueType.getName()+"` does not have single-String constructor to use");
-        }
-        return _stringCtor.newInstance(str);
-    }
-
-    protected Object create(long l) throws Exception {
-        if (_longCtor == null) {
-            throw new IllegalStateException("Class `"+_valueType.getName()+"` does not have single-long constructor to use");
-        }
-        return _longCtor.newInstance(l);
     }
 
     protected void handleUnknown(JSONReader reader, JsonParser parser, String fieldName)

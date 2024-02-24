@@ -455,21 +455,10 @@ public class ValueReaderLocator
 
     protected BeanReader _resolveBeanForDeser(Class<?> raw, POJODefinition beanDef)
     {
-        Constructor<?> defaultCtor = beanDef.defaultCtor;
-        Constructor<?> stringCtor = beanDef.stringCtor;
-        Constructor<?> longCtor = beanDef.longCtor;
-
+        final BeanConstructors constructors = beanDef.constructors();
         final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
         if (forceAccess) {
-            if (defaultCtor != null) {
-                defaultCtor.setAccessible(true);
-            }
-            if (stringCtor != null) {
-                stringCtor.setAccessible(true);
-            }
-            if (longCtor != null) {
-                longCtor.setAccessible(true);
-            }
+            constructors.forceAccess();
         }
         final List<POJODefinition.Prop> rawProps = beanDef.getProperties();
         final int len = rawProps.size();
@@ -479,7 +468,7 @@ public class ValueReaderLocator
         if (len == 0) {
             propMap = Collections.emptyMap();
         } else {
-            propMap = new LinkedHashMap<String, BeanPropertyReader>();
+            propMap = new LinkedHashMap<>();
             final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
             for (int i = 0; i < len; ++i) {
                 POJODefinition.Prop rawProp = rawProps.get(i);
@@ -514,7 +503,7 @@ public class ValueReaderLocator
                 //   we must link via name of primary property, unfortunately:
                 if (rawProp.hasAliases()) {
                     if (aliasMapping == null) {
-                        aliasMapping = new LinkedHashMap<String, String>();
+                        aliasMapping = new LinkedHashMap<>();
                     }
                     for (String alias : rawProp.aliases()) {
                         aliasMapping.put(alias, rawProp.name);
@@ -523,7 +512,7 @@ public class ValueReaderLocator
             }
         }
         final boolean caseInsensitive = JSON.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES.isEnabled(_features);
-        return BeanReader.construct(raw, propMap, defaultCtor, stringCtor, longCtor,
+        return BeanReader.construct(raw, propMap, constructors,
                 beanDef.getIgnorableNames(), aliasMapping, caseInsensitive);
     }
 

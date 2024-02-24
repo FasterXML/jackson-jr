@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import tools.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.impl.BeanConstructors;
 import tools.jackson.jr.ob.impl.JSONReader;
 import tools.jackson.jr.ob.impl.JSONWriter;
 import tools.jackson.jr.ob.impl.POJODefinition;
@@ -39,7 +40,7 @@ public class AnnotationBasedIntrospector
     protected int _features;
 
     protected AnnotationBasedIntrospector(Class<?> type, boolean serialization,
-                                          JsonAutoDetect.Value visibility, int features) {
+            JsonAutoDetect.Value visibility, int features) {
         _type = type;
         _forSerialization = serialization;
         _ignorableNames = serialization ? null : new HashSet<String>();
@@ -78,31 +79,33 @@ public class AnnotationBasedIntrospector
         _findFields();
         _findMethods();
 
-        Constructor<?> defaultCtor = null;
-        Constructor<?> stringCtor = null;
-        Constructor<?> longCtor = null;
+        final BeanConstructors constructors;
 
         // A few things only matter during deserialization: constructors,
         // secondary ignoral information:
-        if (!_forSerialization) {
+        if (_forSerialization) {
+            constructors = null;
+        } else {
+            constructors = new BeanConstructors(_type);
             for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
                 Class<?>[] argTypes = ctor.getParameterTypes();
                 if (argTypes.length == 0) {
-                    defaultCtor = ctor;
+                    constructors.addNoArgsConstructor(ctor);
                 } else if (argTypes.length == 1) {
                     Class<?> argType = argTypes[0];
                     if (argType == String.class) {
-                        stringCtor = ctor;
+                        constructors.addStringConstructor(ctor);
+                    } else if (argType == Integer.class || argType == Integer.TYPE) {
+                        constructors.addIntConstructor(ctor);
                     } else if (argType == Long.class || argType == Long.TYPE) {
-                        longCtor = ctor;
+                        constructors.addLongConstructor(ctor);
                     }
                 }
             }
         }
 
         POJODefinition def = new POJODefinition(_type,
-                _pruneProperties(_forSerialization),
-                defaultCtor, stringCtor, longCtor);
+                _pruneProperties(_forSerialization), constructors);
         if (_ignorableNames != null) {
             def = def.withIgnorals(_ignorableNames);
         }

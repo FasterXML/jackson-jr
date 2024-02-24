@@ -1,7 +1,4 @@
-package tools.jackson.jr.failing;
-
-import tools.jackson.jr.ob.JSON;
-import tools.jackson.jr.ob.TestBase;
+package tools.jackson.jr.ob;
 
 // for [jackson-jr#25], allowing single-int constructors
 public class ReadWithCtors25Test extends TestBase
