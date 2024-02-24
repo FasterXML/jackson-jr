@@ -21,9 +21,13 @@ class GroovyTest {
 
     @Test
     void testRecordEquivalentObjects() throws Exception {
-        def json = JSON.std.asString(new SurrogateCowObject("foo", Map<String,String>.of("foo", "bar")))
         def expected = """{"message":"foo","object":{"foo":"bar"}}"""
+
+        def json = JSON.std.asString(new SurrogateCowObject("foo", Map<String,String>.of("foo", "bar")))
         Assert.assertEquals(json, expected)
+
+        def json2 = JSON.std.asString(new SurrogateCowObject2("foo", Map<String,String>.of("foo", "bar")))
+        Assert.assertEquals(json2, expected)
     }
 }
 
@@ -82,4 +86,21 @@ class SurrogateCowObject{
     }
 }
 
+class SurrogateCowObject2{
+    private final String message;
+    private final Map<String,String> object;
+
+    SurrogateCowObject2(String message,Map<String,String> object) {
+        this.message = message
+        this.object = object
+    }
+
+    String message() {
+        return message
+    }
+
+    Map<String, String> object() {
+        return object
+    }
+}
 record Cow(String message, Map<String, String> object) {}
