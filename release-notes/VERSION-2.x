@@ -14,6 +14,7 @@ Modules:
 2.17.0 (not yet released)
 
 #25: Add support single-int Constructors
+ (contributed by @Shounaks) 
 #78: Deserializes "null" to "0.0" for `java.lang.Double` (wrapper)
  (reported by @bill-phast)
 #93: Skip serialization of `groovy.lang.MetaClass` values to avoid `StackOverflowError`
