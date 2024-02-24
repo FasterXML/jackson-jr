@@ -60,6 +60,8 @@ public class BeanPropertyIntrospector
                 Class<?> argType = argTypes[0];
                 if (argType == String.class) {
                     constructors.addStringConstructor(ctor);
+                } else if (argType == Integer.class || argType == Integer.TYPE) {
+                    constructors.addIntConstructor(ctor);
                 } else if (argType == Long.class || argType == Long.TYPE) {
                     constructors.addLongConstructor(ctor);
                 }

@@ -82,11 +82,6 @@ public class POJODefinition
         return Arrays.asList(_properties);
     }
 
-    @Deprecated // in 2.11, will be removed soon
-    public Prop[] properties() {
-        return _properties;
-    }
-
     public Set<String> getIgnorableNames() {
         if (_ignorableNames == null) {
             return Collections.emptySet();

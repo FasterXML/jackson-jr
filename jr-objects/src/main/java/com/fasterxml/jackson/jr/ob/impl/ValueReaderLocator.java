@@ -456,9 +456,9 @@ public class ValueReaderLocator
             propMap = Collections.emptyMap();
         } else {
             propMap = caseInsensitive
-                    ? new TreeMap<String, BeanPropertyReader>(String.CASE_INSENSITIVE_ORDER)
+                    ? new TreeMap<>(String.CASE_INSENSITIVE_ORDER)
                     // 13-May-2021, tatu: Let's retain ordering here:
-                    : new LinkedHashMap<String, BeanPropertyReader>();
+                    : new LinkedHashMap<>();
             final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
             for (int i = 0; i < len; ++i) {
                 POJODefinition.Prop rawProp = rawProps.get(i);
@@ -494,8 +494,8 @@ public class ValueReaderLocator
                 if (rawProp.hasAliases()) {
                     if (aliasMapping == null) {
                         aliasMapping = caseInsensitive
-                                ? new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER)
-                                : new HashMap<String, String>();
+                                ? new TreeMap<>(String.CASE_INSENSITIVE_ORDER)
+                                : new HashMap<>();
                     }
                     for (String alias : rawProp.aliases()) {
                         aliasMapping.put(alias, rawProp.name);

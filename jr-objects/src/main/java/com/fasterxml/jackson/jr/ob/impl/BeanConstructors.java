@@ -12,8 +12,10 @@ public class BeanConstructors
     protected final Class<?> _valueType;
 
     protected Constructor<?> _noArgsCtor;
-    protected Constructor<?> _stringCtor;
+
+    protected Constructor<?> _intCtor;
     protected Constructor<?> _longCtor;
+    protected Constructor<?> _stringCtor;
 
     public BeanConstructors(Class<?> valueType) {
         _valueType = valueType;
@@ -24,8 +26,8 @@ public class BeanConstructors
         return this;
     }
 
-    public BeanConstructors addStringConstructor(Constructor<?> ctor) {
-        _stringCtor = ctor;
+    public BeanConstructors addIntConstructor(Constructor<?> ctor) {
+        _intCtor = ctor;
         return this;
     }
 
@@ -34,15 +36,23 @@ public class BeanConstructors
         return this;
     }
 
+    public BeanConstructors addStringConstructor(Constructor<?> ctor) {
+        _stringCtor = ctor;
+        return this;
+    }
+
     public void forceAccess() {
         if (_noArgsCtor != null) {
             _noArgsCtor.setAccessible(true);
         }
-        if (_stringCtor != null) {
-            _stringCtor.setAccessible(true);
+        if (_intCtor != null) {
+            _intCtor.setAccessible(true);
         }
         if (_longCtor != null) {
             _longCtor.setAccessible(true);
+        }
+        if (_stringCtor != null) {
+            _stringCtor.setAccessible(true);
         }
     }
 
@@ -61,9 +71,16 @@ public class BeanConstructors
     }
 
     protected Object create(long l) throws Exception {
-        if (_longCtor == null) {
-            throw new IllegalStateException("Class "+_valueType.getName()+" does not have single-long constructor to use");
+        // 23-Feb-2024, tatu: As per [jackson-jr#25] can have `int`-constructors too.
+        //    For now no need to try to optimize separately
+        if (_longCtor != null) {
+            return _longCtor.newInstance(l);
         }
-        return _longCtor.newInstance(l);
+        if (_intCtor != null) {
+            // TODO: should this do bounds checks?
+            return _intCtor.newInstance((int) l);
+        }
+        throw new IllegalStateException("Class "+_valueType.getName()
+            +" does not have single-long or single-int constructor to use");
     }
 }

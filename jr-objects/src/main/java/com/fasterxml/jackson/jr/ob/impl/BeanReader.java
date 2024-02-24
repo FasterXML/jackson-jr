@@ -107,7 +107,7 @@ public class BeanReader
                     Object bean = _constructors.create();
                     final Object[] valueBuf = r._setterBuffer;
                     String propName;
-                    
+
                     for (; (propName = p.nextFieldName()) != null; ) {
                         BeanPropertyReader prop = findProperty(propName);
                         if (prop == null) {
@@ -158,7 +158,7 @@ public class BeanReader
                     Object bean = _constructors.create();
                     String propName;
                     final Object[] valueBuf = r._setterBuffer;
-                    
+
                     for (; (propName = p.nextFieldName()) != null; ) {
                         BeanPropertyReader prop = findProperty(propName);
                         if (prop == null) {
@@ -171,8 +171,7 @@ public class BeanReader
                     // also verify we are not confused...
                     if (!p.hasToken(JsonToken.END_OBJECT)) {
                         throw _reportProblem(p);
-                    }                    
-                    
+                    }
                     return bean;
                 }
             default:
