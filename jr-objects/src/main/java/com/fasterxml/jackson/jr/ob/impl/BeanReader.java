@@ -31,22 +31,23 @@ public class BeanReader
     // @since 2.11
     protected final Set<String> _ignorableNames;
 
-    protected final Constructor<?> _defaultCtor;
-    protected final Constructor<?> _stringCtor;
-    protected final Constructor<?> _longCtor;
+    /**
+     * @since 2.17
+     */
+    protected final BeanConstructors _constructors;
 
     /**
      * Constructors used for deserialization use case
+     *
+     * @since 2.17
      */
     public BeanReader(Class<?> type, Map<String, BeanPropertyReader> props,
-            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,
+            BeanConstructors constructors,
             Set<String> ignorableNames, Map<String, String> aliasMapping)
     {
         super(type);
         _propsByName = props;
-        _defaultCtor = defaultCtor;
-        _stringCtor = stringCtor;
-        _longCtor = longCtor;
+        _constructors = constructors;
         if (ignorableNames == null) {
             ignorableNames = Collections.<String>emptySet();
         }
@@ -55,6 +56,17 @@ public class BeanReader
             aliasMapping = Collections.emptyMap();
         }
         _aliasMapping = aliasMapping;
+    }
+
+    @Deprecated // since 2.17
+    public BeanReader(Class<?> type, Map<String, BeanPropertyReader> props,
+            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor,
+            Set<String> ignorableNames, Map<String, String> aliasMapping)
+    {
+        this(type, props, new BeanConstructors(type).addNoArgsConstructor(defaultCtor)
+                .addStringConstructor(stringCtor)
+                .addLongConstructor(longCtor),
+                ignorableNames, aliasMapping);
     }
 
     @Deprecated // since 2.11
@@ -87,15 +99,15 @@ public class BeanReader
             case VALUE_NULL:
                 return null;
             case VALUE_STRING:
-                return create(p.getText());
+                return _constructors.create(p.getText());
             case VALUE_NUMBER_INT:
-                return create(p.getLongValue());
+                return _constructors.create(p.getLongValue());
             case START_OBJECT:
                 {
-                    Object bean = create();
+                    Object bean = _constructors.create();
                     final Object[] valueBuf = r._setterBuffer;
                     String propName;
-                    
+
                     for (; (propName = p.nextFieldName()) != null; ) {
                         BeanPropertyReader prop = findProperty(propName);
                         if (prop == null) {
@@ -138,15 +150,15 @@ public class BeanReader
             case VALUE_NULL:
                 return null;
             case VALUE_STRING:
-                return create(p.getText());
+                return _constructors.create(p.getText());
             case VALUE_NUMBER_INT:
-                return create(p.getLongValue());
+                return _constructors.create(p.getLongValue());
             case START_OBJECT:
                 {
-                    Object bean = create();
+                    Object bean = _constructors.create();
                     String propName;
                     final Object[] valueBuf = r._setterBuffer;
-                    
+
                     for (; (propName = p.nextFieldName()) != null; ) {
                         BeanPropertyReader prop = findProperty(propName);
                         if (prop == null) {
@@ -159,8 +171,7 @@ public class BeanReader
                     // also verify we are not confused...
                     if (!p.hasToken(JsonToken.END_OBJECT)) {
                         throw _reportProblem(p);
-                    }                    
-                    
+                    }
                     return bean;
                 }
             default:
@@ -174,27 +185,6 @@ public class BeanReader
         }
         throw JSONObjectException.from(p, "Can not create a %s instance out of %s",
                 _valueType.getName(), _tokenDesc(p));
-    }
-    
-    protected Object create() throws Exception {
-        if (_defaultCtor == null) {
-            throw new IllegalStateException("Class "+_valueType.getName()+" does not have default constructor to use");
-        }
-        return _defaultCtor.newInstance((Object[]) null);
-    }
-    
-    protected Object create(String str) throws Exception {
-        if (_stringCtor == null) {
-            throw new IllegalStateException("Class "+_valueType.getName()+" does not have single-String constructor to use");
-        }
-        return _stringCtor.newInstance(str);
-    }
-
-    protected Object create(long l) throws Exception {
-        if (_longCtor == null) {
-            throw new IllegalStateException("Class "+_valueType.getName()+" does not have single-long constructor to use");
-        }
-        return _longCtor.newInstance(l);
     }
 
     protected void handleUnknown(JSONReader reader, JsonParser parser, String fieldName) throws IOException {
