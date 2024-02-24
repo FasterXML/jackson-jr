@@ -241,7 +241,7 @@ You can use Maven dependency like:
 <dependency>
   <groupId>com.fasterxml.jackson.jr</groupId>
   <artifactId>jackson-jr-objects</artifactId>
-  <version>2.13.0</version>
+  <version>2.16.1</version>
 </dependency>
 ```
 
