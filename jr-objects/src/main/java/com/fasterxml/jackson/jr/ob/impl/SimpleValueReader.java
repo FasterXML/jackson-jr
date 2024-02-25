@@ -1,6 +1,10 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,13 +12,12 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
+import java.util.stream.IntStream;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.JsonTokenId;
-import com.fasterxml.jackson.jr.ob.JSONObjectException;
-import com.fasterxml.jackson.jr.ob.api.ValueReader;
+import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
 
 /**
  * Default {@link ValueReader} used for simple scalar types and related,
@@ -292,8 +295,14 @@ public class SimpleValueReader extends ValueReader
 
     protected int[] _readIntArray(JsonParser p) throws IOException
     {
-        // !!! TODO
-        throw new JSONObjectException("Reading of int[] not yet implemented");
+        final IntStream.Builder builder = IntStream.builder();
+        while(p.getCurrentToken() != null){
+            if(!p.getCurrentToken().equals(JsonToken.START_ARRAY) && !p.getCurrentToken().equals(JsonToken.END_ARRAY)){
+                builder.add(p.getValueAsInt());
+            }
+            p.nextToken();
+        }
+        return builder.build().toArray();
     }
 
     protected long _fetchLong(JsonParser p) throws IOException
