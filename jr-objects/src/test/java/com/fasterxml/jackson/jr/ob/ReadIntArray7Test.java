@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.jr.failing;
+package com.fasterxml.jackson.jr.ob;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.TestBase;

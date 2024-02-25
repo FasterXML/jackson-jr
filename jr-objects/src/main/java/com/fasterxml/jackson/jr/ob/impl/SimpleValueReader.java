@@ -293,13 +293,14 @@ public class SimpleValueReader extends ValueReader
         }
     }
 
-    protected int[] _readIntArray(JsonParser p) throws IOException
-    {
+    protected int[] _readIntArray(JsonParser p) throws IOException {
+        if (p.getCurrentToken().equals(JsonToken.START_ARRAY)) {
+            p.nextToken();
+        }
+
         final IntStream.Builder builder = IntStream.builder();
-        while(p.getCurrentToken() != null){
-            if(!p.getCurrentToken().equals(JsonToken.START_ARRAY) && !p.getCurrentToken().equals(JsonToken.END_ARRAY)){
-                builder.add(p.getValueAsInt());
-            }
+        while (!p.getCurrentToken().equals(JsonToken.END_ARRAY)) {
+            builder.add(p.getValueAsInt());
             p.nextToken();
         }
         return builder.build().toArray();
