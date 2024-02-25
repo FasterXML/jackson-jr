@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-public class JacksonJrJavaTimeExtensionTest extends TestCase {
+public class JacksonJrJavaExtensionsTest extends TestCase {
 
     public void testLocalDateTimeTest() throws Exception {
         //Register the extension
