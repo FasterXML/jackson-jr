@@ -21,7 +21,7 @@ public class TypeResolver implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-    private final static ResolvedType[] NO_TYPES = new ResolvedType[0];
+    private final static ResolvedType[] NO_TYPES = ResolvedType.NO_TYPES;
     
     // // Pre-created instances
 

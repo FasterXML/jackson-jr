@@ -89,9 +89,6 @@ public class JrsObject
      */
 
     public Iterator<Map.Entry<String, JrsValue>> fields() {
-        if (_values.isEmpty()) {
-            return _values.entrySet().iterator();
-        }
         return _values.entrySet().iterator();
     }
 

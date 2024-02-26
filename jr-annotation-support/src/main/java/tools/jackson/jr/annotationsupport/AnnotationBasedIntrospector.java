@@ -660,11 +660,9 @@ public class AnnotationBasedIntrospector
                     if (ann != null) {
                         final String[] names = ann.value();
                         if (collectedAliases == null) {
-                            collectedAliases = new HashSet<String>();
+                            collectedAliases = new HashSet<>();
                         }
-                        for (String alias : names) {
-                            collectedAliases.add(alias);
-                        }
+                        collectedAliases.addAll(Arrays.asList(names));
                     }
                 }
             }
