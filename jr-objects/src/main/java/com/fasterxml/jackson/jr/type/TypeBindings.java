@@ -14,7 +14,7 @@ public final class TypeBindings
 
     private final static String[] NO_STRINGS = new String[0];
 
-    private final static ResolvedType[] NO_TYPES = new ResolvedType[0];
+    private final static ResolvedType[] NO_TYPES = ResolvedType.NO_TYPES;
 
     private final static TypeBindings EMPTY = new TypeBindings(NO_STRINGS, NO_TYPES, null);
 
