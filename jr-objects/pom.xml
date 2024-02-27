@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.fasterxml.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
-    <version>2.17.0-rc1-SNAPSHOT</version>
+    <version>2.17.0-rc1</version>
   </parent>
   <artifactId>jackson-jr-objects</artifactId>
   <packaging>bundle</packaging>
@@ -31,7 +31,7 @@ has no other dependencies, and provides additional builder-style content generat
     <packageVersion.template.output>${generatedSourcesDir}/${packageVersion.dir}/PackageVersion.java</packageVersion.template.output>
 
     <!-- for Reproducible Builds -->
-    <project.build.outputTimestamp>2023-11-15T22:39:39Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2024-02-27T01:46:45Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
