@@ -294,12 +294,12 @@ public class SimpleValueReader extends ValueReader
     }
 
     protected int[] _readIntArray(JsonParser p) throws IOException {
-        if (p.getCurrentToken().equals(JsonToken.START_ARRAY)) {
+        if (JsonToken.START_ARRAY.equals(p.currentToken())) {
             p.nextToken();
         }
 
         final IntStream.Builder builder = IntStream.builder();
-        while (!p.getCurrentToken().equals(JsonToken.END_ARRAY)) {
+        while (!JsonToken.END_ARRAY.equals(p.currentToken())) {
             builder.add(p.getValueAsInt());
             p.nextToken();
         }
