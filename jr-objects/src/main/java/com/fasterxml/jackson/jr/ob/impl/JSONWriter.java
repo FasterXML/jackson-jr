@@ -268,7 +268,7 @@ public class JSONWriter
             writeStringLikeField(fieldName, value.toString(), type);
             return;
         case SER_PATH:
-            writeStringLikeField(fieldName, ((Path) value).toUri().toString(), type);
+            writeStringLikeField(fieldName, pathToString((Path) value), type);
             return;
 
         // Others
@@ -398,7 +398,7 @@ public class JSONWriter
             writeStringLikeValue(value.toString(), type);
             return;
         case SER_PATH:
-            writeStringLikeValue(((Path) value).toUri().toString(), type);
+            writeStringLikeValue(pathToString((Path) value), type);
             return;
 
         case SER_ITERABLE:
@@ -783,6 +783,13 @@ public class JSONWriter
         //   since this relies on system-wide defaults, and hard/impossible to
         //   change easily
         return v.toString();
+    }
+
+    /**
+     * @since 2.17
+     */
+    protected String pathToString(Path value) {
+        return value.toString();
     }
 
     /*

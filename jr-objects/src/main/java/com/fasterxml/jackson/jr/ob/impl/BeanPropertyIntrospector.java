@@ -32,11 +32,11 @@ public class BeanPropertyIntrospector
     public static BeanPropertyIntrospector instance() { return INSTANCE; }
 
     public POJODefinition pojoDefinitionForDeserialization(JSONReader r, Class<?> pojoType) {
-        return _construct(pojoType, r.features());
+        return _introspectDefinition(pojoType, false, r.features());
     }
 
     public POJODefinition pojoDefinitionForSerialization(JSONWriter w, Class<?> pojoType) {
-        return _construct(pojoType, w.features());
+        return _introspectDefinition(pojoType, true, w.features());
     }
 
     /*
@@ -45,32 +45,35 @@ public class BeanPropertyIntrospector
     /**********************************************************************
      */
 
-    private POJODefinition _construct(Class<?> beanType, int features)
+    private POJODefinition _introspectDefinition(Class<?> beanType,
+            boolean forSerialization, int features)
     {
-        Map<String,PropBuilder> propsByName = new TreeMap<String,PropBuilder>();
+        Map<String,PropBuilder> propsByName = new TreeMap<>();
         _introspect(beanType, propsByName, features);
 
-        Constructor<?> defaultCtor = null;
-        Constructor<?> stringCtor = null;
-        Constructor<?> longCtor = null;
-
-        for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
-            Class<?>[] argTypes = ctor.getParameterTypes();
-            if (argTypes.length == 0) {
-                defaultCtor = ctor;
-            } else if (argTypes.length == 1) {
-                Class<?> argType = argTypes[0];
-                if (argType == String.class) {
-                    stringCtor = ctor;
-                } else if (argType == Long.class || argType == Long.TYPE) {
-                    longCtor = ctor;
-                } else {
-                    continue;
+        final BeanConstructors constructors;
+        
+        if (forSerialization) {
+            constructors = null;
+        } else {
+            constructors = new BeanConstructors(beanType);
+            for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
+                Class<?>[] argTypes = ctor.getParameterTypes();
+                if (argTypes.length == 0) {
+                    constructors.addNoArgsConstructor(ctor);
+                } else if (argTypes.length == 1) {
+                    Class<?> argType = argTypes[0];
+                    if (argType == String.class) {
+                        constructors.addStringConstructor(ctor);
+                    } else if (argType == Integer.class || argType == Integer.TYPE) {
+                        constructors.addIntConstructor(ctor);
+                    } else if (argType == Long.class || argType == Long.TYPE) {
+                        constructors.addLongConstructor(ctor);
+                    }
                 }
-            } else {
-                continue;
             }
         }
+
         final int len = propsByName.size();
         Prop[] props;
         if (len == 0) {
@@ -82,7 +85,7 @@ public class BeanPropertyIntrospector
                 props[i++] = builder.build();
             }
         }
-        return new POJODefinition(beanType, props, defaultCtor, stringCtor, longCtor);
+        return new POJODefinition(beanType, props, constructors);
     }
 
     private static void _introspect(Class<?> currType, Map<String, PropBuilder> props,
@@ -116,8 +119,7 @@ public class BeanPropertyIntrospector
             final int flags = m.getModifiers();
             // 13-Jun-2015, tatu: Skip synthetic, bridge methods altogether, for now
             //    at least (add more complex handling only if absolutely necessary)
-            if (Modifier.isStatic(flags)
-                    || m.isSynthetic() || m.isBridge()) {
+            if (Modifier.isStatic(flags) || m.isSynthetic() || m.isBridge() || isGroovyMetaClass(m.getReturnType())) {
                 continue;
             }
             Class<?> argTypes[] = m.getParameterTypes();
@@ -158,12 +160,7 @@ public class BeanPropertyIntrospector
     }
 
     private static PropBuilder _propFrom(Map<String,PropBuilder> props, String name) {
-        PropBuilder prop = props.get(name);
-        if (prop == null) {
-            prop = Prop.builder(name);
-            props.put(name, prop);
-        }
-        return prop;
+        return props.computeIfAbsent(name, Prop::builder);
     }
 
     private static String decap(String name) {
@@ -182,4 +179,13 @@ public class BeanPropertyIntrospector
         return name;
     }
 
+    /**
+     * Helper method to detect Groovy's problematic metadata accessor type.
+     *
+     * @implNote Groovy MetaClass have cyclic reference, and hence the class containing it should not be serialised without
+     * either removing that reference, or skipping over such references.
+     */
+    protected static boolean isGroovyMetaClass(Class<?> clazz) {
+        return "groovy.lang.MetaClass".equals(clazz.getName());
+    }
 }

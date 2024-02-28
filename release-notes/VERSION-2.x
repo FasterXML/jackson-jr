@@ -11,10 +11,15 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
-2.17.0 (not yet released)
+2.17.0-rc1 (26-Feb-2024)
 
+#25: Add support single-int Constructors
+ (contributed by @Shounaks) 
 #78: Deserializes "null" to "0.0" for `java.lang.Double` (wrapper)
  (reported by @bill-phast)
+#93: Skip serialization of `groovy.lang.MetaClass` values to avoid `StackOverflowError`
+ (requested by Nikolay C)
+ (fix contributed by @Shounaks) 
 #100: Add support for `java.time` (Java 8 date/time) types
  (requested by @sebastian-zero)
  (contributed by @Shounaks) 

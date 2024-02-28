@@ -440,21 +440,10 @@ public class ValueReaderLocator
 
     protected BeanReader _resolveBeanForDeser(Class<?> raw, POJODefinition beanDef)
     {
-        Constructor<?> defaultCtor = beanDef.defaultCtor;
-        Constructor<?> stringCtor = beanDef.stringCtor;
-        Constructor<?> longCtor = beanDef.longCtor;
-
+        final BeanConstructors constructors = beanDef.constructors();
         final boolean forceAccess = JSON.Feature.FORCE_REFLECTION_ACCESS.isEnabled(_features);
         if (forceAccess) {
-            if (defaultCtor != null) {
-                defaultCtor.setAccessible(true);
-            }
-            if (stringCtor != null) {
-                stringCtor.setAccessible(true);
-            }
-            if (longCtor != null) {
-                longCtor.setAccessible(true);
-            }
+            constructors.forceAccess();
         }
         final boolean caseInsensitive = JSON.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES.isEnabled(_features);
 
@@ -467,9 +456,9 @@ public class ValueReaderLocator
             propMap = Collections.emptyMap();
         } else {
             propMap = caseInsensitive
-                    ? new TreeMap<String, BeanPropertyReader>(String.CASE_INSENSITIVE_ORDER)
+                    ? new TreeMap<>(String.CASE_INSENSITIVE_ORDER)
                     // 13-May-2021, tatu: Let's retain ordering here:
-                    : new LinkedHashMap<String, BeanPropertyReader>();
+                    : new LinkedHashMap<>();
             final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
             for (int i = 0; i < len; ++i) {
                 POJODefinition.Prop rawProp = rawProps.get(i);
@@ -505,8 +494,8 @@ public class ValueReaderLocator
                 if (rawProp.hasAliases()) {
                     if (aliasMapping == null) {
                         aliasMapping = caseInsensitive
-                                ? new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER)
-                                : new HashMap<String, String>();
+                                ? new TreeMap<>(String.CASE_INSENSITIVE_ORDER)
+                                : new HashMap<>();
                     }
                     for (String alias : rawProp.aliases()) {
                         aliasMapping.put(alias, rawProp.name);
@@ -514,7 +503,7 @@ public class ValueReaderLocator
                 }
             }
         }
-        return new BeanReader(raw, propMap, defaultCtor, stringCtor, longCtor,
+        return new BeanReader(raw, propMap, constructors,
                 beanDef.getIgnorableNames(), aliasMapping);
     }
 

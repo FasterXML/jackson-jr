@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -132,10 +133,10 @@ public class SimpleValueReader extends ValueReader
         case SER_NUMBER_DOUBLE:
             return p.getValueAsDouble();
 
-        case SER_NUMBER_BYTE: // fall through
+        case SER_NUMBER_BYTE:
             return (byte) p.getValueAsInt();
             
-        case SER_NUMBER_SHORT: // fall through
+        case SER_NUMBER_SHORT:
             return (short) p.getValueAsInt();
         case SER_NUMBER_INTEGER_WRAPPER:
             if (p.hasToken(JsonToken.VALUE_NULL)) {
@@ -151,9 +152,15 @@ public class SimpleValueReader extends ValueReader
             return p.getValueAsLong();
 
         case SER_NUMBER_BIG_DECIMAL:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             return p.getDecimalValue();
 
         case SER_NUMBER_BIG_INTEGER:
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
             return p.getBigIntegerValue();
 
         // Other scalar types:
@@ -241,15 +248,7 @@ public class SimpleValueReader extends ValueReader
             }
             return URI.create(p.getValueAsString());
         case SER_PATH:
-            if (p.hasToken(JsonToken.VALUE_NULL)) {
-                return null;
-            }
-            String v = p.getValueAsString();
-            try {
-                return Paths.get(new URI(v));
-            } catch (Exception e) {
-                throw new JSONObjectException("Failed to bind `java.nio.file.Path` from value '"+v+"'");
-            }
+            return _readPath(p);
 
 //        case SER_MAP:
 //        case SER_LIST:
@@ -276,6 +275,19 @@ public class SimpleValueReader extends ValueReader
             return null;
         }
         return p.getBinaryValue();
+    }
+
+    // @since 2.17
+    protected Path _readPath(JsonParser p) throws IOException {
+        if (p.hasToken(JsonToken.VALUE_NULL)) {
+            return null;
+        }
+        String v = p.getValueAsString();
+        try {
+            return Paths.get(v);
+        } catch (Exception e) {
+            throw new JSONObjectException("Failed to bind `java.nio.file.Path` from value '"+v+"'");
+        }
     }
 
     protected int[] _readIntArray(JsonParser p) throws IOException

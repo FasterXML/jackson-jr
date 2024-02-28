@@ -102,9 +102,9 @@ public class JrsNumber extends JrsValue.Scalar
             return new BigDecimal((BigInteger) _value);
         }
         if ((_value instanceof Double) || (_value instanceof Float)) {
-            return new BigDecimal(_value.doubleValue());
+            return BigDecimal.valueOf(_value.doubleValue());
         }
-        return new BigDecimal(_value.longValue());
+        return BigDecimal.valueOf(_value.longValue());
     }
 
     /*
