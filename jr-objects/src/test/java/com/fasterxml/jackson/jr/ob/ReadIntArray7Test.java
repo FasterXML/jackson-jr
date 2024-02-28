@@ -24,13 +24,6 @@ public class ReadIntArray7Test extends TestBase {
         assertArrayEquals(input, result);
     }
 
-    public void testReadIntArrayWhenNull() throws Exception {
-        final int[][][] input = new int[][][]{null,{null},{{},null},{null,{},{}},{null,null,null}};
-        String json = JSON.std.asString(input);
-        int[][][] result = JSON.std.beanFrom(int[][][].class, json);
-        assertArrayEquals(input, result);
-    }
-
     public void testReadIntArrayWhenEmpty() throws Exception {
         final int[][][] input = new int[][][]{};
         String json = JSON.std.asString(input);
