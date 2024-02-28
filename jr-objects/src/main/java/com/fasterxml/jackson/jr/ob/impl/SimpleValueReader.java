@@ -1,11 +1,5 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.JsonTokenId;
-import com.fasterxml.jackson.jr.ob.JSONObjectException;
-import com.fasterxml.jackson.jr.ob.api.ValueReader;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -16,6 +10,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 import java.util.stream.IntStream;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.jr.ob.JSONObjectException;
+import com.fasterxml.jackson.jr.ob.api.ValueReader;
 
 import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
 
