@@ -1,8 +1,7 @@
-package com.fasterxml.jackson.jr.stree.failing;
+package com.fasterxml.jackson.jr.stree;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
-import com.fasterxml.jackson.jr.stree.JacksonJrTreeTestBase;
 
 /**
  * Tests for reading content using {@link JSON} with proper
@@ -22,7 +21,6 @@ public class DupFieldNameInTree51Test extends JacksonJrTreeTestBase
         final String json = "{\"a\":1,\"b\":2,\"b\":3,\"c\":4}";
         try {
             /*TreeNode node =*/ treeJSON.treeFrom(json);
-            fail("Should not pass");
         } catch (JSONObjectException e) {
             verifyException(e, "Duplicate key");
         }

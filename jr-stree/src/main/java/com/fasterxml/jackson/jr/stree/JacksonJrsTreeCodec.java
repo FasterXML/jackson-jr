@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 /**
  * {@link TreeCodec} implementation that can build "simple", immutable
@@ -60,6 +62,9 @@ public class JacksonJrsTreeCodec extends TreeCodec
                 Map<String, JrsValue> values = _map();
                 while (p.nextToken() != JsonToken.END_OBJECT) {
                     final String currentName = p.currentName();
+                    if(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS.enabledByDefault() && values.containsKey(currentName)){
+                        throw new JSONObjectException("Duplicate key (key '"+currentName+"')");
+                    }
                     p.nextToken();
                     values.put(currentName, nodeFrom(p));
                 }
@@ -108,7 +113,7 @@ public class JacksonJrsTreeCodec extends TreeCodec
 
     @Override
     public JsonParser treeAsTokens(TreeNode node) {
-        return ((JrsValue) node).traverse(_objectCodec);
+        return node.traverse(_objectCodec);
     }
 
     /*
@@ -169,10 +174,10 @@ public class JacksonJrsTreeCodec extends TreeCodec
      */
     
     protected List<JrsValue> _list() {
-        return new ArrayList<JrsValue>();
+        return new ArrayList<>();
     }
 
     protected Map<String,JrsValue> _map() {
-        return new LinkedHashMap<String,JrsValue>();
+        return new LinkedHashMap<>();
     }
 }
