@@ -26,6 +26,8 @@ import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
  */
 public class SimpleValueReader extends ValueReader
 {
+    private final static int[] NO_INTS = new int[0];
+
     protected final int _typeId;
 
     public SimpleValueReader(Class<?> raw, int typeId) {
@@ -299,9 +301,29 @@ public class SimpleValueReader extends ValueReader
         }
 
         final IntStream.Builder builder = IntStream.builder();
-        while (!JsonToken.END_ARRAY.equals(p.currentToken())) {
-            builder.add(p.getValueAsInt());
+        int t = p.currentTokenId();
+
+        // Tiny optimization
+        if (t == JsonTokenId.ID_END_ARRAY) {
+            return NO_INTS;
+        }
+        
+        main_loop:
+        while (true) {
+            switch (t) {
+            case JsonTokenId.ID_NUMBER_FLOAT:
+            case JsonTokenId.ID_NUMBER_INT:
+            case JsonTokenId.ID_NULL:
+                builder.add(p.getValueAsInt());
+                break;
+            case JsonTokenId.ID_END_ARRAY:
+                break main_loop;
+            default:
+                throw new JSONObjectException("Failed to bind `int` element if `int[]` from value: "+
+                        _tokenDesc(p));
+            }
             p.nextToken();
+            t = p.currentTokenId();
         }
         return builder.build().toArray();
     }
