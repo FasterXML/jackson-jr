@@ -1,19 +1,22 @@
 package tools.jackson.jr.ob.impl;
 
-import static tools.jackson.jr.ob.impl.ValueWriterLocator.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
+import java.util.stream.IntStream;
 
 import tools.jackson.core.*;
 
 import tools.jackson.jr.ob.JSONObjectException;
 import tools.jackson.jr.ob.api.ValueReader;
+
+import static tools.jackson.jr.ob.impl.ValueWriterLocator.*;
 
 /**
  * Default {@link ValueReader} used for simple scalar types and related,
@@ -22,6 +25,8 @@ import tools.jackson.jr.ob.api.ValueReader;
  */
 public class SimpleValueReader extends ValueReader
 {
+    private final static int[] NO_INTS = new int[0];
+
     protected final int _typeId;
 
     public SimpleValueReader(Class<?> raw, int typeId) {
@@ -295,8 +300,36 @@ public class SimpleValueReader extends ValueReader
 
     protected int[] _readIntArray(JsonParser p) throws JacksonException
     {
-        // !!! TODO
-        throw new JSONObjectException("Reading of int[] not yet implemented");
+        if (JsonToken.START_ARRAY.equals(p.currentToken())) {
+            p.nextToken();
+        }
+
+        final IntStream.Builder builder = IntStream.builder();
+        int t = p.currentTokenId();
+
+        // Tiny optimization
+        if (t == JsonTokenId.ID_END_ARRAY) {
+            return NO_INTS;
+        }
+        
+        main_loop:
+        while (true) {
+            switch (t) {
+            case JsonTokenId.ID_NUMBER_FLOAT:
+            case JsonTokenId.ID_NUMBER_INT:
+            case JsonTokenId.ID_NULL:
+                builder.add(p.getValueAsInt());
+                break;
+            case JsonTokenId.ID_END_ARRAY:
+                break main_loop;
+            default:
+                throw new JSONObjectException("Failed to bind `int` element if `int[]` from value: "+
+                        _tokenDesc(p));
+            }
+            p.nextToken();
+            t = p.currentTokenId();
+        }
+        return builder.build().toArray();
     }
 
     protected long _fetchLong(JsonParser p) throws JacksonException
