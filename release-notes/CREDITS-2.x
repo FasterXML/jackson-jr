@@ -48,6 +48,8 @@ Julian Honnen (@jhonnen)
 
 @Shounaks
 
+* Contributed #7: Support deserialization of int[]
+ (2.17.0)
 * Contributed PoC of #25: Add support single-int Constructors
  (2.17.0)
 * Contributed fix for #93: Skip serialization of `groovy.lang.MetaClass` values
