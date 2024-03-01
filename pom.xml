@@ -26,8 +26,8 @@
     <module>jr-stree</module>
     <module>jr-annotation-support</module>
     <module>jr-extension-javatime</module>
+    <module>jr-test-module</module>
     <module>jr-all</module>
-    <module>jackson-jr-test-module</module>
   </modules>
 
   <url>https://github.com/FasterXML/jackson-jr</url>
