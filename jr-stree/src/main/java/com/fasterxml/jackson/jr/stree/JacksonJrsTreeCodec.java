@@ -108,7 +108,7 @@ public class JacksonJrsTreeCodec extends TreeCodec
 
     @Override
     public JsonParser treeAsTokens(TreeNode node) {
-        return ((JrsValue) node).traverse(_objectCodec);
+        return node.traverse(_objectCodec);
     }
 
     /*
@@ -169,10 +169,10 @@ public class JacksonJrsTreeCodec extends TreeCodec
      */
     
     protected List<JrsValue> _list() {
-        return new ArrayList<JrsValue>();
+        return new ArrayList<>();
     }
 
     protected Map<String,JrsValue> _map() {
-        return new LinkedHashMap<String,JrsValue>();
+        return new LinkedHashMap<>();
     }
 }

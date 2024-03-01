@@ -343,16 +343,6 @@ public class ReadSimpleTest extends TestBase
         }
     }
 
-    // not yet supported (but probably should)
-    public void testIntArray() throws Exception {
-        try {
-            JSON.std.beanFrom(IntArrayWrapper.class, "{\"value\":[ 3 ]}");
-            fail("Should not pass");
-        } catch (JSONObjectException e) {
-            verifyException(e, "not yet implemented");
-        }
-    }
-
     public void testInvalidSource() throws Exception {
         try {
             JSON.std.beanFrom(Object.class, Long.valueOf(67));
