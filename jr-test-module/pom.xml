@@ -27,8 +27,8 @@
     </licenses>
     <properties>
         <!--    To Test Latest Java Features Lets use this settings    -->
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- 01-Dec-2015, tatu: OSGi imports, exports should be fine with defaults from parent -->
         <!-- for Reproducible Builds -->
@@ -91,6 +91,15 @@
             <plugin>
                 <groupId>de.jjohannes</groupId>
                 <artifactId>gradle-module-metadata-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.12.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
