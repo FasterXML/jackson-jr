@@ -11,9 +11,10 @@
         <groupId>com.fasterxml.jackson.jr</groupId>
         <artifactId>jackson-jr-parent</artifactId>
         <version>2.17.0-SNAPSHOT</version>
+
     </parent>
     <artifactId>jackson-jr-test-module</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>pom</packaging>
     <description>Test Module with higher JDK Version + Groovy support to test Jackson-Jr</description>
     <url>https://github.com/FasterXML/jackson-jr</url>
 
