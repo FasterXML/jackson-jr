@@ -1,5 +1,6 @@
 package com.fasterxml.jackson.jr.stree;
 
+import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JacksonJrExtension;
 import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
 
@@ -18,6 +19,10 @@ public class JrSimpleTreeExtension
 
     public JrSimpleTreeExtension() {
         this(new JacksonJrsTreeCodec());
+    }
+
+    public JrSimpleTreeExtension(JSON config) {
+        this(new JacksonJrsTreeCodec(config));
     }
 
     public JrSimpleTreeExtension(JacksonJrsTreeCodec tc) {

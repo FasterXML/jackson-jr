@@ -29,7 +29,7 @@ public abstract class JacksonJrTreeTestBase extends TestCase
         String lmsg = (msg == null) ? "" : msg.toLowerCase();
         for (String match : matches) {
             String lmatch = match.toLowerCase();
-            if (lmsg.indexOf(lmatch) >= 0) {
+            if (lmsg.contains(lmatch)) {
                 return;
             }
         }
@@ -44,11 +44,19 @@ public abstract class JacksonJrTreeTestBase extends TestCase
         return json.replace("'", "\"");
     }
 
+    protected JSON jsonWithTreeCodec(JSON config) {
+        return JSON.builder()
+                // 13-Feb-2020, tatu: There are 2 different ways actually..
+//            .treeCodec(new JacksonJrsTreeCodec())
+                .register(new JrSimpleTreeExtension(config))
+            .build();
+    }
+
     protected JSON jsonWithTreeCodec() {
         return JSON.builder()
                 // 13-Feb-2020, tatu: There are 2 different ways actually..
 //            .treeCodec(new JacksonJrsTreeCodec())
                 .register(new JrSimpleTreeExtension())
-            .build();
+                .build();
     }
 }
