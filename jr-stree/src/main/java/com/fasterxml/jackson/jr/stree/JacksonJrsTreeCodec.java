@@ -62,7 +62,7 @@ public class JacksonJrsTreeCodec extends TreeCodec {
                 Map<String, JrsValue> values = _map();
                 while (p.nextToken() != JsonToken.END_OBJECT) {
                     final String currentName = p.currentName();
-                    if (_config.isEnabled(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS) && values.containsKey(currentName)) {
+                    if (duplicateCheck(values, currentName)) {
                         throw new JSONObjectException("Duplicate key (key '" + currentName + "')");
                     }
                     p.nextToken();
@@ -80,6 +80,10 @@ public class JacksonJrsTreeCodec extends TreeCodec {
             default:
         }
         throw new UnsupportedOperationException("Unsupported token id " + tokenId + " (" + p.currentToken() + ")");
+    }
+
+    private boolean duplicateCheck(Map<String, JrsValue> values, String currentName) {
+        return _config != null && _config.isEnabled(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS) && values.containsKey(currentName);
     }
 
     @Override
