@@ -262,6 +262,13 @@ public class JSON implements Versioned
         USE_IS_GETTERS(true, true),
 
         /**
+         * Feature that provides support for Groovy & JDK14 records, by allowing
+         * reading of "non-get-getters" in a class, (like for a field named <code>amount</code>
+         * the getter would be <code>amount()</code>)
+         * */
+        USE_FIELD_NAME_GETTERS(true,true),
+
+        /**
          * Feature that enables use of public fields instead of setters and getters,
          * in cases where no setter/getter is available.
          *<p>
