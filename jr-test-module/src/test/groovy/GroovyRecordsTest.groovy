@@ -11,7 +11,7 @@ class GroovyRecordsTest {
 
     @Test
     void testRecord() throws Exception {
-        def json = JSON.std.asString(new Cow("foo", Map<String, String>.of("foo", "bar")))
+        def json = JSON.builder().enable(JSON.Feature.USE_FIELD_NAME_GETTERS).build().asString(new Cow("foo", Map<String, String>.of("foo", "bar")))
         def expected = """{"message":"foo","object":{"foo":"bar"}}"""
         Assert.assertEquals(expected, json)
     }
@@ -20,10 +20,10 @@ class GroovyRecordsTest {
     void testRecordEquivalentObjects() throws Exception {
         def expected = """{"message":"foo","object":{"foo":"bar"}}"""
 
-        def json = JSON.std.asString(new SimpleGroovyObject("foo", Map<String, String>.of("foo", "bar")))
+        def json = JSON.builder().enable(JSON.Feature.USE_FIELD_NAME_GETTERS).build().asString(new SimpleGroovyObject("foo", Map<String, String>.of("foo", "bar")))
         Assert.assertEquals(expected, json)
 
-        def json2 = JSON.std.asString(new GroovyObjectWithNamedGetters("foo", Map<String, String>.of("foo", "bar")))
+        def json2 = JSON.builder().enable(JSON.Feature.USE_FIELD_NAME_GETTERS).build().asString(new GroovyObjectWithNamedGetters("foo", Map<String, String>.of("foo", "bar")))
         Assert.assertEquals(expected, json2)
     }
 }

@@ -13,7 +13,7 @@ public class Java14RecordTest {
     @Test
     public void testJava14RecordSupport() throws IOException {
         var expectedString = "{\"message\":\"MOO\",\"object\":{\"Foo\":\"Bar\"}}";
-        var json = JSON.std.asString(new Cow("MOO", Map.of("Foo", "Bar")));
+        var json = JSON.builder().enable(JSON.Feature.USE_FIELD_NAME_GETTERS).build().asString(new Cow("MOO", Map.of("Foo", "Bar")));
         Assert.assertEquals(expectedString, json);
     }
 

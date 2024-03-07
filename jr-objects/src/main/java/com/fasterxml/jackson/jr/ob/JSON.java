@@ -266,7 +266,7 @@ public class JSON implements Versioned
          * reading of "non-get-getters" in a class, (like for a field named <code>amount</code>
          * the getter would be <code>amount()</code>)
          * */
-        USE_FIELD_NAME_GETTERS(true,true),
+        USE_FIELD_NAME_GETTERS(false,true),
 
         /**
          * Feature that enables use of public fields instead of setters and getters,
