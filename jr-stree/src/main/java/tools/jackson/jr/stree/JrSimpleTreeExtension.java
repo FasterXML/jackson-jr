@@ -1,6 +1,7 @@
 package tools.jackson.jr.stree;
 
 import tools.jackson.jr.ob.JacksonJrExtension;
+import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.api.ExtensionContext;
 
 /**
@@ -21,9 +22,10 @@ public class JrSimpleTreeExtension
     public JrSimpleTreeExtension(JacksonJrsTreeCodec tc) {
         _codec = tc;
     }
-    
+
     @Override
     protected void register(ExtensionContext ctxt) {
+        _codec.setFailOnDuplicateKeys(ctxt.isEnabled(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS));
         ctxt.setTreeCodec(_codec);
     }
 }

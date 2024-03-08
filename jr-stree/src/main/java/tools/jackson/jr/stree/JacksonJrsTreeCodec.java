@@ -13,10 +13,14 @@ public class JacksonJrsTreeCodec implements TreeCodec
 {
     public static JrsMissing MISSING = JrsMissing.instance;
 
-    public static final JacksonJrsTreeCodec SINGLETON = new JacksonJrsTreeCodec();
+    protected boolean _failOnDuplicateKeys;
 
     public JacksonJrsTreeCodec() { }
 
+    public void setFailOnDuplicateKeys(boolean state) {
+        _failOnDuplicateKeys = state;
+    }
+    
     @SuppressWarnings("unchecked")
     @Override
     public JrsValue readTree(JsonParser p) throws JacksonException {

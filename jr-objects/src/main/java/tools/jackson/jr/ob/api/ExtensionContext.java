@@ -1,6 +1,7 @@
 package tools.jackson.jr.ob.api;
 
 import tools.jackson.core.TreeCodec;
+import tools.jackson.jr.ob.JSON;
 
 /**
  * API that lets {@link tools.jackson.jr.ob.JacksonJrExtension}s to register handlers
@@ -8,6 +9,19 @@ import tools.jackson.core.TreeCodec;
  */
 public abstract class ExtensionContext
 {
+    // // // Config access
+
+    /**
+     * Method for checking whether given {@code JSON.Feature} is enabled.
+     *
+     * @param feature Feature to check
+     *
+     * @return True if given {@code JSON.Feature} is enabled; {@code false} if not
+     *
+     * @since 2.17
+     */
+    public abstract boolean isEnabled(JSON.Feature feature);
+    
     // // // Override of (and access to) singleton handlers
 
     /**
