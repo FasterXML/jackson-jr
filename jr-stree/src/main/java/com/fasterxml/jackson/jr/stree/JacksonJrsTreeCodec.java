@@ -13,24 +13,25 @@ import com.fasterxml.jackson.jr.ob.JSONObjectException;
  * of {@link JrsValue} ("Jrs" from "jackson JR Simple").
  */
 public class JacksonJrsTreeCodec extends TreeCodec {
-    public static final JacksonJrsTreeCodec SINGLETON = new JacksonJrsTreeCodec();
     public static JrsMissing MISSING = JrsMissing.instance;
-    public final JSON _config;
-    protected ObjectCodec _objectCodec;
+    protected final ObjectCodec _objectCodec;
 
+    // @since 2.17
+    protected boolean _failOnDuplicateKeys;
+    
     public JacksonJrsTreeCodec() {
-        this(null, null);
+        this(null);
     }
 
-    public JacksonJrsTreeCodec(JSON config) {
-        this(null, config);
-    }
-
-    public JacksonJrsTreeCodec(ObjectCodec codec, JSON config) {
+    public JacksonJrsTreeCodec(ObjectCodec codec) {
         _objectCodec = codec;
-        _config = config;
     }
 
+    // @since 2.17
+    public void setFailOnDuplicateKeys(boolean state) {
+        _failOnDuplicateKeys = state;
+    }
+    
     @SuppressWarnings("unchecked")
     @Override
     public <T extends TreeNode> T readTree(JsonParser p) throws IOException {
@@ -83,7 +84,7 @@ public class JacksonJrsTreeCodec extends TreeCodec {
     }
 
     private boolean duplicateCheck(Map<String, JrsValue> values, String currentName) {
-        return _config != null && _config.isEnabled(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS) && values.containsKey(currentName);
+        return _failOnDuplicateKeys && values.containsKey(currentName);
     }
 
     @Override

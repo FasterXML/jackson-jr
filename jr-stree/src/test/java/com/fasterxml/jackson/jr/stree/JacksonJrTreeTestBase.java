@@ -48,7 +48,7 @@ public abstract class JacksonJrTreeTestBase extends TestCase
         return JSON.builder()
                 // 13-Feb-2020, tatu: There are 2 different ways actually..
 //            .treeCodec(new JacksonJrsTreeCodec())
-                .register(new JrSimpleTreeExtension(config))
+                .register(new JrSimpleTreeExtension())
             .build();
     }
 

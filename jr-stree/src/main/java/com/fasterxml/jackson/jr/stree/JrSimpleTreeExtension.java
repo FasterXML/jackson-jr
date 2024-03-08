@@ -21,16 +21,13 @@ public class JrSimpleTreeExtension
         this(new JacksonJrsTreeCodec());
     }
 
-    public JrSimpleTreeExtension(JSON config) {
-        this(new JacksonJrsTreeCodec(config));
-    }
-
     public JrSimpleTreeExtension(JacksonJrsTreeCodec tc) {
         _codec = tc;
     }
-    
+
     @Override
     protected void register(ExtensionContext ctxt) {
+        _codec.setFailOnDuplicateKeys(ctxt.isEnabled(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS));
         ctxt.setTreeCodec(_codec);
     }
 }
