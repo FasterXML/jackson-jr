@@ -1,6 +1,7 @@
 package com.fasterxml.jackson.jr.ob.api;
 
 import com.fasterxml.jackson.core.TreeCodec;
+import com.fasterxml.jackson.jr.ob.JSON;
 
 /**
  * API that lets {@link com.fasterxml.jackson.jr.ob.JacksonJrExtension}s to register handlers
@@ -10,6 +11,19 @@ import com.fasterxml.jackson.core.TreeCodec;
  */
 public abstract class ExtensionContext
 {
+    // // // Config access
+
+    /**
+     * Method for checking whether given {@code JSON.Feature} is enabled.
+     *
+     * @param feature Feature to check
+     *
+     * @return True if given {@code JSON.Feature} is enabled; {@code false} if not
+     *
+     * @since 2.17
+     */
+    public abstract boolean isEnabled(JSON.Feature feature);
+    
     // // // Override of (and access to) singleton handlers
 
     /**
