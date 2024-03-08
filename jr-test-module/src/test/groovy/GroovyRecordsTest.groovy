@@ -15,7 +15,7 @@ class GroovyRecordsTest {
         def map = new HashMap<String, String>()
         map.put("foo", "bar")
 
-        def json = JSON.builder().enable(JSON.Feature.USE_FIELD_NAME_GETTERS).build().asString(new Cow("foo", map))
+        def json = JSON.builder().enable(JSON.Feature.USE_FIELD_MATCHING_GETTERS).build().asString(new Cow("foo", map))
         def expected = """{"message":"foo","object":{"foo":"bar"}}"""
         Assert.assertEquals(expected, json)
     }
@@ -28,10 +28,10 @@ class GroovyRecordsTest {
         def map = new HashMap<String, String>()
         map.put("foo", "bar")
 
-        def json = JSON.builder().enable(JSON.Feature.USE_FIELD_NAME_GETTERS).build().asString(new SimpleGroovyObject("foo", map))
+        def json = JSON.builder().enable(JSON.Feature.USE_FIELD_MATCHING_GETTERS).build().asString(new SimpleGroovyObject("foo", map))
         Assert.assertEquals(expected, json)
 
-        def json2 = JSON.builder().enable(JSON.Feature.USE_FIELD_NAME_GETTERS).build().asString(new GroovyObjectWithNamedGetters("foo", map))
+        def json2 = JSON.builder().enable(JSON.Feature.USE_FIELD_MATCHING_GETTERS).build().asString(new GroovyObjectWithNamedGetters("foo", map))
         Assert.assertEquals(expected, json2)
     }
 }

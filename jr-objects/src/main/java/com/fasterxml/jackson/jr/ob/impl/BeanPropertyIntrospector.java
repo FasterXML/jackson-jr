@@ -13,7 +13,7 @@ import com.fasterxml.jackson.jr.ob.impl.POJODefinition.PropBuilder;
 
 
 import static com.fasterxml.jackson.jr.ob.JSON.Feature.INCLUDE_STATIC_FIELDS;
-import static com.fasterxml.jackson.jr.ob.JSON.Feature.USE_FIELD_NAME_GETTERS;
+import static com.fasterxml.jackson.jr.ob.JSON.Feature.USE_FIELD_MATCHING_GETTERS;
 
 /**
  * Helper class that jackson-jr uses by default to introspect POJO properties
@@ -102,7 +102,7 @@ public class BeanPropertyIntrospector
         _introspect(currType.getSuperclass(), props, features);
 
         final boolean noStatics = INCLUDE_STATIC_FIELDS.isDisabled(features);
-        final boolean isFieldNameGettersEnabled = USE_FIELD_NAME_GETTERS.isEnabled(features);
+        final boolean isFieldNameGettersEnabled = USE_FIELD_MATCHING_GETTERS.isEnabled(features);
 
         // then public fields (since 2.8); may or may not be ultimately included
         // but at this point still possible
