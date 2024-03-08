@@ -1695,6 +1695,11 @@ public class JSON implements Versioned
         }
 
         @Override
+        public boolean isEnabled(JSON.Feature feature) {
+            return _builder.isEnabled(feature);
+        }
+        
+        @Override
         public ExtensionContext setTreeCodec(TreeCodec tc) {
             _builder.treeCodec(tc);
             return this;

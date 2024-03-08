@@ -16,8 +16,11 @@ public class JacksonJrsTreeCodec extends TreeCodec
 
     public static final JacksonJrsTreeCodec SINGLETON = new JacksonJrsTreeCodec();
 
-    protected ObjectCodec _objectCodec;
+    protected final ObjectCodec _objectCodec;
 
+    // @since 2.17
+    protected boolean _failOnDuplicateKeys;
+    
     public JacksonJrsTreeCodec() {
         this(null);
     }
@@ -26,6 +29,11 @@ public class JacksonJrsTreeCodec extends TreeCodec
         _objectCodec = codec;
     }
 
+    // @since 2.17
+    public void setFailOnDuplicateKeys(boolean state) {
+        _failOnDuplicateKeys = state;
+    }
+    
     @SuppressWarnings("unchecked")
     @Override
     public <T extends TreeNode> T readTree(JsonParser p) throws IOException {
@@ -121,7 +129,6 @@ public class JacksonJrsTreeCodec extends TreeCodec
      * Factory method for constructing node to represent Boolean values.
      *
      * @param state Whether to create {@code Boolean.TRUE} or {@code Boolean.FALSE} node
-     *
      * @return Node instance for given boolean value
      *
      * @since 2.8
@@ -134,7 +141,6 @@ public class JacksonJrsTreeCodec extends TreeCodec
      * Factory method for constructing node to represent String values.
      *
      * @param text String value for constructed node to contain
-     *
      * @return Node instance for given text value
      *
      * @since 2.8
@@ -150,7 +156,6 @@ public class JacksonJrsTreeCodec extends TreeCodec
      * Factory method for constructing node to represent String values.
      *
      * @param nr Numeric value for constructed node to contain
-     *
      * @return Node instance for given numeric value
      *
      * @since 2.8
@@ -167,12 +172,12 @@ public class JacksonJrsTreeCodec extends TreeCodec
     /* Internal methods
     /**********************************************************************
      */
-    
+
     protected List<JrsValue> _list() {
         return new ArrayList<>();
     }
 
-    protected Map<String,JrsValue> _map() {
+    protected Map<String, JrsValue> _map() {
         return new LinkedHashMap<>();
     }
 }
