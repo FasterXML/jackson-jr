@@ -16,8 +16,11 @@ public class JacksonJrsTreeCodec extends TreeCodec
 
     public static final JacksonJrsTreeCodec SINGLETON = new JacksonJrsTreeCodec();
 
-    protected ObjectCodec _objectCodec;
+    protected final ObjectCodec _objectCodec;
 
+    // @since 2.17
+    protected boolean _failOnDuplicateKeys;
+    
     public JacksonJrsTreeCodec() {
         this(null);
     }
@@ -26,6 +29,11 @@ public class JacksonJrsTreeCodec extends TreeCodec
         _objectCodec = codec;
     }
 
+    // @since 2.17
+    public void setFailOnDuplicateKeys(boolean state) {
+        _failOnDuplicateKeys = state;
+    }
+    
     @SuppressWarnings("unchecked")
     @Override
     public <T extends TreeNode> T readTree(JsonParser p) throws IOException {
