@@ -128,7 +128,6 @@ public class JacksonJrsTreeCodec implements TreeCodec
      * Factory method for constructing node to represent String values.
      *
      * @param nr Numeric value for constructed node to contain
-     *
      * @return Node instance for given numeric value
      *
      * @since 2.8
@@ -146,12 +145,12 @@ public class JacksonJrsTreeCodec implements TreeCodec
     /* Internal methods
     /**********************************************************************
      */
-    
+
     protected List<JrsValue> _list() {
         return new ArrayList<>();
     }
 
-    protected Map<String,JrsValue> _map() {
+    protected Map<String, JrsValue> _map() {
         return new LinkedHashMap<>();
     }
 }
