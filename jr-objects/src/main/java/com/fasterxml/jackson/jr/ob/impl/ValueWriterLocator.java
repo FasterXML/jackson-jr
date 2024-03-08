@@ -1,14 +1,18 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.api.ValueWriter;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import static com.fasterxml.jackson.jr.ob.impl.BeanPropertyIntrospector.pojoDefinitionForSerialization;
 
 /**
  * Helper object used for efficient detection of type information
@@ -193,7 +197,7 @@ public class ValueWriterLocator extends ValueLocatorBase
                     return def;
                 }
             }
-            return BeanPropertyIntrospector.instance().pojoDefinitionForSerialization(_writeContext, raw);
+            return pojoDefinitionForSerialization(_writeContext, raw);
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format
                     ("Failed to introspect ClassDefinition for type '%s': %s",

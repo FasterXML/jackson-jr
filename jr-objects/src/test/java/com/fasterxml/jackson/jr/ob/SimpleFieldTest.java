@@ -37,8 +37,7 @@ public class SimpleFieldTest extends TestBase
 
     public void testDeserializeWithField() throws Exception
     {
-        XY result = JSON.std.with(JSON.Feature.USE_FIELDS)
-                .beanFrom(XY.class, a2q("{'x':3,'y':4}"));
+        XY result = JSON.std.with(JSON.Feature.USE_FIELDS).beanFrom(XY.class, a2q("{'x':3,'y':4}"));
         assertEquals(4, result.getY());
         assertEquals(3, result.x);
     }

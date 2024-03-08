@@ -1,9 +1,5 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
@@ -11,6 +7,15 @@ import com.fasterxml.jackson.jr.ob.api.ValueReader;
 import com.fasterxml.jackson.jr.type.ResolvedType;
 import com.fasterxml.jackson.jr.type.TypeBindings;
 import com.fasterxml.jackson.jr.type.TypeResolver;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static com.fasterxml.jackson.jr.ob.impl.BeanPropertyIntrospector.pojoDefinitionForDeserialization;
 
 /**
  * Helper object used for efficient detection of type information relevant
@@ -430,7 +435,7 @@ public class ValueReaderLocator
                     return def;
                 }
             }
-            return BeanPropertyIntrospector.instance().pojoDefinitionForDeserialization(_readContext, raw);
+            return pojoDefinitionForDeserialization(_readContext, raw);
         } catch (Exception e) {
             throw new IllegalArgumentException(String.format
                     ("Failed to introspect ClassDefinition for type '%s': %s",
