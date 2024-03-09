@@ -34,6 +34,7 @@ Not yet released
  (reported by Julian H)
 #116: Add read/write support for `java.nio.file.Path`
 
+2.16.2 (09-Mar-2024)
 2.16.1 (24-Dec-2023)
 
 No changes since 2.16.0
