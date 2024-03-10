@@ -176,10 +176,6 @@ public class POJODefinition
             _isGetter = m;
             return this;
         }
-
-        public Field get_field() {
-            return _field;
-        }
     }
 }
 
