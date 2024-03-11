@@ -29,7 +29,7 @@ public abstract class JacksonJrTreeTestBase extends TestCase
         String lmsg = (msg == null) ? "" : msg.toLowerCase();
         for (String match : matches) {
             String lmatch = match.toLowerCase();
-            if (lmsg.indexOf(lmatch) >= 0) {
+            if (lmsg.contains(lmatch)) {
                 return;
             }
         }
@@ -49,6 +49,6 @@ public abstract class JacksonJrTreeTestBase extends TestCase
                 // 13-Feb-2020, tatu: There are 2 different ways actually..
 //            .treeCodec(new JacksonJrsTreeCodec())
                 .register(new JrSimpleTreeExtension())
-            .build();
+                .build();
     }
 }

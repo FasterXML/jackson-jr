@@ -11,6 +11,14 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
+Not yet released
+
+#7: Support deserialization of `int[]`
+ (contributed by @Shounaks) 
+#51: Duplicate key detection does not work for (simple) Trees
+ (contributed by @Shounaks) 
+#131: Add mechanism for `JacksonJrExtension`s to access state of `JSON.Feature`s
+
 2.17.0-rc1 (26-Feb-2024)
 
 #25: Add support single-int Constructors
@@ -28,6 +36,7 @@ Modules:
  (reported by Julian H)
 #116: Add read/write support for `java.nio.file.Path`
 
+2.16.2 (09-Mar-2024)
 2.16.1 (24-Dec-2023)
 
 No changes since 2.16.0

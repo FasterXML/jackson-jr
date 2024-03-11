@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 /**
  * {@link TreeCodec} implementation that can build "simple", immutable
@@ -13,11 +14,11 @@ import com.fasterxml.jackson.core.*;
 public class JacksonJrsTreeCodec extends TreeCodec
 {
     public static JrsMissing MISSING = JrsMissing.instance;
+    protected final ObjectCodec _objectCodec;
 
-    public static final JacksonJrsTreeCodec SINGLETON = new JacksonJrsTreeCodec();
-
-    protected ObjectCodec _objectCodec;
-
+    // @since 2.17
+    protected boolean _failOnDuplicateKeys;
+    
     public JacksonJrsTreeCodec() {
         this(null);
     }
@@ -26,6 +27,11 @@ public class JacksonJrsTreeCodec extends TreeCodec
         _objectCodec = codec;
     }
 
+    // @since 2.17
+    public void setFailOnDuplicateKeys(boolean state) {
+        _failOnDuplicateKeys = state;
+    }
+    
     @SuppressWarnings("unchecked")
     @Override
     public <T extends TreeNode> T readTree(JsonParser p) throws IOException {
@@ -36,7 +42,7 @@ public class JacksonJrsTreeCodec extends TreeCodec
     {
         int tokenId = p.hasCurrentToken()
                 ? p.currentTokenId() : p.nextToken().id();
-        
+
         switch (tokenId) {
         case JsonTokenId.ID_TRUE:
             return JrsBoolean.TRUE;
@@ -47,24 +53,25 @@ public class JacksonJrsTreeCodec extends TreeCodec
             return new JrsNumber(p.getNumberValue());
         case JsonTokenId.ID_STRING:
             return new JrsString(p.getText());
-        case JsonTokenId.ID_START_ARRAY:
-            {
-                List<JrsValue> values = _list();
-                while (p.nextToken() != JsonToken.END_ARRAY) {
-                    values.add(nodeFrom(p));
-                }
-                return new JrsArray(values);
+        case JsonTokenId.ID_START_ARRAY: {
+            List<JrsValue> values = _list();
+            while (p.nextToken() != JsonToken.END_ARRAY) {
+                values.add(nodeFrom(p));
             }
-        case JsonTokenId.ID_START_OBJECT:
-            {
-                Map<String, JrsValue> values = _map();
-                while (p.nextToken() != JsonToken.END_OBJECT) {
-                    final String currentName = p.currentName();
-                    p.nextToken();
-                    values.put(currentName, nodeFrom(p));
+            return new JrsArray(values);
+        }
+        case JsonTokenId.ID_START_OBJECT: {
+            Map<String, JrsValue> values = _map();
+            while (p.nextToken() != JsonToken.END_OBJECT) {
+                final String currentName = p.currentName();
+                p.nextToken();
+                JrsValue prev = values.put(currentName, nodeFrom(p));
+                if (_failOnDuplicateKeys && (prev != null)) {
+                    throw new JSONObjectException("Duplicate key (key '" + currentName + "')");
                 }
-                return new JrsObject(values);
             }
+            return new JrsObject(values);
+        }
         case JsonTokenId.ID_EMBEDDED_OBJECT:
             // 07-Jan-2016, tatu: won't happen with JSON, but other types like Smile
             //   may produce binary data or such
@@ -74,7 +81,7 @@ public class JacksonJrsTreeCodec extends TreeCodec
             return JrsNull.instance;
         default:
         }
-        throw new UnsupportedOperationException("Unsupported token id "+tokenId+" ("+p.currentToken()+")");
+        throw new UnsupportedOperationException("Unsupported token id " + tokenId + " (" + p.currentToken() + ")");
     }
 
     @Override
@@ -121,20 +128,18 @@ public class JacksonJrsTreeCodec extends TreeCodec
      * Factory method for constructing node to represent Boolean values.
      *
      * @param state Whether to create {@code Boolean.TRUE} or {@code Boolean.FALSE} node
-     *
      * @return Node instance for given boolean value
      *
      * @since 2.8
      */
     public JrsBoolean booleanNode(boolean state) {
-         return state? JrsBoolean.TRUE : JrsBoolean.FALSE;
+        return state ? JrsBoolean.TRUE : JrsBoolean.FALSE;
     }
 
     /**
      * Factory method for constructing node to represent String values.
      *
      * @param text String value for constructed node to contain
-     *
      * @return Node instance for given text value
      *
      * @since 2.8
@@ -150,7 +155,6 @@ public class JacksonJrsTreeCodec extends TreeCodec
      * Factory method for constructing node to represent String values.
      *
      * @param nr Numeric value for constructed node to contain
-     *
      * @return Node instance for given numeric value
      *
      * @since 2.8
@@ -167,12 +171,12 @@ public class JacksonJrsTreeCodec extends TreeCodec
     /* Internal methods
     /**********************************************************************
      */
-    
+
     protected List<JrsValue> _list() {
         return new ArrayList<>();
     }
 
-    protected Map<String,JrsValue> _map() {
+    protected Map<String, JrsValue> _map() {
         return new LinkedHashMap<>();
     }
 }

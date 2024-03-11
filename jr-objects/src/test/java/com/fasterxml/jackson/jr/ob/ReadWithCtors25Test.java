@@ -1,7 +1,5 @@
 package com.fasterxml.jackson.jr.ob;
 
-import com.fasterxml.jackson.jr.ob.JSON;
-
 // for [jackson-jr#25], allowing single-int constructors
 public class ReadWithCtors25Test extends TestBase
 {
