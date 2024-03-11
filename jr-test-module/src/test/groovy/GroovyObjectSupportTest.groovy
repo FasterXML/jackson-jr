@@ -3,6 +3,11 @@ import org.junit.Test
 
 import tools.jackson.jr.ob.JSON
 
+/**
+ * A minor note on running/debugging this test on local, if you are using intellij, please
+ * change `<packaging>pom</packaging>` to `<packaging>bundle</packaging>`. this is causing
+ * some issue with the IDE.
+ */
 class GroovyObjectSupportTest {
     @Test
     void testSimpleGroovyObject() throws Exception {

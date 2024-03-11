@@ -17,6 +17,8 @@ Not yet released
  (contributed by @Shounaks) 
 #51: Duplicate key detection does not work for (simple) Trees
  (contributed by @Shounaks) 
+#94: Support for serializing Java Records
+ (implementation contributed by @Shounaks) 
 #131: Add mechanism for `JacksonJrExtension`s to access state of `JSON.Feature`s
 
 2.17.0-rc1 (26-Feb-2024)

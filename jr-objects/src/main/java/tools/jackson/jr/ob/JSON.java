@@ -269,6 +269,17 @@ public class JSON
         USE_IS_GETTERS(true, true),
 
         /**
+         * Feature that provides serialization support for Groovy & Java 17 records, by allowing
+         * reading of "non-get-getters" in a class, (like for a field named <code>amount</code>
+         * the getter would be <code>amount()</code>).
+         *
+         * @implNote <p>Feature is disabled by default for backward compatibility.</p>
+         *
+         * @since 2.17
+         */
+        USE_FIELD_MATCHING_GETTERS(false,true),
+
+        /**
          * Feature that enables use of public fields instead of setters and getters,
          * in cases where no setter/getter is available.
          *<p>
