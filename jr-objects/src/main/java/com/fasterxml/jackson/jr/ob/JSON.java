@@ -264,10 +264,12 @@ public class JSON implements Versioned
         /**
          * Feature that provides serialization support for Groovy & Java 17 records, by allowing
          * reading of "non-get-getters" in a class, (like for a field named <code>amount</code>
-         * the getter would be <code>amount()</code>)
+         * the getter would be <code>amount()</code>).
+         *
+         * @implNote <p>Feature is disabled by default for backward compatibility.</p>
+         *
          * @since 2.17
-         * @implNote <p>Default state is false due to backward compatibility.</p>
-         * */
+         */
         USE_FIELD_MATCHING_GETTERS(false,true),
 
         /**

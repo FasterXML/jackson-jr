@@ -57,5 +57,7 @@ Julian Honnen (@jhonnen)
 * Contributed fix for #93: Skip serialization of `groovy.lang.MetaClass` values
   to avoid `StackOverflowError`
  (2.17.0)
+* Constributed implementation of #94: Support for serializing Java Records
+ (2.17.0)
 * Contributed impl for #100: Add support for `java.time` (Java 8 date/time) types
  (2.17.0)
