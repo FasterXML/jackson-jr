@@ -15,6 +15,8 @@ Not yet released
 
 #7: Support deserialization of `int[]`
  (contributed by @Shounaks) 
+#51: Duplicate key detection does not work for (simple) Trees
+ (contributed by @Shounaks) 
 #131: Add mechanism for `JacksonJrExtension`s to access state of `JSON.Feature`s
 
 2.17.0-rc1 (26-Feb-2024)
