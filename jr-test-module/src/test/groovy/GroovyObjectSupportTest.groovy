@@ -2,6 +2,11 @@ import com.fasterxml.jackson.jr.ob.JSON
 import org.junit.Assert
 import org.junit.Test
 
+/**
+ * A minor note on running/debugging this test on local, if you are using intellij, please
+ * change `<packaging>pom</packaging>` to `<packaging>bundle</packaging>`. this is causing
+ * some issue with the IDE.
+ */
 class GroovyObjectSupportTest {
     @Test
     void testSimpleGroovyObject() throws Exception {
