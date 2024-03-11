@@ -44,14 +44,6 @@ public abstract class JacksonJrTreeTestBase extends TestCase
         return json.replace("'", "\"");
     }
 
-    protected JSON jsonWithTreeCodec(JSON config) {
-        return JSON.builder()
-                // 13-Feb-2020, tatu: There are 2 different ways actually..
-//            .treeCodec(new JacksonJrsTreeCodec())
-                .register(new JrSimpleTreeExtension())
-            .build();
-    }
-
     protected JSON jsonWithTreeCodec() {
         return JSON.builder()
                 // 13-Feb-2020, tatu: There are 2 different ways actually..
