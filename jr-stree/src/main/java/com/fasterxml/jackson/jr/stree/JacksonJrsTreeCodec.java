@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
 /**
@@ -12,7 +11,8 @@ import com.fasterxml.jackson.jr.ob.JSONObjectException;
  * (read-only) trees out of JSON: these are represented as subtypes
  * of {@link JrsValue} ("Jrs" from "jackson JR Simple").
  */
-public class JacksonJrsTreeCodec extends TreeCodec {
+public class JacksonJrsTreeCodec extends TreeCodec
+{
     public static JrsMissing MISSING = JrsMissing.instance;
     protected final ObjectCodec _objectCodec;
 
@@ -38,47 +38,48 @@ public class JacksonJrsTreeCodec extends TreeCodec {
         return (T) nodeFrom(p);
     }
 
-    private JrsValue nodeFrom(JsonParser p) throws IOException {
+    private JrsValue nodeFrom(JsonParser p) throws IOException
+    {
         int tokenId = p.hasCurrentToken()
                 ? p.currentTokenId() : p.nextToken().id();
 
         switch (tokenId) {
-            case JsonTokenId.ID_TRUE:
-                return JrsBoolean.TRUE;
-            case JsonTokenId.ID_FALSE:
-                return JrsBoolean.FALSE;
-            case JsonTokenId.ID_NUMBER_INT:
-            case JsonTokenId.ID_NUMBER_FLOAT:
-                return new JrsNumber(p.getNumberValue());
-            case JsonTokenId.ID_STRING:
-                return new JrsString(p.getText());
-            case JsonTokenId.ID_START_ARRAY: {
-                List<JrsValue> values = _list();
-                while (p.nextToken() != JsonToken.END_ARRAY) {
-                    values.add(nodeFrom(p));
-                }
-                return new JrsArray(values);
+        case JsonTokenId.ID_TRUE:
+            return JrsBoolean.TRUE;
+        case JsonTokenId.ID_FALSE:
+            return JrsBoolean.FALSE;
+        case JsonTokenId.ID_NUMBER_INT:
+        case JsonTokenId.ID_NUMBER_FLOAT:
+            return new JrsNumber(p.getNumberValue());
+        case JsonTokenId.ID_STRING:
+            return new JrsString(p.getText());
+        case JsonTokenId.ID_START_ARRAY: {
+            List<JrsValue> values = _list();
+            while (p.nextToken() != JsonToken.END_ARRAY) {
+                values.add(nodeFrom(p));
             }
-            case JsonTokenId.ID_START_OBJECT: {
-                Map<String, JrsValue> values = _map();
-                while (p.nextToken() != JsonToken.END_OBJECT) {
-                    final String currentName = p.currentName();
-                    if (duplicateCheck(values, currentName)) {
-                        throw new JSONObjectException("Duplicate key (key '" + currentName + "')");
-                    }
-                    p.nextToken();
-                    values.put(currentName, nodeFrom(p));
+            return new JrsArray(values);
+        }
+        case JsonTokenId.ID_START_OBJECT: {
+            Map<String, JrsValue> values = _map();
+            while (p.nextToken() != JsonToken.END_OBJECT) {
+                final String currentName = p.currentName();
+                if (duplicateCheck(values, currentName)) {
+                    throw new JSONObjectException("Duplicate key (key '" + currentName + "')");
                 }
-                return new JrsObject(values);
+                p.nextToken();
+                values.put(currentName, nodeFrom(p));
             }
-            case JsonTokenId.ID_EMBEDDED_OBJECT:
-                // 07-Jan-2016, tatu: won't happen with JSON, but other types like Smile
-                //   may produce binary data or such
-                return new JrsEmbeddedObject(p.getEmbeddedObject());
+            return new JrsObject(values);
+        }
+        case JsonTokenId.ID_EMBEDDED_OBJECT:
+            // 07-Jan-2016, tatu: won't happen with JSON, but other types like Smile
+            //   may produce binary data or such
+            return new JrsEmbeddedObject(p.getEmbeddedObject());
 
-            case JsonTokenId.ID_NULL:
-                return JrsNull.instance;
-            default:
+        case JsonTokenId.ID_NULL:
+            return JrsNull.instance;
+        default:
         }
         throw new UnsupportedOperationException("Unsupported token id " + tokenId + " (" + p.currentToken() + ")");
     }
@@ -132,6 +133,7 @@ public class JacksonJrsTreeCodec extends TreeCodec {
      *
      * @param state Whether to create {@code Boolean.TRUE} or {@code Boolean.FALSE} node
      * @return Node instance for given boolean value
+     *
      * @since 2.8
      */
     public JrsBoolean booleanNode(boolean state) {
@@ -143,6 +145,7 @@ public class JacksonJrsTreeCodec extends TreeCodec {
      *
      * @param text String value for constructed node to contain
      * @return Node instance for given text value
+     *
      * @since 2.8
      */
     public JrsString stringNode(String text) {
@@ -157,6 +160,7 @@ public class JacksonJrsTreeCodec extends TreeCodec {
      *
      * @param nr Numeric value for constructed node to contain
      * @return Node instance for given numeric value
+     *
      * @since 2.8
      */
     public JrsNumber numberNode(Number nr) {
