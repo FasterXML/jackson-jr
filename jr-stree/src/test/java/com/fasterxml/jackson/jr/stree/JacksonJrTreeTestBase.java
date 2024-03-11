@@ -49,6 +49,6 @@ public abstract class JacksonJrTreeTestBase extends TestCase
                 // 13-Feb-2020, tatu: There are 2 different ways actually..
 //            .treeCodec(new JacksonJrsTreeCodec())
                 .register(new JrSimpleTreeExtension())
-            .build();
+                .build();
     }
 }
