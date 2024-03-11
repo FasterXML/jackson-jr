@@ -3,6 +3,7 @@ package tools.jackson.jr.stree;
 import java.util.*;
 
 import tools.jackson.core.*;
+import tools.jackson.jr.ob.JSONObjectException;
 
 /**
  * {@link TreeCodec} implementation that can build "simple", immutable
@@ -29,8 +30,9 @@ public class JacksonJrsTreeCodec implements TreeCodec
 
     private JrsValue nodeFrom(JsonParser p) throws JacksonException
     {
-        int tokenId = p.hasCurrentToken() ? p.currentTokenId() : p.nextToken().id();
-        
+        int tokenId = p.hasCurrentToken()
+                ? p.currentTokenId() : p.nextToken().id();
+
         switch (tokenId) {
         case JsonTokenId.ID_TRUE:
             return JrsBoolean.TRUE;
@@ -41,24 +43,25 @@ public class JacksonJrsTreeCodec implements TreeCodec
             return new JrsNumber(p.getNumberValue());
         case JsonTokenId.ID_STRING:
             return new JrsString(p.getText());
-        case JsonTokenId.ID_START_ARRAY:
-            {
-                List<JrsValue> values = _list();
-                while (p.nextToken() != JsonToken.END_ARRAY) {
-                    values.add(nodeFrom(p));
-                }
-                return new JrsArray(values);
+        case JsonTokenId.ID_START_ARRAY: {
+            List<JrsValue> values = _list();
+            while (p.nextToken() != JsonToken.END_ARRAY) {
+                values.add(nodeFrom(p));
             }
-        case JsonTokenId.ID_START_OBJECT:
-            {
-                Map<String, JrsValue> values = _map();
-                while (p.nextToken() != JsonToken.END_OBJECT) {
-                    final String currentName = p.currentName();
-                    p.nextToken();
-                    values.put(currentName, nodeFrom(p));
+            return new JrsArray(values);
+        }
+        case JsonTokenId.ID_START_OBJECT: {
+            Map<String, JrsValue> values = _map();
+            while (p.nextToken() != JsonToken.END_OBJECT) {
+                final String currentName = p.currentName();
+                p.nextToken();
+                JrsValue prev = values.put(currentName, nodeFrom(p));
+                if (_failOnDuplicateKeys && (prev != null)) {
+                    throw new JSONObjectException("Duplicate key (key '" + currentName + "')");
                 }
-                return new JrsObject(values);
             }
+            return new JrsObject(values);
+        }
         case JsonTokenId.ID_EMBEDDED_OBJECT:
             // 07-Jan-2016, tatu: won't happen with JSON, but other types like Smile
             //   may produce binary data or such
@@ -68,7 +71,7 @@ public class JacksonJrsTreeCodec implements TreeCodec
             return JrsNull.instance;
         default:
         }
-        throw new UnsupportedOperationException("Unsupported token id "+tokenId+" ("+p.currentToken()+")");
+        throw new UnsupportedOperationException("Unsupported token id " + tokenId + " (" + p.currentToken() + ")");
     }
 
     @Override
@@ -108,7 +111,7 @@ public class JacksonJrsTreeCodec implements TreeCodec
 
     @Override
     public JrsBoolean booleanNode(boolean state) {
-         return state? JrsBoolean.TRUE : JrsBoolean.FALSE;
+        return state ? JrsBoolean.TRUE : JrsBoolean.FALSE;
     }
 
     @Override
@@ -129,8 +132,6 @@ public class JacksonJrsTreeCodec implements TreeCodec
      *
      * @param nr Numeric value for constructed node to contain
      * @return Node instance for given numeric value
-     *
-     * @since 2.8
      */
 
     public JrsNumber numberNode(Number nr) {
