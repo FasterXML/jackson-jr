@@ -3,10 +3,10 @@ Major version: 2
 
 Modules:
   jackson-jr-annotation-support
+  jackson-jr-extension-javatime
   jackson-jr-objects
   jackson-jr-retrofit2
   jackson-jr-stree
-
 ------------------------------------------------------------------------
 === Releases ===
 ------------------------------------------------------------------------
@@ -15,27 +15,21 @@ Modules:
 
 No changes since 2.17
 
----
-
-Not yet released
+2.17.0 (12-Mar-2024)
 
 #7: Support deserialization of `int[]`
  (contributed by @Shounaks) 
-#51: Duplicate key detection does not work for (simple) Trees
- (contributed by @Shounaks) 
-#94: Support for serializing Java Records
- (implementation contributed by @Shounaks) 
-#131: Add mechanism for `JacksonJrExtension`s to access state of `JSON.Feature`s
-
-2.17.0-rc1 (26-Feb-2024)
-
 #25: Add support single-int Constructors
+ (contributed by @Shounaks) 
+#51: Duplicate key detection does not work for (simple) Trees
  (contributed by @Shounaks) 
 #78: Deserializes "null" to "0.0" for `java.lang.Double` (wrapper)
  (reported by @bill-phast)
 #93: Skip serialization of `groovy.lang.MetaClass` values to avoid `StackOverflowError`
  (requested by Nikolay C)
  (fix contributed by @Shounaks) 
+#94: Support for serializing Java Records
+ (implementation contributed by @Shounaks) 
 #100: Add support for `java.time` (Java 8 date/time) types
  (requested by @sebastian-zero)
  (contributed by @Shounaks) 
@@ -43,6 +37,7 @@ Not yet released
   valued field of bean
  (reported by Julian H)
 #116: Add read/write support for `java.nio.file.Path`
+#131: Add mechanism for `JacksonJrExtension`s to access state of `JSON.Feature`s
 
 2.16.2 (09-Mar-2024)
 2.16.1 (24-Dec-2023)
