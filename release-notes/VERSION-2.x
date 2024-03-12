@@ -11,6 +11,12 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
+2.18.0 (not yet released)
+
+No changes since 2.17
+
+---
+
 Not yet released
 
 #7: Support deserialization of `int[]`
