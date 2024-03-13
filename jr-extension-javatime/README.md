@@ -47,7 +47,7 @@ public class MyClass {
 
 ### Date Classes currently supported by `JacksonJrJavaTimeExtension`
 
-- `java.util.LocalDateTime`
+- `java.time.LocalDateTime`
 
 ### Plans for Future
 
