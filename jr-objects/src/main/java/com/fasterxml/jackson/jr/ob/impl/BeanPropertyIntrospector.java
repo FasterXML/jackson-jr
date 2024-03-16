@@ -69,12 +69,13 @@ public final class BeanPropertyIntrospector {
             // 13-Jun-2015, tatu:
             //      Skip synthetic, bridge methods altogether, for now
             //      at least (add more complex handling only if absolutely necessary)
-            if (isStatic(flags) || m.isSynthetic() || m.isBridge() || !isPublic(flags) || isGroovyMetaClass(returnType)) {
+            if (isStatic(flags) || m.isSynthetic() || m.isBridge() || isGroovyMetaClass(returnType)) {
                 continue;
             }
 
             final Class<?>[] argTypes = m.getParameterTypes();
             if (argTypes.length == 0 && returnType != Void.class) { // getter?
+                if(!isPublic(flags)) continue;
                 generatePropsWithGetter(m, props);
                 generatePropsWithIsGetter(m, props);
                 generatePropsWithFieldMatchingGetter(isFieldNameGettersEnabled, fieldMap, m, props);
