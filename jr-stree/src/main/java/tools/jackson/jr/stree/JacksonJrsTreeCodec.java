@@ -16,17 +16,15 @@ public class JacksonJrsTreeCodec implements TreeCodec
 
     protected boolean _failOnDuplicateKeys;
 
-    protected boolean _useBigDecimalForDouble;
+    protected boolean _useBigDecimalForFloats;
 
     public JacksonJrsTreeCodec() { }
 
-    public void setFailOnDuplicateKeys(boolean state) {
-        _failOnDuplicateKeys = state;
-    }
-
-    // @since 2.17.1
-    public void setUseBigDecimalForDouble(boolean state) {
-        _useBigDecimalForDouble = state;
+    protected JacksonJrsTreeCodec init(boolean failOnDupKeys,
+            boolean useBigDecimalForFloats) {
+        _failOnDuplicateKeys = failOnDupKeys;
+        _useBigDecimalForFloats = useBigDecimalForFloats;
+        return this;
     }
 
     @SuppressWarnings("unchecked")
@@ -47,7 +45,7 @@ public class JacksonJrsTreeCodec implements TreeCodec
             return JrsBoolean.FALSE;
         case JsonTokenId.ID_NUMBER_INT:
         case JsonTokenId.ID_NUMBER_FLOAT:
-            if (_useBigDecimalForDouble) {
+            if (_useBigDecimalForFloats) {
                 return new JrsNumber(p.getDecimalValue());
             }
             return new JrsNumber(p.getNumberValue());

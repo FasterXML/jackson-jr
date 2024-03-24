@@ -556,25 +556,6 @@ public class JSON
             return this;
         }
 
-        /**
-         * Method for specifying {@link TreeCodec} {@link JSON} to be built
-         * should use for reading and writing {@link TreeNode} values.
-         *<p>
-         * Note: by default no {@link TreeCodec} is configured.
-         *
-         * @param tc TreeCodec to use
-         *
-         * @return This builder for call chaining
-         *
-         * @deprecated Since 2.18 should register codec using Extension mechanism
-         *   (using {@link #register(JacksonJrExtension)}).
-         */
-        @Deprecated // since 2.18
-        public Builder treeCodec(TreeCodec tc) {
-            _treeCodec = tc;
-            return this;
-        }
-
         public Builder jsonReader(JSONReader r) {
             if (_collectionBuilder != null) {
                 r = r.with(_collectionBuilder);
@@ -655,6 +636,17 @@ public class JSON
                 _collectionBuilder = CollectionBuilder.defaultImpl();
             }
             return _collectionBuilder;
+        }
+
+        // // // Internal methods for syncing context and builder states
+
+        /**
+         * Internal method used by to assign {@link TreeCodec} for {@link JSON}
+         * instance built to use -- not to be called by end user.
+         */
+        protected Builder treeCodec(TreeCodec tc) {
+            _treeCodec = tc;
+            return this;
         }
     }
 

@@ -25,8 +25,8 @@ public class JrSimpleTreeExtension
 
     @Override
     protected void register(ExtensionContext ctxt) {
-        _codec.setFailOnDuplicateKeys(ctxt.isEnabled(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS));
-        _codec.setUseBigDecimalForDouble(ctxt.isEnabled(JSON.Feature.USE_BIG_DECIMAL_FOR_FLOATS));
+        _codec.init(ctxt.isEnabled(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS),
+                ctxt.isEnabled(JSON.Feature.USE_BIG_DECIMAL_FOR_FLOATS));
         ctxt.setTreeCodec(_codec);
     }
 }
