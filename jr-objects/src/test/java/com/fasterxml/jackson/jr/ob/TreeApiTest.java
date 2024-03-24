@@ -158,6 +158,7 @@ public class TreeApiTest extends TestBase
         }
     }
 
+    @SuppressWarnings("deprecation")
     private final JSON J = JSON.builder()
             .treeCodec(new TestTreeCodec())
             .build();
