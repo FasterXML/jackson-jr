@@ -12,16 +12,23 @@ import tools.jackson.jr.ob.JSONObjectException;
  */
 public class JacksonJrsTreeCodec implements TreeCodec
 {
-    public static JrsMissing MISSING = JrsMissing.instance;
+    public static final JrsMissing MISSING = JrsMissing.instance;
 
     protected boolean _failOnDuplicateKeys;
+
+    protected boolean _useBigDecimalForDouble;
 
     public JacksonJrsTreeCodec() { }
 
     public void setFailOnDuplicateKeys(boolean state) {
         _failOnDuplicateKeys = state;
     }
-    
+
+    // @since 2.17.1
+    public void setUseBigDecimalForDouble(boolean state) {
+        _useBigDecimalForDouble = state;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public JrsValue readTree(JsonParser p) throws JacksonException {
@@ -40,6 +47,9 @@ public class JacksonJrsTreeCodec implements TreeCodec
             return JrsBoolean.FALSE;
         case JsonTokenId.ID_NUMBER_INT:
         case JsonTokenId.ID_NUMBER_FLOAT:
+            if (_useBigDecimalForDouble) {
+                return new JrsNumber(p.getDecimalValue());
+            }
             return new JrsNumber(p.getNumberValue());
         case JsonTokenId.ID_STRING:
             return new JrsString(p.getText());
