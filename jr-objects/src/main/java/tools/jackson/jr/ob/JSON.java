@@ -445,7 +445,7 @@ public class JSON
 
     /*
     /**********************************************************************
-    /* Builder (new in 2.11)
+    /* Builder
     /**********************************************************************
      */
 
@@ -565,7 +565,11 @@ public class JSON
          * @param tc TreeCodec to use
          *
          * @return This builder for call chaining
+         *
+         * @deprecated Since 2.18 should register codec using Extension mechanism
+         *   (using {@link #register(JacksonJrExtension)}).
          */
+        @Deprecated // since 2.18
         public Builder treeCodec(TreeCodec tc) {
             _treeCodec = tc;
             return this;

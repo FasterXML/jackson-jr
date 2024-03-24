@@ -49,6 +49,7 @@ public abstract class JacksonJrTreeTestBase extends TestCase
     protected JSON jsonWithTreeCodec() {
         return JSON.builder()
                 // 13-Feb-2020, tatu: There are 2 different ways actually..
+                // 23-Mar-2024, tatu: this method now DEPRECATED (as of 2.18)
 //            .treeCodec(new JacksonJrsTreeCodec())
                 .register(new JrSimpleTreeExtension())
                 .build();
