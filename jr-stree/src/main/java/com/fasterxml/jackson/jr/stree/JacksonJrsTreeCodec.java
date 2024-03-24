@@ -58,6 +58,8 @@ public class JacksonJrsTreeCodec extends TreeCodec
         case JsonTokenId.ID_FALSE:
             return JrsBoolean.FALSE;
         case JsonTokenId.ID_NUMBER_INT:
+            // Important! No coercion to BigDecimal (wrt [jackson-jr#90]
+            return new JrsNumber(p.getNumberValue());
         case JsonTokenId.ID_NUMBER_FLOAT:
             if (_useBigDecimalForDouble) {
                 return new JrsNumber(p.getDecimalValue());
