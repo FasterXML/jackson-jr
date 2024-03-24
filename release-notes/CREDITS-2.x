@@ -61,3 +61,7 @@ Julian Honnen (@jhonnen)
  (2.17.0)
 * Contributed impl for #100: Add support for `java.time` (Java 8 date/time) types
  (2.17.0)
+* Contributed fix for #90: `USE_BIG_DECIMAL_FOR_FLOATS` feature not working
+  when using `JSON.treeFrom()`
+ (2.17.1)
+
