@@ -13,11 +13,14 @@ import com.fasterxml.jackson.jr.ob.JSONObjectException;
  */
 public class JacksonJrsTreeCodec extends TreeCodec
 {
-    public static JrsMissing MISSING = JrsMissing.instance;
+    public static final JrsMissing MISSING = JrsMissing.instance;
+
     protected final ObjectCodec _objectCodec;
 
     // @since 2.17
     protected boolean _failOnDuplicateKeys;
+
+    // @since 2.17.1
     protected boolean _useBigDecimalForDouble;
 
     public JacksonJrsTreeCodec() {
@@ -33,6 +36,7 @@ public class JacksonJrsTreeCodec extends TreeCodec
         _failOnDuplicateKeys = state;
     }
 
+    // @since 2.17.1
     public void setUseBigDecimalForDouble(boolean state) {
         _useBigDecimalForDouble = state;
     }
