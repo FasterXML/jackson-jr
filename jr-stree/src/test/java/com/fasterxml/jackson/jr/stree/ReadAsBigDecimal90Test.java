@@ -15,16 +15,15 @@ public class ReadAsBigDecimal90Test extends JacksonJrTreeTestBase
                 .disable(JSON.Feature.USE_BIG_DECIMAL_FOR_FLOATS)
                 .register(new JrSimpleTreeExtension())
                 .build();
-
-        String input = "[1.1]";
-
-        TreeNode node = json.treeFrom(input);
+        TreeNode node = json.treeFrom("[1.1]");
         TreeNode elemNode = node.get(0);
 
         assertTrue(elemNode.isValueNode());
         assertTrue(elemNode instanceof JrsNumber);
         assertEquals(Double.class,
                 ((JrsNumber) elemNode).getValue().getClass());
+
+        _verifyInt(json);
     }
 
     // [jackson-jr#90]
@@ -34,15 +33,26 @@ public class ReadAsBigDecimal90Test extends JacksonJrTreeTestBase
                 .enable(JSON.Feature.USE_BIG_DECIMAL_FOR_FLOATS)
                 .register(new JrSimpleTreeExtension())
                 .build();
-
-        String input = "[1.1]";
-
-        TreeNode node = json.treeFrom(input);
+        TreeNode node = json.treeFrom("[1.1]");
         TreeNode elemNode = node.get(0);
 
         assertTrue(elemNode.isValueNode());
         assertTrue(elemNode instanceof JrsNumber);
         assertEquals(BigDecimal.class,
                 ((JrsNumber) elemNode).getValue().getClass());
+
+        _verifyInt(json);
+    }
+
+    private void _verifyInt(JSON json) throws Exception
+    {
+        TreeNode node = json.treeFrom("[123]");
+        TreeNode elemNode = node.get(0);
+
+        assertTrue(elemNode.isValueNode());
+        assertTrue(elemNode instanceof JrsNumber);
+        assertEquals(Integer.class,
+                ((JrsNumber) elemNode).getValue().getClass());
+        assertEquals(123, ((JrsNumber) elemNode).getValue().intValue());
     }
 }
