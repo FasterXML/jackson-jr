@@ -15,7 +15,7 @@ Modules:
 
 No changes since 2.17
 
-2.17.1 (not yet released)
+2.17.1 (04-May-2024)
 
 #90: `USE_BIG_DECIMAL_FOR_FLOATS` feature not working when using `JSON.treeFrom()`
  (reported by @jvdsandt)
