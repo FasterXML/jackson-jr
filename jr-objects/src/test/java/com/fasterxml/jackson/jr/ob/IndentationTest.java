@@ -6,7 +6,7 @@ public class IndentationTest extends TestBase
 {
     public void testSimpleList() throws Exception
     {
-        Map<String,Object> map = new LinkedHashMap<String,Object>();
+        Map<String,Object> map = new LinkedHashMap<>();
         map.put("a", 1);
         map.put("b", 2);
         

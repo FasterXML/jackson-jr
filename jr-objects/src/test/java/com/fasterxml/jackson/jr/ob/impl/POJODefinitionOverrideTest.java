@@ -1,9 +1,10 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import java.util.*;
-
-import com.fasterxml.jackson.jr.ob.*;
+import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.TestBase;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
+
+import java.util.*;
 
 public class POJODefinitionOverrideTest extends TestBase
 {
@@ -16,11 +17,9 @@ public class POJODefinitionOverrideTest extends TestBase
         }
 
         @Override
-        public POJODefinition pojoDefinitionForDeserialization(JSONReader readContext,
-                Class<?> pojoType)
-        {
-            POJODefinition def = BeanPropertyIntrospector.instance().pojoDefinitionForDeserialization(readContext, pojoType);
-            List<POJODefinition.Prop> newProps = new ArrayList<POJODefinition.Prop>();
+        public POJODefinition pojoDefinitionForDeserialization(JSONReader readContext, Class<?> pojoType) {
+            POJODefinition def = BeanPropertyIntrospector.pojoDefinitionForDeserialization(readContext, pojoType);
+            List<POJODefinition.Prop> newProps = new ArrayList<>();
             for (POJODefinition.Prop prop : def.getProperties()) {
                 if (!_toDrop.equals(prop.name)) {
                     newProps.add(prop);
@@ -30,12 +29,10 @@ public class POJODefinitionOverrideTest extends TestBase
         }
 
         @Override
-        public POJODefinition pojoDefinitionForSerialization(JSONWriter writeContext,
-                Class<?> pojoType)
-        {
-            POJODefinition def = BeanPropertyIntrospector.instance().pojoDefinitionForSerialization(writeContext, pojoType);
+        public POJODefinition pojoDefinitionForSerialization(JSONWriter writeContext, Class<?> pojoType) {
+            POJODefinition def = BeanPropertyIntrospector.pojoDefinitionForSerialization(writeContext, pojoType);
             // and then reverse-order
-            Map<String, POJODefinition.Prop> newProps = new TreeMap<String, POJODefinition.Prop>(Collections.reverseOrder());
+            Map<String, POJODefinition.Prop> newProps = new TreeMap<>(Collections.reverseOrder());
             for (POJODefinition.Prop prop : def.getProperties()) {
                 newProps.put(prop.name, prop);
             }
