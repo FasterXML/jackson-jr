@@ -155,6 +155,20 @@ public class BeanReader
                 return _constructors.create(p.getLongValue());
             case START_OBJECT:
                 {
+                    if (RecordsHelpers.isRecord(_valueType)) {
+                        final List<Object> values = new ArrayList<>();
+
+                        String propName;
+                        for (; (propName = p.nextFieldName()) != null;) {
+                            BeanPropertyReader prop = findProperty(propName);
+                            if (prop == null) {
+                                handleUnknown(r, p, propName);
+                                continue;
+                            }
+                            values.add(prop.getReader().readNext(r, p));
+                        }
+                        return _constructors.create(values.toArray());
+                    }
                     Object bean = _constructors.create();
                     String propName;
                     final Object[] valueBuf = r._setterBuffer;

@@ -452,6 +452,7 @@ public class ValueReaderLocator
         final Map<String, BeanPropertyReader> propMap;
         Map<String, String> aliasMapping = null;
 
+        boolean isRecord = RecordsHelpers.isRecord(raw);
         if (len == 0) {
             propMap = Collections.emptyMap();
         } else {
@@ -462,31 +463,41 @@ public class ValueReaderLocator
             final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
             for (int i = 0; i < len; ++i) {
                 POJODefinition.Prop rawProp = rawProps.get(i);
-                Method m = rawProp.setter;
-                Field f = useFields ? rawProp.field : null;
+                Method setter = rawProp.setter;
+                Field field = useFields ? rawProp.field : null;
 
-                if (m != null) {
+                if (setter != null) {
                     if (forceAccess) {
-                        m.setAccessible(true);
-                    } else if (!Modifier.isPublic(m.getModifiers())) {
+                        setter.setAccessible(true);
+                    } else if (!Modifier.isPublic(setter.getModifiers())) {
                         // access to non-public setters must be forced to be usable:
-                        m = null;
+                        setter = null;
                     }
                 }
-                // if no setter, field would do as well
-                if (m == null) {
-                    if (f == null) {
-                        continue;
+                if (isRecord) {
+                    try {
+                        field = raw.getDeclaredField(rawProp.name);
+                    } catch (NoSuchFieldException e) {
+                        throw new IllegalStateException("Cannot access field " + rawProp.name
+                                + " of record class " + raw.getName(), e);
                     }
-                    // fields should always be public, but let's just double-check
-                    if (forceAccess) {
-                        f.setAccessible(true);
-                    } else if (!Modifier.isPublic(f.getModifiers())) {
-                        continue;
+                }
+                if (!isRecord) {
+                    // if no setter, field would do as well
+                    if (setter == null) {
+                        if (field == null) {
+                            continue;
+                        }
+                        // fields should always be public, but let's just double-check
+                        if (forceAccess) {
+                            field.setAccessible(true);
+                        } else if (!Modifier.isPublic(field.getModifiers())) {
+                            continue;
+                        }
                     }
                 }
 
-                propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, f, m));
+                propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, field, setter));
 
                 // 25-Jan-2020, tatu: Aliases are bit different because we can not tie them into
                 //   specific reader instance, due to resolution of cyclic dependencies. Instead,

@@ -1,4 +1,5 @@
 import com.fasterxml.jackson.jr.ob.JSON;
+import com.fasterxml.jackson.jr.ob.JSON.Feature;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -12,9 +13,15 @@ public class Java17RecordTest {
 
     @Test
     public void testJava14RecordSupport() throws IOException {
+        JSON jsonParser = JSON.builder().enable(Feature.USE_FIELD_MATCHING_GETTERS).build();
         var expectedString = "{\"message\":\"MOO\",\"object\":{\"Foo\":\"Bar\"}}";
-        var json = JSON.builder().enable(JSON.Feature.USE_FIELD_MATCHING_GETTERS).build().asString(new Cow("MOO", Map.of("Foo", "Bar")));
+        Cow expectedObject = new Cow("MOO", Map.of("Foo", "Bar"));
+
+        var json = jsonParser.asString(expectedObject);
         Assert.assertEquals(expectedString, json);
+
+        Cow object = jsonParser.beanFrom(Cow.class, json);
+        Assert.assertEquals(expectedObject, object);
     }
 
     record Cow(String message, Map<String, String> object) {
