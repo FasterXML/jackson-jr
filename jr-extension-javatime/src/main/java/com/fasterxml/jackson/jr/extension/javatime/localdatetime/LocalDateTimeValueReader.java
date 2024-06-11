@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.jr.extension.javatime;
+package com.fasterxml.jackson.jr.extension.javatime.localdatetime;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
