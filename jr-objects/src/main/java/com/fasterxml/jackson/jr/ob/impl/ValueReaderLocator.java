@@ -481,8 +481,7 @@ public class ValueReaderLocator
                         throw new IllegalStateException("Cannot access field " + rawProp.name
                                 + " of record class " + raw.getName(), e);
                     }
-                }
-                if (!isRecord) {
+                } else {
                     // if no setter, field would do as well
                     if (setter == null) {
                         if (field == null) {
