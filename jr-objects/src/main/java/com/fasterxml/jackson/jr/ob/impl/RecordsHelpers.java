@@ -8,32 +8,34 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- * Helper class to get Java Record metadata, from Java 8 (not using
- * JDK 17 methods)
- *
- * @since 2.18
+ * Helper class to get Java Record metadata.
  */
 public final class RecordsHelpers {
     private static boolean supportsRecords;
 
+    private static Method isRecordMethod;
     private static Method getRecordComponentsMethod;
     private static Method getTypeMethod;
 
     static {
+        Method isRecordMethod;
         Method getRecordComponentsMethod;
         Method getTypeMethod;
 
         try {
+            isRecordMethod = Class.class.getMethod("isRecord");
             getRecordComponentsMethod = Class.class.getMethod("getRecordComponents");
             Class<?> recordComponentClass = Class.forName("java.lang.reflect.RecordComponent");
             getTypeMethod = recordComponentClass.getMethod("getType");
             supportsRecords = true;
         } catch (Throwable t) {
+            isRecordMethod = null;
             getRecordComponentsMethod = null;
             getTypeMethod = null;
             supportsRecords = false;
         }
 
+        RecordsHelpers.isRecordMethod = isRecordMethod;
         RecordsHelpers.getRecordComponentsMethod = getRecordComponentsMethod;
         RecordsHelpers.getTypeMethod = getTypeMethod;
     }
