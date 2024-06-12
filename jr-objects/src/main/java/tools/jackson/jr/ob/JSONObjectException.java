@@ -64,43 +64,4 @@ public class JSONObjectException
         _processor = p;
         return this;
     }
-
-    /*
-    /**********************************************************************
-    /* Overridden methods
-    /**********************************************************************
-     */
-
-    @Override
-    public String getLocalizedMessage() {
-        return _buildMessage();
-    }
-    
-    /**
-     * Method is overridden so that we can properly inject description
-     * of problem path, if such is defined.
-     */
-    @Override
-    public String getMessage() {
-        return _buildMessage();
-    }
-
-    protected String _buildMessage()
-    {
-        String msg = super.getMessage();
-        if (_path == null) {
-            return msg;
-        }
-        StringBuilder sb = (msg == null) ? new StringBuilder() : new StringBuilder(msg);
-        sb.append(" (through reference chain: ");
-        sb = getPathReference(sb);
-        sb.append(')');
-        return sb.toString();
-    }
-
-    @Override
-    public String toString()
-    {
-        return getClass().getName()+": "+getMessage();
-    }
 }
