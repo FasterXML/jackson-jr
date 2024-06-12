@@ -13,36 +13,31 @@ import java.util.Map;
 public final class RecordsHelpers {
     private static boolean supportsRecords;
 
-    private static Method isRecordMethod;
     private static Method getRecordComponentsMethod;
     private static Method getTypeMethod;
 
     static {
-        Method isRecordMethod;
         Method getRecordComponentsMethod;
         Method getTypeMethod;
 
         try {
-            isRecordMethod = Class.class.getMethod("isRecord");
             getRecordComponentsMethod = Class.class.getMethod("getRecordComponents");
             Class<?> recordComponentClass = Class.forName("java.lang.reflect.RecordComponent");
             getTypeMethod = recordComponentClass.getMethod("getType");
             supportsRecords = true;
         } catch (Throwable t) {
-            isRecordMethod = null;
             getRecordComponentsMethod = null;
             getTypeMethod = null;
             supportsRecords = false;
         }
 
-        RecordsHelpers.isRecordMethod = isRecordMethod;
         RecordsHelpers.getRecordComponentsMethod = getRecordComponentsMethod;
         RecordsHelpers.getTypeMethod = getTypeMethod;
     }
     private RecordsHelpers() {}
 
     static boolean isRecordConstructor(Class<?> beanClass, Constructor<?> ctor, Map<String, PropBuilder> propsByName) {
-        if (!supportsRecords || !isRecord(beanClass)) {
+        if (!supportsRecords || !isRecordType(beanClass)) {
             return false;
         }
 
@@ -71,15 +66,8 @@ public final class RecordsHelpers {
         return true;
     }
 
-    public static boolean isRecord(Class<?> clazz) {
-        if (isRecordMethod == null) {
-            return false;
-        }
-
-        try {
-            return (boolean) isRecordMethod.invoke(clazz);
-        } catch (Throwable t) {
-            return false;
-        }
+    static boolean isRecordType(Class<?> cls) {
+        Class<?> parent = cls.getSuperclass();
+        return (parent != null) && "java.lang.Record".equals(parent.getName());
     }
 }

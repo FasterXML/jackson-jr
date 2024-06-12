@@ -155,7 +155,7 @@ public class BeanReader
                 return _constructors.create(p.getLongValue());
             case START_OBJECT:
                 {
-                    if (RecordsHelpers.isRecord(_valueType)) {
+                    if (RecordsHelpers.isRecordType(_valueType)) {
                         final List<Object> values = new ArrayList<>();
 
                         String propName;

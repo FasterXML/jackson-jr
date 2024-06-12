@@ -452,7 +452,7 @@ public class ValueReaderLocator
         final Map<String, BeanPropertyReader> propMap;
         Map<String, String> aliasMapping = null;
 
-        boolean isRecord = RecordsHelpers.isRecord(raw);
+        boolean isRecord = RecordsHelpers.isRecordType(raw);
         if (len == 0) {
             propMap = Collections.emptyMap();
         } else {
