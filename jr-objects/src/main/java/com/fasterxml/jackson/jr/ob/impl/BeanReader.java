@@ -36,6 +36,8 @@ public class BeanReader
      */
     protected final BeanConstructors _constructors;
 
+    protected boolean _isRecordType;
+
     /**
      * Constructors used for deserialization use case
      *
@@ -56,6 +58,7 @@ public class BeanReader
             aliasMapping = Collections.emptyMap();
         }
         _aliasMapping = aliasMapping;
+        _isRecordType = RecordsHelpers.isRecordType(type);
     }
 
     @Deprecated // since 2.17
@@ -155,7 +158,7 @@ public class BeanReader
                 return _constructors.create(p.getLongValue());
             case START_OBJECT:
                 {
-                    if (RecordsHelpers.isRecordType(_valueType)) {
+                    if (_isRecordType) {
                         final List<Object> values = new ArrayList<>();
 
                         String propName;
