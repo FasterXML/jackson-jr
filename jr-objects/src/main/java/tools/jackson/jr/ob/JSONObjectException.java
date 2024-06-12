@@ -1,8 +1,5 @@
 package tools.jackson.jr.ob;
 
-import java.io.Serializable;
-import java.util.*;
-
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonLocation;
 import tools.jackson.core.JsonParser;
@@ -17,7 +14,6 @@ public class JSONObjectException
     extends JacksonException
 {
     private static final long serialVersionUID = 1L;
-
 
     /*
     /**********************************************************************
