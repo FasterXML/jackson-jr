@@ -28,7 +28,6 @@
     <module>jr-extension-javatime</module>
     <module>jr-test-module</module>
     <module>jr-all</module>
-      <module>jr-records</module>
   </modules>
 
   <url>https://github.com/FasterXML/jackson-jr</url>
