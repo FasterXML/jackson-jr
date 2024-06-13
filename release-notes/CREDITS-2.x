@@ -65,3 +65,7 @@ Julian Honnen (@jhonnen)
   when using `JSON.treeFrom()`
  (2.17.1)
 
+Tomasz Gawęda (@TomaszGaweda)
+
+* Contributed #148: Add support for Java Record deserialization
+ (2.18.0)
