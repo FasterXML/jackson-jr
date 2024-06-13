@@ -14,6 +14,9 @@ public class BeanConstructors
 
     protected Constructor<?> _noArgsCtor;
 
+    // @since 2.18
+    protected Constructor<?> _recordCtor;
+
     protected Constructor<?> _intCtor;
     protected Constructor<?> _longCtor;
     protected Constructor<?> _stringCtor;
@@ -24,6 +27,12 @@ public class BeanConstructors
 
     public BeanConstructors addNoArgsConstructor(Constructor<?> ctor) {
         _noArgsCtor = ctor;
+        return this;
+    }
+
+    // @since 2.18
+    public BeanConstructors addRecordConstructor(Constructor<?> ctor) {
+        _recordCtor = ctor;
         return this;
     }
 
@@ -46,6 +55,9 @@ public class BeanConstructors
         if (_noArgsCtor != null) {
             _noArgsCtor.setAccessible(true);
         }
+        if (_recordCtor != null) {
+            _recordCtor.setAccessible(true);
+        }
         if (_intCtor != null) {
             _intCtor.setAccessible(true);
         }
@@ -62,6 +74,14 @@ public class BeanConstructors
             throw new IllegalStateException("Class "+_valueType.getName()+" does not have default constructor to use");
         }
         return _noArgsCtor.newInstance((Object[]) null);
+    }
+
+    // @since 2.18
+    protected Object createRecord(Object[] components) throws Exception {
+        if (_recordCtor == null) {
+            throw new IllegalStateException("Class "+_valueType.getName()+" does not have record constructor to use");
+        }
+        return _recordCtor.newInstance(components);
     }
     
     protected Object create(String str) throws Exception {

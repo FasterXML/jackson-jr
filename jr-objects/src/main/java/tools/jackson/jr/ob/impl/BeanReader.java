@@ -31,6 +31,8 @@ public class BeanReader
 
     protected final BeanConstructors _constructors;
 
+    protected final boolean _isRecordType;
+
     // // 13-Dec-2017, tatu: NOTE! These will be constructed right after construction, but
     // //    not during it (due to need to resolve possible cyclic deps). So they are
     // //    non-final due to this but never `null` before use.
@@ -52,6 +54,7 @@ public class BeanReader
         _ignorableNames = ignorableNames;
         _aliasMapping = aliasMapping;
         _caseInsensitive = caseInsensitive;
+        _isRecordType = RecordsHelpers.isRecordType(type);
     }
 
     /**

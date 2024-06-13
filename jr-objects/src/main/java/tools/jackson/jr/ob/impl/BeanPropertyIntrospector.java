@@ -66,6 +66,8 @@ public class BeanPropertyIntrospector
                     } else if (argType == Long.class || argType == Long.TYPE) {
                         constructors.addLongConstructor(ctor);
                     }
+                } else if (RecordsHelpers.isRecordConstructor(beanType, ctor, propsByName)) {
+                    constructors.addRecordConstructor(ctor);
                 }
             }
         }
