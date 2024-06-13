@@ -197,9 +197,8 @@ public class BeanPropertyIntrospector
 
     /**
      * Helper method to detect Groovy's problematic metadata accessor type.
-     *
-     * @implNote Groovy MetaClass have cyclic reference, and hence the class containing it should not be serialised without
-     * either removing that reference, or skipping over such references.
+     * Groovy MetaClass have cyclic reference, and hence the class containing it should not be
+     * serialized without either removing that reference, or skipping over such references.
      */
     protected static boolean isGroovyMetaClass(Class<?> clazz) {
         return "groovy.lang.MetaClass".equals(clazz.getName());
