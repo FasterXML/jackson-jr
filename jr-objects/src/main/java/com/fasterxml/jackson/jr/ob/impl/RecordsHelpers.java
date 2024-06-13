@@ -8,7 +8,10 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- * Helper class to get Java Record metadata.
+ * Helper class to get Java Record metadata, from Java 8 (not using
+ * JDK 17 methods)
+ *
+ * @since 2.18
  */
 public final class RecordsHelpers {
     private static boolean supportsRecords;

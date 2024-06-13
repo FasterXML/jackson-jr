@@ -36,7 +36,7 @@ public class BeanReader
      */
     protected final BeanConstructors _constructors;
 
-    protected boolean _isRecordType;
+    protected final boolean _isRecordType;
 
     /**
      * Constructors used for deserialization use case
@@ -158,6 +158,7 @@ public class BeanReader
                 return _constructors.create(p.getLongValue());
             case START_OBJECT:
                 {
+                    // [jackson-jr#148] Record deser support (2.18)
                     if (_isRecordType) {
                         final List<Object> values = new ArrayList<>();
 
@@ -170,8 +171,9 @@ public class BeanReader
                             }
                             values.add(prop.getReader().readNext(r, p));
                         }
-                        return _constructors.create(values.toArray());
+                        return _constructors.createRecord(values.toArray());
                     }
+                    // If not Record, need to use default (no-args) Constructors
                     Object bean = _constructors.create();
                     String propName;
                     final Object[] valueBuf = r._setterBuffer;

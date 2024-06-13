@@ -452,7 +452,6 @@ public class ValueReaderLocator
         final Map<String, BeanPropertyReader> propMap;
         Map<String, String> aliasMapping = null;
 
-        boolean isRecord = RecordsHelpers.isRecordType(raw);
         if (len == 0) {
             propMap = Collections.emptyMap();
         } else {
@@ -474,12 +473,12 @@ public class ValueReaderLocator
                         setter = null;
                     }
                 }
-                if (isRecord) {
+                if (RecordsHelpers.isRecordType(raw)) {
                     try {
                         field = raw.getDeclaredField(rawProp.name);
                     } catch (NoSuchFieldException e) {
-                        throw new IllegalStateException("Cannot access field " + rawProp.name
-                                + " of record class " + raw.getName(), e);
+                        throw new IllegalStateException("Cannot access field '" + rawProp.name
+                                + "' of record class `" + raw.getName() + "`", e);
                     }
                 } else {
                     // if no setter, field would do as well
