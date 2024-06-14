@@ -26,7 +26,7 @@
     <module>jr-stree</module>
     <module>jr-annotation-support</module>
     <module>jr-extension-javatime</module>
-    <module>jr-test-module</module>
+    <module>jr-groovy-test</module>
     <module>jr-all</module>
   </modules>
 
