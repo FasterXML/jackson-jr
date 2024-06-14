@@ -6,7 +6,7 @@
         <artifactId>jackson-jr-parent</artifactId>
         <version>3.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>jackson-jr-test-module</artifactId>
+    <artifactId>jackson-jr-groovy-test</artifactId>
     <packaging>pom</packaging>
     <description>Test Module with higher JDK Version + Groovy support to test Jackson-Jr</description>
     <url>https://github.com/FasterXML/jackson-jr</url>
