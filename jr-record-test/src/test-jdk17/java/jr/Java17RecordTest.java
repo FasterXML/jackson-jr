@@ -3,8 +3,8 @@ package jr;
 import java.io.IOException;
 import java.util.Map;
 
-import com.fasterxml.jackson.jr.ob.JSON;
-import com.fasterxml.jackson.jr.ob.JSON.Feature;
+import tools.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.JSON.Feature;
 
 import junit.framework.TestCase;
 
