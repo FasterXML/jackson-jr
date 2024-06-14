@@ -6,14 +6,14 @@
         <artifactId>jackson-jr-parent</artifactId>
         <version>2.18.0-SNAPSHOT</version>
     </parent>
-    <artifactId>jackson-jr-test-module</artifactId>
+    <artifactId>jackson-jr-groovy-test</artifactId>
     <packaging>pom</packaging>
-    <description>Test Module with higher JDK Version + Groovy support to test Jackson-Jr</description>
+    <description>Test Module with Groovy support to test Jackson-Jr</description>
     <url>https://github.com/FasterXML/jackson-jr</url>
     <properties>
         <!--    To Test Latest Java Features Lets use this settings    -->
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
