@@ -11,15 +11,15 @@ import junit.framework.TestCase;
  */
 public class Java17RecordTest extends TestCase
 {
-    public record Cow(String message, Map<String, String> object) {
+    public record Cow(String message, Map<String, String> object,Integer anInt) {
     }
 
     // [jackson-jr#94]
     public void testJava14RecordSerialization() throws Exception {
         // 13-Jun-2024, tatu: why is this explicitly needed?
         JSON json = JSON.std;
-        var expectedDoc = "{\"message\":\"MOO\",\"object\":{\"Foo\":\"Bar\"}}";
-        Cow input = new Cow("MOO", Map.of("Foo", "Bar"));
+        var expectedDoc = "{\"anInt\":5,\"message\":\"MOO\",\"object\":{\"Foo\":\"Bar\"}}";
+        Cow input = new Cow("MOO", Map.of("Foo", "Bar"),5);
 
         assertEquals(expectedDoc, json.asString(input));
     }
@@ -28,9 +28,31 @@ public class Java17RecordTest extends TestCase
     public void testJava14RecordDeserialization() throws Exception {
         // 13-Jun-2024, tatu: why is this explicitly needed?
         JSON json = JSON.std;
+        var inputDoc = "{\"message\":\"MOO\",\"object\":{\"Foo\":\"Bar\"},\"anInt\":5}";
+
+        Cow expected = new Cow("MOO", Map.of("Foo", "Bar"), 5);
+
+        Cow actual = json.beanFrom(Cow.class, inputDoc);
+        assertEquals(expected, actual);
+    }
+
+    public void testJava14RecordDeserialization2() throws Exception {
+        // 13-Jun-2024, tatu: why is this explicitly needed?
+        JSON json = JSON.std;
+        var inputDoc = "{\"message\":\"MOO\",\"object\":null,\"anInt\":5}";
+
+        Cow expected = new Cow("MOO", null, 5);
+
+        Cow actual = json.beanFrom(Cow.class, inputDoc);
+        assertEquals(expected, actual);
+    }
+
+    public void testJava14RecordDeserializationWithPrimitives() throws Exception {
+        // 13-Jun-2024, tatu: why is this explicitly needed?
+        JSON json = JSON.std;
         String inputDoc = "{\"message\":\"MOO\",\"object\":{\"Foo\":\"Bar\"}}";
 
-        Cow expected = new Cow("MOO", Map.of("Foo", "Bar"));
+        Cow expected = new Cow("MOO", Map.of("Foo", "Bar"), null);
 
         Cow actual = json.beanFrom(Cow.class, inputDoc);
         assertEquals(expected, actual);

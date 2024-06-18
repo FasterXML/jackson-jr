@@ -2,6 +2,7 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -161,6 +162,7 @@ public class BeanReader
                     // [jackson-jr#148] Record deser support (2.18)
                     if (_isRecordType) {
                         final List<Object> values = new ArrayList<>();
+                        final List<Object> props = new ArrayList<>();
 
                         String propName;
                         for (; (propName = p.nextFieldName()) != null;) {
@@ -169,7 +171,17 @@ public class BeanReader
                                 handleUnknown(r, p, propName);
                                 continue;
                             }
+                            props.add(propName);
                             values.add(prop.getReader().readNext(r, p));
+                        }
+
+                        for(Field f : _valueType.getDeclaredFields()) {
+                            if(!props.contains(f.getName())) {
+                                if(!f.getType().isPrimitive()) {
+                                    values.add(null);
+                                }
+                                else handleUnknown(r,p,propName);
+                            }
                         }
                         return _constructors.createRecord(values.toArray());
                     }
