@@ -23,14 +23,23 @@ public class Java17RecordTest extends TestCase
         assertEquals(expectedDoc, json.asString(input));
     }
 
-    // [jackson-jr#148]
-    public void testJava14RecordDeserialization() throws Exception {
-        JSON json = JSON.std;
+    // [jackson-jr#148]: simple deserialization
+    public void testRecordDeserializationSimple() throws Exception {
         String inputDoc = "{\"message\":\"MOO\",\"object\":{\"Foo\":\"Bar\"}}";
+        assertEquals(new Cow("MOO", Map.of("Foo", "Bar")),
+                JSON.std.beanFrom(Cow.class, inputDoc));
+    }
 
-        Cow expected = new Cow("MOO", Map.of("Foo", "Bar"));
-
-        Cow actual = json.beanFrom(Cow.class, inputDoc);
-        assertEquals(expected, actual);
+    // [jackson-jr#157]: deserialization should work with different ordering
+    public void testRecordDeserializationReordered() throws Exception {
+        String inputDoc = "{\"object\":{\"Foo\":\"Bar\"}, \"message\":\"MOO\"}";
+        assertEquals(new Cow("MOO", Map.of("Foo", "Bar")),
+                JSON.std.beanFrom(Cow.class, inputDoc));
+    }
+    // [jackson-jr#157]: deserialization should work with missing, as well
+    public void testRecordDeserializationPartial() throws Exception {
+        String inputDoc = "{\"message\":\"MOO\"}";
+        assertEquals(new Cow("MOO", null),
+                JSON.std.beanFrom(Cow.class, inputDoc));
     }
 }
