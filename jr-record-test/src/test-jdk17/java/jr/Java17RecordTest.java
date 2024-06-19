@@ -16,7 +16,6 @@ public class Java17RecordTest extends TestCase
 
     // [jackson-jr#94]
     public void testJava14RecordSerialization() throws Exception {
-        // 13-Jun-2024, tatu: why is this explicitly needed?
         JSON json = JSON.std;
         var expectedDoc = "{\"message\":\"MOO\",\"object\":{\"Foo\":\"Bar\"}}";
         Cow input = new Cow("MOO", Map.of("Foo", "Bar"));
@@ -26,7 +25,6 @@ public class Java17RecordTest extends TestCase
 
     // [jackson-jr#148]
     public void testJava14RecordDeserialization() throws Exception {
-        // 13-Jun-2024, tatu: why is this explicitly needed?
         JSON json = JSON.std;
         String inputDoc = "{\"message\":\"MOO\",\"object\":{\"Foo\":\"Bar\"}}";
 
