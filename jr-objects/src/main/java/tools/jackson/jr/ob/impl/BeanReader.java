@@ -31,9 +31,6 @@ public class BeanReader
 
     protected final BeanConstructors _constructors;
 
-    // @since 2.18
-    protected final boolean _isRecordType;
-
     // // 13-Dec-2017, tatu: NOTE! These will be constructed right after construction, but
     // //    not during it (due to need to resolve possible cyclic deps). So they are
     // //    non-final due to this but never `null` before use.
@@ -55,7 +52,6 @@ public class BeanReader
         _ignorableNames = ignorableNames;
         _aliasMapping = aliasMapping;
         _caseInsensitive = caseInsensitive;
-        _isRecordType = RecordsHelpers.isRecordType(type);
     }
 
     /**
@@ -140,29 +136,6 @@ public class BeanReader
     public Object read(JSONReader r, JsonParser p) throws JacksonException
     {
         if (p.isExpectedStartObjectToken()) {
-            // [jackson-jr#148] Record deser support (2.18)
-            if (_isRecordType) {
-                final List<Object> values = new ArrayList<>();
-
-                String propName;
-
-                // 13-Jun-2024, tatu: Should optimize the way _readBean()
-                //     optimizes regular case...
-                for (; (propName = p.nextName()) != null;) {
-                    BeanPropertyReader prop = findProperty(propName);
-                    if (prop == null) {
-                        handleUnknown(r, p, propName);
-                        continue;
-                    }
-                    values.add(prop.getReader().readNext(r, p));
-                }
-                try {
-                    return _constructors.createRecord(values.toArray());
-                } catch (Exception e) {
-                    return _reportFailureToCreate(p, e);
-                }
-            }
-
             final Object bean;
             try {
                 bean = _constructors.create();

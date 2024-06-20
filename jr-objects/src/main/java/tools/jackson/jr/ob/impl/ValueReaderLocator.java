@@ -483,25 +483,16 @@ public class ValueReaderLocator
                         setter = null;
                     }
                 }
-                if (RecordsHelpers.isRecordType(raw)) {
-                    try {
-                        field = raw.getDeclaredField(rawProp.name);
-                    } catch (NoSuchFieldException e) {
-                        throw new IllegalStateException("Cannot access field '" + rawProp.name
-                                + "' of record class `" + raw.getName() + "`", e);
+                // if no setter, field would do as well
+                if (setter == null) {
+                    if (field == null) {
+                        continue;
                     }
-                } else {
-                    // if no setter, field would do as well
-                    if (setter == null) {
-                        if (field == null) {
-                            continue;
-                        }
-                        // fields should always be public, but let's just double-check
-                        if (forceAccess) {
-                            field.setAccessible(true);
-                        } else if (!Modifier.isPublic(field.getModifiers())) {
-                            continue;
-                        }
+                    // fields should always be public, but let's just double-check
+                    if (forceAccess) {
+                        field.setAccessible(true);
+                    } else if (!Modifier.isPublic(field.getModifiers())) {
+                        continue;
                     }
                 }
 

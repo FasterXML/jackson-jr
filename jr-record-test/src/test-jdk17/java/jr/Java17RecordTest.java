@@ -14,25 +14,9 @@ public class Java17RecordTest extends TestCase
     public record Cow(String message, Map<String, String> object) {
     }
 
-    // [jackson-jr#94]
+    // [jackson-jr#94]: Record serialization
     public void testJava14RecordSerialization() throws Exception {
-        // 13-Jun-2024, tatu: why is this explicitly needed?
-        JSON json = JSON.std;
-        var expectedDoc = "{\"message\":\"MOO\",\"object\":{\"Foo\":\"Bar\"}}";
-        Cow input = new Cow("MOO", Map.of("Foo", "Bar"));
-
-        assertEquals(expectedDoc, json.asString(input));
-    }
-
-    // [jackson-jr#148]
-    public void testJava14RecordDeserialization() throws Exception {
-        // 13-Jun-2024, tatu: why is this explicitly needed?
-        JSON json = JSON.std;
-        String inputDoc = "{\"message\":\"MOO\",\"object\":{\"Foo\":\"Bar\"}}";
-
-        Cow expected = new Cow("MOO", Map.of("Foo", "Bar"));
-
-        Cow actual = json.beanFrom(Cow.class, inputDoc);
-        assertEquals(expected, actual);
+        assertEquals("{\"message\":\"MOO\",\"object\":{\"Foo\":\"Bar\"}}",
+                JSON.std.asString(new Cow("MOO", Map.of("Foo", "Bar"))));
     }
 }
