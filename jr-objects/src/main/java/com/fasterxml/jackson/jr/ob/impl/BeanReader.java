@@ -36,8 +36,6 @@ public class BeanReader
      */
     protected final BeanConstructors _constructors;
 
-    protected final boolean _isRecordType;
-
     /**
      * Constructors used for deserialization use case
      *
@@ -58,7 +56,6 @@ public class BeanReader
             aliasMapping = Collections.emptyMap();
         }
         _aliasMapping = aliasMapping;
-        _isRecordType = RecordsHelpers.isRecordType(type);
     }
 
     @Deprecated // since 2.17
@@ -158,22 +155,6 @@ public class BeanReader
                 return _constructors.create(p.getLongValue());
             case START_OBJECT:
                 {
-                    // [jackson-jr#148] Record deser support (2.18)
-                    if (_isRecordType) {
-                        final List<Object> values = new ArrayList<>();
-
-                        String propName;
-                        for (; (propName = p.nextFieldName()) != null;) {
-                            BeanPropertyReader prop = findProperty(propName);
-                            if (prop == null) {
-                                handleUnknown(r, p, propName);
-                                continue;
-                            }
-                            values.add(prop.getReader().readNext(r, p));
-                        }
-                        return _constructors.createRecord(values.toArray());
-                    }
-                    // If not Record, need to use default (no-args) Constructors
                     Object bean = _constructors.create();
                     String propName;
                     final Object[] valueBuf = r._setterBuffer;
