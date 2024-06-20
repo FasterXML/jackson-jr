@@ -17,7 +17,7 @@ on:
     - "README.md"
     - "release-notes/*"
 permissions:
-  contents:read
+  contents: read
 
 jobs:
   build:
