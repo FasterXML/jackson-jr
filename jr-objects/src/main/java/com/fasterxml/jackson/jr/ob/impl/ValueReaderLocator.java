@@ -496,9 +496,9 @@ public class ValueReaderLocator
                     }
                 }
 
-                propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, field, setter));
+                propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, field, setter, i));
 
-                // 25-Jan-2020, tatu: Aliases are bit different because we can not tie them into
+                // 25-Jan-2020, tatu: Aliases are a bit different because we can not tie them into
                 //   specific reader instance, due to resolution of cyclic dependencies. Instead,
                 //   we must link via name of primary property, unfortunately:
                 if (rawProp.hasAliases()) {

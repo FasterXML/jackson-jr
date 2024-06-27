@@ -40,6 +40,11 @@ has no other dependencies, and provides additional builder-style content generat
       <artifactId>jackson-core</artifactId>
       <version>${jackson.version.core}</version>
     </dependency>
+    <dependency>
+      <groupId>it.unimi.dsi</groupId>
+      <artifactId>fastutil-core</artifactId>
+      <version>8.5.13</version>
+    </dependency>
   </dependencies>
 
   <build>

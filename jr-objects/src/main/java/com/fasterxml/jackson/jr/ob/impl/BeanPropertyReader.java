@@ -31,7 +31,9 @@ public final class BeanPropertyReader
      */
     private final Field _field;
 
-    public BeanPropertyReader(String name, Field f, Method setter) {
+    private final int _index;
+
+    public BeanPropertyReader(String name, Field f, Method setter, int propertyIndex) {
         if ((f == null) && (setter == null)) {
             throw new IllegalArgumentException("Both `field` and `setter` can not be null");
         }
@@ -39,12 +41,14 @@ public final class BeanPropertyReader
         _field = f;
         _setter = setter;
         _valueReader = null;
+        _index = propertyIndex;
     }
 
     protected BeanPropertyReader(BeanPropertyReader src, ValueReader vr) {
         _name = src._name;
         _field = src._field;
         _setter = src._setter;
+        _index = src._index;
         _valueReader = vr;
     }
 
@@ -68,6 +72,10 @@ public final class BeanPropertyReader
 
     public ValueReader getReader() { return _valueReader; }
     public String getName() { return _name; }
+
+    public int getIndex() {
+        return _index;
+    }
 
     public void setValueFor(Object bean, Object[] valueBuf)
         throws IOException

@@ -9,6 +9,8 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
+import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
 /**
  * Class that contains information about dynamically introspected
@@ -38,6 +40,8 @@ public class BeanReader
 
     protected boolean _isRecordType;
 
+    protected Object2IntMap<String> propertyPositions = new Object2IntArrayMap<>();
+
     /**
      * Constructors used for deserialization use case
      *
@@ -59,6 +63,10 @@ public class BeanReader
         }
         _aliasMapping = aliasMapping;
         _isRecordType = RecordsHelpers.isRecordType(type);
+
+        props.values().forEach(prop -> {
+            propertyPositions.put(prop.getName(), prop.getIndex());
+        });
     }
 
     @Deprecated // since 2.17
@@ -107,24 +115,28 @@ public class BeanReader
                 return _constructors.create(p.getLongValue());
             case START_OBJECT:
                 {
-                    Object bean = _constructors.create();
-                    final Object[] valueBuf = r._setterBuffer;
-                    String propName;
+                    if (_isRecordType) {
+                        return readRecord(r, p);
+                    } else {
+                        Object bean = _constructors.create();
+                        final Object[] valueBuf = r._setterBuffer;
+                        String propName;
 
-                    for (; (propName = p.nextFieldName()) != null; ) {
-                        BeanPropertyReader prop = findProperty(propName);
-                        if (prop == null) {
-                            handleUnknown(r, p, propName);
-                            continue;
+                        for (; (propName = p.nextFieldName()) != null; ) {
+                            BeanPropertyReader prop = findProperty(propName);
+                            if (prop == null) {
+                                handleUnknown(r, p, propName);
+                                continue;
+                            }
+                            valueBuf[0] = prop.getReader().readNext(r, p);
+                            prop.setValueFor(bean, valueBuf);
                         }
-                        valueBuf[0] = prop.getReader().readNext(r, p);
-                        prop.setValueFor(bean, valueBuf);
+                        // also verify we are not confused...
+                        if (!p.hasToken(JsonToken.END_OBJECT)) {
+                            throw _reportProblem(p);
+                        }
+                        return bean;
                     }
-                    // also verify we are not confused...
-                    if (!p.hasToken(JsonToken.END_OBJECT)) {
-                        throw _reportProblem(p);
-                    }                    
-                    return bean;
                 }
             default:
             }
@@ -138,7 +150,23 @@ public class BeanReader
         throw JSONObjectException.from(p,
                 "Can not create a "+_valueType.getName()+" instance out of "+_tokenDesc(p));
     }
-    
+
+    private Object readRecord(JSONReader r, JsonParser p) throws Exception {
+        final Object[] values = new Object[propertiesByName().size()];
+
+        String propName;
+        for (; (propName = p.nextFieldName()) != null;) {
+            BeanPropertyReader prop = findProperty(propName);
+            if (prop == null) {
+                handleUnknown(r, p, propName);
+                continue;
+            }
+            Object value = prop.getReader().readNext(r, p);
+            values[prop.getIndex()] = value;
+        }
+        return _constructors.create(values);
+    }
+
     /**
      * Method used for deserialization; will read an instance of the bean
      * type using given parser.
@@ -159,18 +187,7 @@ public class BeanReader
             case START_OBJECT:
                 {
                     if (_isRecordType) {
-                        final List<Object> values = new ArrayList<>();
-
-                        String propName;
-                        for (; (propName = p.nextFieldName()) != null;) {
-                            BeanPropertyReader prop = findProperty(propName);
-                            if (prop == null) {
-                                handleUnknown(r, p, propName);
-                                continue;
-                            }
-                            values.add(prop.getReader().readNext(r, p));
-                        }
-                        return _constructors.create(values.toArray());
+                        return readRecord(r, p);
                     }
                     Object bean = _constructors.create();
                     String propName;
