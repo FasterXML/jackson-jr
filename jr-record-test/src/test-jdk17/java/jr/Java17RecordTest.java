@@ -22,7 +22,7 @@ public class Java17RecordTest extends TestCase
     public record WrapperRecord(Cow cow, String hello) {
     }
 
-    public record RecordWithWrapper(Cow cow, Wrapper nested) {
+    public record RecordWithWrapper(Cow cow, Wrapper nested, int someInt) {
     }
 
     // [jackson-jr#94]: Record serialization
@@ -122,6 +122,7 @@ public class Java17RecordTest extends TestCase
                         "farmerName": "Bob",
                         "cow": { "message":"MOOO"}
                     },
+                    "someInt": 1337,
                     "cow": { "message":"MOO"}
                 }
                """;
@@ -129,7 +130,7 @@ public class Java17RecordTest extends TestCase
         Wrapper nested = new Wrapper();
         nested.setCow(new Cow("MOOO", null));
         nested.setFarmerName("Bob");
-        var expected = new RecordWithWrapper(new Cow("MOO", null), nested);
+        var expected = new RecordWithWrapper(new Cow("MOO", null), nested, 1337);
         var object = jsonParser.beanFrom(RecordWithWrapper.class, json);
         assertEquals(expected, object);
     }
