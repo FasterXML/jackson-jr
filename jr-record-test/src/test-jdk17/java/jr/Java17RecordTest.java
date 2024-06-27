@@ -22,6 +22,9 @@ public class Java17RecordTest extends TestCase
     public record WrapperRecord(Cow cow, String hello) {
     }
 
+    public record RecordWithWrapper(Cow cow, Wrapper nested) {
+    }
+
     // [jackson-jr#94]: Record serialization
     public void testJava14RecordSerialization() throws Exception {
         var expectedString = """
@@ -102,13 +105,32 @@ public class Java17RecordTest extends TestCase
     public void testNested() throws IOException {
         var json = """
                 {
-                    "cow": { "message":"MOO"},
-                    "hello": "world"
+                    "hello": "world",
+                    "cow": { "message":"MOO"}
                 }
                """;
 
         var expected = new WrapperRecord(new Cow("MOO", null), "world");
         var object = jsonParser.beanFrom(WrapperRecord.class, json);
+        assertEquals(expected, object);
+    }
+
+    public void testNestedObjects() throws IOException {
+        var json = """
+                {
+                    "nested": {
+                        "farmerName": "Bob",
+                        "cow": { "message":"MOOO"}
+                    },
+                    "cow": { "message":"MOO"}
+                }
+               """;
+
+        Wrapper nested = new Wrapper();
+        nested.setCow(new Cow("MOOO", null));
+        nested.setFarmerName("Bob");
+        var expected = new RecordWithWrapper(new Cow("MOO", null), nested);
+        var object = jsonParser.beanFrom(RecordWithWrapper.class, json);
         assertEquals(expected, object);
     }
 }
