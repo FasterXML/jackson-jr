@@ -31,6 +31,9 @@ public final class BeanPropertyReader
      */
     private final Field _field;
 
+    /**
+     * Index used for {@code Record}s constructor parameters. It is not used for getter/setter methods.
+     */
     private final int _index;
 
     public BeanPropertyReader(String name, Field f, Method setter, int propertyIndex) {
