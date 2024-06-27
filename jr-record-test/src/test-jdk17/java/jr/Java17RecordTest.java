@@ -53,6 +53,15 @@ public class Java17RecordTest extends TestCase
         assertNull(jsonParser.beanFrom(Cow.class, "null"));
     }
 
+    public void testPartialParsing() throws IOException {
+        var json = """
+                { "message":"MOO"}""";
+
+        Cow expectedObject = new Cow("MOO", null);
+        Cow object = jsonParser.beanFrom(Cow.class, json);
+        assertEquals(expectedObject, object);
+    }
+
     public void testWhenInsideObject() throws IOException {
         var cowJson = """
                 {"object": null, "message":"MOO"}""";
