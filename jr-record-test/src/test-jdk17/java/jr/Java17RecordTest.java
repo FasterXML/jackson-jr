@@ -19,6 +19,9 @@ public class Java17RecordTest extends TestCase
     public record Cow(String message, Map<String, String> object) {
     }
 
+    public record WrapperRecord(Cow cow, String hello) {
+    }
+
     // [jackson-jr#94]: Record serialization
     public void testJava14RecordSerialization() throws Exception {
         var expectedString = """
@@ -94,5 +97,18 @@ public class Java17RecordTest extends TestCase
 
         object = jsonParser.beanFrom(Wrapper.class, jsonNoCow);
         assertEquals(wrapper, object);
+    }
+
+    public void testNested() throws IOException {
+        var json = """
+                {
+                    "cow": { "message":"MOO"},
+                    "hello": "world"
+                }
+               """;
+
+        var expected = new WrapperRecord(new Cow("MOO", null), "world");
+        var object = jsonParser.beanFrom(WrapperRecord.class, json);
+        assertEquals(expected, object);
     }
 }
