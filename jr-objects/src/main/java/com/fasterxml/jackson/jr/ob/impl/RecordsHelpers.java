@@ -9,6 +9,8 @@ import java.util.Map;
 
 /**
  * Helper class to get Java Record metadata.
+ *
+ * @since 2.18
  */
 public final class RecordsHelpers {
     private static boolean supportsRecords;
