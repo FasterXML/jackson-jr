@@ -9,8 +9,6 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
-import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
 /**
  * Class that contains information about dynamically introspected
@@ -40,7 +38,7 @@ public class BeanReader
 
     protected boolean _isRecordType;
 
-    protected Object2IntMap<String> propertyPositions = new Object2IntArrayMap<>();
+    protected Map<String, Integer> propertyPositions = new HashMap<>();
 
     /**
      * Constructors used for deserialization use case
