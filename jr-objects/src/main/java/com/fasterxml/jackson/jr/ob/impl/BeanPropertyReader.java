@@ -33,6 +33,8 @@ public final class BeanPropertyReader
 
     /**
      * Index used for {@code Record}s constructor parameters. It is not used for getter/setter methods.
+     *
+     * @since 2.18
      */
     private final int _index;
 
