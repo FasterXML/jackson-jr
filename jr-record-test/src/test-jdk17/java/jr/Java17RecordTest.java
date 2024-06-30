@@ -25,6 +25,9 @@ public class Java17RecordTest extends TestCase
     record SingleIntRecord(int value) { }
     record SingleLongRecord(long value) { }
     record SingleStringRecord(String value) { }
+
+    // Degenerate case but supported:
+    record NoFieldsRecord() { }
     
     // [jackson-jr#94]: Record serialization
     public void testJava14RecordSerialization() throws Exception {
@@ -134,6 +137,13 @@ public class Java17RecordTest extends TestCase
         var expected = new RecordWithWrapper(new Cow("MOO", null), nested, 1337);
         var object = jsonHandler.beanFrom(RecordWithWrapper.class, json);
         assertEquals(expected, object);
+    }
+
+    public void testNoFieldRecords() throws Exception {
+        String json = jsonHandler.asString(new NoFieldsRecord());
+        assertEquals("{}", json);
+        assertEquals(new NoFieldsRecord(),
+                jsonHandler.beanFrom(NoFieldsRecord.class, json));
     }
 
     public void testSingleFieldRecords() throws Exception {
