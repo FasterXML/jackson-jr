@@ -55,21 +55,28 @@ public class BeanPropertyIntrospector
             constructors = null;
         } else {
             constructors = new BeanConstructors(beanType);
-            for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
-                Class<?>[] argTypes = ctor.getParameterTypes();
-                if (argTypes.length == 0) {
-                    constructors.addNoArgsConstructor(ctor);
-                } else if (argTypes.length == 1) {
-                    Class<?> argType = argTypes[0];
-                    if (argType == String.class) {
-                        constructors.addStringConstructor(ctor);
-                    } else if (argType == Integer.class || argType == Integer.TYPE) {
-                        constructors.addIntConstructor(ctor);
-                    } else if (argType == Long.class || argType == Long.TYPE) {
-                        constructors.addLongConstructor(ctor);
+            if (RecordsHelpers.isRecordType(beanType)) {
+                for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
+                    if (RecordsHelpers.isRecordConstructor(beanType, ctor, propsByName)) {
+                        constructors.addRecordConstructor(ctor);
+                        break;
                     }
-                } else if (RecordsHelpers.isRecordConstructor(beanType, ctor, propsByName)) {
-                    constructors.addRecordConstructor(ctor);
+                }
+            } else {
+                for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
+                    Class<?>[] argTypes = ctor.getParameterTypes();
+                    if (argTypes.length == 0) {
+                        constructors.addNoArgsConstructor(ctor);
+                    } else if (argTypes.length == 1) {
+                        Class<?> argType = argTypes[0];
+                        if (argType == String.class) {
+                            constructors.addStringConstructor(ctor);
+                        } else if (argType == Integer.class || argType == Integer.TYPE) {
+                            constructors.addIntConstructor(ctor);
+                        } else if (argType == Long.class || argType == Long.TYPE) {
+                            constructors.addLongConstructor(ctor);
+                        }
+                    }
                 }
             }
         }
