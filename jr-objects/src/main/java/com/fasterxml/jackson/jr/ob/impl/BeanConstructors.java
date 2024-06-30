@@ -13,6 +13,12 @@ public class BeanConstructors
     protected final Class<?> _valueType;
 
     protected Constructor<?> _noArgsCtor;
+
+    /**
+     * Constructor (canonical) used when deserializing Java Record types.
+     *
+     * @since 2.18
+     */
     protected Constructor<?> _recordCtor;
 
     protected Constructor<?> _intCtor;
@@ -28,6 +34,9 @@ public class BeanConstructors
         return this;
     }
 
+    /**
+     * @since 2.18
+     */
     public BeanConstructors addRecordConstructor(Constructor<?> ctor) {
         _recordCtor = ctor;
         return this;
@@ -73,7 +82,10 @@ public class BeanConstructors
         return _noArgsCtor.newInstance((Object[]) null);
     }
 
-    protected Object create(Object[] components) throws Exception {
+    /**
+     * @since 2.18
+     */
+    protected Object createRecord(Object[] components) throws Exception {
         if (_recordCtor == null) {
             throw new IllegalStateException("Class "+_valueType.getName()+" does not have record constructor to use");
         }

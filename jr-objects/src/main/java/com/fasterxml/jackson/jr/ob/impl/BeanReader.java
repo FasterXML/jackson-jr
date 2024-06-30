@@ -162,7 +162,7 @@ public class BeanReader
             Object value = prop.getReader().readNext(r, p);
             values[prop.getIndex()] = value;
         }
-        return _constructors.create(values);
+        return _constructors.createRecord(values);
     }
 
     /**
