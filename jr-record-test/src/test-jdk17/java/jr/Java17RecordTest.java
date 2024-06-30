@@ -3,10 +3,9 @@ package jr;
 import java.io.IOException;
 import java.util.Map;
 
-import com.fasterxml.jackson.jr.ob.JSON;
-
-import com.fasterxml.jackson.jr.ob.JSON.Feature;
 import junit.framework.TestCase;
+
+import com.fasterxml.jackson.jr.ob.JSON;
 
 /**
  * This test is in test module since the JDK version to be tested is higher than other, and hence supports Records.
@@ -14,7 +13,7 @@ import junit.framework.TestCase;
 public class Java17RecordTest extends TestCase
 {
 
-    private final JSON jsonParser = JSON.builder().enable(Feature.USE_FIELD_MATCHING_GETTERS).build();
+    private final JSON jsonParser = JSON.builder().build();
 
     public record Cow(String message, Map<String, String> object) {
     }
