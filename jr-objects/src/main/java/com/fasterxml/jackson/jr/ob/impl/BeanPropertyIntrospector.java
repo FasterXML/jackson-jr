@@ -98,8 +98,10 @@ public class BeanPropertyIntrospector
         _introspect(currType.getSuperclass(), props, features);
 
         final boolean noStatics = JSON.Feature.INCLUDE_STATIC_FIELDS.isDisabled(features);
-        final boolean isFieldNameGettersEnabled = JSON.Feature.USE_FIELD_MATCHING_GETTERS.isEnabled(features);
-
+        // 14-Jun-2024, tatu: Need to enable "matching getters" naming style for Java Records
+        //   too, regardless of `Feature.USE_FIELD_MATCHING_GETTERS`
+        final boolean isFieldNameGettersEnabled = JSON.Feature.USE_FIELD_MATCHING_GETTERS.isEnabled(features)
+                || RecordsHelpers.isRecordType(currType);
         final Map<String, Field> fieldNameMap = isFieldNameGettersEnabled ? new HashMap<>() : null;
 
         // then public fields (since 2.8); may or may not be ultimately included
@@ -157,7 +159,8 @@ public class BeanPropertyIntrospector
                     // If method name matches with field name, & method return
                     // type matches the field type only then it can be considered a getter.
                     Field field = fieldNameMap.get(name);
-                    if (field != null && Modifier.isPublic(m.getModifiers()) && m.getReturnType().equals(field.getType())) {
+                    if (field != null && Modifier.isPublic(m.getModifiers())
+                            && m.getReturnType().equals(field.getType())) {
                         // NOTE: do NOT decap, field name should be used as-is
                         _propFrom(props, name).withGetter(m);
                     }
@@ -197,9 +200,10 @@ public class BeanPropertyIntrospector
 
     /**
      * Helper method to detect Groovy's problematic metadata accessor type.
-     *
-     * @implNote Groovy MetaClass have cyclic reference, and hence the class containing it should not be serialised without
-     * either removing that reference, or skipping over such references.
+     *<p>
+     * NOTE: Groovy MetaClass have cyclic reference, and hence the class containing
+     * it should not be serialized without either removing that reference,
+     * or skipping over such references.
      */
     protected static boolean isGroovyMetaClass(Class<?> clazz) {
         return "groovy.lang.MetaClass".equals(clazz.getName());

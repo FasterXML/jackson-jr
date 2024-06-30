@@ -115,26 +115,25 @@ public class BeanReader
                 {
                     if (_isRecordType) {
                         return readRecord(r, p);
-                    } else {
-                        Object bean = _constructors.create();
-                        final Object[] valueBuf = r._setterBuffer;
-                        String propName;
-
-                        for (; (propName = p.nextFieldName()) != null; ) {
-                            BeanPropertyReader prop = findProperty(propName);
-                            if (prop == null) {
-                                handleUnknown(r, p, propName);
-                                continue;
-                            }
-                            valueBuf[0] = prop.getReader().readNext(r, p);
-                            prop.setValueFor(bean, valueBuf);
-                        }
-                        // also verify we are not confused...
-                        if (!p.hasToken(JsonToken.END_OBJECT)) {
-                            throw _reportProblem(p);
-                        }
-                        return bean;
                     }
+                    Object bean = _constructors.create();
+                    final Object[] valueBuf = r._setterBuffer;
+                    String propName;
+
+                    for (; (propName = p.nextFieldName()) != null; ) {
+                        BeanPropertyReader prop = findProperty(propName);
+                        if (prop == null) {
+                            handleUnknown(r, p, propName);
+                            continue;
+                        }
+                        valueBuf[0] = prop.getReader().readNext(r, p);
+                        prop.setValueFor(bean, valueBuf);
+                    }
+                    // also verify we are not confused...
+                    if (!p.hasToken(JsonToken.END_OBJECT)) {
+                        throw _reportProblem(p);
+                    }
+                    return bean;
                 }
             default:
             }

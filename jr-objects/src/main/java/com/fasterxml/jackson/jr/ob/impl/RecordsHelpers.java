@@ -38,7 +38,8 @@ public final class RecordsHelpers {
     }
     private RecordsHelpers() {}
 
-    static boolean isRecordConstructor(Class<?> beanClass, Constructor<?> ctor, Map<String, PropBuilder> propsByName) {
+    static boolean isRecordConstructor(Class<?> beanClass, Constructor<?> ctor,
+            Map<String, PropBuilder> propsByName) {
         if (!supportsRecords || !isRecordType(beanClass)) {
             return false;
         }

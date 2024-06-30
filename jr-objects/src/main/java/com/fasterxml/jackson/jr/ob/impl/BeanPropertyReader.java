@@ -36,6 +36,9 @@ public final class BeanPropertyReader
      */
     private final int _index;
 
+    /**
+     * @since 2.18
+     */
     public BeanPropertyReader(String name, Field f, Method setter, int propertyIndex) {
         if ((f == null) && (setter == null)) {
             throw new IllegalArgumentException("Both `field` and `setter` can not be null");
@@ -45,6 +48,11 @@ public final class BeanPropertyReader
         _setter = setter;
         _valueReader = null;
         _index = propertyIndex;
+    }
+
+    @Deprecated // @since 2.18
+    public BeanPropertyReader(String name, Field f, Method setter) {
+        this(name, f, setter, -1);
     }
 
     protected BeanPropertyReader(BeanPropertyReader src, ValueReader vr) {
