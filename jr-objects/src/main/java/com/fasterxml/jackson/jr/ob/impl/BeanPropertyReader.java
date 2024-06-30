@@ -84,6 +84,9 @@ public final class BeanPropertyReader
     public ValueReader getReader() { return _valueReader; }
     public String getName() { return _name; }
 
+    /**
+     * @since 2.18
+     */
     public int getIndex() {
         return _index;
     }

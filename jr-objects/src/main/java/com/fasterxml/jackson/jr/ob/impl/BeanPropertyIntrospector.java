@@ -98,10 +98,12 @@ public class BeanPropertyIntrospector
         _introspect(currType.getSuperclass(), props, features);
 
         final boolean noStatics = JSON.Feature.INCLUDE_STATIC_FIELDS.isDisabled(features);
+
         // 14-Jun-2024, tatu: Need to enable "matching getters" naming style for Java Records
         //   too, regardless of `Feature.USE_FIELD_MATCHING_GETTERS`
         final boolean isFieldNameGettersEnabled = JSON.Feature.USE_FIELD_MATCHING_GETTERS.isEnabled(features)
                 || RecordsHelpers.isRecordType(currType);
+
         final Map<String, Field> fieldNameMap = isFieldNameGettersEnabled ? new HashMap<>() : null;
 
         // then public fields (since 2.8); may or may not be ultimately included
