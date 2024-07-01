@@ -38,8 +38,6 @@ public class BeanReader
 
     protected final boolean _isRecordType;
 
-    //protected final Map<String, Integer> propertyPositions = new HashMap<>();
-
     /**
      * Constructors used for deserialization use case
      *
@@ -61,12 +59,6 @@ public class BeanReader
         }
         _aliasMapping = aliasMapping;
         _isRecordType = RecordsHelpers.isRecordType(type);
-
-        /*
-        props.values().forEach(prop -> {
-            propertyPositions.put(prop.getName(), prop.getIndex());
-        });
-        */
     }
 
     @Deprecated // since 2.17
@@ -78,12 +70,6 @@ public class BeanReader
                 .addStringConstructor(stringCtor)
                 .addLongConstructor(longCtor),
                 ignorableNames, aliasMapping);
-    }
-
-    @Deprecated // since 2.11
-    public BeanReader(Class<?> type, Map<String, BeanPropertyReader> props,
-            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor) {
-        this(type, props, defaultCtor, stringCtor, longCtor, null, null);
     }
 
     public Map<String,BeanPropertyReader> propertiesByName() { return _propsByName; }
