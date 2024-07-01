@@ -64,3 +64,8 @@ Julian Honnen (@jhonnen)
 * Contributed fix for #90: `USE_BIG_DECIMAL_FOR_FLOATS` feature not working
   when using `JSON.treeFrom()`
  (2.17.1)
+
+Tomasz Gawęda (@TomaszGaweda)
+
+* Contributed #162: Add support for deserializing Java Records
+ (2.18.0)

@@ -13,7 +13,8 @@ Modules:
 
 2.18.0 (not yet released)
 
--
+#162: Add support for deserializing Java Records
+ (contributed by Tomasz G)
 
 2.17.1 (04-May-2024)
 

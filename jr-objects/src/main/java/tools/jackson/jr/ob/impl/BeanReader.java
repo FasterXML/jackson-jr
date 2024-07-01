@@ -31,6 +31,8 @@ public class BeanReader
 
     protected final BeanConstructors _constructors;
 
+    protected final boolean _isRecordType;
+
     // // 13-Dec-2017, tatu: NOTE! These will be constructed right after construction, but
     // //    not during it (due to need to resolve possible cyclic deps). So they are
     // //    non-final due to this but never `null` before use.
@@ -47,6 +49,7 @@ public class BeanReader
             boolean caseInsensitive)
     {
         super(type);
+        _isRecordType = RecordsHelpers.isRecordType(type);
         _propsByName = propsByName;
         _constructors = constructors;
         _ignorableNames = ignorableNames;
@@ -136,6 +139,9 @@ public class BeanReader
     public Object read(JSONReader r, JsonParser p) throws JacksonException
     {
         if (p.isExpectedStartObjectToken()) {
+            if (_isRecordType) {
+                return readRecord(r, p);
+            }
             final Object bean;
             try {
                 bean = _constructors.create();
@@ -167,6 +173,9 @@ public class BeanReader
     {
         JsonToken t = p.nextToken();
         if (t == JsonToken.START_OBJECT) {
+            if (_isRecordType) {
+                return readRecord(r, p);
+            }
             final Object bean;
             try {
                 bean = _constructors.create();
@@ -308,6 +317,27 @@ public class BeanReader
         return bean;
     }
     */
+
+    private Object readRecord(JSONReader r, JsonParser p) throws JacksonException
+    {
+        final Object[] values = new Object[propertiesByName().size()];
+
+        String propName;
+        for (; (propName = p.nextName()) != null;) {
+            BeanPropertyReader prop = findProperty(propName);
+            if (prop == null) {
+                handleUnknown(r, p, propName);
+                continue;
+            }
+            Object value = prop.getReader().readNext(r, p);
+            values[prop.getIndex()] = value;
+        }
+        try {
+            return _constructors.createRecord(values);
+        } catch (Exception e) {
+            return _reportFailureToCreate(p, e);
+        }
+    }    
 
     private final Object _readWithUnknown(JSONReader r, JsonParser p,
             final Object bean, String propName)
