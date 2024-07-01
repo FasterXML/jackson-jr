@@ -408,7 +408,7 @@ public class BeanReader
     }
 
     protected JacksonException _reportProblem(JsonParser p) {
-        return JSONObjectException.from(p, "Unexpected token %s; should get FIELD_NAME or END_OBJECT",
+        return JSONObjectException.from(p, "Unexpected token %s; should get PROPERTY_NAME or END_OBJECT",
                 p.currentToken());
     }
 }

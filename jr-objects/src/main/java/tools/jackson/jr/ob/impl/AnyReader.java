@@ -75,7 +75,7 @@ public class AnyReader extends ValueReader
             default:
             case END_ARRAY:
             case END_OBJECT:
-            case FIELD_NAME:
+            case PROPERTY_NAME:
             case NOT_AVAILABLE:
             */
             }
@@ -132,7 +132,7 @@ public class AnyReader extends ValueReader
         default:
         case END_ARRAY:
         case END_OBJECT:
-        case FIELD_NAME:
+        case PROPERTY_NAME:
         case NOT_AVAILABLE:
         */
         }
@@ -223,7 +223,7 @@ public class AnyReader extends ValueReader
     }
 
     private final void _reportNotEndObject(JsonParser p) throws JacksonException {
-        throw JSONObjectException.from(p, "Unexpected token: %s (should get FIELD_NAME or END_OBJECT)",
+        throw JSONObjectException.from(p, "Unexpected token: %s (should get PROPERTY_NAME or END_OBJECT)",
                 _tokenDesc(p));
     }
 
