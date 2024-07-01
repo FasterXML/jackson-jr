@@ -56,12 +56,12 @@ public class BeanPropertyIntrospector
         } else {
             constructors = new BeanConstructors(beanType);
             if (RecordsHelpers.isRecordType(beanType)) {
-                for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
-                    if (RecordsHelpers.isRecordConstructor(beanType, ctor, propsByName)) {
-                        constructors.addRecordConstructor(ctor);
-                        break;
-                    }
+                Constructor<?> canonical = RecordsHelpers.findCanonicalConstructor(beanType);
+                if (canonical == null) { // should never happen
+                    throw new IllegalArgumentException(
+"Unable to find canonical constructor of Record type `"+beanType.getClass().getName()+"`");
                 }
+                constructors.addRecordConstructor(canonical);
             } else {
                 for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
                     Class<?>[] argTypes = ctor.getParameterTypes();

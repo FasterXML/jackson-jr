@@ -1,11 +1,11 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
-import com.fasterxml.jackson.jr.ob.impl.POJODefinition.PropBuilder;
-
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
+
+import com.fasterxml.jackson.jr.ob.impl.POJODefinition.PropBuilder;
 
 /**
  * Helper class to get Java Record metadata.
@@ -16,30 +16,48 @@ public final class RecordsHelpers {
     private static boolean supportsRecords;
 
     private static Method getRecordComponentsMethod;
-    private static Method getTypeMethod;
+    private static Method getComponentTypeMethod;
+
+    // We may need this in future:
+    //private static Method getComponentNameMethod;
 
     static {
-        Method getRecordComponentsMethod;
-        Method getTypeMethod;
-
         try {
             getRecordComponentsMethod = Class.class.getMethod("getRecordComponents");
             Class<?> recordComponentClass = Class.forName("java.lang.reflect.RecordComponent");
-            getTypeMethod = recordComponentClass.getMethod("getType");
+            getComponentTypeMethod = recordComponentClass.getMethod("getType");
+            //getComponentNameMethod = recordComponentClass.getMethod("getName");
             supportsRecords = true;
         } catch (Throwable t) {
-            getRecordComponentsMethod = null;
-            getTypeMethod = null;
             supportsRecords = false;
         }
-
-        RecordsHelpers.getRecordComponentsMethod = getRecordComponentsMethod;
-        RecordsHelpers.getTypeMethod = getTypeMethod;
     }
     private RecordsHelpers() {}
 
+    static Constructor<?> findCanonicalConstructor(Class<?> beanClass) {
+        // sanity check: caller shouldn't rely on it
+        if (!supportsRecords || !isRecordType(beanClass)) {
+            return null;
+        }
+        try {
+            final Class<?>[] componentTypes = componentTypes(beanClass);
+            for (Constructor<?> ctor : beanClass.getDeclaredConstructors()) {
+                final Class<?>[] parameterTypes = ctor.getParameterTypes();
+                if (parameterTypes.length == componentTypes.length) {
+                    if (Arrays.equals(parameterTypes, componentTypes)) {
+                        return ctor;
+                    }
+                }
+            }
+        } catch (ReflectiveOperationException e) {
+            ;
+        }
+        return null;
+    }
+
     static boolean isRecordConstructor(Class<?> beanClass, Constructor<?> ctor,
-            Map<String, PropBuilder> propsByName) {
+            Map<String, PropBuilder> propsByName)
+    {
         if (!supportsRecords || !isRecordType(beanClass)) {
             return false;
         }
@@ -50,27 +68,28 @@ public final class RecordsHelpers {
         }
 
         try {
-            Object[] recordComponents = (Object[]) getRecordComponentsMethod.invoke(beanClass);
-            Class<?>[] componentTypes = new Class<?>[recordComponents.length];
-            for (int i = 0; i < recordComponents.length; i++) {
-                Object recordComponent = recordComponents[i];
-                Class<?> type = (Class<?>) getTypeMethod.invoke(recordComponent);
-                componentTypes[i] = type;
-            }
-
-            for (int i = 0; i < parameterTypes.length; i++) {
-                if (parameterTypes[i] != componentTypes[i]) {
-                    return false;
-                }
-            }
-        } catch (IllegalAccessException | InvocationTargetException e) {
+            Class<?>[] componentTypes = componentTypes(beanClass);
+            return Arrays.equals(parameterTypes, componentTypes);
+        } catch (ReflectiveOperationException e) {
             return false;
         }
-        return true;
     }
 
     static boolean isRecordType(Class<?> cls) {
         Class<?> parent = cls.getSuperclass();
         return (parent != null) && "java.lang.Record".equals(parent.getName());
+    }
+
+    private static Class<?>[] componentTypes(Class<?> recordType)
+        throws ReflectiveOperationException
+    {
+        Object[] recordComponents = (Object[]) getRecordComponentsMethod.invoke(recordType);
+        Class<?>[] componentTypes = new Class<?>[recordComponents.length];
+        for (int i = 0; i < recordComponents.length; i++) {
+            Object recordComponent = recordComponents[i];
+            Class<?> type = (Class<?>) getComponentTypeMethod.invoke(recordComponent);
+            componentTypes[i] = type;
+        }
+        return componentTypes;
     }
 }
