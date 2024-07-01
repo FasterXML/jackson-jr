@@ -36,6 +36,8 @@ public class BeanReader
      */
     protected final BeanConstructors _constructors;
 
+    protected final boolean _isRecordType;
+
     /**
      * Constructors used for deserialization use case
      *
@@ -56,6 +58,7 @@ public class BeanReader
             aliasMapping = Collections.emptyMap();
         }
         _aliasMapping = aliasMapping;
+        _isRecordType = RecordsHelpers.isRecordType(type);
     }
 
     @Deprecated // since 2.17
@@ -67,12 +70,6 @@ public class BeanReader
                 .addStringConstructor(stringCtor)
                 .addLongConstructor(longCtor),
                 ignorableNames, aliasMapping);
-    }
-
-    @Deprecated // since 2.11
-    public BeanReader(Class<?> type, Map<String, BeanPropertyReader> props,
-            Constructor<?> defaultCtor, Constructor<?> stringCtor, Constructor<?> longCtor) {
-        this(type, props, defaultCtor, stringCtor, longCtor, null, null);
     }
 
     public Map<String,BeanPropertyReader> propertiesByName() { return _propsByName; }
@@ -104,6 +101,9 @@ public class BeanReader
                 return _constructors.create(p.getLongValue());
             case START_OBJECT:
                 {
+                    if (_isRecordType) {
+                        return readRecord(r, p);
+                    }
                     Object bean = _constructors.create();
                     final Object[] valueBuf = r._setterBuffer;
                     String propName;
@@ -120,7 +120,7 @@ public class BeanReader
                     // also verify we are not confused...
                     if (!p.hasToken(JsonToken.END_OBJECT)) {
                         throw _reportProblem(p);
-                    }                    
+                    }
                     return bean;
                 }
             default:
@@ -135,7 +135,23 @@ public class BeanReader
         throw JSONObjectException.from(p,
                 "Can not create a "+_valueType.getName()+" instance out of "+_tokenDesc(p));
     }
-    
+
+    private Object readRecord(JSONReader r, JsonParser p) throws Exception {
+        final Object[] values = new Object[propertiesByName().size()];
+
+        String propName;
+        for (; (propName = p.nextFieldName()) != null;) {
+            BeanPropertyReader prop = findProperty(propName);
+            if (prop == null) {
+                handleUnknown(r, p, propName);
+                continue;
+            }
+            Object value = prop.getReader().readNext(r, p);
+            values[prop.getIndex()] = value;
+        }
+        return _constructors.createRecord(values);
+    }
+
     /**
      * Method used for deserialization; will read an instance of the bean
      * type using given parser.
@@ -155,6 +171,9 @@ public class BeanReader
                 return _constructors.create(p.getLongValue());
             case START_OBJECT:
                 {
+                    if (_isRecordType) {
+                        return readRecord(r, p);
+                    }
                     Object bean = _constructors.create();
                     String propName;
                     final Object[] valueBuf = r._setterBuffer;

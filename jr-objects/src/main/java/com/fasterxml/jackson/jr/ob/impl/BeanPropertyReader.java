@@ -31,7 +31,17 @@ public final class BeanPropertyReader
      */
     private final Field _field;
 
-    public BeanPropertyReader(String name, Field f, Method setter) {
+    /**
+     * Index used for {@code Record}s constructor parameters. It is not used for getter/setter methods.
+     *
+     * @since 2.18
+     */
+    private final int _index;
+
+    /**
+     * @since 2.18
+     */
+    public BeanPropertyReader(String name, Field f, Method setter, int propertyIndex) {
         if ((f == null) && (setter == null)) {
             throw new IllegalArgumentException("Both `field` and `setter` can not be null");
         }
@@ -39,12 +49,19 @@ public final class BeanPropertyReader
         _field = f;
         _setter = setter;
         _valueReader = null;
+        _index = propertyIndex;
+    }
+
+    @Deprecated // @since 2.18
+    public BeanPropertyReader(String name, Field f, Method setter) {
+        this(name, f, setter, -1);
     }
 
     protected BeanPropertyReader(BeanPropertyReader src, ValueReader vr) {
         _name = src._name;
         _field = src._field;
         _setter = src._setter;
+        _index = src._index;
         _valueReader = vr;
     }
 
@@ -68,6 +85,13 @@ public final class BeanPropertyReader
 
     public ValueReader getReader() { return _valueReader; }
     public String getName() { return _name; }
+
+    /**
+     * @since 2.18
+     */
+    public int getIndex() {
+        return _index;
+    }
 
     public void setValueFor(Object bean, Object[] valueBuf)
         throws IOException
