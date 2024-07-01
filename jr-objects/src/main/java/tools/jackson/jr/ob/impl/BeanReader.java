@@ -318,7 +318,11 @@ public class BeanReader
     }
     */
 
-    private Object readRecord(JSONReader r, JsonParser p) throws JacksonException
+    // 30-Jun-2024, tatu: NOTE: not as optimized as "readBean()": could rewrite
+    // to use _propNameMatcher but handling of unknown properties bit different.
+    // So left as future improvement
+    private Object readRecord(JSONReader r, JsonParser p)
+        throws JacksonException
     {
         final Object[] values = new Object[propertiesByName().size()];
 
