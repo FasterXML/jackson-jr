@@ -16,6 +16,10 @@ Modules:
 #162: Add support for deserializing Java Records
  (contributed by Tomasz G)
 
+2.17.2 (05-Jul-2024)
+
+No changes since 2.17.1
+
 2.17.1 (04-May-2024)
 
 #90: `USE_BIG_DECIMAL_FOR_FLOATS` feature not working when using `JSON.treeFrom()`
