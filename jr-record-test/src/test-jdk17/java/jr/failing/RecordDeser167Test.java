@@ -1,6 +1,6 @@
 package jr.failing;
 
-import com.fasterxml.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.JSON;
 
 import junit.framework.TestCase;
 
