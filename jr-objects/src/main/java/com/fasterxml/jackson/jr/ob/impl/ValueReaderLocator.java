@@ -458,7 +458,7 @@ public class ValueReaderLocator
             final Parameter[] parameters = constructors._recordCtor.getParameters();
             for (int i = 0; i < parameters.length; i++) {
                 Parameter parameter = parameters[i];
-                if (!parameter.getName().isBlank()) {
+                if (!parameter.getName().isEmpty()) {
                     ctorParameterIndexMap.put(parameter.getName(), i);
                 }
             }
