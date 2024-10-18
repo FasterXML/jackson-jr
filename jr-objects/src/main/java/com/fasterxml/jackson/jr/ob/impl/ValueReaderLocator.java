@@ -452,7 +452,6 @@ public class ValueReaderLocator
         final Map<String, BeanPropertyReader> propMap;
         Map<String, String> aliasMapping = null;
 
-        boolean isRecord = RecordsHelpers.isRecordType(raw);
         if (len == 0) {
             propMap = Collections.emptyMap();
         } else {
@@ -461,6 +460,7 @@ public class ValueReaderLocator
                     // 13-May-2021, tatu: Let's retain ordering here:
                     : new LinkedHashMap<>();
             final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
+            final boolean isRecord = RecordsHelpers.isRecordType(raw);
             for (int i = 0; i < len; ++i) {
                 POJODefinition.Prop rawProp = rawProps.get(i);
                 Method setter = rawProp.setter;
@@ -496,7 +496,17 @@ public class ValueReaderLocator
                     }
                 }
 
-                propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, field, setter, i));
+                if (isRecord) {
+                    Parameter[] parameters = constructors._recordCtor.getParameters();
+                    for (int j = 0; j < parameters.length; j++) {
+                        Parameter parameter = parameters[j];
+                        if (!parameter.getName().isBlank() && parameter.getName().equals(rawProp.name)) {
+                            propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, field, setter, j));
+                        }
+                    }
+                } else {
+                    propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, field, setter, i));
+                }
 
                 // 25-Jan-2020, tatu: Aliases are a bit different because we can not tie them into
                 //   specific reader instance, due to resolution of cyclic dependencies. Instead,
