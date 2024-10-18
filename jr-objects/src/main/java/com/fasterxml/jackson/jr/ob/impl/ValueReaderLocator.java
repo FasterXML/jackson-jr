@@ -452,6 +452,18 @@ public class ValueReaderLocator
         final Map<String, BeanPropertyReader> propMap;
         Map<String, String> aliasMapping = null;
 
+        final Map<String, Integer> ctorParameterIndexMap = new HashMap<>();
+        final boolean isRecord = RecordsHelpers.isRecordType(raw);
+        if (isRecord) {
+            final Parameter[] parameters = constructors._recordCtor.getParameters();
+            for (int i = 0; i < parameters.length; i++) {
+                Parameter parameter = parameters[i];
+                if (!parameter.getName().isBlank()) {
+                    ctorParameterIndexMap.put(parameter.getName(), i);
+                }
+            }
+        }
+
         if (len == 0) {
             propMap = Collections.emptyMap();
         } else {
@@ -460,7 +472,6 @@ public class ValueReaderLocator
                     // 13-May-2021, tatu: Let's retain ordering here:
                     : new LinkedHashMap<>();
             final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
-            final boolean isRecord = RecordsHelpers.isRecordType(raw);
             for (int i = 0; i < len; ++i) {
                 POJODefinition.Prop rawProp = rawProps.get(i);
                 Method setter = rawProp.setter;
@@ -497,13 +508,8 @@ public class ValueReaderLocator
                 }
 
                 if (isRecord) {
-                    Parameter[] parameters = constructors._recordCtor.getParameters();
-                    for (int j = 0; j < parameters.length; j++) {
-                        Parameter parameter = parameters[j];
-                        if (!parameter.getName().isBlank() && parameter.getName().equals(rawProp.name)) {
-                            propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, field, setter, j));
-                        }
-                    }
+                    final Integer ctorIndex = ctorParameterIndexMap.get(rawProp.name);
+                    propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, field, setter, ctorIndex));
                 } else {
                     propMap.put(rawProp.name, new BeanPropertyReader(rawProp.name, field, setter, i));
                 }
