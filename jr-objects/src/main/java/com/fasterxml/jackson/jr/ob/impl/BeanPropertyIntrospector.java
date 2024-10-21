@@ -1,9 +1,7 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
 import java.lang.reflect.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition.Prop;
@@ -30,11 +28,13 @@ public class BeanPropertyIntrospector
     public static BeanPropertyIntrospector instance() { return INSTANCE; }
 
     public POJODefinition pojoDefinitionForDeserialization(JSONReader r, Class<?> pojoType) {
-        return _introspectDefinition(pojoType, false, r.features());
+        return _introspectDefinition(pojoType, false, r.features(),
+                RecordsHelpers.isRecordType(pojoType));
     }
 
     public POJODefinition pojoDefinitionForSerialization(JSONWriter w, Class<?> pojoType) {
-        return _introspectDefinition(pojoType, true, w.features());
+        return _introspectDefinition(pojoType, true, w.features(),
+                RecordsHelpers.isRecordType(pojoType));
     }
 
     /*
@@ -44,10 +44,10 @@ public class BeanPropertyIntrospector
      */
 
     private POJODefinition _introspectDefinition(Class<?> beanType,
-            boolean forSerialization, int features)
+            boolean forSerialization, int features, boolean isRecord)
     {
         Map<String,PropBuilder> propsByName = new TreeMap<>();
-        _introspect(beanType, propsByName, features);
+        _introspect(beanType, propsByName, features, isRecord);
 
         final BeanConstructors constructors;
         
@@ -55,7 +55,7 @@ public class BeanPropertyIntrospector
             constructors = null;
         } else {
             constructors = new BeanConstructors(beanType);
-            if (RecordsHelpers.isRecordType(beanType)) {
+            if (isRecord) {
                 Constructor<?> canonical = RecordsHelpers.findCanonicalConstructor(beanType);
                 if (canonical == null) { // should never happen
                     throw new IllegalArgumentException(
@@ -96,22 +96,22 @@ public class BeanPropertyIntrospector
     }
 
     private static void _introspect(Class<?> currType, Map<String, PropBuilder> props,
-            int features)
+            int features, boolean isRecord)
     {
         if (currType == null || currType == Object.class) {
             return;
         }
         // First, check base type
-        _introspect(currType.getSuperclass(), props, features);
+        _introspect(currType.getSuperclass(), props, features, isRecord);
 
         final boolean noStatics = JSON.Feature.INCLUDE_STATIC_FIELDS.isDisabled(features);
 
         // 14-Jun-2024, tatu: Need to enable "matching getters" naming style for Java Records
         //   too, regardless of `Feature.USE_FIELD_MATCHING_GETTERS`
-        final boolean isFieldNameGettersEnabled = JSON.Feature.USE_FIELD_MATCHING_GETTERS.isEnabled(features)
-                || RecordsHelpers.isRecordType(currType);
+        final boolean isFieldNameGettersEnabled = isRecord
+                || JSON.Feature.USE_FIELD_MATCHING_GETTERS.isEnabled(features);
 
-        final Map<String, Field> fieldNameMap = isFieldNameGettersEnabled ? new HashMap<>() : null;
+        final Map<String, Field> fieldNameMap = isFieldNameGettersEnabled ? new LinkedHashMap<>() : null;
 
         // then public fields (since 2.8); may or may not be ultimately included
         // but at this point still possible
