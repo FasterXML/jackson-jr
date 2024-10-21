@@ -137,7 +137,7 @@ public class BeanReader
     }
 
     private Object readRecord(JSONReader r, JsonParser p) throws Exception {
-        final Object[] values = new Object[propertiesByName().size()];
+        final Object[] values = new Object[_propsByName.size()];
 
         String propName;
         for (; (propName = p.nextFieldName()) != null;) {
@@ -159,7 +159,7 @@ public class BeanReader
     @Override
     public Object read(JSONReader r, JsonParser p) throws IOException
     {
-        JsonToken t = p.getCurrentToken();
+        JsonToken t = p.currentToken();
 
         try {
             switch (t) {
