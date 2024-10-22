@@ -69,3 +69,9 @@ Tomasz Gawęda (@TomaszGaweda)
 
 * Contributed #162: Add support for deserializing Java Records
  (2.18.0)
+
+Giovanni van der Schelde (@Giovds)
+
+* Reported, suggested a fix for #167: Deserialization of record fails
+  on constructor parameter ordering
+ (2.18.1)

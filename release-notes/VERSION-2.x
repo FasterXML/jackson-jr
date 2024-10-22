@@ -15,6 +15,11 @@ Modules:
 
 -
 
+2.18.1 (not yet released)
+
+#167: Deserialization of record fails on constructor parameter ordering
+ (reported, fix suggested by Giovanni V-d-S)
+
 2.18.0 (26-Sep-2024)
 
 #162: Add support for deserializing Java Records
