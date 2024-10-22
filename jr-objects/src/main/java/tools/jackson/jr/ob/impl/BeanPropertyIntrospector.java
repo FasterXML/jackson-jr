@@ -51,10 +51,8 @@ public class BeanPropertyIntrospector
 
         Map<String,PropBuilder> propsByName = forSerialization ?
                 new TreeMap<>() : new LinkedHashMap<>();
-        _introspect(beanType, propsByName, features, isRecord);
-
-        final BeanConstructors constructors;
         
+        final BeanConstructors constructors;
         if (forSerialization) {
             constructors = null;
         } else {
@@ -66,6 +64,11 @@ public class BeanPropertyIntrospector
 "Unable to find canonical constructor of Record type `"+beanType.getClass().getName()+"`");
                 }
                 constructors.addRecordConstructor(canonical);
+                // And then let's "seed" properties to ensure correct ordering
+                // of Properties wrt Canonical constructor parameters:
+                for (Parameter ctorParam : canonical.getParameters()) {
+                    _propFrom(propsByName, ctorParam.getName());
+                }
             } else {
                 for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
                     Class<?>[] argTypes = ctor.getParameterTypes();
@@ -84,6 +87,7 @@ public class BeanPropertyIntrospector
                 }
             }
         }
+        _introspect(beanType, propsByName, features, isRecord);
 
         final int len = propsByName.size();
         Prop[] props;
@@ -105,8 +109,11 @@ public class BeanPropertyIntrospector
         if (currType == null || currType == Object.class) {
             return;
         }
-        // First, check base type
-        _introspect(currType.getSuperclass(), props, features, isRecord);
+        // First, check base type.
+        // 21-Oct-2024, tatu: ... but not for Records (no need; it's `java.lang.Record`)
+        if (!isRecord) {
+            _introspect(currType.getSuperclass(), props, features, isRecord);
+        }
 
         final boolean noStatics = JSON.Feature.INCLUDE_STATIC_FIELDS.isDisabled(features);
 
@@ -133,12 +140,9 @@ public class BeanPropertyIntrospector
             if (fieldNameMap != null) {
                 fieldNameMap.put(f.getName(), f);
             }
+            // Otherwise we will only include public Fields
             if (Modifier.isPublic(f.getModifiers())) {
                 _propFrom(props, f.getName()).withField(f);
-            } else if (isRecord) {
-                // 21-Oct-2024, tatu: [jackson-jr#167] Need to retain ordering of Record
-                //   properties. One way is to pre-create properties like so.
-                _propFrom(props, f.getName());
             }
         }
 
