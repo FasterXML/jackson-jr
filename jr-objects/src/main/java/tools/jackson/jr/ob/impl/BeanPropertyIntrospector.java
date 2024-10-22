@@ -114,10 +114,8 @@ public class BeanPropertyIntrospector
         // then public fields (since 2.8); may or may not be ultimately included
         // but at this point still possible
         for (Field f : currType.getDeclaredFields()) {
-            if (fieldNameMap != null) {
-                fieldNameMap.put(f.getName(), f);
-            }
-            if (!Modifier.isPublic(f.getModifiers()) || f.isEnumConstant() || f.isSynthetic()) {
+            // First things first: skip synthetics, Enum constants
+            if (f.isEnumConstant() || f.isSynthetic()) {
                 continue;
             }
             // Only include static members if (a) inclusion feature enabled and
@@ -125,7 +123,13 @@ public class BeanPropertyIntrospector
             if (Modifier.isStatic(f.getModifiers()) && (noStatics || Modifier.isFinal(f.getModifiers()))) {
                 continue;
             }
-            _propFrom(props, f.getName()).withField(f);
+            // But for possible renaming, even non-public Fields have effect so:
+            if (fieldNameMap != null) {
+                fieldNameMap.put(f.getName(), f);
+            }
+            if (Modifier.isPublic(f.getModifiers())) {
+                _propFrom(props, f.getName()).withField(f);
+            }
         }
 
         // then get methods from within this class
