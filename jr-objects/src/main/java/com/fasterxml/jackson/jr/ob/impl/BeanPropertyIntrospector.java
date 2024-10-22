@@ -138,7 +138,8 @@ public class BeanPropertyIntrospector
             if (Modifier.isPublic(f.getModifiers())) {
                 _propFrom(props, f.getName()).withField(f);
             } else if (isRecord) {
-                // 21-Oct-2024, tatu: [jackson-jr#167] Need to ensure ordering of Record properties
+                // 21-Oct-2024, tatu: [jackson-jr#167] Need to retain ordering of Record
+                //   properties. One way is to pre-create properties like so.
                 _propFrom(props, f.getName());
             }
         }
