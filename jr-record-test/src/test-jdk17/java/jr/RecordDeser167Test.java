@@ -1,4 +1,4 @@
-package jr.failing;
+package jr;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 
