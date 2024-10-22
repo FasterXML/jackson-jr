@@ -44,7 +44,13 @@ public class BeanPropertyIntrospector
     private POJODefinition _introspectDefinition(Class<?> beanType,
             boolean forSerialization, int features, boolean isRecord)
     {
-        Map<String,PropBuilder> propsByName = new TreeMap<>();
+        // 21-Oct-2024, tatu: [jackson-jr#167] Need to retain property order
+        //   for Deserialization, to keep Record properties ordered.
+        //   For Serialization OTOH we need sorting (although would probably
+        //   be better to sort after the fact, maybe in future)
+
+        Map<String,PropBuilder> propsByName = forSerialization ?
+                new TreeMap<>() : new LinkedHashMap<>();
         _introspect(beanType, propsByName, features, isRecord);
 
         final BeanConstructors constructors;
@@ -129,6 +135,10 @@ public class BeanPropertyIntrospector
             }
             if (Modifier.isPublic(f.getModifiers())) {
                 _propFrom(props, f.getName()).withField(f);
+            } else if (isRecord) {
+                // 21-Oct-2024, tatu: [jackson-jr#167] Need to retain ordering of Record
+                //   properties. One way is to pre-create properties like so.
+                _propFrom(props, f.getName());
             }
         }
 

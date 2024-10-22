@@ -1,4 +1,4 @@
-package jr.failing;
+package jr;
 
 import tools.jackson.jr.ob.JSON;
 
