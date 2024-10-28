@@ -11,7 +11,7 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
-2.18.1 (not yet released)
+2.18.1 (28-Oct-2024)
 
 #167: Deserialization of record fails on constructor parameter ordering
  (reported, fix suggested by Giovanni V-d-S)
