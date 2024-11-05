@@ -1,4 +1,4 @@
-package jr.failing;
+package jr;
 
 import java.time.Instant;
 import java.time.ZoneId;
