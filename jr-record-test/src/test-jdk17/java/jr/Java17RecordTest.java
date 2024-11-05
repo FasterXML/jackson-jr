@@ -22,6 +22,10 @@ public class Java17RecordTest extends TestCase
     public record RecordWithWrapper(Cow cow, Wrapper nested, int someInt) {
     }
 
+    // [jackson-jr#171]: Whether to serialize Records in declaration or alphabetical order
+    public record RecordNonAlphabetic171(int c, int b, int a) {
+    }
+    
     record SingleIntRecord(int value) { }
     record SingleLongRecord(long value) { }
     record SingleStringRecord(String value) { }
@@ -162,4 +166,19 @@ public class Java17RecordTest extends TestCase
         assertEquals("{\"value\":\"abc\"}", json);
         assertEquals(inputStr, jsonHandler.beanFrom(SingleStringRecord.class, json));
     }
+
+    // [jackson-jr#171]: Whether to serialize Records in declaration or alphabetical order
+    public void testRecordFieldWriteOrder() throws Exception
+    {
+        RecordNonAlphabetic171 input = new RecordNonAlphabetic171(1, 2, 3);
+
+        // Alphabetical order:
+        assertEquals("{\"a\":3,\"b\":2,\"c\":1}",
+                jsonHandler.without(JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER).asString(input));
+
+        // Declaration order:
+        assertEquals("{\"c\":1,\"b\":2,\"a\":3}",
+                jsonHandler.with(JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER).asString(input));
+    }
 }
+

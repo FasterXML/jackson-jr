@@ -250,6 +250,17 @@ public class JSON
         WRITE_READONLY_BEAN_PROPERTIES(true, true),
 
         /**
+         * Feature that determines whether record fields are serialized in declaration
+         * order (enabled) or not (disabled). If disabled, record fields are serialized
+         * same way as POJO properties, that is, alphabetically sorted.
+         *<p>
+         * Feature is disabled by default for backwards compatibility reasons.
+         * 
+         * @since 2.19
+         */
+        WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER(false, true),
+
+        /**
          * Feature that determines whether access to {@link java.lang.reflect.Method}s and
          * {@link java.lang.reflect.Constructor}s that are used with dynamically
          * introspected Beans may be forced using

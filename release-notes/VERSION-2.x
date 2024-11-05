@@ -13,7 +13,8 @@ Modules:
 
 2.19.0 (not yet released)
 
--
+#171: Add a `JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER` for
+  retaining Serialization order of Java Records (instead of alphabetic)
 
 2.18.1 (28-Oct-2024)
 
