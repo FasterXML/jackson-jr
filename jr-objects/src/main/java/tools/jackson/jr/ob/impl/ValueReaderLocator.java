@@ -470,6 +470,8 @@ public class ValueReaderLocator
             propMap = Collections.emptyMap();
         } else {
             propMap = new LinkedHashMap<>();
+            Set<String> recordProps = isRecord
+                    ? new HashSet<>(RecordsHelpers.recordPropertyNames(raw)) : null;
             final boolean useFields = JSON.Feature.USE_FIELDS.isEnabled(_features);
             for (int i = 0; i < len; ++i) {
                 POJODefinition.Prop rawProp = rawProps.get(i);
@@ -485,6 +487,11 @@ public class ValueReaderLocator
                     }
                 }
                 if (isRecord) {
+                    // Records can only deserialize propreties that are declared in the record;
+                    // other virtual properties (getter methods) need to be ignored
+                    if (!recordProps.contains(rawProp.name)) {
+                        continue;
+                    }
                     try {
                         field = raw.getDeclaredField(rawProp.name);
                     } catch (NoSuchFieldException e) {

@@ -16,6 +16,11 @@ Modules:
 #171: Add a `JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER` for
   retaining Serialization order of Java Records (instead of alphabetic)
 
+2.18.2 (not yet released)
+
+#172: Record deserialisation with instance methods fails
+ (reported by Giovanni V-d-S)
+
 2.18.1 (28-Oct-2024)
 
 #167: Deserialization of record fails on constructor parameter ordering

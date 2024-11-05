@@ -1,9 +1,12 @@
 package tools.jackson.jr.ob.impl;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import tools.jackson.jr.ob.impl.POJODefinition.PropBuilder;
 
@@ -78,6 +81,12 @@ public final class RecordsHelpers {
     static boolean isRecordType(Class<?> cls) {
         Class<?> parent = cls.getSuperclass();
         return (parent != null) && "java.lang.Record".equals(parent.getName());
+    }
+
+    static List<String> recordPropertyNames(Class<?> cls) {
+        // Let's base this on public fields
+        return Arrays.asList(cls.getDeclaredFields()).stream().map(Field::getName)
+                .collect(Collectors.toList());
     }
 
     private static Class<?>[] componentTypes(Class<?> recordType)
