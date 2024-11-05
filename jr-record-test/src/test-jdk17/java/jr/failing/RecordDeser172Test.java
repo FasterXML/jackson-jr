@@ -5,7 +5,7 @@ import java.time.ZoneId;
 
 import junit.framework.TestCase;
 
-import com.fasterxml.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.JSON;
 
 public class RecordDeser172Test extends TestCase
 {
