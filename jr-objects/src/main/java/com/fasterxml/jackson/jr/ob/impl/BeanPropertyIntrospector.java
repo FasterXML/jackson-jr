@@ -51,20 +51,32 @@ public class BeanPropertyIntrospector
         //   For Serialization OTOH we need sorting (although would probably
         //   be better to sort after the fact, maybe in future)
 
-        Map<String,PropBuilder> propsByName = forSerialization ?
-                new TreeMap<>() : new LinkedHashMap<>();
-        
+        Map<String,PropBuilder> propsByName;
+        // 04-Nov-2024, tatu [jackson-jr#171] May need to retain order
+        //  for Record serialization too
+        final boolean recordSerInDeclOrder = isRecord && forSerialization
+                && JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER.isEnabled(features);
+
+        // Alphabetic ordering unnecessary for Deserialization (and some serialization too)
+        if (forSerialization && !recordSerInDeclOrder) {
+            propsByName = new TreeMap<>();  
+        } else {
+            propsByName = new LinkedHashMap<>();
+        }
+
         final BeanConstructors constructors;
         if (forSerialization) {
+            if (recordSerInDeclOrder) {
+                Constructor<?> canonical = _getCanonicalRecordConstructor(beanType);
+                for (Parameter ctorParam : canonical.getParameters()) {
+                    _propFrom(propsByName, ctorParam.getName());
+                }
+            }
             constructors = null;
         } else {
             constructors = new BeanConstructors(beanType);
             if (isRecord) {
-                Constructor<?> canonical = RecordsHelpers.findCanonicalConstructor(beanType);
-                if (canonical == null) { // should never happen
-                    throw new IllegalArgumentException(
-"Unable to find canonical constructor of Record type `"+beanType.getClass().getName()+"`");
-                }
+                Constructor<?> canonical = _getCanonicalRecordConstructor(beanType);
                 constructors.addRecordConstructor(canonical);
                 // And then let's "seed" properties to ensure correct ordering
                 // of Properties wrt Canonical constructor parameters:
@@ -105,6 +117,15 @@ public class BeanPropertyIntrospector
         return new POJODefinition(beanType, props, constructors);
     }
 
+    private Constructor<?> _getCanonicalRecordConstructor(Class<?> beanType) {
+        Constructor<?> canonical = RecordsHelpers.findCanonicalConstructor(beanType);
+        if (canonical == null) { // should never happen
+            throw new IllegalArgumentException(
+"Unable to find canonical constructor of Record type `"+beanType.getClass().getName()+"`");
+        }
+        return canonical;
+    }
+        
     private static void _introspect(Class<?> currType, Map<String, PropBuilder> props,
             int features, boolean isRecord)
     {
