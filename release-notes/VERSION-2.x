@@ -11,6 +11,11 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
+2.18.2 (not yet released)
+
+#172: Record deserialisation with instance methods fails
+ (reported by Giovanni V-d-S)
+
 2.18.1 (28-Oct-2024)
 
 #167: Deserialization of record fails on constructor parameter ordering

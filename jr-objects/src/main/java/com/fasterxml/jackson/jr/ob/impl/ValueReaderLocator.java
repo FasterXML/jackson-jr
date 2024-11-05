@@ -456,6 +456,8 @@ public class ValueReaderLocator
         if (len == 0) {
             propMap = Collections.emptyMap();
         } else {
+            Set<String> recordProps = isRecord
+                    ? new HashSet<>(RecordsHelpers.recordPropertyNames(raw)) : null;
             propMap = caseInsensitive
                     ? new TreeMap<>(String.CASE_INSENSITIVE_ORDER)
                     // 13-May-2021, tatu: Let's retain ordering here:
@@ -475,6 +477,11 @@ public class ValueReaderLocator
                     }
                 }
                 if (isRecord) {
+                    // Records can only deserialize propreties that are declared in the record;
+                    // other virtual properties (getter methods) need to be ignored
+                    if (!recordProps.contains(rawProp.name)) {
+                        continue;
+                    }
                     try {
                         field = raw.getDeclaredField(rawProp.name);
                     } catch (NoSuchFieldException e) {
