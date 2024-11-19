@@ -1,4 +1,4 @@
-package com.fasterxml.jackson.jr.extension.javatime;
+package com.fasterxml.jackson.jr.extension.javatime.localdatetime;
 
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
@@ -37,7 +37,7 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
      *  </li>
      *</ul>
      * 
-     * @param formatter
+     * @param formatter {@link DateTimeFormatter} instance
      *
      * @return This provider instance for call chaining
      */
