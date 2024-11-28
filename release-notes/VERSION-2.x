@@ -11,7 +11,7 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
-2.18.2 (not yet released)
+2.18.2 (27-Nov-2024)
 
 #172: Record deserialisation with instance methods fails
  (reported by Giovanni V-d-S)
