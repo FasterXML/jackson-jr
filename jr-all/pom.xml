@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.fasterxml.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
-    <version>2.18.2-SNAPSHOT</version>
+    <version>2.18.2</version>
   </parent>
   <artifactId>jackson-jr-all</artifactId>
   <name>jackson-jr-all</name>
@@ -23,7 +23,7 @@ Streaming, in a single jar.
 
   <properties>
     <!-- for Reproducible Builds -->
-    <project.build.outputTimestamp>2024-10-28T23:23:07Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2024-11-28T01:10:33Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
