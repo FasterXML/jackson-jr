@@ -357,7 +357,7 @@ public class ValueIterator<T> implements Iterator<T>, Closeable
      * 
      * @return Location of the input stream of the underlying parser
      */
-    public JsonLocation currentLocation() {
+    public TokenStreamLocation currentLocation() {
         return _parser.currentLocation();
     }
 

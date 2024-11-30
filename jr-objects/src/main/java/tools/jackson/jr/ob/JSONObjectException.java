@@ -1,8 +1,8 @@
 package tools.jackson.jr.ob;
 
 import tools.jackson.core.JacksonException;
-import tools.jackson.core.JsonLocation;
 import tools.jackson.core.JsonParser;
+import tools.jackson.core.TokenStreamLocation;
 
 /**
  * Standard exception exposed by this package; equivalent of
@@ -29,11 +29,11 @@ public class JSONObjectException
         super(msg, rootCause);
     }
 
-    public JSONObjectException(String msg, JsonLocation loc) {
+    public JSONObjectException(String msg, TokenStreamLocation loc) {
         super(msg, loc, null);
     }
 
-    public JSONObjectException(String msg, JsonLocation loc, Throwable rootCause) {
+    public JSONObjectException(String msg, TokenStreamLocation loc, Throwable rootCause) {
         super(msg, loc, rootCause);
     }
 
