@@ -4,7 +4,6 @@ on:
     branches:
     - master
     - "3.0"
-    - "2.19"
     paths-ignore:
     - "README.md"
     - "release-notes/*"
@@ -12,7 +11,6 @@ on:
     branches:
     - master
     - "3.0"
-    - "2.19"
     paths-ignore:
     - "README.md"
     - "release-notes/*"
@@ -25,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java_version: ['8', '11', '17', '21']
+        java_version: ['17', '21']
         os: ['ubuntu-22.04']
     env:
       JAVA_OPTS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
@@ -49,17 +47,17 @@ jobs:
       id: projectVersion
       run: echo "version=$(./mvnw org.apache.maven.plugins:maven-help-plugin:3.5.1:evaluate -DforceStdout -Dexpression=project.version -q)" >> $GITHUB_OUTPUT
     - name: Deploy snapshot
-      if: ${{ github.event_name != 'pull_request' && matrix.java_version == '8' && endsWith(steps.projectVersion.outputs.version, '-SNAPSHOT') }}
+      if: ${{ github.event_name != 'pull_request' && matrix.java_version == '17' && endsWith(steps.projectVersion.outputs.version, '-SNAPSHOT') }}
       env:
         CI_DEPLOY_USERNAME: ${{ secrets.CI_DEPLOY_USERNAME3 }}
         CI_DEPLOY_PASSWORD: ${{ secrets.CI_DEPLOY_PASSWORD3 }}
         # MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
       run: ./mvnw -B -q -ff -DskipTests -ntp source:jar deploy
     - name: Generate code coverage
-      if: ${{ github.event_name != 'pull_request' && matrix.java_version == '8' }}
+      if: ${{ github.event_name != 'pull_request' && matrix.java_version == '17' }}
       run: ./mvnw -B -q -ff -ntp test
     - name: Publish code coverage
-      if: ${{ github.event_name != 'pull_request' && matrix.java_version == '8' }}
+      if: ${{ github.event_name != 'pull_request' && matrix.java_version == '17' }}
       uses: codecov/codecov-action@015f24e6818733317a2da2edd6290ab26238649a # v5.0.7
       with:
         token: ${{ secrets.CODECOV_TOKEN }}

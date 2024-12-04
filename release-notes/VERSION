@@ -14,3 +14,4 @@ Modules:
 3.0.0 (not yet released)
 
 #96: Rename "com.fasterxml.jackson" -> "tools.jackson"
+- Minimum Java baseline: Java 17

@@ -34,6 +34,11 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- [databind#4820]: Java 17 baseline -->
+    <javac.src.version>17</javac.src.version>
+    <javac.target.version>17</javac.target.version>
+
     <!-- 23-Feb-2019, tatu: Removing debug info makes jr-objects jar 20% smaller...
             but loses line numbers from stack traces. So bit of a difficult choice.
       -->
