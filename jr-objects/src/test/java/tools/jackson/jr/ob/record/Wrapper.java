@@ -1,18 +1,16 @@
-package jr;
-
-import jr.Java17RecordTest.Cow;
+package tools.jackson.jr.ob.record;
 
 import java.util.Objects;
 
 public final class Wrapper {
-    Cow cow;
+    Java17RecordTest.Cow cow;
     String farmerName;
 
-    public Cow getCow() {
+    public Java17RecordTest.Cow getCow() {
         return cow;
     }
 
-    public void setCow(Cow cow) {
+    public void setCow(Java17RecordTest.Cow cow) {
         this.cow = cow;
     }
 

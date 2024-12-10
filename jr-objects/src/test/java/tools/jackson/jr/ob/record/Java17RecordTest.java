@@ -1,15 +1,14 @@
-package jr;
+package tools.jackson.jr.ob.record;
 
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import tools.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.TestBase;
 
 /**
  * This test is in test module since the JDK version to be tested is higher than other, and hence supports Records.
  */
-public class Java17RecordTest extends TestCase
+public class Java17RecordTest extends TestBase
 {
     private final JSON jsonHandler = JSON.std;
 

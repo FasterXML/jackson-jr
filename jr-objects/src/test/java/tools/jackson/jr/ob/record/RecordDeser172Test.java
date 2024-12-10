@@ -1,13 +1,12 @@
-package jr;
+package tools.jackson.jr.ob.record;
 
 import java.time.Instant;
 import java.time.ZoneId;
 
-import junit.framework.TestCase;
-
 import tools.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.TestBase;
 
-public class RecordDeser172Test extends TestCase
+public class RecordDeser172Test extends TestBase
 {
     record FoundDependency(String id, String g, String a, String v, long timestamp) {
         public String getDateTime() {
