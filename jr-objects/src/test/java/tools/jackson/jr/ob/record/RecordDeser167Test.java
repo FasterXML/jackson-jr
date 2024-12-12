@@ -1,10 +1,9 @@
-package jr;
+package tools.jackson.jr.ob.record;
 
 import tools.jackson.jr.ob.JSON;
+import tools.jackson.jr.ob.TestBase;
 
-import junit.framework.TestCase;
-
-public class RecordDeser167Test extends TestCase
+public class RecordDeser167Test extends TestBase
 {
     record FoundDependency(String id, String g, String a, String v, String timestamp) {}
 
