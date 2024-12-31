@@ -1,5 +1,6 @@
 package tools.jackson.jr.stree;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -50,8 +51,8 @@ public class JrsObject
     }
 
     @Override
-    public Iterator<String> propertyNames() {
-        return _values.keySet().iterator();
+    public Collection<String> propertyNames() {
+        return _values.keySet();
     }
 
     @Override

@@ -1,5 +1,7 @@
 package tools.jackson.jr.ob;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 import tools.jackson.core.*;
@@ -26,8 +28,8 @@ public class TreeApiTest extends TestBase
         }
 
         @Override
-        public Iterator<String> propertyNames() {
-            return null;
+        public Collection<String> propertyNames() {
+            return Collections.emptyList();
         }
 
         @Override

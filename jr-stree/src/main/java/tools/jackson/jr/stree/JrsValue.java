@@ -1,6 +1,7 @@
 package tools.jackson.jr.stree;
 
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.Collections;
 
 import tools.jackson.core.*;
 import tools.jackson.jr.stree.util.JrsTreeTraversingParser;
@@ -44,8 +45,8 @@ public abstract class JrsValue implements TreeNode
     }
     
     @Override
-    public Iterator<String> propertyNames() {
-        return null;
+    public Collection<String> propertyNames() {
+        return Collections.emptyList();
     }
 
     @Override
