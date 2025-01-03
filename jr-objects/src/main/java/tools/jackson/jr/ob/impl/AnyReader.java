@@ -40,7 +40,7 @@ public class AnyReader extends ValueReader
                 }
                 return readArrayFromArray(r, p, r._collectionBuilder);
             case ID_STRING:
-                return fromString(p.getText());
+                return fromString(p.getString());
             case ID_NUMBER_INT:
                 {
                     NumberType n = p.getNumberType();
@@ -97,7 +97,7 @@ public class AnyReader extends ValueReader
             }
             return readArrayFromArray(r, p, r._collectionBuilder);
         case ID_STRING:
-            return fromString(p.getText());
+            return fromString(p.getString());
         case ID_NUMBER_INT:
             {
                 NumberType n = p.getNumberType();

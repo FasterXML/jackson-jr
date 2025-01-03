@@ -19,6 +19,6 @@ public class LocalDateTimeValueReader extends ValueReader {
 
     @Override
     public Object read(JSONReader reader, JsonParser p) throws JacksonException {
-        return LocalDateTime.parse(p.getText(), formatter);
+        return LocalDateTime.parse(p.getString(), formatter);
     }
 }

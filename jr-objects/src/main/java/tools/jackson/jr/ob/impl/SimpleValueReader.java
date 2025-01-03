@@ -43,7 +43,7 @@ public class SimpleValueReader extends ValueReader
         case SER_STRING:
         case SER_CHARACTER_SEQUENCE:
             {
-                String str = p.nextTextValue();
+                String str = p.nextStringValue();
                 if (str != null) {
                     return str;
                 }
@@ -52,7 +52,7 @@ public class SimpleValueReader extends ValueReader
 
         case SER_CHAR_ARRAY:
             {
-                String str = p.nextTextValue();
+                String str = p.nextStringValue();
                 if (str != null) {
                     return str.toCharArray();
                 }

@@ -156,7 +156,7 @@ public class BeanReader
             case JsonTokenId.ID_NULL:
                 return null;
             case JsonTokenId.ID_STRING:
-                return _constructors.create(p.getText());
+                return _constructors.create(p.getString());
             case JsonTokenId.ID_NUMBER_INT:
                 return _constructors.create(p.getLongValue());
             default:
@@ -191,7 +191,7 @@ public class BeanReader
                 case VALUE_NULL:
                     return null;
                 case VALUE_STRING:
-                    return _constructors.create(p.getText());
+                    return _constructors.create(p.getString());
                 case VALUE_NUMBER_INT:
                     return _constructors.create(p.getLongValue());
                 default:

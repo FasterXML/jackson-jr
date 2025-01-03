@@ -234,7 +234,7 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
      */
 
     @Override
-    public String getText()
+    public String getString()
     {
         if (_closed) {
             return null;
@@ -255,22 +255,22 @@ public class JrsTreeTraversingParser extends ParserMinimalBase
     }
 
     @Override
-    public char[] getTextCharacters() throws JacksonException {
-        return getText().toCharArray();
+    public char[] getStringCharacters() throws JacksonException {
+        return getString().toCharArray();
     }
 
     @Override
-    public int getTextLength() throws JacksonException {
-        return getText().length();
+    public int getStringLength() throws JacksonException {
+        return getString().length();
     }
 
     @Override
-    public int getTextOffset() throws JacksonException {
+    public int getStringOffset() throws JacksonException {
         return 0;
     }
 
     @Override
-    public boolean hasTextCharacters() {
+    public boolean hasStringCharacters() {
         // generally we do not have efficient access as char[], hence:
         return false;
     }

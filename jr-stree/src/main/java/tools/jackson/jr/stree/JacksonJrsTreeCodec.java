@@ -52,7 +52,7 @@ public class JacksonJrsTreeCodec implements TreeCodec
             }
             return new JrsNumber(p.getNumberValue());
         case JsonTokenId.ID_STRING:
-            return new JrsString(p.getText());
+            return new JrsString(p.getString());
         case JsonTokenId.ID_START_ARRAY: {
             List<JrsValue> values = _list();
             while (p.nextToken() != JsonToken.END_ARRAY) {

@@ -76,7 +76,7 @@ public class ValueReaderModifierTest extends TestBase
                 new ValueReader(String.class) {
             @Override
             public Object read(JSONReader reader, JsonParser p) {
-                return p.getText().toUpperCase();
+                return p.getString().toUpperCase();
             };
         });
         assertEquals("FOOBAR",

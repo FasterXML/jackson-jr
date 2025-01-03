@@ -34,7 +34,7 @@ public class EnumReader extends ValueReader
 
     @Override
     public Object readNext(JSONReader reader, JsonParser p) throws JacksonException {
-        String name = p.nextTextValue();
+        String name = p.nextStringValue();
         if (name != null) {
             return _enum(name);
         }

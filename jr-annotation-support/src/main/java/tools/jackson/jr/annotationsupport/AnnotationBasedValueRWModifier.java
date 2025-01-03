@@ -204,7 +204,7 @@ public class AnnotationBasedValueRWModifier extends ReaderWriterModifier
         public Object read(JSONReader reader, JsonParser p) throws JacksonException
         {
             try {
-                return _jsonCreatorMethod.invoke(_valueType, p.getText());
+                return _jsonCreatorMethod.invoke(_valueType, p.getString());
             } catch (Exception e) {
                 throw new JSONObjectException("Cannot call JsonCreator method", e);
             }

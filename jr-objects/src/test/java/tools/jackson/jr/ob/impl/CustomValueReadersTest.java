@@ -63,7 +63,7 @@ public class CustomValueReadersTest extends TestBase
 
         @Override
         public Object read(JSONReader reader, JsonParser p) {
-            final String str = p.getText();
+            final String str = p.getString();
             if ("n/a".equals(str)) {
                 return ABC.DEF;
             }
@@ -78,7 +78,7 @@ public class CustomValueReadersTest extends TestBase
 
         @Override
         public Object read(JSONReader reader, JsonParser p) {
-            return p.getText().toUpperCase();
+            return p.getString().toUpperCase();
         }
     }
 
