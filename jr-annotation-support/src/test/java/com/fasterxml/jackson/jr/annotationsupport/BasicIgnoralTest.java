@@ -43,6 +43,11 @@ public class BasicIgnoralTest extends ASTestBase
         }
     }
 
+    record SnakeCaseRecord(
+        @JsonIgnore int x,
+        @JsonProperty("y_value") int y
+    ) {}
+
     private final JSON JSON_WITH_ANNO = jsonWithAnnotationSupport();
     private final JSON JSON_WITH_ANNO_WITH_STATIC =
             JSON.builder().register(JacksonAnnotationExtension.std).enable(JSON.Feature.INCLUDE_STATIC_FIELDS).build();
@@ -109,6 +114,21 @@ public class BasicIgnoralTest extends ASTestBase
         // should read 'y', but not 'x'
         assertEquals(2, result.y);
         assertEquals(new XY().x, result.x);
+    }
+
+    public void testSnakeCaseRecordDeserialization() throws Exception
+    {
+        final String input = a2q("{ 'x':1, 'y_value':2 }");
+        SnakeCaseRecord result;
+
+        // First: without setting, nothing matches
+        result = JSON.std.beanFrom(SnakeCaseRecord.class, input);
+        assertNull(result);
+
+        // but with annotations it's all good...
+        result = JSON_WITH_ANNO.beanFrom(SnakeCaseRecord.class, input);
+        assertEquals(0, result.x());
+        assertEquals(2, result.y());
     }
 
     /*

@@ -111,7 +111,10 @@ public class BasicRenameTest extends ASTestBase
         }
     }
 
-
+    record SnakeCaseRecord(
+        @JsonProperty("first_name") String firstName,
+        @JsonProperty("last_name") String lastName
+    ) {}
 
     /*
     /**********************************************************************
@@ -258,5 +261,21 @@ public class BasicRenameTest extends ASTestBase
         assertEquals("\"ENUM_NO_JSON_VALUE\"", JSON.std.asString(input));
         // with annotations
         assertEquals(a2q("\"ENUM_NO_JSON_VALUE\""), JSON_WITH_ANNO.asString(input));
+    }
+
+    public void testSnakeCaseRecordDeserialization() throws Exception
+    {
+        final String input = a2q("{ 'first_name':'John', 'last_name':'Doe' }");
+        SnakeCaseRecord result;
+
+        // First: without setting, nothing matches
+        result = JSON.std.beanFrom(SnakeCaseRecord.class, input);
+        assertNull(result.firstName());
+        assertNull(result.lastName());
+
+        // but with annotations it's all good...
+        result = JSON_WITH_ANNO.beanFrom(SnakeCaseRecord.class, input);
+        assertEquals("John", result.firstName());
+        assertEquals("Doe", result.lastName());
     }
 }

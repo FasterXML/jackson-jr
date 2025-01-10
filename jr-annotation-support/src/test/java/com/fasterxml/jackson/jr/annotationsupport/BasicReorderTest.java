@@ -1,7 +1,7 @@
 package com.fasterxml.jackson.jr.annotationsupport;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.jr.ob.JSON;
 
 public class BasicReorderTest extends ASTestBase
@@ -37,6 +37,11 @@ public class BasicReorderTest extends ASTestBase
         public void setLast(String n) { last = n; }
     }
 
+    record SnakeCaseRecord(
+        @JsonProperty("first_name") String firstName,
+        @JsonProperty("last_name") String lastName
+    ) {}
+
     private final JSON JSON_WITH_ANNO = jsonWithAnnotationSupport();
 
     public void testSimpleReorder() throws Exception
@@ -67,5 +72,21 @@ public class BasicReorderTest extends ASTestBase
 
         // and ensure no leakage to default one:
         assertEquals(EXP_DEFAULT, JSON.std.asString(input));
+    }
+
+    public void testSnakeCaseRecordDeserialization() throws Exception
+    {
+        final String input = a2q("{ 'first_name':'John', 'last_name':'Doe' }");
+        SnakeCaseRecord result;
+
+        // First: without setting, nothing matches
+        result = JSON.std.beanFrom(SnakeCaseRecord.class, input);
+        assertNull(result.firstName());
+        assertNull(result.lastName());
+
+        // but with annotations it's all good...
+        result = JSON_WITH_ANNO.beanFrom(SnakeCaseRecord.class, input);
+        assertEquals("John", result.firstName());
+        assertEquals("Doe", result.lastName());
     }
 }
