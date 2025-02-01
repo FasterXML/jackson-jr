@@ -1,14 +1,19 @@
 package com.fasterxml.jackson.jr.stree;
 
+import java.math.BigDecimal;
+
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.jr.ob.JSON;
 
-import java.math.BigDecimal;
+import static org.junit.jupiter.api.Assertions.*;
 
 // [jackson-jr#90]: JSON.Feature.USE_BIG_DECIMAL_FOR_FLOATS should work
 public class ReadAsBigDecimal90Test extends JacksonJrTreeTestBase
 {
     // [jackson-jr#90]
+    @Test
     public void testDefaultBehaviourReadAsDouble() throws Exception
     {
         JSON json = JSON.builder()
@@ -27,6 +32,7 @@ public class ReadAsBigDecimal90Test extends JacksonJrTreeTestBase
     }
 
     // [jackson-jr#90]
+    @Test
     public void testReadAsBigDecimal() throws Exception
     {
         JSON json = JSON.builder()

@@ -5,9 +5,9 @@ import java.util.Arrays;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.jr.ob.JSON;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.fail;
 
-public abstract class JacksonJrTreeTestBase extends TestCase
+public abstract class JacksonJrTreeTestBase
 {
     protected final JsonFactory _factory = new JsonFactory();
 

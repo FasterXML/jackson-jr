@@ -2,13 +2,18 @@ package com.fasterxml.jackson.jr.stree;
 
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.jr.ob.JSON;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WriteViaJSONTest extends JacksonJrTreeTestBase
 {
-     private final JSON treeJSON = jsonWithTreeCodec();
+    private final JSON treeJSON = jsonWithTreeCodec();
 
-     public void testSimpleList() throws Exception
+    @Test
+    public void testSimpleList() throws Exception
     {
         List<JrsValue> stuff = new LinkedList<JrsValue>();
         stuff.add(new JrsString("x"));
@@ -17,6 +22,7 @@ public class WriteViaJSONTest extends JacksonJrTreeTestBase
         assertEquals("[\"x\",true,123]", treeJSON.asString(new JrsArray(stuff)));
     }
 
+    @Test
     public void testSimpleMap() throws Exception
     {
         Map<String,JrsValue> stuff = new LinkedHashMap<String,JrsValue>();
@@ -28,6 +34,7 @@ public class WriteViaJSONTest extends JacksonJrTreeTestBase
                   treeJSON.asString(new JrsObject(stuff)));
     }
 
+    @Test
     public void testNest() throws Exception
     {
         Map<String,JrsValue> stuff = new LinkedHashMap<String,JrsValue>();
