@@ -1,5 +1,9 @@
 package com.fasterxml.jackson.jr.ob;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 // For [jackson-jr#94]: support for Serializing JDK 17/Groovy records
 // (minimal one; full test in separate test package)
 //
@@ -26,6 +30,7 @@ public class ReadRecordLikeTest extends TestBase
         public int mismatched() { return 42; }
     }
 
+    @Test
     public void testRecordLikePOJO() throws Exception
     {
         // By default, do not auto-detect "record-style" accessors

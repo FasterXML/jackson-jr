@@ -2,8 +2,13 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class IndentationTest extends TestBase
 {
+    @Test
     public void testSimpleList() throws Exception
     {
         Map<String,Object> map = new LinkedHashMap<String,Object>();

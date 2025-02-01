@@ -1,5 +1,9 @@
 package com.fasterxml.jackson.jr.ob;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class ReadWithCtorsTest extends TestBase
 {
     static class FromString {
@@ -23,6 +27,7 @@ public class ReadWithCtorsTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testStringCtor() throws Exception
     {
         FromString output = JSON.std.beanFrom(FromString.class, q("abc"));
@@ -30,6 +35,7 @@ public class ReadWithCtorsTest extends TestBase
         assertEquals("abc", output.value);
     }
 
+    @Test
     public void testLongCtor() throws Exception
     {
         FromLong1 output = JSON.std.beanFrom(FromLong1.class, "123");

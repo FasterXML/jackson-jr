@@ -9,7 +9,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WriteSimpleTest extends TestBase
 {
@@ -41,7 +45,8 @@ public class WriteSimpleTest extends TestBase
     /* Test methdods
     /**********************************************************************
      */
-    
+
+    @Test
     public void testSimpleList() throws Exception
     {
         List<Object> stuff = new LinkedList<Object>();
@@ -61,6 +66,7 @@ public class WriteSimpleTest extends TestBase
         assertEquals(exp, bytes.toString("UTF-8"));
     }
 
+    @Test
     public void testSimpleMap() throws Exception
     {
         Map<String,Object> stuff = new LinkedHashMap<String,Object>();
@@ -76,6 +82,7 @@ public class WriteSimpleTest extends TestBase
                 JSON.std.asString(stuff));
     }
 
+    @Test
     public void testSimpleIntContainers() throws Exception {
         assertEquals("[1,2,3]", JSON.std.asString(new int[] { 1, 2, 3 }));
         assertEquals("[1,2,3]", JSON.std.asString(new Integer[] { 1, 2, 3 }));
@@ -85,15 +92,18 @@ public class WriteSimpleTest extends TestBase
         assertEquals("[4,-8]", JSON.std.asString(list));
     }
 
+    @Test
     public void testSimpleBooleanArray() throws Exception {
         assertEquals("[true,false]", JSON.std.asString(new boolean[] { true, false }));
         assertEquals("[true,false]", JSON.std.asString(new Boolean[] { true, false }));
     }
     
+    @Test
     public void testSimpleStringArray() throws Exception {
         assertEquals(a2q("['abc','def']"), JSON.std.asString(new String[] { "abc", "def" }));
     }
     
+    @Test
     public void testNest() throws Exception
     {
         Map<String,Object> stuff = new LinkedHashMap<String,Object>();
@@ -110,6 +120,7 @@ public class WriteSimpleTest extends TestBase
                 JSON.std.asString(stuff));
     }
 
+    @Test
     public void testKnownSimpleTypeURI() throws Exception
     {
         final String URL_STR = "http://fasterxml.com";
@@ -117,6 +128,7 @@ public class WriteSimpleTest extends TestBase
         assertEquals(q(URL_STR), JSON.std.asString(uri));
     }
 
+    @Test
     public void testKnownSimpleTypeFile() throws Exception
     {
         final String PATH = "/foo/bar.txt";
@@ -124,6 +136,7 @@ public class WriteSimpleTest extends TestBase
                 JSON.std.asString(new File(PATH)));
     }
 
+    @Test
     public void testKnownSimpleTypePath() throws Exception
     {
         Path p = Paths.get(new URI("file:///foo/bar.txt"));
@@ -132,12 +145,14 @@ public class WriteSimpleTest extends TestBase
         assertEquals(a2q("{'path':'/foo/bar.txt'}"), JSON.std.asString(new PathWrapper(p)));
     }
 
+    @Test
     public void testSimpleEnumTypes() throws Exception
     {
         assertEquals(q("B"), JSON.std.asString(ABC.B));
         assertEquals("1", JSON.std.with(Feature.WRITE_ENUMS_USING_INDEX).asString(ABC.B));
     }
 
+    @Test
     public void testUnknownType() throws Exception
     {
         try {
@@ -152,6 +167,7 @@ public class WriteSimpleTest extends TestBase
     }
 
     // For [jackson-jr#16]
+    @Test
     public void testTypedMaps() throws Exception
     {
         final Address from = new Address("xyz");

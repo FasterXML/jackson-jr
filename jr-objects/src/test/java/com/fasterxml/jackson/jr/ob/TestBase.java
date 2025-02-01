@@ -9,9 +9,7 @@ import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 
-import junit.framework.TestCase;
-
-public abstract class TestBase extends TestCase
+public abstract class TestBase
 {
     protected enum ABC { A, B, C; }
 

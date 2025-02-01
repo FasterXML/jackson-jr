@@ -3,8 +3,12 @@ package com.fasterxml.jackson.jr.ob;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TreeApiTest extends TestBase
 {
@@ -159,6 +163,7 @@ public class TreeApiTest extends TestBase
     }
 
     @SuppressWarnings("deprecation")
+    @Test
     private final JSON J = JSON.builder()
             .treeCodec(new TestTreeCodec())
             .build();

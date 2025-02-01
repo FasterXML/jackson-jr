@@ -2,6 +2,10 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class SimpleComposerTest extends TestBase
 {
     public static class NameBean {
@@ -15,6 +19,7 @@ public class SimpleComposerTest extends TestBase
         public void setFirst(String s) { first = s; }
     }
 
+    @Test
     public void testSimpleNonNestedObject() throws Exception
     {
         String json = JSON.std.composeString()
@@ -26,6 +31,7 @@ public class SimpleComposerTest extends TestBase
         assertEquals("{\"a\":1,\"b\":false}", json);
     }
 
+    @Test
     public void testSimpleNonNestedArray() throws Exception
     {
         String json = JSON.std.composeString()
@@ -38,6 +44,7 @@ public class SimpleComposerTest extends TestBase
         assertEquals("[true,\"abc\",75]", json);
     }
 
+    @Test
     public void testNestedObject() throws Exception
     {
         String json = JSON.std.composeString()
@@ -54,6 +61,7 @@ public class SimpleComposerTest extends TestBase
         assertEquals("{\"a\":1,\"ob\":{\"x\":{\"inner\":{}}}}", json);
     }
 
+    @Test
     public void testNestedArray() throws Exception
     {
         String json = JSON.std.composeString()
@@ -69,7 +77,8 @@ public class SimpleComposerTest extends TestBase
                 .finish();
         assertEquals("[[true,[[],13]]]", json);
     }
-    
+
+    @Test
     public void testNestedMixed() throws Exception
     {
         byte[] json = JSON.std.composeBytes()
@@ -91,6 +100,7 @@ public class SimpleComposerTest extends TestBase
             new String(json, "UTF-8"));
     }
 
+    @Test
     public void testListComposer() throws Exception
     {
         List<Object> list = JSON.std
@@ -114,6 +124,7 @@ public class SimpleComposerTest extends TestBase
         assertEquals("[-3,{\"a\":1,\"b\":2}]", JSON.std.asString(list));
     }
 
+    @Test
     public void testComposerWithPojo() throws Exception
     {
         String json = JSON.std.composeString()
@@ -127,6 +138,7 @@ public class SimpleComposerTest extends TestBase
         assertEquals(a2q("[{'first':'Bob'},{'name':{'first':'Bill'}}]"), json);
     }
 
+    @Test
     public void testComposerWithIndent() throws Exception
     {
         String json = JSON.std
@@ -142,6 +154,7 @@ public class SimpleComposerTest extends TestBase
                 json);
     }
 
+    @Test
     public void testSimpleComposeMap() throws Exception
     {
         Map<String, Object> map = JSON.std.composeMap()

@@ -2,14 +2,19 @@ package com.fasterxml.jackson.jr.failing;
 
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.TestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 // for [jackson-jr#21]
 public class ReadEnumMap21Test extends TestBase
 {
     enum DEF { D, E, F; }
 
+    @Test
     static class WithEnumMap {
         private Map<DEF, String> values;
 
@@ -24,6 +29,7 @@ public class ReadEnumMap21Test extends TestBase
     }
  
     // [issue#21]
+    @Test
     public void testMapWithEnumKey() throws Exception
     {
         WithEnumMap input = new WithEnumMap(DEF.E, "bar");
