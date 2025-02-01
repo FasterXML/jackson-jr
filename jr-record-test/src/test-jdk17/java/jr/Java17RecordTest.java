@@ -2,14 +2,17 @@ package jr;
 
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.jr.ob.JSON;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * This test is in test module since the JDK version to be tested is higher than other, and hence supports Records.
  */
-public class Java17RecordTest extends TestCase
+public class Java17RecordTest
 {
     private final JSON jsonHandler = JSON.std;
 
@@ -34,6 +37,7 @@ public class Java17RecordTest extends TestCase
     record NoFieldsRecord() { }
     
     // [jackson-jr#94]: Record serialization
+    @Test
     public void testJava14RecordSerialization() throws Exception {
         var expectedString = """
                 {"message":"MOO","object":{"Foo":"Bar"}}""";
@@ -46,6 +50,7 @@ public class Java17RecordTest extends TestCase
         assertEquals(expectedObject, object);
     }
 
+    @Test
     public void testDifferentOrder() throws Exception {
         var json = """
                 {"object":{"Foo":"Bar"}, "message":"MOO"}""";
@@ -55,6 +60,7 @@ public class Java17RecordTest extends TestCase
         assertEquals(expectedObject, object);
     }
 
+    @Test
     public void testNullAndRecord() throws Exception {
         var json = """
                 {"object": null, "message":"MOO"}""";
@@ -67,6 +73,7 @@ public class Java17RecordTest extends TestCase
         assertNull(jsonHandler.beanFrom(Cow.class, "null"));
     }
 
+    @Test
     public void testPartialParsing() throws Exception {
         var json = """
                 { "message":"MOO"}""";
@@ -76,6 +83,7 @@ public class Java17RecordTest extends TestCase
         assertEquals(expectedObject, object);
     }
 
+    @Test
     public void testWhenInsideObject() throws Exception {
         var cowJson = """
                 {"object": null, "message":"MOO"}""";
@@ -110,6 +118,7 @@ public class Java17RecordTest extends TestCase
         assertEquals(wrapper, object);
     }
 
+    @Test
     public void testNested() throws Exception {
         var json = """
                 {
@@ -123,6 +132,7 @@ public class Java17RecordTest extends TestCase
         assertEquals(expected, object);
     }
 
+    @Test
     public void testNestedObjects() throws Exception {
         var json = """
                 {
@@ -143,6 +153,7 @@ public class Java17RecordTest extends TestCase
         assertEquals(expected, object);
     }
 
+    @Test
     public void testNoFieldRecords() throws Exception {
         String json = jsonHandler.asString(new NoFieldsRecord());
         assertEquals("{}", json);
@@ -150,6 +161,7 @@ public class Java17RecordTest extends TestCase
                 jsonHandler.beanFrom(NoFieldsRecord.class, json));
     }
 
+    @Test
     public void testSingleFieldRecords() throws Exception {
         SingleIntRecord inputInt = new SingleIntRecord(42);
         String json = jsonHandler.asString(inputInt);
@@ -168,6 +180,7 @@ public class Java17RecordTest extends TestCase
     }
 
     // [jackson-jr#171]: Whether to serialize Records in declaration or alphabetical order
+    @Test
     public void testRecordFieldWriteOrder() throws Exception
     {
         RecordNonAlphabetic171 input = new RecordNonAlphabetic171(1, 2, 3);
