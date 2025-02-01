@@ -3,6 +3,9 @@ package com.fasterxml.jackson.jr.annotationsupport;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import com.fasterxml.jackson.jr.ob.JSON;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BasicReorderTest extends ASTestBase
 {
@@ -39,6 +42,7 @@ public class BasicReorderTest extends ASTestBase
 
     private final JSON JSON_WITH_ANNO = jsonWithAnnotationSupport();
 
+    @Test
     public void testSimpleReorder() throws Exception
     {
         final OrderedNameBean input = new OrderedNameBean("Bob", "Burger");
@@ -54,6 +58,7 @@ public class BasicReorderTest extends ASTestBase
         assertEquals(EXP_DEFAULT, JSON.std.asString(input));
     }
 
+    @Test
     public void testPartialReorder() throws Exception
     {
         final FullNameBean input = new FullNameBean("Bob", "DeLorean", "Burger");

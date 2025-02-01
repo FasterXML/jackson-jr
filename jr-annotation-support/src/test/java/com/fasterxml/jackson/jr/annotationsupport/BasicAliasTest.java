@@ -1,7 +1,12 @@
 package com.fasterxml.jackson.jr.annotationsupport;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.jr.ob.JSON;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class BasicAliasTest extends ASTestBase
 {
@@ -39,6 +44,7 @@ public class BasicAliasTest extends ASTestBase
     private final JSON JSON_WITH_ANNO = jsonWithAnnotationSupport()
             .with(JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY);
 
+    @Test
     public void testSimpleAliases() throws Exception
     {
         final String input = a2q("{ 'fn':'Billy', 'middleName':'Bob', 'lastName':'Burger' }");
