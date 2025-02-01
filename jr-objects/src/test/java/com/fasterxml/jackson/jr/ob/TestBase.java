@@ -9,6 +9,8 @@ import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 public abstract class TestBase
 {
     protected enum ABC { A, B, C; }

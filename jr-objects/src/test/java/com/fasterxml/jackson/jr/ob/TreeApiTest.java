@@ -163,11 +163,11 @@ public class TreeApiTest extends TestBase
     }
 
     @SuppressWarnings("deprecation")
-    @Test
     private final JSON J = JSON.builder()
             .treeCodec(new TestTreeCodec())
             .build();
 
+    @Test
     public void testSimpleNodeCreation() {
         assertEquals(TestArrayNode.class, J.createArrayNode().getClass());
         assertEquals(TestObjectNode.class, J.createObjectNode().getClass());

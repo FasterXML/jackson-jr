@@ -14,7 +14,6 @@ public class ReadEnumMap21Test extends TestBase
 {
     enum DEF { D, E, F; }
 
-    @Test
     static class WithEnumMap {
         private Map<DEF, String> values;
 

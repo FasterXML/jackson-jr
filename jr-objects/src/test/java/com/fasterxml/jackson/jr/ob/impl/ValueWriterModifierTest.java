@@ -2,12 +2,16 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.io.IOException;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.TestBase;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ValueWriter;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ValueWriterModifierTest extends TestBase
 {
@@ -88,7 +92,8 @@ public class ValueWriterModifierTest extends TestBase
     /* Tests for wholesale replacement of `ValueReader`
     /**********************************************************************
      */
-    
+
+    @Test
     public void testStringWriterReplacement() throws Exception
     {
         final ReaderWriterModifier mod = new RWModifier(String.class,
@@ -120,6 +125,7 @@ public class ValueWriterModifierTest extends TestBase
                 JSON.std.asString(new Name("Bob", "Hope")));
     }
 
+    @Test
     public void testPOJOWriterReplacement() throws Exception
     {
         final ReaderWriterModifier mod = new RWModifier(NameBean.class,
@@ -144,6 +150,7 @@ public class ValueWriterModifierTest extends TestBase
                 JSON.std.asString(input));
     }
 
+    @Test
     public void testPOJOWriterDelegatingReplacement() throws Exception
     {
         final NameBean input = new NameBean("Foo", "Bar");

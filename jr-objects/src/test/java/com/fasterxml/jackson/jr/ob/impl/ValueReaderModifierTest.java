@@ -3,12 +3,16 @@ package com.fasterxml.jackson.jr.ob.impl;
 import java.io.IOException;
 import java.util.Map;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.JsonParser;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.TestBase;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ValueReaderModifierTest extends TestBase
 {
@@ -66,7 +70,8 @@ public class ValueReaderModifierTest extends TestBase
     /* Tests for wholesale replacement of `ValueReader`
     /**********************************************************************
      */
-    
+
+    @Test
     public void testStringReaderReplacement() throws Exception
     {
         final String input = q("foobar");
@@ -87,6 +92,7 @@ public class ValueReaderModifierTest extends TestBase
         assertEquals("foobar", JSON.std.beanFrom(String.class, input));
     }
 
+    @Test
     public void testPOJOReaderReplacement() throws Exception
     {
         final ReaderWriterModifier mod = new RWModifier(NameBean.class,
@@ -109,6 +115,7 @@ public class ValueReaderModifierTest extends TestBase
         assertEquals("bar", result.getLast());
     }
 
+    @Test
     public void testPOJOReaderDelegation() throws Exception
     {
         final String input = a2q("{'first':'Foo', 'last':'Bar'}");
