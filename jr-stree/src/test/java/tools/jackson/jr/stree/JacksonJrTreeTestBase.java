@@ -7,9 +7,9 @@ import tools.jackson.core.json.JsonFactory;
 
 import tools.jackson.jr.ob.JSON;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.fail;
 
-public abstract class JacksonJrTreeTestBase extends TestCase
+public abstract class JacksonJrTreeTestBase
 {
     protected final TokenStreamFactory _factory = new JsonFactory();
 

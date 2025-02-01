@@ -1,12 +1,17 @@
 package tools.jackson.jr.stree;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.core.TreeNode;
 import tools.jackson.jr.ob.JSON;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JrsValueEqualsTest extends JacksonJrTreeTestBase
 {
     private final JSON treeJSON = jsonWithTreeCodec();
 
+    @Test
     public void testObjectEquality() throws Exception
     {
         final String INPUT = "{\"a\":1,\"b\":true,\"c\":3}";
@@ -23,6 +28,7 @@ public class JrsValueEqualsTest extends JacksonJrTreeTestBase
         assertFalse(tree.equals(tree2));
     }
 
+    @Test
     public void testArrayEquality() throws Exception
     {
         final String INPUT = "[true,\"abc\"]";
@@ -39,6 +45,7 @@ public class JrsValueEqualsTest extends JacksonJrTreeTestBase
         assertFalse(tree.equals(tree2));
     }
 
+    @Test
     public void testScalarEquality() throws Exception
     {
         TreeNode tree = treeJSON.treeFrom("12");

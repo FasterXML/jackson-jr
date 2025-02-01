@@ -2,8 +2,13 @@ package tools.jackson.jr.ob;
 
 import java.io.*;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class RoundtripTest extends TestBase
 {
+    @Test
     public void testSimple() throws Exception
     {
         MediaItem input = buildItem();

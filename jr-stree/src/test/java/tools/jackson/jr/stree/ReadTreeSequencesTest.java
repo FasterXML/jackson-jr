@@ -2,16 +2,21 @@ package tools.jackson.jr.stree;
 
 import java.io.StringReader;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.JsonParser.NumberType;
 
 import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.ValueIterator;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class ReadTreeSequencesTest extends JacksonJrTreeTestBase
 {
     private final JSON treeJSON = jsonWithTreeCodec();
 
+    @Test
     public void testBeanSequence() throws Exception
     {
         final String INPUT = a2q("{'id':1, 'msg':'foo'} [1, 2, 3] null   ");

@@ -2,12 +2,15 @@ package tools.jackson.jr.ob;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
+
+import org.junit.jupiter.api.Test;
 
 import tools.jackson.core.*;
 import tools.jackson.core.JsonParser.NumberType;
 import tools.jackson.core.tree.ArrayTreeNode;
 import tools.jackson.core.tree.ObjectTreeNode;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TreeApiTest extends TestBase
 {
@@ -194,6 +197,7 @@ public class TreeApiTest extends TestBase
             .treeCodec(new TestTreeCodec())
             .build();
 
+    @Test
     public void testSimpleNodeCreation() {
         assertEquals(TestArrayNode.class, J.createArrayNode().getClass());
         assertEquals(TestObjectNode.class, J.createObjectNode().getClass());

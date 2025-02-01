@@ -3,14 +3,16 @@ package tools.jackson.jr.stree;
 import java.io.StringWriter;
 import java.util.*;
 
-import tools.jackson.core.JsonGenerator;
-import tools.jackson.core.ObjectWriteContext;
-import tools.jackson.core.TreeCodec;
-import tools.jackson.core.TreeNode;
+import org.junit.jupiter.api.Test;
+
+import tools.jackson.core.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WriteViaCodecTest extends JacksonJrTreeTestBase
 {
-    public void testSimpleList()
+    @Test
+    public void testSimpleList() throws Exception
     {
         List<JrsValue> stuff = new LinkedList<JrsValue>();
         stuff.add(new JrsString("x"));
@@ -19,7 +21,8 @@ public class WriteViaCodecTest extends JacksonJrTreeTestBase
         assertEquals("[\"x\",true,123]", writeTree(new JacksonJrsTreeCodec(), new JrsArray(stuff)));
     }
 
-    public void testSimpleMap()
+    @Test
+    public void testSimpleMap() throws Exception
     {
         Map<String,JrsValue> stuff = new LinkedHashMap<String,JrsValue>();
         stuff.put("a", new JrsNumber(15));
@@ -30,7 +33,8 @@ public class WriteViaCodecTest extends JacksonJrTreeTestBase
                 writeTree(new JacksonJrsTreeCodec(), new JrsObject(stuff)));
     }
 
-    public void testNest()
+    @Test
+    public void testNest() throws Exception
     {
         Map<String,JrsValue> stuff = new LinkedHashMap<String,JrsValue>();
         List<JrsValue> list = new ArrayList<JrsValue>();
@@ -54,5 +58,4 @@ public class WriteViaCodecTest extends JacksonJrTreeTestBase
          g.close();
          return writer.toString();
      }
-
 }

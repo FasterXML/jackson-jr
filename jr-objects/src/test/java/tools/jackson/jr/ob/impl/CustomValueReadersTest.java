@@ -2,12 +2,16 @@ package tools.jackson.jr.ob.impl;
 
 import java.util.Map;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.core.JsonParser;
 import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.JSONObjectException;
 import tools.jackson.jr.ob.TestBase;
 import tools.jackson.jr.ob.api.ReaderWriterProvider;
 import tools.jackson.jr.ob.api.ValueReader;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CustomValueReadersTest extends TestBase
 {
@@ -179,6 +183,7 @@ public class CustomValueReadersTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testCustomBeanReader() throws Exception
     {
         // First: without handler, will fail to map
@@ -206,6 +211,7 @@ public class CustomValueReadersTest extends TestBase
         assertEquals(224, v.value);
     }
 
+    @Test
     public void testChainedCustomBeanReaders() throws Exception
     {
         JSON json = jsonWithProviders(new CustomReaders(0),
@@ -219,6 +225,7 @@ public class CustomValueReadersTest extends TestBase
         assertEquals(173, v.value);
     }
 
+    @Test
     public void testCustomEnumReader() throws Exception
     {
         // First: without handler, will fail to map
@@ -245,6 +252,7 @@ public class CustomValueReadersTest extends TestBase
     }
 
     // Even more fun, override default String deserializer!
+    @Test
     public void testCustomStringReader() throws Exception
     {
         String allCaps = jsonWithProvider(new CapStringReaderProvider())
@@ -252,6 +260,7 @@ public class CustomValueReadersTest extends TestBase
         assertEquals("SOME TEXT", allCaps);
     }
 
+    @Test
     public void testChainedStringReaders() throws Exception {
         String result = jsonWithProviders(new CapStringReaderProvider(),
                 new OverrideStringReaderProvider("foo"))
@@ -275,8 +284,9 @@ public class CustomValueReadersTest extends TestBase
                 .beanFrom(String.class, q("Some text"));
         assertEquals("foo", result);
     }
-    
+
     // But also can use methods from "JSONReader" for convenience
+    @Test
     public void testCustomDelegatingReader() throws Exception
     {
         // First: without handler, will fail to map

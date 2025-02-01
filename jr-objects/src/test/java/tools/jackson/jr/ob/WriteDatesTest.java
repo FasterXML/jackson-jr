@@ -2,11 +2,16 @@ package tools.jackson.jr.ob;
 
 import java.util.Date;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.jr.ob.JSON.Feature;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WriteDatesTest extends TestBase
 {
     // For [jackson-jr#29]
+    @Test
     public void testSimpleDates() throws Exception
     {
         final Date input = new Date(0L);
@@ -30,5 +35,4 @@ public class WriteDatesTest extends TestBase
         json = j.asString(input);
         assertEquals("0", json);
     }
-
 }

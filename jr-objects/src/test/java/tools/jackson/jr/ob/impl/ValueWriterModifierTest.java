@@ -1,11 +1,15 @@
 package tools.jackson.jr.ob.impl;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.core.JsonGenerator;
 
 import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.TestBase;
 import tools.jackson.jr.ob.api.ReaderWriterModifier;
 import tools.jackson.jr.ob.api.ValueWriter;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ValueWriterModifierTest extends TestBase
 {
@@ -86,7 +90,8 @@ public class ValueWriterModifierTest extends TestBase
     /* Tests for wholesale replacement of `ValueReader`
     /**********************************************************************
      */
-    
+
+    @Test
     public void testStringWriterReplacement() throws Exception
     {
         final ReaderWriterModifier mod = new RWModifier(String.class,
@@ -118,6 +123,7 @@ public class ValueWriterModifierTest extends TestBase
                 JSON.std.asString(new Name("Bob", "Hope")));
     }
 
+    @Test
     public void testPOJOWriterReplacement() throws Exception
     {
         final ReaderWriterModifier mod = new RWModifier(NameBean.class,
@@ -142,6 +148,7 @@ public class ValueWriterModifierTest extends TestBase
                 JSON.std.asString(input));
     }
 
+    @Test
     public void testPOJOWriterDelegatingReplacement() throws Exception
     {
         final NameBean input = new NameBean("Foo", "Bar");

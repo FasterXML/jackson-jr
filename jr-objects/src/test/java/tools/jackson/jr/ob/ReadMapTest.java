@@ -2,9 +2,13 @@ package tools.jackson.jr.ob;
 
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.core.JsonParser;
 
 import tools.jackson.jr.ob.api.MapBuilder;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 // for [jackson-jr#49], where `DeferredMap` explodes
 public class ReadMapTest extends TestBase
@@ -53,6 +57,7 @@ public class ReadMapTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testMapOfLists() throws Exception
     {
         final String INPUT = a2q("{'stuff':{'a':[1, 2, 3], 'b' : [7, 2]}}");
@@ -75,6 +80,7 @@ public class ReadMapTest extends TestBase
                 map.get("b"));
     }
 
+    @Test
     public void testInvalidMapOfLists() throws Exception
     {
         try {
@@ -88,6 +94,7 @@ public class ReadMapTest extends TestBase
         }
     }
 
+    @Test
     public void testCustomMapBuilder() throws Exception
     {
         final JSON json = JSON.builder()
@@ -101,6 +108,7 @@ public class ReadMapTest extends TestBase
         assertEquals(Arrays.asList("a", "b"), new ArrayList<String>(map.keySet()));
     }
 
+    @Test
     public void testIssue49() throws Exception
     {
         for (int i : new int[] { 7, 99, 513, 1099, 3003, 5005, 10001, 90003, 111111 }) {

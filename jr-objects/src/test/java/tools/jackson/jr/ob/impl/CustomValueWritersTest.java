@@ -2,10 +2,14 @@ package tools.jackson.jr.ob.impl;
 
 import java.util.Collections;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.core.JsonGenerator;
 
 import tools.jackson.jr.ob.*;
 import tools.jackson.jr.ob.api.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CustomValueWritersTest extends TestBase
 {
@@ -78,6 +82,7 @@ public class CustomValueWritersTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testCustomBeanWriter() throws Exception
     {
         // without handler, empty "bean":
@@ -98,6 +103,7 @@ public class CustomValueWritersTest extends TestBase
                 withCustom42.asString(new CustomBeanWrapper()));
     }
 
+    @Test
     public void testChainedBeanWriters() throws Exception
     {
         assertEquals(q("abc"),

@@ -1,6 +1,10 @@
 package tools.jackson.jr.stree;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.core.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SimpleTraverseTest extends JacksonJrTreeTestBase
 {
@@ -8,6 +12,7 @@ public class SimpleTraverseTest extends JacksonJrTreeTestBase
 
   private final static ObjectReadContext EMPTY_READ_CONTEXT = new ObjectReadContext.Base();
     
+    @Test
     public void testSimpleObject() throws Exception
     {
         final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":-2,\"d\":null}";

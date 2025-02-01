@@ -1,13 +1,18 @@
 package tools.jackson.jr.ob.record;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.TestBase;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RecordDeser167Test extends TestBase
 {
     record FoundDependency(String id, String g, String a, String v, String timestamp) {}
 
     // [jackson-jr#167]
+    @Test
     public void testRecordDeserOrder167() throws Exception
     {
         final String input = """

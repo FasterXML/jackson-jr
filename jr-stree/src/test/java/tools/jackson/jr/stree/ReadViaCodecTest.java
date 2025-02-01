@@ -2,7 +2,11 @@ package tools.jackson.jr.stree;
 
 import java.io.StringWriter;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.core.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for reading content directly using codec, and not
@@ -15,6 +19,7 @@ public class ReadViaCodecTest extends JacksonJrTreeTestBase
     private final ObjectReadContext READ_CONTEXT = ObjectReadContext.empty();
     private final ObjectWriteContext WRITE_CONTEXT = ObjectWriteContext.empty();
     
+    @Test
     public void testSimpleList() throws Exception
     {
         final String INPUT = "[true,\"abc\"]";
@@ -30,6 +35,7 @@ public class ReadViaCodecTest extends JacksonJrTreeTestBase
         assertEquals(INPUT, writer.toString());
     }
     
+    @Test
     public void testSimpleMap() throws Exception
     {
         final String INPUT = "{\"a\":1,\"b\":true,\"c\":3}";
@@ -44,6 +50,7 @@ public class ReadViaCodecTest extends JacksonJrTreeTestBase
         assertEquals(INPUT, writer.toString());
     }
 
+    @Test
     public void testSimpleMixed() throws Exception
     {
         final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";
@@ -61,6 +68,7 @@ public class ReadViaCodecTest extends JacksonJrTreeTestBase
         assertEquals(INPUT, writer.toString());
     }
 
+    @Test
     public void testSimpleJsonPointer() throws Exception
     {
         final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";

@@ -1,8 +1,12 @@
 package tools.jackson.jr.annotationsupport;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import tools.jackson.jr.ob.JSON;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BasicVisibilityTest extends ASTestBase
 {
@@ -121,6 +125,7 @@ public class BasicVisibilityTest extends ASTestBase
     /**********************************************************************
      */
 
+    @Test
     public void testSimpleSerializeFieldVisibility() throws Exception
     {
         final FieldXYZ input = new FieldXYZ(1, 2, 3);
@@ -144,6 +149,7 @@ public class BasicVisibilityTest extends ASTestBase
     }
 
     // Test to ensure we will not attempt deserializing transient fields
+    @Test
     public void testSimpleSerializeWrtTransient() throws Exception
     {
         final FieldXYTransient input = new FieldXYTransient(1, 2);
@@ -158,6 +164,7 @@ public class BasicVisibilityTest extends ASTestBase
                 .asString(input));
     }
 
+    @Test
     public void testSimpleDeserializeFieldVisibility() throws Exception
     {
         final String input = a2q("{'x':1,'y':2,'z':3}");
@@ -182,6 +189,7 @@ public class BasicVisibilityTest extends ASTestBase
     }
 
     // Test to ensure we will not attempt deserializing transient fields
+    @Test
     public void testSimpleDeserializeWrtTransient() throws Exception
     {
         final String input = a2q("{'x':1,'y':2}");
@@ -204,6 +212,7 @@ public class BasicVisibilityTest extends ASTestBase
     /**********************************************************************
      */
 
+    @Test
     public void testSimpleGetterVisibility() throws Exception
     {
         final MethodXYEnabled input = new MethodXYEnabled(1, 2, true);
@@ -216,6 +225,7 @@ public class BasicVisibilityTest extends ASTestBase
                 .asString(input));
     }
 
+    @Test
     public void testSimpleGetterWithAnnotationVisibility() throws Exception
     {
         final MethodXYEnabledWithAnnotations input = new MethodXYEnabledWithAnnotations(1, 2, true);
@@ -229,6 +239,7 @@ public class BasicVisibilityTest extends ASTestBase
     /**********************************************************************
      */
 
+    @Test
     public void testSimpleSetterVisibility() throws Exception
     {
         final String input = a2q("{'enabled':true,'x':1,'y':2}");
@@ -248,6 +259,7 @@ public class BasicVisibilityTest extends ASTestBase
         assertEquals(false, result._enabled);
     }
 
+    @Test
     public void testSimpleSetterWithAnnotationVisibility() throws Exception
     {
         final String input = a2q("{'enabled':true,'x':1,'y':2}");

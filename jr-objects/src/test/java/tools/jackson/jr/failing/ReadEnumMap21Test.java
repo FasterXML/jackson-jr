@@ -2,8 +2,12 @@ package tools.jackson.jr.failing;
 
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.TestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 // for [jackson-jr#21]
 public class ReadEnumMap21Test extends TestBase
@@ -24,6 +28,7 @@ public class ReadEnumMap21Test extends TestBase
     }
  
     // [issue#21]
+    @Test
     public void testMapWithEnumKey() throws Exception
     {
         WithEnumMap input = new WithEnumMap(DEF.E, "bar");

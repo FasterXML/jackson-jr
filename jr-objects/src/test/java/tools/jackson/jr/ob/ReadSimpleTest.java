@@ -9,10 +9,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.TreeNode;
 
 import tools.jackson.jr.ob.JSON.Feature;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ReadSimpleTest extends TestBase
 {
@@ -38,31 +42,37 @@ public class ReadSimpleTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testByteArray() throws Exception {
         byte[] result = JSON.std.beanFrom(byte[].class, q("YWJj"));
         assertEquals("abc", new String(result, "UTF-8"));
     }
 
+    @Test
     public void testCharArray() throws Exception {
         char[] result = JSON.std.beanFrom(char[].class, q("abc"));
         assertEquals("abc", new String(result));
     }
 
+    @Test
     public void testSimpleArray() throws Exception
     {
         _testArray("[true,\"abc\",3]", 3);
     }
 
+    @Test
     public void testEmptyArray() throws Exception
     {
         _testArray("[]", 0);
     }
 
     // separate tests since code path differs
+    @Test
     public void testSingleElementArray() throws Exception {
         _testArray("[12]", 1);
     }
 
+    @Test
     public void testSmallArray() throws Exception {
         _testArray("[true,42,\"maybe\"]", 3);
     }
@@ -111,7 +121,8 @@ public class ReadSimpleTest extends TestBase
     /* Tests for Maps
     /**********************************************************************
      */
-    
+
+    @Test
     public void testSimpleMap() throws Exception
     {
         final String INPUT = "{\"a\":1,\"b\":true,\"c\":3}";
@@ -132,16 +143,19 @@ public class ReadSimpleTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testBoolean() throws Exception {
         assertEquals(Boolean.TRUE, JSON.std.beanFrom(Boolean.class, "true"));
         BooleanWrapper w = JSON.std.beanFrom(BooleanWrapper.class, "{\"value\":true}");
         assertTrue(w.value);
     }
 
+    @Test
     public void testCharacter() throws Exception {
         assertEquals(Character.valueOf('a'), JSON.std.beanFrom(Character.class, "\"a\""));
     }
 
+    @Test
     public void testNumbers() throws Exception {
         assertEquals(Byte.valueOf((byte) 13), JSON.std.beanFrom(Byte.class, "13"));
         assertEquals(Short.valueOf((short) 13), JSON.std.beanFrom(Short.class, "13"));
@@ -156,7 +170,8 @@ public class ReadSimpleTest extends TestBase
 
     // 07-Jul-2020, tatu: Should probably make fail, but doesn't yet:
     /*
-    public void testNumberFail() throws Exception {
+    @Test
+    public void testIntegerFail() throws Exception {
         try {
             Integer I = JSON.std.beanFrom(Integer.class, "true");
             fail("Should not pass, got: "+I);
@@ -166,6 +181,7 @@ public class ReadSimpleTest extends TestBase
     }
     */
 
+    @Test
     public void testBooleanFail() throws Exception {
         try {
             Boolean B = JSON.std.beanFrom(Boolean.class, "13");
@@ -175,11 +191,13 @@ public class ReadSimpleTest extends TestBase
         }
     }
 
+    @Test
     public void testMiscScalars() throws Exception {
         assertEquals(new Date(123456L), JSON.std.beanFrom(Date.class,"123456"));
         assertEquals(Object.class, JSON.std.beanFrom(Class.class, q(Object.class.getName())));
     }
 
+    @Test
     public void testMiscUriTypes() throws Exception
     {
         final String URL_STR = "http://fasterxml.com";
@@ -191,7 +209,8 @@ public class ReadSimpleTest extends TestBase
         assertEquals(p,
                 JSON.std.beanFrom(Path.class, json));
     }
-    
+
+    @Test
     public void testMiscScalarFail() throws Exception {
         for (String input : new String[] { " false ",  "true", "[ ]", "{ }" } ) {
             try {
@@ -209,6 +228,7 @@ public class ReadSimpleTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testNullForMiscNumbers() throws Exception {
         assertNull(JSON.std.beanFrom(Integer.class," null "));
         assertNull(JSON.std.beanFrom(Long.class," null "));
@@ -218,6 +238,7 @@ public class ReadSimpleTest extends TestBase
         assertNull(JSON.std.beanFrom(BigDecimal.class," null "));
     }
 
+    @Test
     public void testNullForMiscScalars() throws Exception {
         assertNull(JSON.std.beanFrom(Date.class," null "));
         assertNull(JSON.std.beanFrom(Calendar.class," null "));
@@ -230,12 +251,14 @@ public class ReadSimpleTest extends TestBase
     }
 
     // Testing that `null` will not cause an exception, for now at least
+    @Test
     public void testNullForPrimitiveProperties() throws Exception {
         BooleanWrapper w = JSON.std.beanFrom(BooleanWrapper.class, a2q("{'value':null}"));
         assertNotNull(w);
         assertFalse(w.value);
     }
 
+    @Test
     public void testNullForScalarProperties() throws Exception {
         DateWrapper w = JSON.std.beanFrom(DateWrapper.class, a2q("{'value':null}"));
         assertNotNull(w);
@@ -248,6 +271,7 @@ public class ReadSimpleTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testSimpleMixed() throws Exception
     {
         final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";
@@ -268,6 +292,7 @@ public class ReadSimpleTest extends TestBase
         assertEquals(json, JSON.std.asString(ob));
     }
 
+    @Test
     public void testSimpleEnums() throws Exception
     {
         // First using index
@@ -297,6 +322,7 @@ public class ReadSimpleTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testTreeReadWithoutCodec() throws Exception
     {
         try {
@@ -327,7 +353,8 @@ public class ReadSimpleTest extends TestBase
             verifyException(e, "No `TreeCodec` specified");
         }
     }
-        
+
+    @Test
     public void testTreeNodeCreationWithoutCodec() throws Exception {
         try {
             JSON.std.createArrayNode();
@@ -344,6 +371,7 @@ public class ReadSimpleTest extends TestBase
         }
     }
 
+    @Test
     public void testInvalidSource() throws Exception {
         try {
             JSON.std.beanFrom(Object.class, Long.valueOf(67));
@@ -353,6 +381,7 @@ public class ReadSimpleTest extends TestBase
         }
     }
 
+    @Test
     public void testEmptySource() throws Exception {
         try {
             JSON.std.beanFrom(Object.class, "   ");

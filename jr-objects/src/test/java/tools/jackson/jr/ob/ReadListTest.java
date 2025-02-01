@@ -2,9 +2,13 @@ package tools.jackson.jr.ob;
 
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.core.JsonParser;
 
 import tools.jackson.jr.ob.api.CollectionBuilder;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ReadListTest extends TestBase
 {
@@ -51,7 +55,8 @@ public class ReadListTest extends TestBase
     /* Tests for simple Lists
     /**********************************************************************
      */
-    
+
+    @Test
     public void testSimpleList() throws Exception
     {
         final String INPUT = "[1,2,3]";
@@ -80,6 +85,7 @@ public class ReadListTest extends TestBase
     /**********************************************************************
      */
     
+    @Test
     public void testListOfMaps() throws Exception
     {
         ListHolder h = JSON.std
@@ -93,6 +99,7 @@ public class ReadListTest extends TestBase
         assertEquals(Integer.valueOf(6), list.get(1).get("a"));
     }
 
+    @Test
     public void testInvalidListOfMaps() throws Exception
     {
         try {
@@ -112,6 +119,7 @@ public class ReadListTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testCustomMapBuilder() throws Exception
     {
         final JSON json = JSON.builder()

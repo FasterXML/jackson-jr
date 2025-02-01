@@ -2,7 +2,11 @@ package tools.jackson.jr.ob.impl;
 
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.jr.ob.TestBase;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ValueWriterLocatorTest extends TestBase
 {
@@ -40,6 +44,7 @@ public class ValueWriterLocatorTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testBasicTypeDetectionForSer() {
         // note: must create non-blue-print instance to avoid NPE
         ValueWriterLocator td = ValueWriterLocator.blueprint(null, null)

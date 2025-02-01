@@ -1,12 +1,12 @@
 package tools.jackson.jr.annotationsupport;
 
-import junit.framework.TestCase;
-
 import java.util.Arrays;
 
 import tools.jackson.jr.ob.JSON;
 
-public abstract class ASTestBase extends TestCase
+import static org.junit.jupiter.api.Assertions.fail;
+
+public abstract class ASTestBase
 {
     protected static class NameBean {
         protected String first, last;

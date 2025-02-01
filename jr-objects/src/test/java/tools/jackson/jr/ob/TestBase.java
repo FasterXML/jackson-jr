@@ -9,9 +9,9 @@ import tools.jackson.jr.ob.api.ExtensionContext;
 import tools.jackson.jr.ob.api.ReaderWriterModifier;
 import tools.jackson.jr.ob.api.ReaderWriterProvider;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.fail;
 
-public abstract class TestBase extends TestCase
+public abstract class TestBase
 {
     protected enum ABC { A, B, C; }
 

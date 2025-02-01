@@ -3,8 +3,12 @@ package tools.jackson.jr.ob.record;
 import java.time.Instant;
 import java.time.ZoneId;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.TestBase;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RecordDeser172Test extends TestBase
 {
@@ -15,6 +19,7 @@ public class RecordDeser172Test extends TestBase
         }
     }
 
+    @Test
     public void testRecordDeser172() throws Exception
     {
         final String input = """

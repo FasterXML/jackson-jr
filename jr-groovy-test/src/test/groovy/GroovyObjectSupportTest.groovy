@@ -1,7 +1,8 @@
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Test;
 
 import tools.jackson.jr.ob.JSON
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * A minor note on running/debugging this test on local, if you are using intellij, please
@@ -13,7 +14,7 @@ class GroovyObjectSupportTest {
     void testSimpleGroovyObject() throws Exception {
         def json = JSON.std.asString(new GroovyOb())
         def expected = """{"AAAAA_A_Field_Starting_With_Two_Capital_Letters":"XYZ","aDouble":0.0,"aPublicInitializedInteger":56,"aPublicInitializedIntegerObject":1516,"aPublicUninitializedInteger":0,"anInitializedIntegerObject":1112,"anInitializedPublicString":"stringData","anInitializedString":"ABC","anInteger":0,"anIntegerWithValue":12}"""
-        Assert.assertEquals(json, expected)
+        assertEquals(json, expected)
     }
 }
 

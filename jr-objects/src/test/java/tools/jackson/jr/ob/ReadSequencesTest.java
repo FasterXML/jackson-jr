@@ -3,8 +3,12 @@ package tools.jackson.jr.ob;
 import java.io.*;
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.exc.StreamReadException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ReadSequencesTest extends TestBase
 {
@@ -19,6 +23,7 @@ public class ReadSequencesTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testAnySequence() throws Exception
     {
         final String INPUT = a2q("'hello world!' 127 true [ 1, 2, 3]\nnull { 'msg':'none'}   ");
@@ -51,6 +56,7 @@ public class ReadSequencesTest extends TestBase
         it.close();
     }
 
+    @Test
     public void testAnyViaAll() throws Exception
     {
         final String INPUT = "1\n3\n3";
@@ -102,6 +108,7 @@ public class ReadSequencesTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testBeanSequence() throws Exception
     {
         final String INPUT = a2q("{'id':1, 'msg':'foo'} {'id':2, 'msg':'Same'} null   ");
@@ -144,6 +151,7 @@ public class ReadSequencesTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testResync() throws Exception
     {
         final String INPUT = "1\n[ 300a ]\n3";
@@ -172,6 +180,7 @@ public class ReadSequencesTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testBrokenContent() throws Exception
     {
         final String INPUT = "1  abc";
@@ -188,6 +197,7 @@ public class ReadSequencesTest extends TestBase
         }
     }
 
+    @Test
     public void testReadAfterEnd() throws Exception
     {
         final String INPUT = "1\n3\n3";
@@ -201,6 +211,7 @@ public class ReadSequencesTest extends TestBase
         }
     }
 
+    @Test
     public void testReadAfterClose() throws Exception
     {
         final String INPUT = "1\n3\n3";
@@ -214,7 +225,8 @@ public class ReadSequencesTest extends TestBase
             ; // expected, no message
         }
     }
-    
+
+    @Test
     public void testTryToRemove() throws Exception
     {
         final String INPUT = "1\n3\n3";
