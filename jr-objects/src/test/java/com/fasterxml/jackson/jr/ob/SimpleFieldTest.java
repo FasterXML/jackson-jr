@@ -1,8 +1,12 @@
 package com.fasterxml.jackson.jr.ob;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 public class SimpleFieldTest extends TestBase
 {
-    static class XY {
+    public static class XY {
         public int x;
         private int y;
 
@@ -16,11 +20,13 @@ public class SimpleFieldTest extends TestBase
         public void setY(int value) { y = value; }
     }
 
+    @Test
     public void testDefaultSettings() {
         // Changed in 2.10
         assertTrue(JSON.std.isEnabled(JSON.Feature.USE_FIELDS));
     }
 
+    @Test
     public void testSerializeWithoutField() throws Exception
     {
         String json = JSON.std.without(JSON.Feature.USE_FIELDS)
@@ -28,6 +34,7 @@ public class SimpleFieldTest extends TestBase
         assertEquals(a2q("{'y':2}"), json);
     }
 
+    @Test
     public void testSerializeWithField() throws Exception
     {
         String json = JSON.std.with(JSON.Feature.USE_FIELDS)
@@ -35,6 +42,7 @@ public class SimpleFieldTest extends TestBase
         assertEquals(a2q("{'x':1,'y':2}"), json);
     }
 
+    @Test
     public void testDeserializeWithField() throws Exception
     {
         XY result = JSON.std.with(JSON.Feature.USE_FIELDS)

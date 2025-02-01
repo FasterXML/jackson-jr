@@ -1,11 +1,16 @@
 package com.fasterxml.jackson.jr.stree;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SimpleTraverseTest extends JacksonJrTreeTestBase
 {
     private final TreeCodec TREE_CODEC = new JacksonJrsTreeCodec();
 
+    @Test
     public void testSimpleObject() throws Exception
     {
         final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":-2,\"d\":null}";

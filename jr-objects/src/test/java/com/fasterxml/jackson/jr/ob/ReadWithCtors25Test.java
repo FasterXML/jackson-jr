@@ -1,5 +1,9 @@
 package com.fasterxml.jackson.jr.ob;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 // for [jackson-jr#25], allowing single-int constructors
 public class ReadWithCtors25Test extends TestBase
 {
@@ -19,6 +23,7 @@ public class ReadWithCtors25Test extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testIntCtor() throws Exception
     {
         FromInt1 output = JSON.std.beanFrom(FromInt1.class, "123");

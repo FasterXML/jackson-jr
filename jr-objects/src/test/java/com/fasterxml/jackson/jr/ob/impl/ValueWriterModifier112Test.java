@@ -5,10 +5,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import com.fasterxml.jackson.jr.ob.*;
 import com.fasterxml.jackson.jr.ob.api.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ValueWriterModifier112Test extends TestBase
 {
@@ -76,6 +80,7 @@ public class ValueWriterModifier112Test extends TestBase
             }).build();
 
     // [jackson-jr#112]
+    @Test
     public void testMultipleFieldOverrides() throws Exception
     {
         TestBean112 input = new TestBean112();
@@ -85,6 +90,7 @@ public class ValueWriterModifier112Test extends TestBase
         assertEquals(a2q("{'p1':'some/path','p2':'some/other/path'}"), json);
     }
 
+    @Test
     public void testMultipleStringFieldOverrides() throws Exception
     {
         StringBean112 input = new StringBean112();

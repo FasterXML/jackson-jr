@@ -3,11 +3,13 @@ package jr;
 import java.time.Instant;
 import java.time.ZoneId;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 
-public class RecordDeser172Test extends TestCase
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class RecordDeser172Test
 {
     record FoundDependency(String id, String g, String a, String v, long timestamp) {
         public String getDateTime() {
@@ -16,6 +18,7 @@ public class RecordDeser172Test extends TestCase
         }
     }
 
+    @Test
     public void testRecordDeser172() throws Exception
     {
         final String input = """

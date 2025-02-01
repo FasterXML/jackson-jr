@@ -1,5 +1,9 @@
 package com.fasterxml.jackson.jr.ob;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 public class ReadFeaturesTest extends TestBase
 {
     static class IsBean {
@@ -14,6 +18,7 @@ public class ReadFeaturesTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testPojoWithIsGetter() throws Exception
     {
         assertTrue(JSON.std.isEnabled(JSON.Feature.USE_IS_GETTERS));
@@ -44,6 +49,7 @@ public class ReadFeaturesTest extends TestBase
         assertEquals(a2q("{'enabled':true,'value':42}"), json);
     }
 
+    @Test
     public void testFailOnDupMapKeys() throws Exception
     {
         JSON j = JSON.builder()

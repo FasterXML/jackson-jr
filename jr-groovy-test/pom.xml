@@ -10,7 +10,6 @@
     <description>Test Module with Groovy support to test Jackson-Jr</description>
     <url>https://github.com/FasterXML/jackson-jr</url>
     <properties>
-        <!--    To Test Latest Java Features Lets use this settings    -->
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -42,7 +41,7 @@
                     <dependency>
                         <groupId>org.apache.groovy</groupId>
                         <artifactId>groovy</artifactId>
-                        <version>4.0.23</version>
+                        <version>4.0.25</version>
                     </dependency>
                 </dependencies>
                 <configuration>

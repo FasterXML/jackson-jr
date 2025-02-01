@@ -3,9 +3,13 @@ package com.fasterxml.jackson.jr.ob.impl;
 import java.io.IOException;
 import java.util.Collections;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.jr.ob.*;
 import com.fasterxml.jackson.jr.ob.api.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CustomValueWritersTest extends TestBase
 {
@@ -78,6 +82,7 @@ public class CustomValueWritersTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testCustomBeanWriter() throws Exception
     {
         // without handler, empty "bean":
@@ -98,6 +103,7 @@ public class CustomValueWritersTest extends TestBase
                 withCustom42.asString(new CustomBeanWrapper()));
     }
 
+    @Test
     public void testChainedBeanWriters() throws Exception
     {
         assertEquals(q("abc"),

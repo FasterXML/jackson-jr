@@ -2,9 +2,13 @@ package com.fasterxml.jackson.jr.stree;
 
 import java.io.StringWriter;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.*;
 
 import com.fasterxml.jackson.jr.ob.JSON;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for reading content using {@link JSON} with proper
@@ -15,6 +19,7 @@ public class ReadViaJSONTest extends JacksonJrTreeTestBase
     private final TreeCodec TREE_CODEC = new JacksonJrsTreeCodec();
     private final JSON treeJSON = jsonWithTreeCodec();
 
+    @Test
     public void testSimpleList() throws Exception
     {
         final String INPUT = "[true,\"abc\"]";
@@ -31,6 +36,7 @@ public class ReadViaJSONTest extends JacksonJrTreeTestBase
         assertEquals(INPUT, writer.toString());
     }
 
+    @Test
     public void testSimpleMap() throws Exception
     {
         final String INPUT = "{\"a\":1,\"b\":true,\"c\":3}";
@@ -45,6 +51,7 @@ public class ReadViaJSONTest extends JacksonJrTreeTestBase
         assertEquals(INPUT, writer.toString());
     }
 
+    @Test
     public void testSimpleMixed() throws Exception
     {
         final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";

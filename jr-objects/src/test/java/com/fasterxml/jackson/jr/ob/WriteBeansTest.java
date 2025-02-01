@@ -2,7 +2,11 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.jr.ob.JSON.Feature;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class WriteBeansTest extends TestBase
 {
@@ -73,7 +77,8 @@ public class WriteBeansTest extends TestBase
     /* Test methods
     /**********************************************************************
      */
-    
+
+    @Test
     public void testBinary() throws Exception
     {
         String json = JSON.std.asString(new BinaryBean());
@@ -86,6 +91,7 @@ public class WriteBeansTest extends TestBase
         assertEquals("AQIDBAUGBw==", base64);
     }
     
+    @Test
     public void testSimpleMap() throws Exception
     {
         // first: with default settings, should serialize 2 props
@@ -111,6 +117,7 @@ public class WriteBeansTest extends TestBase
     }
 
     // Make sure we handle stuff from base class too
+    @Test
     public void testMethodsFromSuperclass() throws Exception
     {
         String json = JSON.std.asString(new BaseImpl(1, 2));
@@ -128,6 +135,7 @@ public class WriteBeansTest extends TestBase
         assertEquals(-245, result.getValue());
     }
 
+    @Test
     public void testBeanNulls() throws Exception
     {
         final JSON withNulls = JSON.std.with(JSON.Feature.WRITE_NULL_PROPERTIES);
@@ -147,6 +155,7 @@ public class WriteBeansTest extends TestBase
                 withNulls.asString(new StringBeanBean(new StringBean(null))));
     }
 
+    @Test
     public void testBeanWithRecursiveType() throws Exception
     {
         TreeNodeBean root = new TreeNodeBean(1, "root");

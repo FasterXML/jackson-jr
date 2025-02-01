@@ -1,8 +1,12 @@
 package com.fasterxml.jackson.jr.annotationsupport;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.jr.ob.JSON;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BasicIgnoralTest extends ASTestBase
 {
@@ -54,6 +58,7 @@ public class BasicIgnoralTest extends ASTestBase
     /**********************************************************************
      */
 
+    @Test
     public void testPropertyIgnoralOnSerialize() throws Exception
     {
         final XY input = new XY(1, 2);
@@ -71,6 +76,7 @@ public class BasicIgnoralTest extends ASTestBase
         assertEquals(a2q("{'DEFAULT':123,'y':2}"), JSON_WITH_ANNO_WITH_STATIC.asString(input));
     }
 
+    @Test
     public void testPropertyIgnoralOnDeserialize() throws Exception
     {
         final String json = a2q("{'DEFAULT':125,'x':1,'y':2}");
@@ -102,6 +108,7 @@ public class BasicIgnoralTest extends ASTestBase
         XY.DEFAULT = XY.DEFAULT_FINAL;
     }
 
+    @Test
     public void testPropertyIgnoreWithUnknown() throws Exception
     {
         final JSON jsonNoUnknowns = JSON_WITH_ANNO.with(JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY);
@@ -117,12 +124,14 @@ public class BasicIgnoralTest extends ASTestBase
     /**********************************************************************
      */
 
+    @Test
     public void testClassIgnoralOnSerialize() throws Exception
     {
         final XYZ input = new XYZ(1, 2, 3);
         assertEquals(a2q("{'x':1,'z':3}"), JSON_WITH_ANNO.asString(input));
     }
 
+    @Test
     public void testClassIgnoralOnDeserialize() throws Exception
     {
         // First, regular ignoral (with skipped unknowns)
@@ -132,6 +141,7 @@ public class BasicIgnoralTest extends ASTestBase
         assertEquals(3, result.z);
     }
 
+    @Test
     public void testClassIgnoralOnDeserializeWithUnknown() throws Exception
     {
         final JSON jsonNoUnknowns = JSON_WITH_ANNO.with(JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY);
