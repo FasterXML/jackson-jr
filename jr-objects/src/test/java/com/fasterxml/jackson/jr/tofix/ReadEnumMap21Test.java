@@ -1,7 +1,8 @@
-package com.fasterxml.jackson.jr.failing;
+package com.fasterxml.jackson.jr.tofix;
 
 import java.util.*;
 
+import com.fasterxml.jackson.jr.testutil.failure.JacksonTestFailureExpected;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.jr.ob.JSON;
@@ -28,6 +29,7 @@ public class ReadEnumMap21Test extends TestBase
     }
  
     // [issue#21]
+    @JacksonTestFailureExpected
     @Test
     public void testMapWithEnumKey() throws Exception
     {
