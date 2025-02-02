@@ -1,4 +1,4 @@
-package tools.jackson.jr.failing;
+package tools.jackson.jr.tofix;
 
 import java.util.*;
 
@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.TestBase;
+import tools.jackson.jr.testutil.failure.JacksonTestFailureExpected;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,6 +29,7 @@ public class ReadEnumMap21Test extends TestBase
     }
  
     // [issue#21]
+    @JacksonTestFailureExpected
     @Test
     public void testMapWithEnumKey() throws Exception
     {
