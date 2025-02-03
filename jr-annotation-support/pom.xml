@@ -11,7 +11,7 @@
     <version>3.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-annotation-support</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <description>Additional package that adds support for a subset of Jackson core annotations from
   https://github.com/FasterXML/jackson-annotations
 </description>
@@ -54,10 +54,6 @@
         <artifactId>replacer</artifactId>
       </plugin>
       <plugin>
-        <groupId>org.moditect</groupId>
-        <artifactId>moditect-maven-plugin</artifactId>
-      </plugin>
-       <plugin>
         <groupId>de.jjohannes</groupId>
         <artifactId>gradle-module-metadata-maven-plugin</artifactId>
       </plugin>

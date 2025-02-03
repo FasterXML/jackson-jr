@@ -11,7 +11,7 @@
     <version>3.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-objects</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <description>Simple data-binding that builds directly on jackson-core (streaming),
 has no other dependencies, and provides additional builder-style content generator
 </description>
@@ -31,12 +31,6 @@ has no other dependencies, and provides additional builder-style content generat
     <dependency>
       <groupId>tools.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy</artifactId>
-      <version>4.0.18</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -69,10 +63,6 @@ has no other dependencies, and provides additional builder-style content generat
       <plugin>
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>replacer</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.moditect</groupId>
-        <artifactId>moditect-maven-plugin</artifactId>
       </plugin>
        <plugin>
         <groupId>de.jjohannes</groupId>

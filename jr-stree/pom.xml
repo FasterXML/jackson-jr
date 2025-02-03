@@ -11,7 +11,7 @@
     <version>3.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-stree</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <description>Simple immutable (read-only) tree model that builds directly on jackson-core (streaming),
 has no other dependencies.
 </description>
@@ -49,10 +49,6 @@ has no other dependencies.
         <!-- Inherited from oss-base. Generate PackageVersion.java.-->
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>replacer</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.moditect</groupId>
-        <artifactId>moditect-maven-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>de.jjohannes</groupId>

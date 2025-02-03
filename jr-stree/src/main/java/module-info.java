@@ -1,4 +1,6 @@
-module tools.jackson.jr.stree {
+// Jackson-jr Simple Tree module Main artifact Module descriptor
+module tools.jackson.jr.stree
+{
     requires transitive tools.jackson.core;
     requires tools.jackson.jr.ob;
 

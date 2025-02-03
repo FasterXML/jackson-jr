@@ -1,4 +1,6 @@
-module tools.jackson.jr.ob {
+// Jackson-jr Objects module Main artifact Module descriptor
+module tools.jackson.jr.ob
+{
     requires transitive tools.jackson.core;
 
     exports tools.jackson.jr.ob;
