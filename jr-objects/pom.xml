@@ -32,12 +32,6 @@ has no other dependencies, and provides additional builder-style content generat
       <groupId>tools.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy</artifactId>
-      <version>4.0.18</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
