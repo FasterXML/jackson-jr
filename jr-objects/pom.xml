@@ -11,7 +11,7 @@
     <version>3.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-objects</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <description>Simple data-binding that builds directly on jackson-core (streaming),
 has no other dependencies, and provides additional builder-style content generator
 </description>

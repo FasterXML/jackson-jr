@@ -5,7 +5,6 @@
     <!-- that they should prefer consuming it instead. -->
     <!-- do_not_remove: published-with-gradle-metadata -->
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>tools.jackson.jr</groupId>
         <artifactId>jackson-jr-parent</artifactId>
@@ -13,7 +12,7 @@
     </parent>
 
     <artifactId>jackson-jr-extension-javatime</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <description>Jackson-jr extension that adds support for Java 8 Date/Time value types such as `java.time.LocalDateTime`</description>
     <url>https://github.com/FasterXML/jackson-jr</url>
 

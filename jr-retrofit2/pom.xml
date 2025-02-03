@@ -11,7 +11,7 @@
     <version>3.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-retrofit2</artifactId>
-  <packaging>bundle</packaging>
+  <packaging>jar</packaging>
   <description>Basic provider implementation for Retrofit 2 library
 </description>
   <properties>
@@ -33,7 +33,6 @@ ${project.groupId}.retrofit2;version=${project.version}
     <dependency>
       <groupId>tools.jackson.jr</groupId>
       <artifactId>jackson-jr-objects</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
