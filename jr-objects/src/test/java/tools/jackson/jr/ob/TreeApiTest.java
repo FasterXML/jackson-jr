@@ -46,7 +46,7 @@ public class TreeApiTest extends TestBase
         }
 
         @Override
-        public boolean isContainerNode() {
+        public boolean isContainer() {
             return true;
         }
 

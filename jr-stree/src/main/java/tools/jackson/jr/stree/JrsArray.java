@@ -38,7 +38,7 @@ public class JrsArray
     }
 
     @Override
-    public boolean isContainerNode() {
+    public boolean isContainer() {
         return true;
     }
 

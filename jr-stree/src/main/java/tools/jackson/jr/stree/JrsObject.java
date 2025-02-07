@@ -41,7 +41,7 @@ public class JrsObject
     }
 
     @Override
-    public boolean isContainerNode() {
+    public boolean isContainer() {
         return true;
     }
 

@@ -29,7 +29,7 @@ public final class JrsMissing extends JrsValue
     }
 
     @Override
-    public boolean isContainerNode() {
+    public boolean isContainer() {
         return false;
     }
 
