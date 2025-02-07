@@ -142,7 +142,7 @@ public abstract class JrsValue implements TreeNode
         }
 
         @Override
-        public final boolean isContainerNode() {
+        public final boolean isContainer() {
             return false;
         }
 
