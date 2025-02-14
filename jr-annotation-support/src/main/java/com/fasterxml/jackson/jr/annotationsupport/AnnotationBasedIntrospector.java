@@ -95,8 +95,12 @@ public class AnnotationBasedIntrospector
             if (RecordsHelpers.isRecordType(_type)) {
                 Constructor<?> canonical = RecordsHelpers.findCanonicalConstructor(_type);
                 constructors.addRecordConstructor(canonical);
-                for (Parameter ctorParam : canonical.getParameters()) {
-                    _propBuilder(ctorParam.getName());
+                for (int i = 0; i < canonical.getParameterCount(); i++) {
+                    Parameter ctorParam = canonical.getParameters()[i];
+                    final String explName = _findExplicitName(ctorParam);
+                    if (explName != null) {
+                        constructors.addRecordConstructorAlias(explName, ctorParam.getType(), i);
+                    }
                 }
             } else {
                 for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
