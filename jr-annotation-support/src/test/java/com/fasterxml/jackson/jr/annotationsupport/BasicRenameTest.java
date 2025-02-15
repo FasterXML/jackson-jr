@@ -116,7 +116,10 @@ public class BasicRenameTest extends ASTestBase
         }
     }
 
-
+    record SnakeCaseRecord(
+        @JsonProperty("first_name") String firstName,
+        @JsonProperty("last_name") String lastName
+    ) {}
 
     /*
     /**********************************************************************
