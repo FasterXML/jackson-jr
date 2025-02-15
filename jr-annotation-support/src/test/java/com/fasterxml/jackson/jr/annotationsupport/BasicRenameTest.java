@@ -1,11 +1,16 @@
 package com.fasterxml.jackson.jr.annotationsupport;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class BasicRenameTest extends ASTestBase
 {
@@ -126,6 +131,7 @@ public class BasicRenameTest extends ASTestBase
     private final JSON JSON_WITH_ANNO = jsonWithAnnotationSupport()
             .with(JSON.Feature.FAIL_ON_UNKNOWN_BEAN_PROPERTY);
 
+    @Test
     public void testBasicRenameOnSerialize() throws Exception
     {
         final NameSimple input = new NameSimple("Bob", "Burger");
@@ -139,6 +145,7 @@ public class BasicRenameTest extends ASTestBase
         assertEquals(a2q("{'_first':'Bob','_last':'Burger'}"), JSON.std.asString(input));
     }
 
+    @Test
     public void testBasicRenameOnDeserialize() throws Exception
     {
         final String json = a2q("{'firstName':'Bob','_last':'Burger'}");
@@ -156,6 +163,7 @@ public class BasicRenameTest extends ASTestBase
         assertEquals("Burger", result._last);
     }
 
+    @Test
     public void testEnumRenameOnSerialize() throws Exception
     {
         ABCRename inputA = ABCRename.A;
@@ -177,6 +185,7 @@ public class BasicRenameTest extends ASTestBase
         assertEquals(a2q("\"C\""), JSON_WITH_ANNO.asString(inputC));
     }
 
+    @Test
     public void testEnumRenameOnDeserialize() throws Exception
     {
         String jsonA = a2q("\"A1\"");
@@ -192,6 +201,7 @@ public class BasicRenameTest extends ASTestBase
         assertEquals(ABCRename.C, resultC);
     }
 
+    @Test
     public void testJsonValueCreatorEnumRenameOnSerialize() throws Exception
     {
         ABCJsonValueJsonCreator inputA = ABCJsonValueJsonCreator.A;
@@ -213,6 +223,7 @@ public class BasicRenameTest extends ASTestBase
         assertEquals(a2q("\"C\""), JSON_WITH_ANNO.asString(inputC));
     }
 
+    @Test
     public void testJsonValueCreatorEnumRenameOnDeserialize() throws Exception
     {
         String jsonA = a2q("\"A1\"");
@@ -228,6 +239,7 @@ public class BasicRenameTest extends ASTestBase
         assertEquals(ABCJsonValueJsonCreator.C, resultC);
     }
 
+    @Test
     public void testJsonValueCreatorHierarchicalEnumRenameOnSerialize() throws Exception
     {
         SubclassingEnum inputA = SubclassingEnum.ENUM_A;
@@ -243,6 +255,7 @@ public class BasicRenameTest extends ASTestBase
         assertEquals(a2q("\"B\""), JSON_WITH_ANNO.asString(inputB));
     }
 
+    @Test
     public void testJsonValueCreatorHierarchicalEnumRenameOnDeserialize() throws Exception
     {
         String jsonA = a2q("\"A\"");
@@ -254,6 +267,7 @@ public class BasicRenameTest extends ASTestBase
         assertEquals(SubclassingEnum.ENUM_B, resultB);
     }
 
+    @Test
     public void testJsonValueHidingSubclass() throws Exception
     {
         SubclassingEnum input = SubclassingEnum.ENUM_NO_JSON_VALUE;

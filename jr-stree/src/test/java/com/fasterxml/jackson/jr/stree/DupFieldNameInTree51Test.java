@@ -1,7 +1,11 @@
 package com.fasterxml.jackson.jr.stree;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for reading content using {@link JSON} with proper
@@ -20,6 +24,7 @@ public class DupFieldNameInTree51Test extends JacksonJrTreeTestBase
             .build();
     
     // [jackson-jr#51]: test dup keys for trees too
+    @Test
     public void testFailOnDupMapKeys() throws Exception
     {
         assertTrue(NO_DUPS_JSON.isEnabled(JSON.Feature.FAIL_ON_DUPLICATE_MAP_KEYS));

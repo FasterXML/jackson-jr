@@ -1,52 +1,56 @@
 package com.fasterxml.jackson.jr.ob;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class NullHandlingTest extends TestBase
 {
-    static class Bean107 {
+    public static class Bean107 {
         public byte[] b = new byte[0];
     }
 
-    static class StringBean {
+    public static class StringBean {
         public String str = "a";
     }
 
     // [jackson-jr#78]
-    static class IntegerWrapper {
+    public static class IntegerWrapper {
         public Integer value;
     }
-    static class IntPrimitiveWrapper {
+    public static class IntPrimitiveWrapper {
         public int value;
     }
-    static class LongWrapper {
+    public static class LongWrapper {
         public Long value;
     }
-    static class LongPrimitiveWrapper {
+    public static class LongPrimitiveWrapper {
         public long value;
     }
-    static class FloatWrapper {
+    public static class FloatWrapper {
         public Float value;
     }
-    static class FloatPrimitiveWrapper {
+    public static class FloatPrimitiveWrapper {
         public float value;
     }
-    static class DoubleWrapper {
+    public static class DoubleWrapper {
         public Double value;
     }
-    static class DoublePrimitiveWrapper {
+    public static class DoublePrimitiveWrapper {
         public double value;
     }
-
-    static class BooleanWrapper {
+    public static class BooleanWrapper {
         public Boolean value;
     }
-    static class BooleanPrimitiveWrapper {
+    public static class BooleanPrimitiveWrapper {
         public boolean value;
     }
 
     // Test to verify that outputting of nulls is configurable
+    @Test
     public void testMapNullEntries() throws Exception
     {
         Map<String,Object> map = new LinkedHashMap<String,Object>();
@@ -59,6 +63,7 @@ public class NullHandlingTest extends TestBase
                 JSON.std.with(JSON.Feature.WRITE_NULL_PROPERTIES).asString(map));
     }
 
+    @Test
     public void testNullForString() throws Exception
     {
         assertNull(JSON.std.beanFrom(StringBean.class, "null"));
@@ -68,6 +73,7 @@ public class NullHandlingTest extends TestBase
     }
 
     // [jackson-jr#107]: nulls should be accepted as byte[]
+    @Test
     public void testNullForByteArray() throws Exception
     {
         assertNull(JSON.std.beanFrom(Bean107.class, "null"));
@@ -78,6 +84,7 @@ public class NullHandlingTest extends TestBase
 
     // [jackson-jr#78], int/Integer
 
+    @Test
     public void testIntPrimitive() throws Exception
     {
         IntPrimitiveWrapper w = JSON.std.beanFrom(IntPrimitiveWrapper.class,
@@ -89,6 +96,7 @@ public class NullHandlingTest extends TestBase
         assertEquals(0, w.value);
     }
 
+    @Test
     public void testIntWrapper() throws Exception
     {
         IntegerWrapper w = JSON.std.beanFrom(IntegerWrapper.class,
@@ -102,6 +110,7 @@ public class NullHandlingTest extends TestBase
 
     // [jackson-jr#78], long/Long
 
+    @Test
     public void testLongPrimitive() throws Exception
     {
         LongPrimitiveWrapper w = JSON.std.beanFrom(LongPrimitiveWrapper.class,
@@ -113,6 +122,7 @@ public class NullHandlingTest extends TestBase
         assertEquals(0L, w.value);
     }
 
+    @Test
     public void testLongWrapper() throws Exception
     {
         LongWrapper w = JSON.std.beanFrom(LongWrapper.class,
@@ -126,6 +136,7 @@ public class NullHandlingTest extends TestBase
 
     // [jackson-jr#78], float/Float
 
+    @Test
     public void testFloatPrimitive() throws Exception
     {
         FloatPrimitiveWrapper w = JSON.std.beanFrom(FloatPrimitiveWrapper.class,
@@ -137,6 +148,7 @@ public class NullHandlingTest extends TestBase
         assertEquals(0.0f, w.value);
     }
 
+    @Test
     public void testFloatWrapper() throws Exception
     {
         FloatWrapper w = JSON.std.beanFrom(FloatWrapper.class,
@@ -150,6 +162,7 @@ public class NullHandlingTest extends TestBase
 
     // [jackson-jr#78], double/Double
 
+    @Test
     public void testDoublePrimitive() throws Exception
     {
         DoublePrimitiveWrapper w = JSON.std.beanFrom(DoublePrimitiveWrapper.class,
@@ -162,6 +175,7 @@ public class NullHandlingTest extends TestBase
         assertEquals(0.0, w.value);
     }
 
+    @Test
     public void testDoubleWrapper() throws Exception
     {
         DoubleWrapper w = JSON.std.beanFrom(DoubleWrapper.class,
@@ -175,6 +189,7 @@ public class NullHandlingTest extends TestBase
 
     // [jackson-jr#78], boolean/Boolean
 
+    @Test
     public void testBooleanPrimitive() throws Exception
     {
         BooleanPrimitiveWrapper w = JSON.std.beanFrom(BooleanPrimitiveWrapper.class,
@@ -186,6 +201,7 @@ public class NullHandlingTest extends TestBase
         assertFalse(w.value);
     }
 
+    @Test
     public void testBooleanWrapper() throws Exception
     {
         BooleanWrapper w = JSON.std.beanFrom(BooleanWrapper.class,

@@ -2,7 +2,11 @@ package com.fasterxml.jackson.jr.ob;
 
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.JsonParser;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ReadBeansTest extends TestBase
 {
@@ -24,7 +28,7 @@ public class ReadBeansTest extends TestBase
         public NameBean getName() { return name; }
     }
 
-    private enum Option {
+    public enum Option {
         Option1,
         Option2
     }
@@ -68,6 +72,7 @@ public class ReadBeansTest extends TestBase
     /**********************************************************************
      */
 
+    @Test
     public void testSimpleBean() throws Exception
     {
         final String INPUT = a2q("{'name':{'first':'Bob','last':'Burger'},'x':13, 'option': 'Option1'}");
@@ -81,6 +86,7 @@ public class ReadBeansTest extends TestBase
         assertEquals(Option.Option1, bean.option);
     }
 
+    @Test
     public void testSimpleBeanCaseInsensitive() throws Exception
     {
         final String INPUT = a2q("{'NaMe':{'FIRST':'Bob','last':'Burger'},'x':13, 'optioN': 'opTIOn1'}");
@@ -99,6 +105,7 @@ public class ReadBeansTest extends TestBase
         assertEquals(Option.Option1, bean.option);
     }
 
+    @Test
     public void testUnknownProps() throws Exception
     {
         final String INPUT = a2q("{'first':'Bob','middle':'Eugene', 'last':'Smith'}");
@@ -123,6 +130,7 @@ public class ReadBeansTest extends TestBase
         }
     }
 
+    @Test
     public void testPOJOWithList() throws Exception
     {
         final String INPUT = a2q("{'names': [ { 'first':'John','last':'Smith' },"
@@ -135,6 +143,7 @@ public class ReadBeansTest extends TestBase
         assertEquals("Burger", name.getLast());
     }
 
+    @Test
     public void testPOJOWithMap() throws Exception
     {
         final String INPUT = a2q("{'stuff': { 'a':3, 'b':4 } }");
@@ -145,6 +154,7 @@ public class ReadBeansTest extends TestBase
         assertEquals(Integer.valueOf(4), map.stuff.get("b"));
     }
 
+    @Test
     public void testSimpleBeanCollections() throws Exception
     {
         final String INPUT = a2q("["
@@ -180,6 +190,7 @@ public class ReadBeansTest extends TestBase
     }
 
     // @since 2.10
+    @Test
     public void testSimpleBeanMaps() throws Exception
     {
         final String INPUT = a2q("{ 'first':"
@@ -205,6 +216,7 @@ public class ReadBeansTest extends TestBase
         assertEquals("Bacon", bean2.name.last);
     }
 
+    @Test
     public void testJvmSerializersPOJO() throws Exception
     {
         MediaItem.Content content = new MediaItem.Content();
@@ -247,7 +259,8 @@ public class ReadBeansTest extends TestBase
         assertEquals(IMAGE_URI1, im1.getUri());
     }
 
-    // For [#15]
+    // For [jackson-jr#15]
+    @Test
     public void testLongBind() throws Exception
     {
         final String INPUT = "{\"value\":2}";
@@ -256,6 +269,7 @@ public class ReadBeansTest extends TestBase
         assertEquals(Long.valueOf(2L), bean.value);
     }
 
+    @Test
     public void testPojoArray() throws Exception
     {
         LongBean[] empty = JSON.std
@@ -272,6 +286,7 @@ public class ReadBeansTest extends TestBase
         assertEquals(3L, result[0].value.longValue());
     }
 
+    @Test
     public void testNameWithLeadingUppers() throws Exception
     {
         final String expURL = "http://foo";

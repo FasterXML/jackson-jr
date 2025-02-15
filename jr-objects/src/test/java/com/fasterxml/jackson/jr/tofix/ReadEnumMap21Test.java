@@ -1,9 +1,14 @@
-package com.fasterxml.jackson.jr.failing;
+package com.fasterxml.jackson.jr.tofix;
 
 import java.util.*;
 
+import com.fasterxml.jackson.jr.testutil.failure.JacksonTestFailureExpected;
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.TestBase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 // for [jackson-jr#21]
 public class ReadEnumMap21Test extends TestBase
@@ -24,6 +29,8 @@ public class ReadEnumMap21Test extends TestBase
     }
  
     // [issue#21]
+    @JacksonTestFailureExpected
+    @Test
     public void testMapWithEnumKey() throws Exception
     {
         WithEnumMap input = new WithEnumMap(DEF.E, "bar");

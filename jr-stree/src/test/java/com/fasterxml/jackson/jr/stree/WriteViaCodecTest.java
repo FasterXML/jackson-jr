@@ -4,12 +4,17 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.TreeCodec;
 import com.fasterxml.jackson.core.TreeNode;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class WriteViaCodecTest extends JacksonJrTreeTestBase
 {
+    @Test
     public void testSimpleList() throws Exception
     {
         List<JrsValue> stuff = new LinkedList<JrsValue>();
@@ -19,6 +24,7 @@ public class WriteViaCodecTest extends JacksonJrTreeTestBase
         assertEquals("[\"x\",true,123]", writeTree(new JacksonJrsTreeCodec(), new JrsArray(stuff)));
     }
 
+    @Test
     public void testSimpleMap() throws Exception
     {
         Map<String,JrsValue> stuff = new LinkedHashMap<String,JrsValue>();
@@ -30,6 +36,7 @@ public class WriteViaCodecTest extends JacksonJrTreeTestBase
                 writeTree(new JacksonJrsTreeCodec(), new JrsObject(stuff)));
     }
 
+    @Test
     public void testNest() throws Exception
     {
         Map<String,JrsValue> stuff = new LinkedHashMap<String,JrsValue>();

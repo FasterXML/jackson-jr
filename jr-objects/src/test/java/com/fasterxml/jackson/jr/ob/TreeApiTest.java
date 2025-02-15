@@ -3,8 +3,12 @@ package com.fasterxml.jackson.jr.ob;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.JsonParser.NumberType;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TreeApiTest extends TestBase
 {
@@ -163,6 +167,7 @@ public class TreeApiTest extends TestBase
             .treeCodec(new TestTreeCodec())
             .build();
 
+    @Test
     public void testSimpleNodeCreation() {
         assertEquals(TestArrayNode.class, J.createArrayNode().getClass());
         assertEquals(TestObjectNode.class, J.createObjectNode().getClass());

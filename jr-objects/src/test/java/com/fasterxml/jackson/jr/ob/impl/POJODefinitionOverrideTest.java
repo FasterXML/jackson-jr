@@ -2,8 +2,12 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.jr.ob.*;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class POJODefinitionOverrideTest extends TestBase
 {
@@ -45,6 +49,7 @@ public class POJODefinitionOverrideTest extends TestBase
 
     static class NoOpModifier extends ReaderWriterModifier { }
 
+    @Test
     public void testReadIgnoreProperty() throws Exception
     {
         // verify default read first
@@ -65,6 +70,7 @@ public class POJODefinitionOverrideTest extends TestBase
         assertEquals("Burger", bean.getLast());
     }
 
+    @Test
     public void testModifierPairForReading() throws Exception
     {
         final String INPUT = a2q("{'first':'Bob','last':'Burger'}");
@@ -80,6 +86,7 @@ public class POJODefinitionOverrideTest extends TestBase
         assertNull(bean.getLast());
     }
 
+    @Test
     public void testWriteInReverseOrder() throws Exception
     {
         // verify default write first
@@ -97,6 +104,7 @@ public class POJODefinitionOverrideTest extends TestBase
         assertEquals(EXP_DEFAULT, JSON.std.asString(input));
     }
 
+    @Test
     public void testModifierPairForWriting() throws Exception
     {
         final NameBean input = new NameBean("Bill", "Burger");

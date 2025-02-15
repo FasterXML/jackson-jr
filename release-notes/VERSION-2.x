@@ -15,6 +15,9 @@ Modules:
 
 #171: Add a `JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER` for
   retaining Serialization order of Java Records (instead of alphabetic)
+#184: Unify testing structure/tools to JUnit5 [JSTEP-10]
+- Update Retrofit2 dep from 2.9 to 2.11
+- Fix `retrofit2` module deps to Retrofit/OkHttp libraries
 
 2.18.2 (27-Nov-2024)
 

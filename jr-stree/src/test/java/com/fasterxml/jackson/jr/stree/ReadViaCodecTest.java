@@ -2,9 +2,11 @@ package com.fasterxml.jackson.jr.stree;
 
 import java.io.StringWriter;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.TreeCodec;
-import com.fasterxml.jackson.core.TreeNode;
+import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.core.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for reading content directly using codec, and not
@@ -14,6 +16,7 @@ public class ReadViaCodecTest extends JacksonJrTreeTestBase
 {
     private final TreeCodec TREE_CODEC = new JacksonJrsTreeCodec();
 
+    @Test
     public void testSimpleList() throws Exception
     {
         final String INPUT = "[true,\"abc\"]";
@@ -29,6 +32,7 @@ public class ReadViaCodecTest extends JacksonJrTreeTestBase
         assertEquals(INPUT, writer.toString());
     }
     
+    @Test
     public void testSimpleMap() throws Exception
     {
         final String INPUT = "{\"a\":1,\"b\":true,\"c\":3}";
@@ -43,6 +47,7 @@ public class ReadViaCodecTest extends JacksonJrTreeTestBase
         assertEquals(INPUT, writer.toString());
     }
 
+    @Test
     public void testSimpleMixed() throws Exception
     {
         final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";
@@ -60,6 +65,7 @@ public class ReadViaCodecTest extends JacksonJrTreeTestBase
         assertEquals(INPUT, writer.toString());
     }
 
+    @Test
     public void testSimpleJsonPointer() throws Exception
     {
         final String INPUT = "{\"a\":[1,2,{\"b\":true},3],\"c\":3}";

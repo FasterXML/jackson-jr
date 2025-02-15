@@ -1,9 +1,9 @@
-// Generated 11-Mar-2019 using Moditect maven plugin
 module com.fasterxml.jackson.jr.retrofit2 {
     requires transitive com.fasterxml.jackson.jr.ob;
-    // 11-Mar-2019, tatu: These are probably not right...
-    requires transitive okhttp;
-    requires transitive retrofit;
+
+    // 02-Feb-2025, tatu: Automatic-Module-Names:
+    requires transitive okhttp3;
+    requires transitive retrofit2;
 
     exports com.fasterxml.jackson.jr.retrofit2;
 }

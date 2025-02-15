@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.fail;
 
-public abstract class ASTestBase extends TestCase
+public abstract class ASTestBase
 {
     protected static class NameBean {
         protected String first, last;

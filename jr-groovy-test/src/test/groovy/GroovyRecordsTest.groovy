@@ -1,14 +1,16 @@
 import com.fasterxml.jackson.jr.ob.JSON
-import org.junit.Assert
-import org.junit.Test
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * A minor note on running/debugging this test on local, if you are using intellij, please
  * change `<packaging>pom</packaging>` to `<packaging>bundle</packaging>`. this is causing
  * some issue with the IDE.
 */
-class GroovyRecordsTest {
-
+class GroovyRecordsTest
+{
     @Test
     void testRecord() throws Exception {
         /* We need to use this since build (8, ubuntu-20.04), will fail Map.of() was added in Java 9*/
@@ -17,7 +19,7 @@ class GroovyRecordsTest {
 
         def json = JSON.builder().enable(JSON.Feature.USE_FIELD_MATCHING_GETTERS).build().asString(new Cow("foo", map))
         def expected = """{"message":"foo","object":{"foo":"bar"}}"""
-        Assert.assertEquals(expected, json)
+        assertEquals(expected, json)
     }
 
     @Test
@@ -29,10 +31,10 @@ class GroovyRecordsTest {
         map.put("foo", "bar")
 
         def json = JSON.builder().enable(JSON.Feature.USE_FIELD_MATCHING_GETTERS).build().asString(new SimpleGroovyObject("foo", map))
-        Assert.assertEquals(expected, json)
+        assertEquals(expected, json)
 
         def json2 = JSON.builder().enable(JSON.Feature.USE_FIELD_MATCHING_GETTERS).build().asString(new GroovyObjectWithNamedGetters("foo", map))
-        Assert.assertEquals(expected, json2)
+        assertEquals(expected, json2)
     }
 }
 
