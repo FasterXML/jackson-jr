@@ -52,7 +52,7 @@ ${project.groupId}.retrofit2;version=${project.version}
   <build>
     <plugins>
       <plugin>
-        <groupId>de.jjohannes</groupId>
+        <groupId>org.gradlex</groupId>
         <artifactId>gradle-module-metadata-maven-plugin</artifactId>
       </plugin>
     </plugins>

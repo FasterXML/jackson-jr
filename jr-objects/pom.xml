@@ -65,7 +65,7 @@ has no other dependencies, and provides additional builder-style content generat
         <artifactId>replacer</artifactId>
       </plugin>
        <plugin>
-        <groupId>de.jjohannes</groupId>
+        <groupId>org.gradlex</groupId>
         <artifactId>gradle-module-metadata-maven-plugin</artifactId>
       </plugin>
     </plugins>
