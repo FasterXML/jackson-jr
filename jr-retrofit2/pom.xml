@@ -12,8 +12,7 @@
   </parent>
   <artifactId>jackson-jr-retrofit2</artifactId>
   <packaging>jar</packaging>
-  <description>Basic provider implementation for Retrofit 2 library
-</description>
+  <description>Basic provider implementation for Retrofit 2 library</description>
   <properties>
     <!-- Looks like we need to be bit careful on OSGi exports, to avoid
         accidentally double-exporting jr-objects types
@@ -33,6 +32,7 @@ ${project.groupId}.retrofit2;version=${project.version}
     <dependency>
       <groupId>tools.jackson.jr</groupId>
       <artifactId>jackson-jr-objects</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>

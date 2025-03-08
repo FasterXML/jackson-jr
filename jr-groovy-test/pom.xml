@@ -11,7 +11,6 @@
     <description>Test Module with higher JDK Version + Groovy support to test Jackson-Jr</description>
     <url>https://github.com/FasterXML/jackson-jr</url>
     <properties>
-        <!--    To Test Latest Java Features Lets use this settings    -->
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,6 +20,7 @@
         <dependency>
             <groupId>tools.jackson.jr</groupId>
             <artifactId>jackson-jr-objects</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
