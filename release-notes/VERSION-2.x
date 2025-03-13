@@ -19,6 +19,10 @@ Modules:
 - Update Retrofit2 dep from 2.9 to 2.11
 - Fix `retrofit2` module deps to Retrofit/OkHttp libraries
 
+2.18.3 (28-Feb-2025)
+
+No changes since 2.18.2
+
 2.18.2 (27-Nov-2024)
 
 #172: Record deserialisation with instance methods fails
