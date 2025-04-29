@@ -44,6 +44,11 @@
 
     <build>
         <plugins>
+            <!-- 28-Apr-2025, tatu: SBOM generation [JSTEP-14] -->
+            <plugin>
+              <groupId>org.cyclonedx</groupId>
+              <artifactId>cyclonedx-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.gradlex</groupId>
                 <artifactId>gradle-module-metadata-maven-plugin</artifactId>
