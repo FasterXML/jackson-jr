@@ -3,7 +3,7 @@
   <parent>
     <groupId>tools.jackson</groupId>
     <artifactId>jackson-base</artifactId>
-    <version>3.0.0-rc4-SNAPSHOT</version>
+    <version>3.0.0-rc4</version>
   </parent>
   <groupId>tools.jackson.jr</groupId>
   <artifactId>jackson-jr-parent</artifactId>
@@ -28,7 +28,7 @@
     <connection>scm:git:git@github.com:FasterXML/jackson-jr.git</connection>
     <developerConnection>scm:git:git@github.com:FasterXML/jackson-jr.git</developerConnection>
     <url>http://github.com/FasterXML/jackson-jr</url>    
-    <tag>jackson-jr-parent-3.0.0-rc3</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
