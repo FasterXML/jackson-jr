@@ -7,7 +7,7 @@
     <version>2.18.6-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-all</artifactId>
-  <name>jackson-jr-all</name>
+  <name>Jackson-jr: uber-jar</name>
   <packaging>jar</packaging>
   <description>"Uber" jar that contains all Jackson jr components as well as underlying Jackson core
 Streaming, in a single jar.
