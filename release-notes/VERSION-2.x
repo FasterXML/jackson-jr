@@ -15,6 +15,10 @@ Modules:
 
 -
 
+2.19.1 (13-Jun-2025)
+
+No changes since 2.19.0
+
 2.19.0 (24-Apr-2025)
 
 #171: Add a `JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER` for

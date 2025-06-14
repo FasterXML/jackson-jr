@@ -6,6 +6,7 @@
         <version>2.20.0-SNAPSHOT</version>
     </parent>
     <artifactId>jackson-jr-record-test</artifactId>
+    <name>Jackson-jr: Record test(s)</name>
     <packaging>jar</packaging>
     <description>Test Module for testing JDK 17 Record support</description>
     <url>https://github.com/FasterXML/jackson-jr</url>

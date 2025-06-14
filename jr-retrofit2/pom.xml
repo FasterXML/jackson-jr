@@ -11,6 +11,7 @@
     <version>2.20.0-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-retrofit2</artifactId>
+  <name>Jackson-jr: Retrofit2 support</name>
   <packaging>bundle</packaging>
   <description>Basic provider implementation for Retrofit 2 library
 </description>
