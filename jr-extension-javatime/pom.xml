@@ -13,6 +13,7 @@
     </parent>
 
     <artifactId>jackson-jr-extension-javatime</artifactId>
+    <name>Jackson-jr: Java.time extension</name>
     <packaging>bundle</packaging>
     <description>Jackson-jr extension that adds support for Java 8 Date/Time value types such as `java.time.LocalDateTime`</description>
     <url>https://github.com/FasterXML/jackson-jr</url>

@@ -11,6 +11,7 @@
     <version>2.19.1-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-stree</artifactId>
+  <name>Jackson-jr: (simple) Tree extension</name>
   <packaging>bundle</packaging>
   <description>Simple immutable (read-only) tree model that builds directly on jackson-core (streaming),
 has no other dependencies.

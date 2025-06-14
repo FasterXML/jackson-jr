@@ -11,6 +11,7 @@
     <version>2.19.1-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-objects</artifactId>
+  <name>Jackson-jr: Objects (main)</name>
   <packaging>bundle</packaging>
   <description>Simple data-binding that builds directly on jackson-core (streaming),
 has no other dependencies, and provides additional builder-style content generator
