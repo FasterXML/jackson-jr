@@ -66,6 +66,15 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
+            <!-- 13-Jun-2025, tatu: try one more thing wrt new Central publishing -->
+            <plugin>
+                 <groupId>org.sonatype.central</groupId>
+                 <artifactId>central-publishing-maven-plugin</artifactId>
+                 <configuration>
+		     <enabled>false</enabled>
+                     <skipPublishing>true</skipPublishing>
+                 </configuration>
+            </plugin>
         </plugins>
     </build>
 
