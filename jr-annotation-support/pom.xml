@@ -11,6 +11,7 @@
     <version>3.0.0-rc6-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-annotation-support</artifactId>
+  <name>Jackson-jr: Jackson annotation support</name>
   <packaging>jar</packaging>
   <description>Additional package that adds support for a subset of Jackson core annotations from
   https://github.com/FasterXML/jackson-annotations
