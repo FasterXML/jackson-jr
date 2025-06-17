@@ -1,0 +1,125 @@
+package com.fasterxml.jackson.jr.ob;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
+public class PrimitiveArrayTest extends TestBase
+{
+    // Test all 7 primitive array types: boolean[], byte[], short[], int[], long[], float[], double[]
+    // Also test char[] which is handled specially (as String)
+
+    @Test
+    public void testBooleanArray() throws Exception {
+        final boolean[] input = new boolean[]{true, false, true, false, true};
+        String json = JSON.std.asString(input);
+        boolean[] result = JSON.std.beanFrom(boolean[].class, json);
+        assertArrayEquals(input, result);
+    }
+
+    @Test
+    public void testByteArray() throws Exception {
+        final byte[] input = new byte[]{1, 2, 3, 127, -128};
+        String json = JSON.std.asString(input);
+        byte[] result = JSON.std.beanFrom(byte[].class, json);
+        assertArrayEquals(input, result);
+    }
+
+    @Test
+    public void testCharArray() throws Exception {
+        final char[] input = new char[]{'a', 'b', 'c', 'X', 'Y', 'Z'};
+        String json = JSON.std.asString(input);
+        char[] result = JSON.std.beanFrom(char[].class, json);
+        assertArrayEquals(input, result);
+    }
+
+    @Test
+    public void testShortArray() throws Exception {
+        final short[] input = new short[]{1, 2, 3, 32767, -32768};
+        String json = JSON.std.asString(input);
+        short[] result = JSON.std.beanFrom(short[].class, json);
+        assertArrayEquals(input, result);
+    }
+
+    @Test
+    public void testIntArray() throws Exception {
+        final int[] input = new int[]{1, 2, 3, 25, 999};
+        String json = JSON.std.asString(input);
+        int[] result = JSON.std.beanFrom(int[].class, json);
+        assertArrayEquals(input, result);
+    }
+
+    @Test
+    public void testLongArray() throws Exception {
+        final long[] input = new long[]{1L, 2L, 3L, 999999999999L, -999999999999L};
+        String json = JSON.std.asString(input);
+        long[] result = JSON.std.beanFrom(long[].class, json);
+        assertArrayEquals(input, result);
+    }
+
+    @Test
+    public void testFloatArray() throws Exception {
+        final float[] input = new float[]{1.0f, 2.5f, 3.14f, -5.5f, 0.0f};
+        String json = JSON.std.asString(input);
+        float[] result = JSON.std.beanFrom(float[].class, json);
+        assertArrayEquals(input, result, 0.0001f);
+    }
+
+    @Test
+    public void testDoubleArray() throws Exception {
+        final double[] input = new double[]{1.0, 2.5, 3.14159, -5.5, 0.0};
+        String json = JSON.std.asString(input);
+        double[] result = JSON.std.beanFrom(double[].class, json);
+        assertArrayEquals(input, result, 0.0000001);
+    }
+
+    // Test empty arrays
+    @Test
+    public void testEmptyArrays() throws Exception {
+        assertArrayEquals(new boolean[0], JSON.std.beanFrom(boolean[].class, "[]"));
+        assertArrayEquals(new byte[0], JSON.std.beanFrom(byte[].class, "[]"));
+        assertArrayEquals(new char[0], JSON.std.beanFrom(char[].class, "\"\""));
+        assertArrayEquals(new short[0], JSON.std.beanFrom(short[].class, "[]"));
+        assertArrayEquals(new int[0], JSON.std.beanFrom(int[].class, "[]"));
+        assertArrayEquals(new long[0], JSON.std.beanFrom(long[].class, "[]"));
+        assertArrayEquals(new float[0], JSON.std.beanFrom(float[].class, "[]"), 0.0f);
+        assertArrayEquals(new double[0], JSON.std.beanFrom(double[].class, "[]"), 0.0);
+    }
+
+    // Test arrays as object fields
+    public static class AllArraysBean {
+        public boolean[] booleans;
+        public byte[] bytes;
+        public char[] chars;
+        public short[] shorts;
+        public int[] ints;
+        public long[] longs;
+        public float[] floats;
+        public double[] doubles;
+    }
+
+    @Test
+    public void testArraysAsObjectFields() throws Exception {
+        AllArraysBean input = new AllArraysBean();
+        input.booleans = new boolean[]{true, false};
+        input.bytes = new byte[]{1, 2, 3};
+        input.chars = new char[]{'a', 'b'};
+        input.shorts = new short[]{10, 20};
+        input.ints = new int[]{100, 200};
+        input.longs = new long[]{1000L, 2000L};
+        input.floats = new float[]{1.5f, 2.5f};
+        input.doubles = new double[]{10.5, 20.5};
+
+        String json = JSON.std.asString(input);
+        AllArraysBean result = JSON.std.beanFrom(AllArraysBean.class, json);
+
+        assertArrayEquals(input.booleans, result.booleans);
+        assertArrayEquals(input.bytes, result.bytes);
+        assertArrayEquals(input.chars, result.chars);
+        assertArrayEquals(input.shorts, result.shorts);
+        assertArrayEquals(input.ints, result.ints);
+        assertArrayEquals(input.longs, result.longs);
+        assertArrayEquals(input.floats, result.floats, 0.0001f);
+        assertArrayEquals(input.doubles, result.doubles, 0.0000001);
+    }
+}

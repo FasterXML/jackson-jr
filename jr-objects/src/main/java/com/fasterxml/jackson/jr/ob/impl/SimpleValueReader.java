@@ -27,6 +27,11 @@ import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
 public class SimpleValueReader extends ValueReader
 {
     private final static int[] NO_INTS = new int[0];
+    private final static long[] NO_LONGS = new long[0];
+    private final static boolean[] NO_BOOLEANS = new boolean[0];
+    private final static short[] NO_SHORTS = new short[0];
+    private final static float[] NO_FLOATS = new float[0];
+    private final static double[] NO_DOUBLES = new double[0];
 
     protected final int _typeId;
 
@@ -110,6 +115,16 @@ public class SimpleValueReader extends ValueReader
 
         case SER_INT_ARRAY:
             return _readIntArray(p);
+        case SER_LONG_ARRAY:
+            return _readLongArray(p);
+        case SER_BOOLEAN_ARRAY:
+            return _readBooleanArray(p);
+        case SER_SHORT_ARRAY:
+            return _readShortArray(p);
+        case SER_FLOAT_ARRAY:
+            return _readFloatArray(p);
+        case SER_DOUBLE_ARRAY:
+            return _readDoubleArray(p);
 
         case SER_TREE_NODE:
             return reader.readTree();
@@ -326,6 +341,190 @@ public class SimpleValueReader extends ValueReader
             t = p.currentTokenId();
         }
         return builder.build().toArray();
+    }
+
+    protected long[] _readLongArray(JsonParser p) throws IOException {
+        if (JsonToken.START_ARRAY.equals(p.currentToken())) {
+            p.nextToken();
+        }
+
+        java.util.List<Long> values = new java.util.ArrayList<>();
+        int t = p.currentTokenId();
+
+        if (t == JsonTokenId.ID_END_ARRAY) {
+            return NO_LONGS;
+        }
+        
+        main_loop:
+        while (true) {
+            switch (t) {
+            case JsonTokenId.ID_NUMBER_FLOAT:
+            case JsonTokenId.ID_NUMBER_INT:
+            case JsonTokenId.ID_NULL:
+                values.add(p.getValueAsLong());
+                break;
+            case JsonTokenId.ID_END_ARRAY:
+                break main_loop;
+            default:
+                throw new JSONObjectException("Failed to bind `long` element if `long[]` from value: "+
+                        _tokenDesc(p));
+            }
+            p.nextToken();
+            t = p.currentTokenId();
+        }
+        long[] result = new long[values.size()];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = values.get(i);
+        }
+        return result;
+    }
+
+    protected boolean[] _readBooleanArray(JsonParser p) throws IOException {
+        if (JsonToken.START_ARRAY.equals(p.currentToken())) {
+            p.nextToken();
+        }
+
+        java.util.List<Boolean> values = new java.util.ArrayList<>();
+        int t = p.currentTokenId();
+
+        if (t == JsonTokenId.ID_END_ARRAY) {
+            return NO_BOOLEANS;
+        }
+        
+        main_loop:
+        while (true) {
+            switch (t) {
+            case JsonTokenId.ID_TRUE:
+                values.add(Boolean.TRUE);
+                break;
+            case JsonTokenId.ID_FALSE:
+                values.add(Boolean.FALSE);
+                break;
+            case JsonTokenId.ID_NULL:
+                values.add(Boolean.FALSE);
+                break;
+            case JsonTokenId.ID_END_ARRAY:
+                break main_loop;
+            default:
+                throw new JSONObjectException("Failed to bind `boolean` element if `boolean[]` from value: "+
+                        _tokenDesc(p));
+            }
+            p.nextToken();
+            t = p.currentTokenId();
+        }
+        boolean[] result = new boolean[values.size()];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = values.get(i);
+        }
+        return result;
+    }
+
+    protected short[] _readShortArray(JsonParser p) throws IOException {
+        if (JsonToken.START_ARRAY.equals(p.currentToken())) {
+            p.nextToken();
+        }
+
+        java.util.List<Short> values = new java.util.ArrayList<>();
+        int t = p.currentTokenId();
+
+        if (t == JsonTokenId.ID_END_ARRAY) {
+            return NO_SHORTS;
+        }
+        
+        main_loop:
+        while (true) {
+            switch (t) {
+            case JsonTokenId.ID_NUMBER_FLOAT:
+            case JsonTokenId.ID_NUMBER_INT:
+            case JsonTokenId.ID_NULL:
+                values.add((short) p.getValueAsInt());
+                break;
+            case JsonTokenId.ID_END_ARRAY:
+                break main_loop;
+            default:
+                throw new JSONObjectException("Failed to bind `short` element if `short[]` from value: "+
+                        _tokenDesc(p));
+            }
+            p.nextToken();
+            t = p.currentTokenId();
+        }
+        short[] result = new short[values.size()];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = values.get(i);
+        }
+        return result;
+    }
+
+    protected float[] _readFloatArray(JsonParser p) throws IOException {
+        if (JsonToken.START_ARRAY.equals(p.currentToken())) {
+            p.nextToken();
+        }
+
+        java.util.List<Float> values = new java.util.ArrayList<>();
+        int t = p.currentTokenId();
+
+        if (t == JsonTokenId.ID_END_ARRAY) {
+            return NO_FLOATS;
+        }
+        
+        main_loop:
+        while (true) {
+            switch (t) {
+            case JsonTokenId.ID_NUMBER_FLOAT:
+            case JsonTokenId.ID_NUMBER_INT:
+            case JsonTokenId.ID_NULL:
+                values.add((float) p.getValueAsDouble());
+                break;
+            case JsonTokenId.ID_END_ARRAY:
+                break main_loop;
+            default:
+                throw new JSONObjectException("Failed to bind `float` element if `float[]` from value: "+
+                        _tokenDesc(p));
+            }
+            p.nextToken();
+            t = p.currentTokenId();
+        }
+        float[] result = new float[values.size()];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = values.get(i);
+        }
+        return result;
+    }
+
+    protected double[] _readDoubleArray(JsonParser p) throws IOException {
+        if (JsonToken.START_ARRAY.equals(p.currentToken())) {
+            p.nextToken();
+        }
+
+        java.util.List<Double> values = new java.util.ArrayList<>();
+        int t = p.currentTokenId();
+
+        if (t == JsonTokenId.ID_END_ARRAY) {
+            return NO_DOUBLES;
+        }
+        
+        main_loop:
+        while (true) {
+            switch (t) {
+            case JsonTokenId.ID_NUMBER_FLOAT:
+            case JsonTokenId.ID_NUMBER_INT:
+            case JsonTokenId.ID_NULL:
+                values.add(p.getValueAsDouble());
+                break;
+            case JsonTokenId.ID_END_ARRAY:
+                break main_loop;
+            default:
+                throw new JSONObjectException("Failed to bind `double` element if `double[]` from value: "+
+                        _tokenDesc(p));
+            }
+            p.nextToken();
+            t = p.currentTokenId();
+        }
+        double[] result = new double[values.size()];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = values.get(i);
+        }
+        return result;
     }
 
     protected long _fetchLong(JsonParser p) throws IOException

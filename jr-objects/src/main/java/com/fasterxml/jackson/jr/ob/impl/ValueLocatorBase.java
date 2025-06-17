@@ -61,6 +61,9 @@ public abstract class ValueLocatorBase
     public final static int SER_INT_ARRAY = 5;
     public final static int SER_LONG_ARRAY = 6;
     public final static int SER_BOOLEAN_ARRAY = 7;
+    public final static int SER_SHORT_ARRAY = 38;
+    public final static int SER_FLOAT_ARRAY = 39;
+    public final static int SER_DOUBLE_ARRAY = 40;
     
     /**
      * An implementation of {@link com.fasterxml.jackson.core.TreeNode}
@@ -158,6 +161,15 @@ public abstract class ValueLocatorBase
                 }
                 if (raw == boolean[].class) {
                     return SER_BOOLEAN_ARRAY;
+                }
+                if (raw == short[].class) {
+                    return SER_SHORT_ARRAY;
+                }
+                if (raw == float[].class) {
+                    return SER_FLOAT_ARRAY;
+                }
+                if (raw == double[].class) {
+                    return SER_DOUBLE_ARRAY;
                 }
                 // Hmmh. Could support all types; add as/when needed
                 return SER_UNKNOWN;
