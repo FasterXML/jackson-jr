@@ -334,7 +334,7 @@ public class SimpleValueReader extends ValueReader
             case JsonTokenId.ID_END_ARRAY:
                 break main_loop;
             default:
-                throw new JSONObjectException("Failed to bind `int` element if `int[]` from value: "+
+                throw new JSONObjectException("Failed to bind `int` element of `int[]` from value: "+
                         _tokenDesc(p));
             }
             p.nextToken();
