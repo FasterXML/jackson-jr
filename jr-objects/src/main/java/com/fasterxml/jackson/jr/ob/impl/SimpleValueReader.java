@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -348,9 +349,10 @@ public class SimpleValueReader extends ValueReader
             p.nextToken();
         }
 
-        java.util.List<Long> values = new java.util.ArrayList<>();
+        final LongStream.Builder builder = LongStream.builder();
         int t = p.currentTokenId();
 
+        // Tiny optimization
         if (t == JsonTokenId.ID_END_ARRAY) {
             return NO_LONGS;
         }
@@ -361,22 +363,18 @@ public class SimpleValueReader extends ValueReader
             case JsonTokenId.ID_NUMBER_FLOAT:
             case JsonTokenId.ID_NUMBER_INT:
             case JsonTokenId.ID_NULL:
-                values.add(p.getValueAsLong());
+                builder.add(p.getValueAsLong());
                 break;
             case JsonTokenId.ID_END_ARRAY:
                 break main_loop;
             default:
-                throw new JSONObjectException("Failed to bind `long` element if `long[]` from value: "+
+                throw new JSONObjectException("Failed to bind `long` element of `long[]` from value: "+
                         _tokenDesc(p));
             }
             p.nextToken();
             t = p.currentTokenId();
         }
-        long[] result = new long[values.size()];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = values.get(i);
-        }
-        return result;
+        return builder.build().toArray();
     }
 
     protected boolean[] _readBooleanArray(JsonParser p) throws IOException {
