@@ -15,6 +15,10 @@ Modules:
 
 -
 
+2.19.2 (not yet released)
+
+#198: No deserializer for `long[]` type
+
 2.19.1 (13-Jun-2025)
 
 No changes since 2.19.0
