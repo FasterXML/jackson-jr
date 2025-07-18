@@ -11,7 +11,7 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
-2.19.2 (not yet released)
+2.19.2 (18-Jul-2025)
 
 #198: No deserializer for `long[]` type
 
