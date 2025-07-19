@@ -76,8 +76,8 @@ public class JacksonAnnotationExtension
                     JsonAutoDetect.Visibility.PUBLIC_ONLY, // getters
                     JsonAutoDetect.Visibility.PUBLIC_ONLY, // isGetters
                     JsonAutoDetect.Visibility.PUBLIC_ONLY, // setters
-                    JsonAutoDetect.Visibility.NONE, // other creators,
-                    JsonAutoDetect.Visibility.NONE // scalar creators,
+                    JsonAutoDetect.Visibility.NONE, // regular creators
+                    JsonAutoDetect.Visibility.NONE // scalar constructors
             );
 
     /**
