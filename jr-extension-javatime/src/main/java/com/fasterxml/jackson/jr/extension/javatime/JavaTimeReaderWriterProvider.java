@@ -2,6 +2,7 @@ package com.fasterxml.jackson.jr.extension.javatime;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -19,31 +20,19 @@ import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
  */
 public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
 {
-    protected static final DateTimeFormatter FORMATTER;
-        
-    static {
-        FORMATTER = new DateTimeFormatterBuilder()
-                .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
-                .optionalStart()
-                    .appendFraction(ChronoField.MILLI_OF_SECOND, 1, 9, true)
-                .optionalEnd()
-                .optionalStart()
-                    .appendOffsetId()
-                .optionalEnd()
-                .optionalStart()
-                    .appendLiteral('[')
-                    .appendZoneRegionId()
-                    .appendLiteral(']')
-                .optionalEnd()
-            .toFormatter();
-    }
+    private ZoneId _fallbackLocalZoneId;
     
-    public JavaTimeReaderWriterProvider() { }
+    protected static final DateTimeFormatter FORMATTER = createFormatter(true);
+    protected static final DateTimeFormatter LOCAL_FORMATTER = createFormatter(false);
+    
+    public JavaTimeReaderWriterProvider() {
+        _fallbackLocalZoneId = ZoneId.systemDefault();
+    }
 
     @Override
     public ValueReader findValueReader(JSONReader readContext, Class<?> type) {
         if (LocalDateTime.class.isAssignableFrom(type)) {
-            return new LocalDateTimeValueReader();
+            return new LocalDateTimeValueReader(_fallbackLocalZoneId);
         }
         if (OffsetDateTime.class.isAssignableFrom(type)) {
             return new DefaultDateTimeValueReader<OffsetDateTime>(OffsetDateTime.class, OffsetDateTime::from);
@@ -66,5 +55,50 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
             return new ZonedDateTimeValueWriter();
         }
         return null;
+    }
+    
+    /**
+     * Setter to configure a time zone that is to be applied when a zoned ISO 8601 date time needs
+     * to be converted to a <code>LocalDateTime</code>. Can be set to <code>null</code> to apply
+     * the system default.
+     * @see java.time.LocalDateTime
+     * @param fallbackLocalZoneId Time zone to apply, or <code>null</code>
+     * @return Reference for chaining
+     */
+    public JavaTimeReaderWriterProvider setLocalFallbackTimeZone(ZoneId fallbackLocalZoneId) {
+        _fallbackLocalZoneId = fallbackLocalZoneId == null ? ZoneId.systemDefault() : fallbackLocalZoneId;
+        return this;
+    }
+    
+    /**
+     * Create a forgiving date time formatter that allows different interpretations of ISO 8601
+     * strings to be parsed.
+     * 
+     * @param includeUtcDefault Set to <code>true</code> to set UTC to be the default offset
+     *                          for non-local date times. Set to <code>false</code> when handling
+     *                          local date times.
+     * @return Formatter
+     */
+    public static DateTimeFormatter createFormatter(boolean includeUtcDefault) {
+        final DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
+                .parseLenient()
+                .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+                .optionalStart()
+                    .appendFraction(ChronoField.MILLI_OF_SECOND, 1, 9, true)
+                .optionalEnd()
+                .optionalStart()
+                    .appendOffsetId()
+                    .optionalStart()
+                        .appendLiteral('[')
+                        .appendZoneRegionId()
+                        .appendLiteral(']')
+                    .optionalEnd()
+                .optionalEnd();
+        
+        if (includeUtcDefault) {
+            builder.parseDefaulting(ChronoField.OFFSET_SECONDS, 0);
+        }
+        
+        return builder.toFormatter();
     }
 }
