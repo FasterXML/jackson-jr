@@ -9,7 +9,7 @@
     <parent>
         <groupId>com.fasterxml.jackson.jr</groupId>
         <artifactId>jackson-jr-parent</artifactId>
-        <version>2.20.0-rc1-SNAPSHOT</version>
+        <version>2.20.0-rc2-SNAPSHOT</version>
     </parent>
 
     <artifactId>jackson-jr-extension-javatime</artifactId>
@@ -33,7 +33,7 @@
         <osgi.export>${project.groupId}.extension.javatime;version=${project.version}</osgi.export>
 
         <!-- for Reproducible Builds -->
-        <project.build.outputTimestamp>2025-08-01T17:08:12Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-08-05T01:02:35Z</project.build.outputTimestamp>
     </properties>
 
     <dependencies>
