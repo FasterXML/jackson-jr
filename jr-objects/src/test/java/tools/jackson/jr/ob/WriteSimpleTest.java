@@ -11,6 +11,8 @@ import java.util.*;
 
 import org.junit.jupiter.api.Test;
 
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.core.json.JsonWriteFeature;
 import tools.jackson.jr.ob.JSON.Feature;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,29 +48,38 @@ public class WriteSimpleTest extends TestBase
     /**********************************************************************
      */
 
+    
+    private JSON json() {
+        return JSON.builder(JsonFactory.builder().enable(JsonWriteFeature.ESCAPE_FORWARD_SLASHES)
+                .build()).build();
+
+    }
+
     @Test
     public void testSimpleList() throws Exception
     {
-        List<Object> stuff = new LinkedList<Object>();
+        final JSON json = json();
+        List<Object> stuff = new LinkedList<>();
         stuff.add("x");
         stuff.add(true);
         stuff.add(123);
         final String exp = "[\"x\",true,123]";
-        assertEquals(exp, JSON.std.asString(stuff));
-        assertEquals(exp, new String(JSON.std.asBytes(stuff), "ASCII"));
+        assertEquals(exp, json.asString(stuff));
+        assertEquals(exp, new String(json.asBytes(stuff), "ASCII"));
 
         StringWriter sw = new StringWriter();
-        JSON.std.write(stuff, sw);
+        json.write(stuff, sw);
         assertEquals(exp, sw.toString());
 
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        JSON.std.write(stuff, bytes);
+        json.write(stuff, bytes);
         assertEquals(exp, bytes.toString("UTF-8"));
     }
 
     @Test
     public void testSimpleMap() throws Exception
     {
+        final JSON json = json();
         Map<String,Object> stuff = new LinkedHashMap<>();
         stuff.put("a", 15);
         stuff.put("b", Boolean.TRUE);
@@ -81,88 +92,97 @@ public class WriteSimpleTest extends TestBase
                 "{'a':15,'b':true,'c':'foobar','d':'8f88e079-7dc6-46f8-abfb-a533130f4ea0',"
                 +"'e':'https:\\/\\/github.com\\/FasterXML\\/jackson-jr?a=x&b=y',"
                 +"'f':'https:\\/\\/github.com\\/FasterXML\\/jackson-jr?c=x&c=y'}"),
-                JSON.std.asString(stuff));
+                json.asString(stuff));
     }
 
     @Test
     public void testSimpleIntContainers() throws Exception {
-        assertEquals("[1,2,3]", JSON.std.asString(new int[] { 1, 2, 3 }));
-        assertEquals("[1,2,3]", JSON.std.asString(new Integer[] { 1, 2, 3 }));
+        final JSON json = json();
+        assertEquals("[1,2,3]", json.asString(new int[] { 1, 2, 3 }));
+        assertEquals("[1,2,3]", json.asString(new Integer[] { 1, 2, 3 }));
         List<Integer> list = new ArrayList<>();
         list.add(4);
         list.add(-8);
-        assertEquals("[4,-8]", JSON.std.asString(list));
+        assertEquals("[4,-8]", json.asString(list));
     }
 
     @Test
     public void testSimpleBooleanArray() throws Exception {
-        assertEquals("[true,false]", JSON.std.asString(new boolean[] { true, false }));
-        assertEquals("[true,false]", JSON.std.asString(new Boolean[] { true, false }));
+        final JSON json = json();
+        assertEquals("[true,false]", json.asString(new boolean[] { true, false }));
+        assertEquals("[true,false]", json.asString(new Boolean[] { true, false }));
     }
-    
+
     @Test
     public void testSimpleStringArray() throws Exception {
-        assertEquals(a2q("['abc','def']"), JSON.std.asString(new String[] { "abc", "def" }));
+        final JSON json = json();
+        assertEquals(a2q("['abc','def']"), json.asString(new String[] { "abc", "def" }));
     }
     
     @Test
     public void testNest() throws Exception
     {
-        Map<String,Object> stuff = new LinkedHashMap<String,Object>();
-        List<Integer> list = new ArrayList<Integer>();
+        final JSON json = json();
+        Map<String,Object> stuff = new LinkedHashMap<>();
+        List<Integer> list = new ArrayList<>();
         list.add(123);
         list.add(456);
         stuff.put("first", list);
-        Map<String,Object> second = new LinkedHashMap<String,Object>();
+        Map<String,Object> second = new LinkedHashMap<>();
         stuff.put("second", second);
         second.put("foo", "bar");
-        second.put("bar", new ArrayList<Object>());
+        second.put("bar", new ArrayList<>());
 
         assertEquals("{\"first\":[123,456],\"second\":{\"foo\":\"bar\",\"bar\":[]}}",
-                JSON.std.asString(stuff));
+                json.asString(stuff));
     }
 
     @Test
     public void testKnownSimpleTypeURI() throws Exception
     {
+        final JSON json = json();
         final String URL_STR = "http://fasterxml.com";
         final URI uri = new URI(URL_STR);
         assertEquals(q("http:\\/\\/fasterxml.com"),
-                JSON.std.asString(uri));
+                json.asString(uri));
     }
 
     @Test
     public void testKnownSimpleTypeFile() throws Exception
     {
+        final JSON json = json();
         final String PATH = "/foo/bar.txt";
         assertEquals(q("\\/foo\\/bar.txt"),
-                JSON.std.asString(new File(PATH)));
+                json.asString(new File(PATH)));
     }
 
     @Test
     public void testKnownSimpleTypePath() throws Exception
     {
+        final JSON json = json();
         Path p = Paths.get(new URI("file:///foo/bar.txt"));
-        assertEquals(q("\\/foo\\/bar.txt"), JSON.std.asString(p));
+        assertEquals(q("\\/foo\\/bar.txt"), json.asString(p));
 
-        assertEquals(a2q("{'path':'\\/foo\\/bar.txt'}"), JSON.std.asString(new PathWrapper(p)));
+        assertEquals(a2q("{'path':'\\/foo\\/bar.txt'}"), json.asString(new PathWrapper(p)));
     }
 
     @Test
     public void testSimpleEnumTypes() throws Exception
     {
-        assertEquals(q("B"), JSON.std.asString(ABC.B));
-        assertEquals("1", JSON.std.with(Feature.WRITE_ENUMS_USING_INDEX).asString(ABC.B));
+        final JSON json = json();
+        assertEquals(q("B"), json.asString(ABC.B));
+        assertEquals("1", json.with(Feature.WRITE_ENUMS_USING_INDEX).asString(ABC.B));
     }
 
     @Test
     public void testUnknownType() throws Exception
     {
+        final JSON json = json();
         try {
-            String json = JSON.std.with(JSON.Feature.FAIL_ON_UNKNOWN_TYPE_WRITE)
+            String jsonStr = json.with(JSON.Feature.FAIL_ON_UNKNOWN_TYPE_WRITE)
                     .without(JSON.Feature.HANDLE_JAVA_BEANS)
                     .asString(new POJO());
-            fail("Should have failed: instead got: "+json);
+            fail("Should have failed: instead got: "+jsonStr);
         } catch (Exception e) {
             verifyException(e, "unrecognized type");
             verifyException(e, "POJO");
@@ -173,21 +193,22 @@ public class WriteSimpleTest extends TestBase
     @Test
     public void testTypedMaps() throws Exception
     {
+        final JSON json = json();
         final Address from = new Address("xyz");
-        final Map<String,Set<Address>> to = new HashMap<String,Set<Address>>();
-        to.put("static_addr", new HashSet<Address>());
+        final Map<String,Set<Address>> to = new HashMap<>();
+        to.put("static_addr", new HashSet<>());
         to.get("static_addr").add(new Address("abc"));
 
-        final   Map<String,Object> temp = new HashMap<String,Object>();
+        final   Map<String,Object> temp = new HashMap<>();
         temp.put("from", from);
         temp.put("TO", to);
 
-        String json = JSON.std.asString(temp);
+        String jsonStr = json.asString(temp);
 
-        assertNotNull(json);
+        assertNotNull(jsonStr);
         
         // and sanity check for back direction
-        Map<?,?> map = JSON.std.mapFrom(json);
+        Map<?,?> map = json.mapFrom(jsonStr);
         assertNotNull(map);
         assertEquals(2, map.size());
     }

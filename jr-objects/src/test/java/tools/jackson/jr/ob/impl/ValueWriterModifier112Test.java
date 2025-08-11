@@ -86,7 +86,7 @@ public class ValueWriterModifier112Test extends TestBase
         input.p1 = Paths.get("some/path");
         input.p2 = Paths.get("some/other/path");
         String json = WRITER.asString(input);
-        assertEquals(a2q("{'p1':'some\\/path','p2':'some\\/other\\/path'}"), json);
+        assertEquals(a2q("{'p1':'some/path','p2':'some/other/path'}"), json);
     }
 
     @Test
