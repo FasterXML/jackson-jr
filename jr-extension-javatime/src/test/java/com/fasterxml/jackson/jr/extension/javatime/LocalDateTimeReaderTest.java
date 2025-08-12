@@ -139,4 +139,18 @@ public class LocalDateTimeReaderTest {
         Assertions.assertEquals("\"2025-08-04T12:34:15.123+02:00[Europe/Berlin]\"", zdtString);
     }
     
+    @Test
+    public void testNull() throws JSONObjectException, IOException {
+    	final JSON json = JSON.builder().register(new JacksonJrJavaTimeExtension()).build();
+        
+    	final LocalDateTime local = json.beanFrom(LocalDateTime.class, "null");
+        Assertions.assertNull(local);
+        
+        final OffsetDateTime offset = json.beanFrom(OffsetDateTime.class, "null");
+        Assertions.assertNull(offset);
+        
+        final ZonedDateTime zoned = json.beanFrom(ZonedDateTime.class, "null");
+        Assertions.assertNull(zoned);
+    }
+    
 }

@@ -63,6 +63,7 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
      * the system default.
      * @see java.time.LocalDateTime
      * @param fallbackLocalZoneId Time zone to apply, or <code>null</code>
+     * @since 2.20
      * @return Reference for chaining
      */
     public JavaTimeReaderWriterProvider setLocalFallbackTimeZone(ZoneId fallbackLocalZoneId) {
@@ -77,6 +78,7 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
      * @param includeUtcDefault Set to <code>true</code> to set UTC to be the default offset
      *                          for non-local date times. Set to <code>false</code> when handling
      *                          local date times.
+ *     @since 2.20
      * @return Formatter
      */
     public static DateTimeFormatter createFormatter(boolean includeUtcDefault) {

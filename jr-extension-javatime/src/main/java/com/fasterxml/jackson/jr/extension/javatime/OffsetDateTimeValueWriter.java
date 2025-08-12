@@ -8,6 +8,12 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.jr.ob.api.ValueWriter;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 
+/**
+ * {@link ValueWriter} that converts a {@link OffsetDateTime} to an ISO 8601 string including
+ * an offset.
+ * @see <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 on Wikipedia</a>
+ * @since 2.20
+ */
 public class OffsetDateTimeValueWriter implements ValueWriter {
     @Override
     public void writeValue(JSONWriter context, JsonGenerator g, Object value) throws IOException {
