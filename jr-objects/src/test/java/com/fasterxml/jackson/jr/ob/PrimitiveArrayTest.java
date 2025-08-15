@@ -15,6 +15,8 @@ public class PrimitiveArrayTest extends TestBase
     private final static String BOOLEAN_ARRAY_JSON = "[true,false,true,false,true]";
     private final static boolean[] BOOLEAN_ARRAY = new boolean[] { true, false, true, false, true };
 
+    // Not yet implemented in Jackson-jr
+    @JacksonTestFailureExpected
     @Test
     public void testBooleanArrayRead() throws Exception {
         assertArrayEquals(BOOLEAN_ARRAY, JSON.std.beanFrom(boolean[].class, BOOLEAN_ARRAY_JSON));
@@ -46,6 +48,7 @@ public class PrimitiveArrayTest extends TestBase
     private final static String SHORT_ARRAY_JSON = "[1,2,3,32767,-32768]";
     private final static short[] SHORT_ARRAY = new short[] { 1, 2, 3, 32767, -32768 };
 
+    // Not yet implemented in Jackson-jr
     @JacksonTestFailureExpected
     @Test
     public void testShortArrayRead() throws Exception {
@@ -83,23 +86,41 @@ public class PrimitiveArrayTest extends TestBase
         assertEquals(LONG_ARRAY_JSON, JSON.std.asString(LONG_ARRAY));
     }
 
+    private final static String FLOAT_ARRAY_JSON = "[1.0,2.5,3.125,-5.5,0.0]";
+    private final static float[] FLOAT_ARRAY = new float[] {1.0f, 2.5f, 3.125f, -5.5f, 0.0f};
+
+    // Not yet implemented in Jackson-jr
+    @JacksonTestFailureExpected
     @Test
-    public void testFloatArray() throws Exception {
-        final float[] input = new float[]{1.0f, 2.5f, 3.14f, -5.5f, 0.0f};
-        String json = JSON.std.asString(input);
-        float[] result = JSON.std.beanFrom(float[].class, json);
-        assertArrayEquals(input, result, 0.0001f);
+    public void testFloatArrayRead() throws Exception {
+        assertArrayEquals(FLOAT_ARRAY, JSON.std.beanFrom(float[].class, FLOAT_ARRAY_JSON),
+                0.00001f);
     }
 
     @Test
-    public void testDoubleArray() throws Exception {
-        final double[] input = new double[]{1.0, 2.5, 3.14159, -5.5, 0.0};
-        String json = JSON.std.asString(input);
-        double[] result = JSON.std.beanFrom(double[].class, json);
-        assertArrayEquals(input, result, 0.0000001);
+    public void testFloatArrayWrite() throws Exception {
+        assertEquals(FLOAT_ARRAY_JSON, JSON.std.asString(FLOAT_ARRAY));
+    }
+
+    private final static String DOUBLE_ARRAY_JSON = "[0.5,-2.25,3.14159,-5.5,0.0]";
+    private final static double[] DOUBLE_ARRAY = new double[] {0.5, -2.25, 3.14159, -5.5f, 0.0};
+
+    // Not yet implemented in Jackson-jr
+    @JacksonTestFailureExpected
+    @Test
+    public void testDoubleArrayRead() throws Exception {
+        assertArrayEquals(DOUBLE_ARRAY, JSON.std.beanFrom(double[].class, DOUBLE_ARRAY_JSON),
+                0.00001);
+    }
+
+    @Test
+    public void testDoubleArrayWrite() throws Exception {
+        assertEquals(DOUBLE_ARRAY_JSON, JSON.std.asString(DOUBLE_ARRAY));
     }
 
     // Test empty arrays
+    // Not yet implemented in Jackson-jr
+    @JacksonTestFailureExpected
     @Test
     public void testEmptyArrays() throws Exception {
         assertArrayEquals(new boolean[0], JSON.std.beanFrom(boolean[].class, "[]"));
@@ -124,6 +145,8 @@ public class PrimitiveArrayTest extends TestBase
         public double[] doubles;
     }
 
+    // Not yet fully implemented in Jackson-jr
+    @JacksonTestFailureExpected
     @Test
     public void testArraysAsObjectFields() throws Exception {
         AllArraysBean input = new AllArraysBean();
