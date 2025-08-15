@@ -48,7 +48,7 @@ public abstract class ValueReader
      * Default implementation simply calls `p.nextToken()` first, then calls
      * {#link {@link #read(JSONReader, JsonParser)}, but some implementations
      * may decide to implement this differently to use (slightly) more efficient
-     * accessor in {@link JsonParser}, like {@link JsonParser#nextIntValue(int)}.
+     * accessors in {@link JsonParser}, like {@link JsonParser#nextIntValue(int)}.
      *
      * @param reader Context object that allows calling other read methods for contained
      *     values of different types (for example for collection readers).
