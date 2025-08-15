@@ -9,6 +9,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 
@@ -35,26 +36,24 @@ public class LocalDateTimeValueReader extends ValueReader {
 
     @Override
     public Object read(JSONReader reader, JsonParser p) throws IOException {
-    	// SimpleValueReader allows 'Date' objects to be null, so this should probably
-    	// also be the case here.
-    	if (p.hasToken(JsonToken.VALUE_NULL)) {
+        if (p.hasToken(JsonToken.VALUE_NULL)) {
             return null;
         }
-    	
-    	final TemporalAccessor ta = JavaTimeReaderWriterProvider.LOCAL_FORMATTER.parseBest(p.getText(), 
-                ZonedDateTime::from, LocalDateTime::from);
-        
-        if (ta instanceof ZonedDateTime) {
-            // Convert a date time that unexpectedly includes a time offset or zone ID, to a proper local date time
-            return ((ZonedDateTime)ta).withZoneSameInstant(_localZoneId).toLocalDateTime();
+        if (p.hasToken(JsonToken.VALUE_STRING)) {
+            final TemporalAccessor ta = JavaTimeReaderWriterProvider.LOCAL_FORMATTER.parseBest(p.getText(), 
+                    ZonedDateTime::from, LocalDateTime::from);
+            
+            if (ta instanceof ZonedDateTime) {
+                // Convert a date time that unexpectedly includes a time offset or zone ID, to a 
+                // local date time
+                return ((ZonedDateTime)ta).withZoneSameInstant(_localZoneId).toLocalDateTime();
+            }
+            if (ta instanceof LocalDateTime) {
+                return ta;
+            }
         }
-        if (ta instanceof LocalDateTime) {
-            return ta;
-        }
-        
-        throw new IOException(String.format("Converting \"%s\" to an instance of %s was "
-        		+ "unexpected and should not occur", 
-        		p.getText(),
-        		ta.getClass().getSimpleName()));
+     
+        throw JSONObjectException.from(p,
+                "Can not create a "+_valueType.getName()+" instance out of "+_tokenDesc(p));
     }
 }

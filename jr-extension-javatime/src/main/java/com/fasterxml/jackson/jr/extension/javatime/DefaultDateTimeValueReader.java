@@ -9,6 +9,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 
@@ -23,25 +24,34 @@ public class DefaultDateTimeValueReader<T extends TemporalAccessor> extends Valu
     private final TemporalQuery<T> _query;
 
     /**
-     * Constructor that includes a temportal query that is to be used during formatting.
+     * Constructor that includes a temporal query that is to be used during formatting.
      * @param targetType Target type
      * @param query Temporal query for parsing
      */
     public DefaultDateTimeValueReader(Class<T> targetType, TemporalQuery<T> query) {
         super(targetType);
-        
-        this._query = Objects.requireNonNull(query);
+        _query = Objects.requireNonNull(query);
     }
 
     @Override
     public Object read(JSONReader reader, JsonParser p) throws IOException {
-    	// SimpleValueReader allows 'Date' objects to be null, so this should probably
-    	// also be the case here.
-    	if (p.hasToken(JsonToken.VALUE_NULL)) {
+        if (p.hasToken(JsonToken.VALUE_NULL)) {
             return null;
         }
-    	
-        return JavaTimeReaderWriterProvider.FORMATTER.parse(p.getText(), _query);
+        if (p.hasToken(JsonToken.VALUE_STRING)) {
+        	return JavaTimeReaderWriterProvider.OFFSET_FORMATTER.parse(p.getText(), _query);
+        }
+        
+        throw JSONObjectException.from(p,
+                "Can not create a "+_valueType.getName()+" instance out of "+_tokenDesc(p));
     }
     
+    /**
+     * Check if an ISO 8601 string contains a time offset or not.
+     * @param text ISO 8601 string
+     * @return Return <code>true</code> when an offset is missing, otherwise: <code>false</code>
+     */
+    protected boolean offsetMissing(String text) {
+    	return !text.matches(".*(Z|[+-]\\d{2}(:?\\d{2})?)$");
+    }
 }

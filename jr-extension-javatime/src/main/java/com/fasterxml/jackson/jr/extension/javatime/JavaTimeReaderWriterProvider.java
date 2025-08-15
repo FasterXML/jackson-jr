@@ -20,25 +20,25 @@ import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
  */
 public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
 {
-    private ZoneId _fallbackLocalZoneId;
+    private ZoneId _localZoneId;
     
-    protected static final DateTimeFormatter FORMATTER = createFormatter(true);
-    protected static final DateTimeFormatter LOCAL_FORMATTER = createFormatter(false);
+    protected static final DateTimeFormatter OFFSET_FORMATTER = _createFormatter(true);
+    protected static final DateTimeFormatter LOCAL_FORMATTER = _createFormatter(false);
     
     public JavaTimeReaderWriterProvider() {
-        _fallbackLocalZoneId = ZoneId.systemDefault();
+        withLocalTimeZone(null);
     }
 
     @Override
     public ValueReader findValueReader(JSONReader readContext, Class<?> type) {
         if (LocalDateTime.class.isAssignableFrom(type)) {
-            return new LocalDateTimeValueReader(_fallbackLocalZoneId);
+            return new LocalDateTimeValueReader(_localZoneId);
         }
         if (OffsetDateTime.class.isAssignableFrom(type)) {
-            return new DefaultDateTimeValueReader<OffsetDateTime>(OffsetDateTime.class, OffsetDateTime::from);
+            return new OffsetDateTimeValueReader(_localZoneId);
         }
         if (ZonedDateTime.class.isAssignableFrom(type)) {
-            return new DefaultDateTimeValueReader<ZonedDateTime>(ZonedDateTime.class, ZonedDateTime::from);
+        	return new ZonedDateTimeValueReader(_localZoneId);
         }
         return null;
     }
@@ -59,16 +59,25 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
     
     /**
      * Setter to configure a time zone that is to be applied when a zoned ISO 8601 date time needs
-     * to be converted to a <code>LocalDateTime</code>. Can be set to <code>null</code> to apply
-     * the system default.
-     * @see java.time.LocalDateTime
-     * @param fallbackLocalZoneId Time zone to apply, or <code>null</code>
+     * to be converted to a {@link LocalDateTime}. Can be set to <code>null</code> to apply the
+     * UTC default.
+     * @param localZoneId Time zone to apply, or <code>null</code>
      * @since 2.20
      * @return Reference for chaining
      */
-    public JavaTimeReaderWriterProvider setLocalFallbackTimeZone(ZoneId fallbackLocalZoneId) {
-        _fallbackLocalZoneId = fallbackLocalZoneId == null ? ZoneId.systemDefault() : fallbackLocalZoneId;
+    public JavaTimeReaderWriterProvider withLocalTimeZone(ZoneId localZoneId) {
+        _localZoneId = localZoneId == null ? ZoneId.of("Z") : localZoneId;
         return this;
+    }
+    
+    /**
+     * Convenience method to quickly set the system default time zone as the preferred one. This
+     * is equivalent to calling: <code>withLocalTimeZone(ZoneId.systemDefault())</code>.
+     * @since 2.20
+     * @return Reference for chaining
+     */
+    public JavaTimeReaderWriterProvider withSystemDefaultTimeZone() {
+    	return withLocalTimeZone(ZoneId.systemDefault());
     }
     
     /**
@@ -76,12 +85,12 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
      * strings to be parsed.
      * 
      * @param includeUtcDefault Set to <code>true</code> to set UTC to be the default offset
-     *                          for non-local date times. Set to <code>false</code> when handling
-     *                          local date times.
+     *                          for non-local date times that do not have an offset. Set to 
+     *                          <code>false</code> when handling local date times.
  *     @since 2.20
      * @return Formatter
      */
-    public static DateTimeFormatter createFormatter(boolean includeUtcDefault) {
+    private static DateTimeFormatter _createFormatter(boolean includeUtcDefault) {
         final DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
                 .parseLenient()
                 .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
@@ -98,6 +107,8 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
                 .optionalEnd();
         
         if (includeUtcDefault) {
+        	// Without this, parsing a ZonedDateTime or OffsetDateTime will cause an exception if
+        	// no offset was specified. So we default the offset to UTC to be safe.
             builder.parseDefaulting(ChronoField.OFFSET_SECONDS, 0);
         }
         

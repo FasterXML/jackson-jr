@@ -17,7 +17,7 @@ import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 public class ZonedDateTimeValueWriter implements ValueWriter {
     @Override
     public void writeValue(JSONWriter context, JsonGenerator g, Object value) throws IOException {
-        String zonedDateTimeString = ((ZonedDateTime) value).format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        final String zonedDateTimeString = ((ZonedDateTime) value).format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
         context.writeValue(zonedDateTimeString);
     }
 

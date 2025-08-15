@@ -19,7 +19,7 @@ public class LocalDateTimeReaderTest {
     @Test
     public void testRead() throws JSONObjectException, IOException {
         final JSON json = JSON.builder().register(new JacksonJrJavaTimeExtension()
-                .with(new JavaTimeReaderWriterProvider().setLocalFallbackTimeZone(ZoneId.of("Europe/Berlin"))))
+                .with(new JavaTimeReaderWriterProvider().withLocalTimeZone(ZoneId.of("Europe/Berlin"))))
                 .build();
         
         final LocalDateTime local = json.beanFrom(LocalDateTime.class, "\"2025-08-04T14:34:15.123456789\"");
@@ -73,16 +73,16 @@ public class LocalDateTimeReaderTest {
         Assertions.assertEquals(123, offsetted.getLong(ChronoField.MILLI_OF_SECOND));
         Assertions.assertEquals(7200, offsetted.getOffset().getTotalSeconds());
         
-        final OffsetDateTime offsettedtWithoutOffset = json.beanFrom(OffsetDateTime.class, "\"2025-08-04T12:34:15.123\"");
+        final OffsetDateTime offsettedtWithoutOffset = json.beanFrom(OffsetDateTime.class, "\"2025-08-04T14:34:15.123\"");
         
         Assertions.assertEquals(2025, offsettedtWithoutOffset.getYear());
         Assertions.assertEquals(8, offsettedtWithoutOffset.getMonthValue());
         Assertions.assertEquals(4, offsettedtWithoutOffset.getDayOfMonth());
-        Assertions.assertEquals(12, offsettedtWithoutOffset.getHour());
+        Assertions.assertEquals(14, offsettedtWithoutOffset.getHour());
         Assertions.assertEquals(34, offsettedtWithoutOffset.getMinute());
         Assertions.assertEquals(15, offsettedtWithoutOffset.getSecond());
         Assertions.assertEquals(123, offsettedtWithoutOffset.getLong(ChronoField.MILLI_OF_SECOND));
-        Assertions.assertEquals(0, offsettedtWithoutOffset.getOffset().getTotalSeconds());
+        Assertions.assertEquals(7200, offsettedtWithoutOffset.getOffset().getTotalSeconds());
         
         final ZonedDateTime zoned = json.beanFrom(ZonedDateTime.class, "\"2025-08-04T12:34:15.123+02:00[Europe/Berlin]\"");
         
@@ -107,12 +107,51 @@ public class LocalDateTimeReaderTest {
         Assertions.assertEquals(123, zonedWithoutZoneName.getLong(ChronoField.MILLI_OF_SECOND));
         Assertions.assertEquals(7200, zonedWithoutZoneName.getOffset().getTotalSeconds());
         
-        final ZonedDateTime zonedWithoutOffset = json.beanFrom(ZonedDateTime.class, "\"2025-08-04T12:34:15.123\"");
+        final ZonedDateTime zonedWithoutOffset = json.beanFrom(ZonedDateTime.class, "\"2025-08-04T14:34:15.123\"");
         
         Assertions.assertEquals(2025, zonedWithoutOffset.getYear());
         Assertions.assertEquals(8, zonedWithoutOffset.getMonthValue());
         Assertions.assertEquals(4, zonedWithoutOffset.getDayOfMonth());
-        Assertions.assertEquals(12, zonedWithoutOffset.getHour());
+        Assertions.assertEquals(14, zonedWithoutOffset.getHour());
+        Assertions.assertEquals(34, zonedWithoutOffset.getMinute());
+        Assertions.assertEquals(15, zonedWithoutOffset.getSecond());
+        Assertions.assertEquals(123, zonedWithoutOffset.getLong(ChronoField.MILLI_OF_SECOND));
+        Assertions.assertEquals(7200, zonedWithoutOffset.getOffset().getTotalSeconds());
+    }
+    
+    @Test
+    public void testReadUtc() throws JSONObjectException, IOException {
+        final JSON json = JSON.builder().register(new JacksonJrJavaTimeExtension()
+                .with(new JavaTimeReaderWriterProvider()))
+                .build();
+        
+        final LocalDateTime local = json.beanFrom(LocalDateTime.class, "\"2025-08-04T14:34:15.123456789\"");
+        
+        Assertions.assertEquals(2025, local.getYear());
+        Assertions.assertEquals(8, local.getMonthValue());
+        Assertions.assertEquals(4, local.getDayOfMonth());
+        Assertions.assertEquals(14, local.getHour());
+        Assertions.assertEquals(34, local.getMinute());
+        Assertions.assertEquals(15, local.getSecond());
+        Assertions.assertEquals(123, local.getLong(ChronoField.MILLI_OF_SECOND));
+        
+        final OffsetDateTime offsettedtWithoutOffset = json.beanFrom(OffsetDateTime.class, "\"2025-08-04T14:34:15.123\"");
+        
+        Assertions.assertEquals(2025, offsettedtWithoutOffset.getYear());
+        Assertions.assertEquals(8, offsettedtWithoutOffset.getMonthValue());
+        Assertions.assertEquals(4, offsettedtWithoutOffset.getDayOfMonth());
+        Assertions.assertEquals(14, offsettedtWithoutOffset.getHour());
+        Assertions.assertEquals(34, offsettedtWithoutOffset.getMinute());
+        Assertions.assertEquals(15, offsettedtWithoutOffset.getSecond());
+        Assertions.assertEquals(123, offsettedtWithoutOffset.getLong(ChronoField.MILLI_OF_SECOND));
+        Assertions.assertEquals(0, offsettedtWithoutOffset.getOffset().getTotalSeconds());
+        
+        final ZonedDateTime zonedWithoutOffset = json.beanFrom(ZonedDateTime.class, "\"2025-08-04T14:34:15.123\"");
+        
+        Assertions.assertEquals(2025, zonedWithoutOffset.getYear());
+        Assertions.assertEquals(8, zonedWithoutOffset.getMonthValue());
+        Assertions.assertEquals(4, zonedWithoutOffset.getDayOfMonth());
+        Assertions.assertEquals(14, zonedWithoutOffset.getHour());
         Assertions.assertEquals(34, zonedWithoutOffset.getMinute());
         Assertions.assertEquals(15, zonedWithoutOffset.getSecond());
         Assertions.assertEquals(123, zonedWithoutOffset.getLong(ChronoField.MILLI_OF_SECOND));
@@ -141,9 +180,9 @@ public class LocalDateTimeReaderTest {
     
     @Test
     public void testNull() throws JSONObjectException, IOException {
-    	final JSON json = JSON.builder().register(new JacksonJrJavaTimeExtension()).build();
+        final JSON json = JSON.builder().register(new JacksonJrJavaTimeExtension()).build();
         
-    	final LocalDateTime local = json.beanFrom(LocalDateTime.class, "null");
+        final LocalDateTime local = json.beanFrom(LocalDateTime.class, "null");
         Assertions.assertNull(local);
         
         final OffsetDateTime offset = json.beanFrom(OffsetDateTime.class, "null");
