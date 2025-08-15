@@ -12,7 +12,7 @@ Modules:
 ------------------------------------------------------------------------
 
 #196: `float[]` and `double[]` are serialized to JSON as `{ }`
- (reported by Luke H)
+ (contributed by Luke H)
 
 2.20.0-rc1 (04-Aug-2025)
 

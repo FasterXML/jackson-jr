@@ -53,24 +53,34 @@ public class PrimitiveArrayTest extends TestBase
     }
 
     @Test
-    public void testShortArrayArrayWrite() throws Exception {
+    public void testShortArrayWrite() throws Exception {
         assertEquals(SHORT_ARRAY_JSON, JSON.std.asString(SHORT_ARRAY));
     }
 
+    private final static String INT_ARRAY_JSON = "[1,2,-2000,1000000,-999999999]";
+    private final static int[] INT_ARRAY = new int[] {1,2,-2000,1000000,-999999999};
+
     @Test
-    public void testIntArray() throws Exception {
-        final int[] input = new int[]{1, 2, 3, 25, 999};
-        String json = JSON.std.asString(input);
-        int[] result = JSON.std.beanFrom(int[].class, json);
-        assertArrayEquals(input, result);
+    public void testIntArrayRead() throws Exception {
+        assertArrayEquals(INT_ARRAY, JSON.std.beanFrom(int[].class, INT_ARRAY_JSON));
     }
 
     @Test
-    public void testLongArray() throws Exception {
-        final long[] input = new long[]{1L, 2L, 3L, 999999999999L, -999999999999L};
-        String json = JSON.std.asString(input);
-        long[] result = JSON.std.beanFrom(long[].class, json);
-        assertArrayEquals(input, result);
+    public void testIntArrayWrite() throws Exception {
+        assertEquals(INT_ARRAY_JSON, JSON.std.asString(INT_ARRAY));
+    }
+
+    private final static String LONG_ARRAY_JSON = "[1,-2,3,999999999999,-999999999999]";
+    private final static long[] LONG_ARRAY = new long[] {1L,-2L,3L,999999999999L,-999999999999L};
+
+    @Test
+    public void testLongArrayRead() throws Exception {
+        assertArrayEquals(LONG_ARRAY, JSON.std.beanFrom(long[].class, LONG_ARRAY_JSON));
+    }
+
+    @Test
+    public void testLongArrayWrite() throws Exception {
+        assertEquals(LONG_ARRAY_JSON, JSON.std.asString(LONG_ARRAY));
     }
 
     @Test
