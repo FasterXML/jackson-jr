@@ -9,6 +9,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PrimitiveArrayTest extends TestBase
 {
+    // Test arrays as object fields
+    static class AllArraysBean {
+        public boolean[] booleans;
+        public byte[] bytes;
+        public char[] chars;
+        public short[] shorts;
+        public int[] ints;
+        public long[] longs;
+        public float[] floats;
+        public double[] doubles;
+    }
+
     // Test all 7 primitive array types: boolean[], byte[], short[], int[], long[], float[], double[]
     // Also test char[] which is handled specially (as String)
 
@@ -136,18 +148,6 @@ public class PrimitiveArrayTest extends TestBase
         assertArrayEquals(new short[0], JSON.std.beanFrom(short[].class, "[]"));
         assertArrayEquals(new float[0], JSON.std.beanFrom(float[].class, "[]"), 0.0f);
         assertArrayEquals(new double[0], JSON.std.beanFrom(double[].class, "[]"), 0.0);
-    }
-    
-    // Test arrays as object fields
-    public static class AllArraysBean {
-        public boolean[] booleans;
-        public byte[] bytes;
-        public char[] chars;
-        public short[] shorts;
-        public int[] ints;
-        public long[] longs;
-        public float[] floats;
-        public double[] doubles;
     }
 
     // Not yet fully implemented in Jackson-jr
