@@ -69,10 +69,22 @@ public abstract class ValueReader
     /**********************************************************************
      */
 
+    /**
+     * Helper method for getting description of type of values this reader
+     * produces from input: used for example in exception messages.
+     */
+    protected String _valueTypeDesc() {
+        return _valueType.getCanonicalName();
+    }
+
+    /**
+     * Helper method for getting description of the token parser currently points to,
+     * for use in descriptions and exception messages.
+     */
     public static String _tokenDesc(JsonParser p) {
         return _tokenDesc(p, p.currentToken());
     }
-    
+
     protected static String _tokenDesc(JsonParser p, JsonToken t) {
         if (t == null) {
             return "NULL";

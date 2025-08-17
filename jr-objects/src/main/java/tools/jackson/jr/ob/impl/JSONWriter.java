@@ -193,6 +193,15 @@ public class JSONWriter
         case SER_BOOLEAN_ARRAY:
             writeBooleanArrayProperty(propName, (boolean[]) value);
             return;
+        case SER_SHORT_ARRAY:
+            writeShortArrayField(propName, (short[]) value);
+            return;
+        case SER_FLOAT_ARRAY:
+            writeFloatArrayField(propName, (float[]) value);
+            return;
+        case SER_DOUBLE_ARRAY:
+            writeDoubleArrayField(propName, (double[]) value);
+            return;
         case SER_TREE_NODE:
             writeTreeNodeProperty(propName, (TreeNode) value);
             return;
@@ -324,6 +333,15 @@ public class JSONWriter
         case SER_BOOLEAN_ARRAY:
             writeBooleanArrayValue((boolean[]) value);
             return;
+        case SER_SHORT_ARRAY:
+            writeShortArrayValue((short[]) value);
+            return;
+        case SER_FLOAT_ARRAY:
+            writeFloatArrayValue((float[]) value);
+            return;
+        case SER_DOUBLE_ARRAY:
+            writeDoubleArrayValue((double[]) value);
+            return;
         case SER_TREE_NODE:
             writeTreeNodeValue((TreeNode) value);
             return;
@@ -432,7 +450,11 @@ public class JSONWriter
 
     protected void writeCollectionValue(Collection<?> v) throws JacksonException
     {
-        _generator.writeStartArray();
+        if (v instanceof RandomAccess) {
+            _generator.writeStartArray(v, v.size());
+        } else {
+            _generator.writeStartArray(v);
+        }
         for (Object ob : v) {
             writeValue(ob);
         }
@@ -447,7 +469,7 @@ public class JSONWriter
 
     protected void writeIterableValue(Iterable<?> v) throws JacksonException
     {
-        _generator.writeStartArray();
+        _generator.writeStartArray(v);
         for (Object ob : v) {
             writeValue(ob);
         }
@@ -483,7 +505,7 @@ public class JSONWriter
 
     protected void writeMapValue(Map<?,?> v) throws JacksonException
     {
-        _generator.writeStartObject(v);
+        _generator.writeStartObject(v, v.size());
         if (!v.isEmpty()) {
             for (Map.Entry<?,?> entry : v.entrySet()) {
                 String key = keyToString(entry.getKey());
@@ -540,12 +562,7 @@ public class JSONWriter
     }
 
     protected void writeIntArrayValue(int[] v) throws JacksonException {
-        final int len = v.length;
-        _generator.writeStartArray(v, len);
-        for (int i = 0; i < len; ++i) {
-            _generator.writeNumber(v[i]);
-        }
-        _generator.writeEndArray();
+        _generator.writeArray(v, 0, v.length);
     }
 
     protected void writeIntArrayProperty(String propName, int[] v) throws JacksonException {
@@ -554,12 +571,7 @@ public class JSONWriter
     }
 
     protected void writeLongArrayValue(long[] v) throws JacksonException {
-        final int len = v.length;
-        _generator.writeStartArray(v, len);
-        for (int i = 0; i < len; ++i) {
-            _generator.writeNumber(v[i]);
-        }
-        _generator.writeEndArray();
+        _generator.writeArray(v, 0, v.length);
     }
 
     protected void writeLongArrayProperty(String propName, long[] v) throws JacksonException {
@@ -579,6 +591,41 @@ public class JSONWriter
     protected void writeBooleanArrayProperty(String propName, boolean[] v) throws JacksonException {
         _generator.writeName(propName);
         writeBooleanArrayValue(v);
+    }
+
+    protected void writeShortArrayValue(short[] v) throws JacksonException {
+        _generator.writeStartArray(v, v.length);
+        for (int i = 0, len = v.length; i < len; ++i) {
+            _generator.writeNumber(v[i]);
+        }
+        _generator.writeEndArray();
+    }
+
+    protected void writeShortArrayField(String fieldName, short[] v) throws JacksonException {
+        _generator.writeName(fieldName);
+        writeShortArrayValue(v);
+    }
+
+    protected void writeFloatArrayValue(float[] v) throws JacksonException {
+        _generator.writeStartArray(v, v.length);
+        for (int i = 0, len = v.length; i < len; ++i) {
+            _generator.writeNumber(v[i]);
+        }
+        _generator.writeEndArray();
+    }
+
+    protected void writeFloatArrayField(String fieldName, float[] v) throws JacksonException {
+        _generator.writeName(fieldName);
+        writeFloatArrayValue(v);
+    }
+
+    protected void writeDoubleArrayValue(double[] v) throws JacksonException {
+        _generator.writeArray(v, 0, v.length);
+    }
+
+    protected void writeDoubleArrayField(String fieldName, double[] v) throws JacksonException {
+        _generator.writeName(fieldName);
+        writeDoubleArrayValue(v);
     }
 
     protected void writeTreeNodeValue(TreeNode v) throws JacksonException {

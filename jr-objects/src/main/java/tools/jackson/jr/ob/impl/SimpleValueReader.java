@@ -113,9 +113,14 @@ public class SimpleValueReader extends ValueReader
             return _readIntArray(p);
         case SER_LONG_ARRAY:
             return _readLongArray(p);
-        //case SER_BOOLEAN_ARRAY:
-            // TODO:
-
+ 
+        // Not yet supported:
+        case SER_BOOLEAN_ARRAY:
+        case SER_SHORT_ARRAY:
+        case SER_FLOAT_ARRAY:
+        case SER_DOUBLE_ARRAY:
+            throw JSONObjectException.from(p,
+                "Deserialization of `"+_valueTypeDesc()+"` not yet supported");
         case SER_TREE_NODE:
             return reader.readTree();
 
@@ -275,7 +280,7 @@ public class SimpleValueReader extends ValueReader
         }
 
         throw JSONObjectException.from(p,
-                "Can not create a `"+_valueType.getName()+"` instance out of "+_tokenDesc(p));
+                "Can not create a `"+_valueTypeDesc()+"` instance out of "+_tokenDesc(p));
     }    
 
     /*
@@ -378,6 +383,6 @@ public class SimpleValueReader extends ValueReader
             return p.getLongValue();
         }
         throw JSONObjectException.from(p, "Can not get long numeric value from JSON (to construct "
-                +_valueType.getName()+") from "+_tokenDesc(p, t));
+                +_valueTypeDesc()+") from "+_tokenDesc(p, t));
     }
 }
