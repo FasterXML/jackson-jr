@@ -12,8 +12,12 @@ import tools.jackson.jr.extension.javatime.JavaTimeReaderWriterProvider;
 import tools.jackson.jr.ob.JSON;
 import tools.jackson.jr.ob.JSONObjectException;
 
-public class LocalDateTimeReaderTest {
-
+/**
+ * Tests for reading and writing supported {@code java.time} value types
+ * from/to JSON.
+ */
+public class JavaTimeValueReadWriteTest
+{
     @Test
     public void testRead() throws Exception {
         final JSON json = JSON.builder().register(new JacksonJrJavaTimeExtension()
