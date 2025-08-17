@@ -6,6 +6,7 @@ import com.fasterxml.jackson.jr.testutil.failure.JacksonTestFailureExpected;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class PrimitiveArrayTest extends TestBase
 {
@@ -61,10 +62,15 @@ public class PrimitiveArrayTest extends TestBase
     private final static short[] SHORT_ARRAY = new short[] { 1, 2, 3, 32767, -32768 };
 
     // Not yet implemented in Jackson-jr
-    @JacksonTestFailureExpected
     @Test
     public void testShortArrayRead() throws Exception {
-        assertArrayEquals(SHORT_ARRAY, JSON.std.beanFrom(short[].class, SHORT_ARRAY_JSON));
+//        assertArrayEquals(SHORT_ARRAY, JSON.std.beanFrom(short[].class, SHORT_ARRAY_JSON));
+        try {
+            JSON.std.beanFrom(short[].class, SHORT_ARRAY_JSON);
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "Deserialization of `short[]` not yet supported");
+        }
     }
 
     @Test
@@ -102,11 +108,17 @@ public class PrimitiveArrayTest extends TestBase
     private final static float[] FLOAT_ARRAY = new float[] {1.0f, 2.5f, 3.125f, -5.5f, 0.0f};
 
     // Not yet implemented in Jackson-jr
-    @JacksonTestFailureExpected
     @Test
     public void testFloatArrayRead() throws Exception {
-        assertArrayEquals(FLOAT_ARRAY, JSON.std.beanFrom(float[].class, FLOAT_ARRAY_JSON),
-                0.00001f);
+        //assertArrayEquals(FLOAT_ARRAY, JSON.std.beanFrom(float[].class, FLOAT_ARRAY_JSON),
+        //        0.00001f);
+
+        try {
+            JSON.std.beanFrom(float[].class, FLOAT_ARRAY_JSON);
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "Deserialization of `float[]` not yet supported");
+        }
     }
 
     @Test
@@ -117,12 +129,17 @@ public class PrimitiveArrayTest extends TestBase
     private final static String DOUBLE_ARRAY_JSON = "[0.5,-2.25,3.14159,-5.5,0.0]";
     private final static double[] DOUBLE_ARRAY = new double[] {0.5, -2.25, 3.14159, -5.5f, 0.0};
 
-    // Not yet implemented in Jackson-jr
-    @JacksonTestFailureExpected
     @Test
     public void testDoubleArrayRead() throws Exception {
-        assertArrayEquals(DOUBLE_ARRAY, JSON.std.beanFrom(double[].class, DOUBLE_ARRAY_JSON),
-                0.00001);
+        //assertArrayEquals(DOUBLE_ARRAY, JSON.std.beanFrom(double[].class, DOUBLE_ARRAY_JSON),
+        //        0.00001);
+
+        try {
+            JSON.std.beanFrom(double[].class, DOUBLE_ARRAY_JSON);
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "Deserialization of `double[]` not yet supported");
+        }
     }
 
     @Test
