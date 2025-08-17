@@ -75,3 +75,8 @@ Giovanni van der Schelde (@Giovds)
 * Reported, suggested a fix for #167: Deserialization of record fails
   on constructor parameter ordering
  (2.18.1)
+
+Luke Hutchison (@lukehutch)
+
+* Reported #196: `float[]` and `double[]` are serialized to JSON as `{ }`
+ (2.20.0)
