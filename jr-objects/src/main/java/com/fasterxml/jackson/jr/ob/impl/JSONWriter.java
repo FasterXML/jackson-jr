@@ -445,7 +445,11 @@ public class JSONWriter
 
     protected void writeCollectionValue(Collection<?> v) throws IOException
     {
-        _generator.writeStartArray();
+        if (v instanceof RandomAccess) {
+            _generator.writeStartArray(v, v.size());
+        } else {
+            _generator.writeStartArray(v);
+        }
         for (Object ob : v) {
             writeValue(ob);
         }
@@ -460,7 +464,7 @@ public class JSONWriter
 
     protected void writeIterableValue(Iterable<?> v) throws IOException
     {
-        _generator.writeStartArray();
+        _generator.writeStartArray(v);
         for (Object ob : v) {
             writeValue(ob);
         }
@@ -475,7 +479,11 @@ public class JSONWriter
 
     protected void writeListValue(List<?> list) throws IOException
     {
-        _generator.writeStartArray();
+        if (list instanceof RandomAccess) {
+            _generator.writeStartArray(list, list.size());
+        } else {
+            _generator.writeStartArray(list);
+        }
         for (int i = 0, len = list.size(); i < len; ++i) {
             Object value = list.get(i);
             if (value == null) {
@@ -495,7 +503,7 @@ public class JSONWriter
 
     protected void writeMapValue(Map<?,?> v) throws IOException
     {
-        _generator.writeStartObject();
+        _generator.writeStartObject(v, v.size());
         if (!v.isEmpty()) {
             for (Map.Entry<?,?> entry : v.entrySet()) {
                 String key = keyToString(entry.getKey());
@@ -522,8 +530,9 @@ public class JSONWriter
     }
 
     protected void writeObjectArrayValue(Object[] v) throws IOException {
-        _generator.writeStartArray();
-        for (int i = 0, len = v.length; i < len; ++i) {
+        final int len = v.length;
+        _generator.writeStartArray(v, len);
+        for (int i = 0; i < len; ++i) {
             writeValue(v[i]);
         }
         _generator.writeEndArray();
@@ -535,11 +544,7 @@ public class JSONWriter
     }
 
     protected void writeIntArrayValue(int[] v) throws IOException {
-        _generator.writeStartArray();
-        for (int i = 0, len = v.length; i < len; ++i) {
-            _generator.writeNumber(v[i]);
-        }
-        _generator.writeEndArray();
+        _generator.writeArray(v, 0, v.length);
     }
 
     protected void writeIntArrayField(String fieldName, int[] v) throws IOException {
@@ -548,11 +553,7 @@ public class JSONWriter
     }
 
     protected void writeLongArrayValue(long[] v) throws IOException {
-        _generator.writeStartArray();
-        for (int i = 0, len = v.length; i < len; ++i) {
-            _generator.writeNumber(v[i]);
-        }
-        _generator.writeEndArray();
+        _generator.writeArray(v, 0, v.length);
     }
 
     protected void writeLongArrayField(String fieldName, long[] v) throws IOException {
@@ -561,7 +562,7 @@ public class JSONWriter
     }
 
     protected void writeBooleanArrayValue(boolean[] v) throws IOException {
-        _generator.writeStartArray();
+        _generator.writeStartArray(v, v.length);
         for (int i = 0, len = v.length; i < len; ++i) {
             _generator.writeBoolean(v[i]);
         }
@@ -574,7 +575,7 @@ public class JSONWriter
     }
 
     protected void writeShortArrayValue(short[] v) throws IOException {
-        _generator.writeStartArray();
+        _generator.writeStartArray(v, v.length);
         for (int i = 0, len = v.length; i < len; ++i) {
             _generator.writeNumber(v[i]);
         }
@@ -587,7 +588,7 @@ public class JSONWriter
     }
 
     protected void writeFloatArrayValue(float[] v) throws IOException {
-        _generator.writeStartArray();
+        _generator.writeStartArray(v, v.length);
         for (int i = 0, len = v.length; i < len; ++i) {
             _generator.writeNumber(v[i]);
         }
@@ -600,11 +601,7 @@ public class JSONWriter
     }
 
     protected void writeDoubleArrayValue(double[] v) throws IOException {
-        _generator.writeStartArray();
-        for (int i = 0, len = v.length; i < len; ++i) {
-            _generator.writeNumber(v[i]);
-        }
-        _generator.writeEndArray();
+        _generator.writeArray(v, 0, v.length);
     }
 
     protected void writeDoubleArrayField(String fieldName, double[] v) throws IOException {

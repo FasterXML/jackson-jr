@@ -281,7 +281,7 @@ public class SimpleValueReader extends ValueReader
         }
 
         throw JSONObjectException.from(p,
-                "Can not create a `"+_valueType.getName()+"` instance out of "+_tokenDesc(p));
+                "Can not create a `"+_valueTypeDesc()+"` instance out of "+_tokenDesc(p));
     }    
 
     /*
@@ -532,6 +532,6 @@ public class SimpleValueReader extends ValueReader
             return p.getLongValue();
         }
         throw JSONObjectException.from(p, "Can not get long numeric value from JSON (to construct "
-                +_valueType.getName()+") from "+_tokenDesc(p, t));
+                +_valueTypeDesc()+") from "+_tokenDesc(p, t));
     }
 }

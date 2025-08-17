@@ -58,64 +58,64 @@ public abstract class ValueLocatorBase
      */
     public final static int SER_OBJECT_ARRAY = 4;
 
-    public final static int SER_INT_ARRAY = 5;
-    public final static int SER_LONG_ARRAY = 6;
-    public final static int SER_BOOLEAN_ARRAY = 7;
-    public final static int SER_SHORT_ARRAY = 38;
-    public final static int SER_FLOAT_ARRAY = 39;
-    public final static int SER_DOUBLE_ARRAY = 40;
-    
+    public final static int SER_SHORT_ARRAY = 5; // since 2.20
+    public final static int SER_INT_ARRAY = 6;
+    public final static int SER_LONG_ARRAY = 7;
+    public final static int SER_FLOAT_ARRAY = 8; // since 2.20
+    public final static int SER_DOUBLE_ARRAY = 9; // since 2.20
+    public final static int SER_BOOLEAN_ARRAY = 10;
+
     /**
      * An implementation of {@link com.fasterxml.jackson.core.TreeNode}
      */
-    public final static int SER_TREE_NODE = 8;
+    public final static int SER_TREE_NODE = 11;
     
     // // // String(-like) types
 
-    public final static int SER_STRING = 9;
-    public final static int SER_CHARACTER_SEQUENCE = 10;
-    public final static int SER_CHAR_ARRAY = 11;
-    public final static int SER_BYTE_ARRAY = 12;
+    public final static int SER_STRING = 12;
+    public final static int SER_CHARACTER_SEQUENCE = 13;
+    public final static int SER_CHAR_ARRAY = 14;
+    public final static int SER_BYTE_ARRAY = 15;
 
     // // // Numbers
     
-    public final static int SER_NUMBER_BYTE = 13;
+    public final static int SER_NUMBER_BYTE = 16;
 
-    public final static int SER_NUMBER_SHORT = 14;
+    public final static int SER_NUMBER_SHORT = 17;
 
-    public final static int SER_NUMBER_INTEGER = 15;
-    public final static int SER_NUMBER_INTEGER_WRAPPER = 16;
+    public final static int SER_NUMBER_INTEGER = 18;
+    public final static int SER_NUMBER_INTEGER_WRAPPER = 19;
 
-    public final static int SER_NUMBER_LONG = 17;
-    public final static int SER_NUMBER_LONG_WRAPPER = 18;
+    public final static int SER_NUMBER_LONG = 20;
+    public final static int SER_NUMBER_LONG_WRAPPER = 21;
 
-    public final static int SER_NUMBER_FLOAT = 19;
-    public final static int SER_NUMBER_FLOAT_WRAPPER = 20;
+    public final static int SER_NUMBER_FLOAT = 22;
+    public final static int SER_NUMBER_FLOAT_WRAPPER = 23;
 
-    public final static int SER_NUMBER_DOUBLE = 21;
-    public final static int SER_NUMBER_DOUBLE_WRAPPER = 22;
+    public final static int SER_NUMBER_DOUBLE = 24;
+    public final static int SER_NUMBER_DOUBLE_WRAPPER = 25;
 
-    public final static int SER_NUMBER_BIG_INTEGER = 23;
+    public final static int SER_NUMBER_BIG_INTEGER = 26;
 
-    public final static int SER_NUMBER_BIG_DECIMAL = 24;
+    public final static int SER_NUMBER_BIG_DECIMAL = 27;
 
     // // // Other specific scalar types
 
-    public final static int SER_BOOLEAN = 25;
-    public final static int SER_BOOLEAN_WRAPPER = 26;
-    public final static int SER_CHAR = 27;
+    public final static int SER_BOOLEAN = 28;
+    public final static int SER_BOOLEAN_WRAPPER = 29;
+    public final static int SER_CHAR = 30;
 
-    public final static int SER_ENUM = 28;
+    public final static int SER_ENUM = 31;
 
-    public final static int SER_DATE = 29;
-    public final static int SER_CALENDAR = 30;
+    public final static int SER_DATE = 32;
+    public final static int SER_CALENDAR = 33;
 
-    public final static int SER_CLASS = 31;
-    public final static int SER_FILE = 32;
-    public final static int SER_UUID = 33;
-    public final static int SER_URL = 34;
-    public final static int SER_URI = 35;
-    public final static int SER_PATH = 36; // since 2.17
+    public final static int SER_CLASS = 34;
+    public final static int SER_FILE = 35;
+    public final static int SER_UUID = 36;
+    public final static int SER_URL = 37;
+    public final static int SER_URI = 38;
+    public final static int SER_PATH = 39; // since 2.17
 
     // // // Iterate-able types
 
@@ -123,7 +123,7 @@ public abstract class ValueLocatorBase
      * Anything that implements {@link java.lang.Iterable}, but not
      * {@link java.util.Collection}.
      */
-    public final static int SER_ITERABLE = 37;
+    public final static int SER_ITERABLE = 40;
 
     /*
     /**********************************************************************
