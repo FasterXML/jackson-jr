@@ -82,6 +82,16 @@ public abstract class ValueReader
      */
 
     /**
+     * Helper method for getting description of type of values this reader
+     * produces from input: used for example in exception messages.
+     *
+     * @since 2.20
+     */
+    protected String _valueTypeDesc() {
+        return _valueType.getCanonicalName();
+    }
+
+    /**
      * Helper method for getting description of the token parser currently points to,
      * for use in descriptions and exception messages.
      */
