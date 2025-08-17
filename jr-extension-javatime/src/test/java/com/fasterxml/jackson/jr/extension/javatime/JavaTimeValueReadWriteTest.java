@@ -14,8 +14,12 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 
-public class LocalDateTimeReaderTest {
-
+/**
+ * Tests for reading and writing supported {@code java.time} value types
+ * from/to JSON.
+ */
+public class JavaTimeValueReadWriteTest
+{
     @Test
     public void testRead() throws JSONObjectException, IOException {
         final JSON json = JSON.builder().register(new JacksonJrJavaTimeExtension()
