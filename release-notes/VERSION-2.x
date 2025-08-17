@@ -13,6 +13,8 @@ Modules:
 
 #196: `float[]` and `double[]` are serialized to JSON as `{ }`
  (contributed by Luke H)
+#201: Support for OffsetDateTime and ZonedDateTime in jackson-jr-extension-javatime
+ (contributed by Stan B)
 
 2.20.0-rc1 (04-Aug-2025)
 
