@@ -1518,9 +1518,6 @@ public class JSON
         if (source instanceof Reader) {
             return f.createParser(this, (Reader) source);
         }
-        if (source instanceof URL) {
-            return f.createParser(this, (URL) source);
-        }
         if (type == char[].class) {
             return f.createParser(this, new CharArrayReader((char[]) source));
         }
@@ -1530,8 +1527,13 @@ public class JSON
         if (source instanceof CharSequence) {
             return f.createParser(this, ((CharSequence) source).toString());
         }
+        if (source instanceof URL) {
+            // 19-Aug-2025, tatu: as per [core#1463] `java.net.URL` is no longer supported
+            throw new JSONObjectException("Can not use Source of type `"+source.getClass().getName()
+                    +"` as input -- suppor drop in Jackson 3.0 (use an `InputStream`, `Reader`, `String`/`CharSequence`, `byte[]`, `char[]` or `File`");
+        }
         throw new JSONObjectException("Can not use Source of type `"+source.getClass().getName()
-+"` as input (use an `InputStream`, `Reader`, `String`/`CharSequence`, `byte[]`, `char[]`, `File` or `URL`");
++"` as input (use an `InputStream`, `Reader`, `String`/`CharSequence`, `byte[]`, `char[]` or `File`");
     }
 
     protected JsonParser _initForReading(JsonParser p) throws JacksonException
