@@ -49,6 +49,16 @@ public class PrimitiveArrayTest extends TestBase
         assertArrayEquals(input, result);
     }
 
+    @Test
+    public void testByteArrayReadFromArray() throws Exception {
+        try {
+            JSON.std.beanFrom(byte[].class, "[1,2,3]");
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "Can only bind `byte[]` from Binary value");
+        }
+    }
+
     // Special: char[] is serialized as a String
     @Test
     public void testCharArray() throws Exception {

@@ -13,6 +13,7 @@ Modules:
 
 #196: `float[]` and `double[]` are serialized to JSON as `{ }`
  (contributed by Luke H)
+#200: Odd errors when attempting to read `byte[]` from regular JSON array
 #201: Support for OffsetDateTime and ZonedDateTime in jackson-jr-extension-javatime
  (contributed by Stan B)
 
