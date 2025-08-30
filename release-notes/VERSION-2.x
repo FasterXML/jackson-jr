@@ -11,15 +11,17 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
+2.21.0 (not yet released)
+
+No changes since 2.20
+
+2.20.0 (28-Aug-2025)
+
 #196: `float[]` and `double[]` are serialized to JSON as `{ }`
  (contributed by Luke H)
 #200: Odd errors when attempting to read `byte[]` from regular JSON array
 #201: Support for OffsetDateTime and ZonedDateTime in jackson-jr-extension-javatime
  (contributed by Stan B)
-
-2.20.0-rc1 (04-Aug-2025)
-
-No changes since 2.19
 
 2.19.2 (18-Jul-2025)
 
