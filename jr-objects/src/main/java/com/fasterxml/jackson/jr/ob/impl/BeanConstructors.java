@@ -1,6 +1,8 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Container class added to encapsulate details of collection and use of
@@ -24,6 +26,8 @@ public class BeanConstructors
     protected Constructor<?> _intCtor;
     protected Constructor<?> _longCtor;
     protected Constructor<?> _stringCtor;
+
+    protected Map<String, Integer> _recordCtorAliases = new HashMap<>();
 
     public BeanConstructors(Class<?> valueType) {
         _valueType = valueType;
@@ -111,5 +115,9 @@ public class BeanConstructors
         }
         throw new IllegalStateException("Class "+_valueType.getName()
             +" does not have single-long or single-int constructor to use");
+    }
+
+    public void addRecordConstructorAlias(String explicitName, Class<?> type, int i) {
+        _recordCtorAliases.put(explicitName, i);
     }
 }

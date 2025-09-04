@@ -138,7 +138,7 @@ public class POJODefinition
             return !aliases.isEmpty();
         }
 
-        public Iterable<String> aliases() {
+        public Collection<String> aliases() {
             return aliases;
         }
     }

@@ -16,6 +16,7 @@ import com.fasterxml.jackson.jr.ob.impl.BeanConstructors;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
+import com.fasterxml.jackson.jr.ob.impl.RecordsHelpers;
 
 /**
  *
@@ -36,12 +37,13 @@ public class AnnotationBasedIntrospector
 
     // // // State (collected properties, related)
 
-    protected final Map<String, APropBuilder> _props = new HashMap<String, APropBuilder>();
+    protected Map<String, APropBuilder> _props;
 
     // // // State only for deserialization:
 
     protected Set<String> _ignorableNames;
     protected int _features;
+    protected boolean _isRecord;
 
     protected AnnotationBasedIntrospector(Class<?> type, boolean serialization,
             JsonAutoDetect.Value visibility, int features) {
@@ -58,6 +60,19 @@ public class AnnotationBasedIntrospector
         } else {
             _visibility = visibility.withOverrides(JsonAutoDetect.Value.from(ann));
         }
+        _isRecord = RecordsHelpers.isRecordType(type);
+
+        // May need to retain order for Record serialization too
+        if (keepPropertyOrderForRecord(features)) {
+            _props = new LinkedHashMap<>();
+        } else {
+            _props = new HashMap<>();
+        }
+    }
+
+    private boolean keepPropertyOrderForRecord(int features) {
+        return _isRecord && _forSerialization
+                && JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER.isEnabled(features);
     }
 
     public static POJODefinition pojoDefinitionForDeserialization(JSONReader r,
@@ -89,31 +104,65 @@ public class AnnotationBasedIntrospector
         // secondary ignoral information:
         if (_forSerialization) {
             constructors = null;
+            if (_isRecord) {
+                Constructor<?> canonical = _getCanonicalRecordConstructor(_type);
+
+                for (Parameter ctorParam : canonical.getParameters()) {
+                    _props.computeIfAbsent(ctorParam.getName(), APropBuilder::new);
+                }
+            }
         } else {
             constructors = new BeanConstructors(_type);
-            for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
-                Class<?>[] argTypes = ctor.getParameterTypes();
-                if (argTypes.length == 0) {
-                    constructors.addNoArgsConstructor(ctor);
-                } else if (argTypes.length == 1) {
-                    Class<?> argType = argTypes[0];
-                    if (argType == String.class) {
-                        constructors.addStringConstructor(ctor);
-                    } else if (argType == Integer.class || argType == Integer.TYPE) {
-                        constructors.addIntConstructor(ctor);
-                    } else if (argType == Long.class || argType == Long.TYPE) {
-                        constructors.addLongConstructor(ctor);
+            if (_isRecord) {
+                Constructor<?> canonical = _getCanonicalRecordConstructor(_type);
+                constructors.addRecordConstructor(canonical);
+                // And then let's "seed" properties to ensure correct ordering
+                // of Properties wrt Canonical constructor parameters:
+                for (Parameter ctorParam : canonical.getParameters()) {
+                    _props.computeIfAbsent(ctorParam.getName(), APropBuilder::new);
+                }
+
+                for (int i = 0; i < canonical.getParameterCount(); i++) {
+                    Parameter ctorParam = canonical.getParameters()[i];
+                    final String explicitName = _findExplicitName(ctorParam);
+                    if (explicitName != null) {
+                        constructors.addRecordConstructorAlias(explicitName, ctorParam.getType(), i);
+                    }
+                    }
+            } else {
+                for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
+                    Class<?>[] argTypes = ctor.getParameterTypes();
+                    if (argTypes.length == 0) {
+                        constructors.addNoArgsConstructor(ctor);
+                    } else if (argTypes.length == 1) {
+                        Class<?> argType = argTypes[0];
+                        if (argType == String.class) {
+                            constructors.addStringConstructor(ctor);
+                        } else if (argType == Integer.class || argType == Integer.TYPE) {
+                            constructors.addIntConstructor(ctor);
+                        } else if (argType == Long.class || argType == Long.TYPE) {
+                            constructors.addLongConstructor(ctor);
+                        }
                     }
                 }
             }
         }
 
         POJODefinition def = new POJODefinition(_type,
-                _pruneProperties(_forSerialization), constructors);
+                _pruneProperties(_forSerialization && !_isRecord), constructors);
         if (_ignorableNames != null) {
             def = def.withIgnorals(_ignorableNames);
         }
         return def;
+    }
+
+    private Constructor<?> _getCanonicalRecordConstructor(Class<?> beanType) {
+        Constructor<?> canonical = RecordsHelpers.findCanonicalConstructor(beanType);
+        if (canonical == null) { // should never happen
+            throw new IllegalArgumentException(
+                    "Unable to find canonical constructor of Record type `"+beanType.getName()+"`");
+        }
+        return canonical;
     }
 
     /*
@@ -147,19 +196,19 @@ public class AnnotationBasedIntrospector
                 continue;
             }
             // but even without ignorals, something has to be visible; if not, remove prop
-            if (!prop.anyVisible()) { // if nothing visible, just remove altogether
+            if (!_isRecord && !prop.anyVisible()) { // if nothing visible, just remove altogether
                 it.remove();
                 continue;
             }
             // plus then remove non-visible accessors
-            prop.removeNonVisible();
+            prop.removeNonVisible(_isRecord);
 
             // and finally, see if renaming (due to explicit name override) needed:
             String explName = prop.findPrimaryExplicitName(_forSerialization);
             if (explName != null) {
                 it.remove();
                 if (renamed == null) {
-                    renamed = new LinkedList<APropBuilder>();
+                    renamed = new LinkedList<>();
                 }
                 renamed.add(prop.withName(explName));
             }
@@ -634,8 +683,8 @@ public class AnnotationBasedIntrospector
             }
         }
 
-        public void removeNonVisible() {
-            if ((field != null) && !field.isVisible) {
+        public void removeNonVisible(boolean isRecord) {
+            if ((field != null) && (!field.isVisible && !isRecord)) {
                 field = null;
             }
             if ((getter != null) && !getter.isVisible) {

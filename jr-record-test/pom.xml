@@ -20,6 +20,11 @@
             <artifactId>jackson-jr-objects</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jr</groupId>
+            <artifactId>jackson-jr-annotation-support</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

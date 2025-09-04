@@ -82,7 +82,7 @@ public class BeanReader
         return prop;
     }
 
-    private final BeanPropertyReader _findAlias(String name) {
+    private BeanPropertyReader _findAlias(String name) {
         String primaryName = _aliasMapping.get(name);
         return (primaryName == null) ? null : _propsByName.get(primaryName);
     }
@@ -141,7 +141,7 @@ public class BeanReader
 
         String propName;
         for (; (propName = p.nextFieldName()) != null;) {
-            BeanPropertyReader prop = findProperty(propName);
+            BeanPropertyReader prop = _findAlias(propName);
             if (prop == null) {
                 handleUnknown(r, p, propName);
                 continue;
