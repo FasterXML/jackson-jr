@@ -121,14 +121,6 @@ public class AnnotationBasedIntrospector
                 for (Parameter ctorParam : canonical.getParameters()) {
                     _props.computeIfAbsent(ctorParam.getName(), APropBuilder::new);
                 }
-
-                for (int i = 0; i < canonical.getParameterCount(); i++) {
-                    Parameter ctorParam = canonical.getParameters()[i];
-                    final String explicitName = _findExplicitName(ctorParam);
-                    if (explicitName != null) {
-                        constructors.addRecordConstructorAlias(explicitName, ctorParam.getType(), i);
-                    }
-                    }
             } else {
                 for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
                     Class<?>[] argTypes = ctor.getParameterTypes();
@@ -622,6 +614,7 @@ public class AnnotationBasedIntrospector
         public POJODefinition.Prop asProperty(boolean collectAliases) {
             Set<String> aliases = collectAliases ? collectAliases() : null;
             return new POJODefinition.Prop(name,
+                    origName,
                     (field == null) ? null : field.accessor,
                     (setter == null) ? null : setter.accessor,
                     (getter == null) ? null : getter.accessor,
@@ -702,6 +695,8 @@ public class AnnotationBasedIntrospector
             collectedAliases = _collectAliases(field, collectedAliases);
             collectedAliases = _collectAliases(getter, collectedAliases);
             collectedAliases = _collectAliases(setter, collectedAliases);
+            // HERE COLLECT RECORD ALIASES
+//            collectedAliases.add(origName);
             return collectedAliases;
         }
 

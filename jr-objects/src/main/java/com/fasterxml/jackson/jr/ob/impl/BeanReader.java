@@ -141,7 +141,7 @@ public class BeanReader
 
         String propName;
         for (; (propName = p.nextFieldName()) != null;) {
-            BeanPropertyReader prop = _findAlias(propName);
+            BeanPropertyReader prop = findProperty(propName);
             if (prop == null) {
                 handleUnknown(r, p, propName);
                 continue;

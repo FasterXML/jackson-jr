@@ -8,6 +8,7 @@ import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterModifier;
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
+import com.fasterxml.jackson.jr.ob.impl.POJODefinition.Prop;
 import com.fasterxml.jackson.jr.type.ResolvedType;
 import com.fasterxml.jackson.jr.type.TypeBindings;
 import com.fasterxml.jackson.jr.type.TypeResolver;
@@ -477,13 +478,14 @@ public class ValueReaderLocator
                     }
                 }
                 if (isRecord) {
-                    // Records can only deserialize propreties that are declared in the record;
+                    // Records can only deserialize properties that are declared in the record;
                     // other virtual properties (getter methods) need to be ignored
-                    if (!recordProps.contains(rawProp.name)) {
+                    if (!recordProps.contains(rawProp.originalName())
+                            || propsContainAlias(rawProps, rawProp)) {
                         continue;
                     }
                     try {
-                        field = raw.getDeclaredField(rawProp.name);
+                        field = raw.getDeclaredField(rawProp.originalName());
                     } catch (NoSuchFieldException e) {
                         throw new IllegalStateException("Cannot access field " + rawProp.name
                                 + " of record class " + raw.getName(), e);
@@ -522,6 +524,21 @@ public class ValueReaderLocator
         }
         return new BeanReader(raw, propMap, constructors,
                 beanDef.getIgnorableNames(), aliasMapping);
+    }
+
+    private boolean propsContainAlias(List<Prop> rawProps, Prop rawProp) {
+        if (!rawProp.hasAliases()) {
+            return false;
+        }
+        for (String alias : rawProp.aliases()) {
+            for (Prop prop : rawProps) {
+                if (alias.equals(prop.originalName())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private TypeBindings _bindings(Class<?> ctxt) {
