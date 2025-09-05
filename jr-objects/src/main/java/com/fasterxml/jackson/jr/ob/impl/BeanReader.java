@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
+import com.fasterxml.jackson.jr.ob.impl.POJODefinition.Prop;
 
 /**
  * Class that contains information about dynamically introspected
@@ -149,7 +150,40 @@ public class BeanReader
             Object value = prop.getReader().readNext(r, p);
             values[prop.getIndex()] = value;
         }
+        if (_isRecordType) {
+            for (int i = 0; i < values.length; i++) {
+                if (values[i] == null) {
+                    for (BeanPropertyReader prop : _propsByName.values()) {
+                        if (prop.getIndex() == i) {
+                            values[i] = nullValue(prop.getReader().valueType());
+                        }
+                    }
+                }
+            }
+        }
         return _constructors.createRecord(values);
+    }
+
+    private Object nullValue(Class<?> aClass) {
+        if (!aClass.isPrimitive()) {
+            return null;
+        }
+        if (aClass.equals(int.class)) {
+            return 0;
+        }
+        if (aClass.equals(long.class)) {
+            return (long) 0;
+        }
+        if (aClass.equals(boolean.class)) {
+            return Boolean.FALSE;
+        }
+        if (aClass.equals(short.class)) {
+            return (short) 0;
+        }
+        if (aClass.equals(char.class)) {
+            return (char) 0;
+        }
+        throw new IllegalArgumentException("Cannot determine null value for " + aClass);
     }
 
     /**

@@ -200,6 +200,7 @@ public abstract class AbstractJava17RecordTest
         String json = jsonHandler.asString(r);
         SnakeCaseRecordWithIgnore r2 = jsonHandler.beanFrom(SnakeCaseRecordWithIgnore.class, json);
         assertEquals(r.value(), r2.value());
+        assertEquals(0, r2.x());
     }
 }
 

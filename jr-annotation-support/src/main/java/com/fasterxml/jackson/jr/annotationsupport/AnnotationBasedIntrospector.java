@@ -168,12 +168,13 @@ public class AnnotationBasedIntrospector
         // First round: entry removal, collections of things to rename
         List<APropBuilder> renamed = null;
         Iterator<APropBuilder> it = _props.values().iterator();
+        boolean keepIgnored = _isRecord && !_forSerialization;
         while (it.hasNext()) {
             final APropBuilder prop = it.next();
 
             // Start with ignorals, since those can be used as marker for otherwise
             // unknown properties
-            if (prop.anyIgnorals()) {
+            if (!keepIgnored && prop.anyIgnorals()) {
                 // if one or more ignorals, and no explicit markers, remove the whole thing
                 if (!prop.anyExplicit()) {
                     it.remove();

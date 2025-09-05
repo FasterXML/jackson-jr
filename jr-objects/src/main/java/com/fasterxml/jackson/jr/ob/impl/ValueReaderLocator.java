@@ -448,12 +448,12 @@ public class ValueReaderLocator
         }
         final boolean caseInsensitive = JSON.Feature.ACCEPT_CASE_INSENSITIVE_PROPERTIES.isEnabled(_features);
 
+        final boolean isRecord = RecordsHelpers.isRecordType(raw);
         final List<POJODefinition.Prop> rawProps = beanDef.getProperties();
         final int len = rawProps.size();
         final Map<String, BeanPropertyReader> propMap;
         Map<String, String> aliasMapping = null;
 
-        boolean isRecord = RecordsHelpers.isRecordType(raw);
         if (len == 0) {
             propMap = Collections.emptyMap();
         } else {
@@ -480,8 +480,7 @@ public class ValueReaderLocator
                 if (isRecord) {
                     // Records can only deserialize properties that are declared in the record;
                     // other virtual properties (getter methods) need to be ignored
-                    if (!recordProps.contains(rawProp.originalName())
-                            || propsContainAlias(rawProps, rawProp)) {
+                    if (!recordProps.contains(rawProp.originalName()) || propsContainAlias(rawProps, rawProp)) {
                         continue;
                     }
                     try {
