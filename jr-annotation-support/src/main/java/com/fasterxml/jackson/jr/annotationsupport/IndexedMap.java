@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.jr.annotationsupport;
 
-import java.util.AbstractCollection;
+import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toSet;
 /**
  * Map used when we need to maintain insertion index.
  */
+@SuppressWarnings("NullableProblems")
 class IndexedMap<K, V> extends AbstractMap<K, V> {
 
     private final ArrayList<Map.Entry<K, V>> entries = new ArrayList<>();
@@ -96,7 +97,7 @@ class IndexedMap<K, V> extends AbstractMap<K, V> {
         }
     }
 
-    class Values extends AbstractCollection<V> {
+    class Values extends AbstractList<V> {
         @Override
         public int size() {
             return entries.size();
@@ -115,7 +116,7 @@ class IndexedMap<K, V> extends AbstractMap<K, V> {
         @Override
         public Iterator<V> iterator() {
             return new Iterator<V>() {
-                Iterator<Map.Entry<K, V>> it = entries.iterator();
+                final Iterator<Map.Entry<K, V>> it = entries.iterator();
                 @Override
                 public boolean hasNext() {
                     return it.hasNext();
@@ -161,6 +162,11 @@ class IndexedMap<K, V> extends AbstractMap<K, V> {
                 }
             }
             return false;
+        }
+
+        @Override
+        public V get(int index) {
+            return entries.get(index).getValue();
         }
 
         @Override
