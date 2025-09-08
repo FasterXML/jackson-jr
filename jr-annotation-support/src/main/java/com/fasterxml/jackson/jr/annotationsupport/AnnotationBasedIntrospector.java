@@ -64,7 +64,7 @@ public class AnnotationBasedIntrospector
 
         // May need to retain order for Record serialization too
         if (keepPropertyOrderForRecord(features)) {
-            _props = new LinkedHashMap<>();
+            _props = new IndexedMap<>();
         } else {
             _props = new HashMap<>();
         }
@@ -168,7 +168,9 @@ public class AnnotationBasedIntrospector
         // First round: entry removal, collections of things to rename
         List<APropBuilder> renamed = null;
         Iterator<APropBuilder> it = _props.values().iterator();
-        boolean keepIgnored = _isRecord && !_forSerialization;
+        final boolean keepIgnored = _isRecord && !_forSerialization;
+        final boolean keepPropertyOrderForRecord = keepPropertyOrderForRecord(_features);
+
         while (it.hasNext()) {
             final APropBuilder prop = it.next();
 
@@ -197,13 +199,23 @@ public class AnnotationBasedIntrospector
             prop.removeNonVisible(_isRecord);
 
             // and finally, see if renaming (due to explicit name override) needed:
-            String explName = prop.findPrimaryExplicitName(_forSerialization);
-            if (explName != null) {
-                it.remove();
-                if (renamed == null) {
-                    renamed = new LinkedList<>();
+            String explicitName = prop.findPrimaryExplicitName(_forSerialization);
+            if (explicitName != null) {
+                APropBuilder newProp = prop.withName(explicitName);
+                if (keepPropertyOrderForRecord) {
+                    APropBuilder orig = _props.get(explicitName);
+                    if (orig != null) {
+                        newProp = APropBuilder.merge(orig, newProp);
+                    }
+                    ((IndexedMap<String, APropBuilder>) _props)
+                            .replaceAtIndex(prop.name, explicitName, newProp);
+                } else {
+                    it.remove();
+                    if (renamed == null) {
+                        renamed = new LinkedList<>();
+                    }
+                    renamed.add(newProp);
                 }
-                renamed.add(prop.withName(explName));
             }
         }
 
@@ -250,7 +262,7 @@ public class AnnotationBasedIntrospector
             }
 
             // and anything remaining, add alphabetically
-            TreeMap<String, APropBuilder> sorted = new TreeMap<String, APropBuilder>(_props);
+            TreeMap<String, APropBuilder> sorted = new TreeMap<>(_props);
 
             // For now, order alphabetically (natural order by name)
             for (APropBuilder prop : sorted.values()) {

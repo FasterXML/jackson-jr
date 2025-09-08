@@ -2,6 +2,7 @@ package jr;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import jr.TestClasses.Cow;
+import jr.TestClasses.NonAlphabeticWithAliases;
 import jr.TestClasses.RecordNonAlphabetic171;
 import jr.TestClasses.RecordWithWrapper;
 import jr.TestClasses.SnakeCaseRecord;

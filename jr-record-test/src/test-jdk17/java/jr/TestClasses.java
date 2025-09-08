@@ -32,4 +32,12 @@ public final class TestClasses {
             @JsonIgnore int x,
             @JsonProperty("value") int value
     ) {}
+
+    record NonAlphabeticWithAliases(
+            @JsonIgnore int x,
+            @JsonProperty("z") int d,
+            @JsonProperty("c") int c,
+            String b,
+            int a
+    ) {}
 }
