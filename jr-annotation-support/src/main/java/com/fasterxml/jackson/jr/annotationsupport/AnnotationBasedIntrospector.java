@@ -589,7 +589,7 @@ public class AnnotationBasedIntrospector
             // First: do NOT lower case if more than one leading upper case letters:
             if ((name.length() == 1)
                     || !Character.isUpperCase(name.charAt(1))) {
-                char chars[] = name.toCharArray();
+                char[] chars = name.toCharArray();
                 chars[0] = lowerC;
                 return new String(chars);
             }
@@ -712,8 +712,6 @@ public class AnnotationBasedIntrospector
             collectedAliases = _collectAliases(field, collectedAliases);
             collectedAliases = _collectAliases(getter, collectedAliases);
             collectedAliases = _collectAliases(setter, collectedAliases);
-            // HERE COLLECT RECORD ALIASES
-//            collectedAliases.add(origName);
             return collectedAliases;
         }
 
