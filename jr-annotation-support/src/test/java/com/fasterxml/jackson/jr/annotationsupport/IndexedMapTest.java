@@ -2,7 +2,6 @@ package com.fasterxml.jackson.jr.annotationsupport;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +28,7 @@ class IndexedMapTest {
         assertNull(map.get("b"));
         assertEquals("a", map.get("a"));
 
-        map.replaceAtIndex("c", "z", "z");
+        map.replaceAtIndexOf("c", "z", "z");
         assertEquals("z", map.get("z"));
         assertEquals(Arrays.asList("d", "z", "a"), map.values());
     }

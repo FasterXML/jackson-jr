@@ -212,7 +212,7 @@ public class AnnotationBasedIntrospector
                         newProp = APropBuilder.merge(orig, newProp);
                     }
                     ((IndexedMap<String, APropBuilder>) _props)
-                            .replaceAtIndex(prop.name, explicitName, newProp);
+                            .replaceAtIndexOf(prop.name, explicitName, newProp);
                 } else {
                     it.remove();
                     if (renamed == null) {

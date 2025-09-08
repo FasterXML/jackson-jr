@@ -86,7 +86,10 @@ class IndexedMap<K, V> extends AbstractMap<K, V> {
         return new LinkedHashSet<>(entries);
     }
 
-    public void replaceAtIndex(K oldKey, K newKey, V value) {
+    /**
+     * Replaces entry at the index of {@code oldKey} with a new entry: {@code newKey, value}.
+     */
+    public void replaceAtIndexOf(K oldKey, K newKey, V value) {
         boolean stop = false;
         for (int index = 0; index < entries.size() && !stop; index++) {
             Entry<K, V> kvEntry = entries.get(index);
