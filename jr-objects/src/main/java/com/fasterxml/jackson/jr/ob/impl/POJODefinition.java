@@ -157,6 +157,7 @@ public class POJODefinition
 
         public PropBuilder(String name) {
             _name = name;
+            _origName = name;
         }
 
         public Prop build() {

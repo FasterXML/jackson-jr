@@ -150,13 +150,11 @@ public class BeanReader
             Object value = prop.getReader().readNext(r, p);
             values[prop.getIndex()] = value;
         }
-        if (_isRecordType) {
-            for (int i = 0; i < values.length; i++) {
-                if (values[i] == null) {
-                    for (BeanPropertyReader prop : _propsByName.values()) {
-                        if (prop.getIndex() == i) {
-                            values[i] = nullValue(prop.getReader().valueType());
-                        }
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] == null) {
+                for (BeanPropertyReader prop : _propsByName.values()) {
+                    if (prop.getIndex() == i) {
+                        values[i] = nullValue(prop.getReader().valueType());
                     }
                 }
             }
