@@ -186,22 +186,5 @@ public abstract class AbstractJava17RecordTest
         assertEquals("{\"c\":1,\"b\":2,\"a\":3}",
                 jsonHandler.with(JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER).asString(input));
     }
-
-    @Test
-    public void testAliasesWork() throws Exception {
-        SnakeCaseRecord r = new SnakeCaseRecord("Tom");
-        String json = jsonHandler.asString(r);
-        SnakeCaseRecord r2 = jsonHandler.beanFrom(SnakeCaseRecord.class, json);
-        assertEquals(r.firstName(), r2.firstName());
-    }
-
-    @Test
-    public void testIgnoreWork() throws Exception {
-        SnakeCaseRecordWithIgnore r = new SnakeCaseRecordWithIgnore(10, 13);
-        String json = jsonHandler.asString(r);
-        SnakeCaseRecordWithIgnore r2 = jsonHandler.beanFrom(SnakeCaseRecordWithIgnore.class, json);
-        assertEquals(r.value(), r2.value());
-        assertEquals(0, r2.x());
-    }
 }
 

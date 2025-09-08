@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.jr.annotationsupport.JacksonAnnotationExtension;
 import com.fasterxml.jackson.jr.ob.JSON;
 import jr.TestClasses.NonAlphabeticWithAliases;
+import jr.TestClasses.SnakeCaseRecord;
+import jr.TestClasses.SnakeCaseRecordWithIgnore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +25,23 @@ public class Java17RecordWithJacksonAnnotationTest extends AbstractJava17RecordT
         builder.register(JacksonAnnotationExtension.std);
         builder.enable(WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER);
         jsonHandler = builder.build();
+    }
+
+    @Test
+    public void testAliasesWork() throws Exception {
+        SnakeCaseRecord r = new SnakeCaseRecord("Tom");
+        String json = jsonHandler.asString(r);
+        SnakeCaseRecord r2 = jsonHandler.beanFrom(SnakeCaseRecord.class, json);
+        assertEquals(r.firstName(), r2.firstName());
+    }
+
+    @Test
+    public void testIgnoreWork() throws Exception {
+        SnakeCaseRecordWithIgnore r = new SnakeCaseRecordWithIgnore(10, 13);
+        String json = jsonHandler.asString(r);
+        SnakeCaseRecordWithIgnore r2 = jsonHandler.beanFrom(SnakeCaseRecordWithIgnore.class, json);
+        assertEquals(r.value(), r2.value());
+        assertEquals(0, r2.x());
     }
 
     // [jackson-jr#171]: Whether to serialize Records in declaration or alphabetical order
