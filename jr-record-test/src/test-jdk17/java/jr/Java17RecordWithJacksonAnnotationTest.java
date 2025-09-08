@@ -36,8 +36,14 @@ public class Java17RecordWithJacksonAnnotationTest extends AbstractJava17RecordT
                 jsonHandler.without(JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER).asString(input));
 
         // Declaration order:
-        assertEquals("{\"z\":2,\"c\":3,\"b\":\"4\",\"a\":5}",
-                jsonHandler.with(JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER).asString(input));
+        String expected = "{\"z\":2,\"c\":3,\"b\":\"4\",\"a\":5}";
+        assertEquals(expected, jsonHandler.with(JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER).asString(input));
+        NonAlphabeticWithAliases serializedAgain = jsonHandler.with(JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER)
+                                                              .beanFrom(NonAlphabeticWithAliases.class, expected);
+        assertEquals(input.clearX(), serializedAgain);
+        serializedAgain = jsonHandler.without(JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER)
+                                                              .beanFrom(NonAlphabeticWithAliases.class, expected);
+        assertEquals(input.clearX(), serializedAgain);
     }
 }
 

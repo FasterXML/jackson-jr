@@ -63,16 +63,20 @@ public class AnnotationBasedIntrospector
         _isRecord = RecordsHelpers.isRecordType(type);
 
         // May need to retain order for Record serialization too
-        if (keepPropertyOrderForRecord(features)) {
+        if (keepPropertyOrderForRecord()) {
             _props = new IndexedMap<>();
         } else {
             _props = new HashMap<>();
         }
     }
 
-    private boolean keepPropertyOrderForRecord(int features) {
-        return _isRecord && _forSerialization
-                && JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER.isEnabled(features);
+    /**
+     * Property order must be kept for records when:
+     * - record is deserialized
+     * - record is serialized and feature {@link JSON.Feature#WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER} is enabled.
+     */
+    private boolean keepPropertyOrderForRecord() {
+        return _isRecord && (!_forSerialization || JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER.isEnabled(_features));
     }
 
     public static POJODefinition pojoDefinitionForDeserialization(JSONReader r,
@@ -169,7 +173,7 @@ public class AnnotationBasedIntrospector
         List<APropBuilder> renamed = null;
         Iterator<APropBuilder> it = _props.values().iterator();
         final boolean keepIgnored = _isRecord && !_forSerialization;
-        final boolean keepPropertyOrderForRecord = keepPropertyOrderForRecord(_features);
+        final boolean keepPropertyOrderForRecord = keepPropertyOrderForRecord();
 
         while (it.hasNext()) {
             final APropBuilder prop = it.next();

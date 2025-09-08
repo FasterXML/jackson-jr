@@ -39,5 +39,9 @@ public final class TestClasses {
             @JsonProperty("c") int c,
             String b,
             int a
-    ) {}
+    ) {
+        public NonAlphabeticWithAliases clearX() {
+            return new NonAlphabeticWithAliases(0, d, c, b, a);
+        }
+    }
 }
