@@ -1,8 +1,6 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Container class added to encapsulate details of collection and use of
