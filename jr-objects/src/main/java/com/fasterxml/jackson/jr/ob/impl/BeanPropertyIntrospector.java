@@ -2,6 +2,7 @@ package com.fasterxml.jackson.jr.ob.impl;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition.Prop;
@@ -67,38 +68,16 @@ public class BeanPropertyIntrospector
         final BeanConstructors constructors;
         if (forSerialization) {
             if (recordSerInDeclOrder) {
-                Constructor<?> canonical = _getCanonicalRecordConstructor(beanType);
-                for (Parameter ctorParam : canonical.getParameters()) {
-                    _propFrom(propsByName, ctorParam.getName());
-                }
+                derivePropertiesFromConstructor(beanType, propsByName, PropBuilder::new);
             }
             constructors = null;
         } else {
             constructors = new BeanConstructors(beanType);
             if (isRecord) {
-                Constructor<?> canonical = _getCanonicalRecordConstructor(beanType);
+                Constructor<?> canonical = derivePropertiesFromConstructor(beanType, propsByName, PropBuilder::new);
                 constructors.addRecordConstructor(canonical);
-                // And then let's "seed" properties to ensure correct ordering
-                // of Properties wrt Canonical constructor parameters:
-                for (Parameter ctorParam : canonical.getParameters()) {
-                    _propFrom(propsByName, ctorParam.getName());
-                }
             } else {
-                for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
-                    Class<?>[] argTypes = ctor.getParameterTypes();
-                    if (argTypes.length == 0) {
-                        constructors.addNoArgsConstructor(ctor);
-                    } else if (argTypes.length == 1) {
-                        Class<?> argType = argTypes[0];
-                        if (argType == String.class) {
-                            constructors.addStringConstructor(ctor);
-                        } else if (argType == Integer.class || argType == Integer.TYPE) {
-                            constructors.addIntConstructor(ctor);
-                        } else if (argType == Long.class || argType == Long.TYPE) {
-                            constructors.addLongConstructor(ctor);
-                        }
-                    }
-                }
+                addConstructors(beanType, constructors);
             }
         }
         _introspect(beanType, propsByName, features, isRecord);
@@ -117,7 +96,44 @@ public class BeanPropertyIntrospector
         return new POJODefinition(beanType, props, constructors);
     }
 
-    private Constructor<?> _getCanonicalRecordConstructor(Class<?> beanType) {
+    public static <P> Constructor<?> derivePropertiesFromConstructor(Class<?> beanType, Map<String, P> propsByName,
+                                                                     Function<String, P> propBuilder) {
+        Constructor<?> canonical = _getCanonicalRecordConstructor(beanType);
+        // And then let's "seed" properties to ensure correct ordering
+        // of Properties wrt Canonical constructor parameters:
+        for (Parameter ctorParam : canonical.getParameters()) {
+            addProperty(propsByName, ctorParam.getName(), propBuilder);
+        }
+        return canonical;
+    }
+
+    public static <P>  P addProperty(Map<String, P> props, String name, Function<String, P> propBuilder) {
+        return props.computeIfAbsent(name, propBuilder);
+    }
+
+    private static PropBuilder _propFrom(Map<String,PropBuilder> props, String name) {
+        return addProperty(props, name, Prop::builder);
+    }
+
+    public static void addConstructors(Class<?> beanType, BeanConstructors constructors) {
+        for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
+            Class<?>[] argTypes = ctor.getParameterTypes();
+            if (argTypes.length == 0) {
+                constructors.addNoArgsConstructor(ctor);
+            } else if (argTypes.length == 1) {
+                Class<?> argType = argTypes[0];
+                if (argType == String.class) {
+                    constructors.addStringConstructor(ctor);
+                } else if (argType == Integer.class || argType == Integer.TYPE) {
+                    constructors.addIntConstructor(ctor);
+                } else if (argType == Long.class || argType == Long.TYPE) {
+                    constructors.addLongConstructor(ctor);
+                }
+            }
+        }
+    }
+
+    private static Constructor<?> _getCanonicalRecordConstructor(Class<?> beanType) {
         Constructor<?> canonical = RecordsHelpers.findCanonicalConstructor(beanType);
         if (canonical == null) { // should never happen
             throw new IllegalArgumentException(
@@ -224,10 +240,6 @@ public class BeanPropertyIntrospector
                 _propFrom(props, name).withSetter(m);
             }
         }
-    }
-
-    private static PropBuilder _propFrom(Map<String,PropBuilder> props, String name) {
-        return props.computeIfAbsent(name, Prop::builder);
     }
 
     private static String decap(String name) {

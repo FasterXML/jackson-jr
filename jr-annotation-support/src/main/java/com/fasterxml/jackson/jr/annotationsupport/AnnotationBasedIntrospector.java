@@ -13,10 +13,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.impl.BeanConstructors;
+import com.fasterxml.jackson.jr.ob.impl.BeanPropertyIntrospector;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
 import com.fasterxml.jackson.jr.ob.impl.RecordsHelpers;
+
+import static com.fasterxml.jackson.jr.ob.impl.BeanPropertyIntrospector.addConstructors;
+import static com.fasterxml.jackson.jr.ob.impl.BeanPropertyIntrospector.derivePropertiesFromConstructor;
 
 /**
  *
@@ -38,6 +42,7 @@ public class AnnotationBasedIntrospector
     // // // State (collected properties, related)
 
     protected Map<String, APropBuilder> _props;
+    protected IndexedMap<String, APropBuilder> _propsAsIndexed;
 
     // // // State only for deserialization:
 
@@ -64,9 +69,11 @@ public class AnnotationBasedIntrospector
 
         // May need to retain order for Record serialization too
         if (keepPropertyOrderForRecord()) {
-            _props = new IndexedMap<>();
+            _propsAsIndexed = new IndexedMap<>();
+            _props = _propsAsIndexed;
         } else {
             _props = new HashMap<>();
+            _propsAsIndexed  = null;
         }
     }
 
@@ -109,56 +116,24 @@ public class AnnotationBasedIntrospector
         if (_forSerialization) {
             constructors = null;
             if (_isRecord) {
-                Constructor<?> canonical = _getCanonicalRecordConstructor(_type);
-
-                for (Parameter ctorParam : canonical.getParameters()) {
-                    _props.computeIfAbsent(ctorParam.getName(), APropBuilder::new);
-                }
+                derivePropertiesFromConstructor(_type, _props, APropBuilder::new);
             }
         } else {
             constructors = new BeanConstructors(_type);
             if (_isRecord) {
-                Constructor<?> canonical = _getCanonicalRecordConstructor(_type);
+                Constructor<?> canonical = derivePropertiesFromConstructor(_type, _props, APropBuilder::new);
                 constructors.addRecordConstructor(canonical);
-                // And then let's "seed" properties to ensure correct ordering
-                // of Properties wrt Canonical constructor parameters:
-                for (Parameter ctorParam : canonical.getParameters()) {
-                    _props.computeIfAbsent(ctorParam.getName(), APropBuilder::new);
-                }
             } else {
-                for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
-                    Class<?>[] argTypes = ctor.getParameterTypes();
-                    if (argTypes.length == 0) {
-                        constructors.addNoArgsConstructor(ctor);
-                    } else if (argTypes.length == 1) {
-                        Class<?> argType = argTypes[0];
-                        if (argType == String.class) {
-                            constructors.addStringConstructor(ctor);
-                        } else if (argType == Integer.class || argType == Integer.TYPE) {
-                            constructors.addIntConstructor(ctor);
-                        } else if (argType == Long.class || argType == Long.TYPE) {
-                            constructors.addLongConstructor(ctor);
-                        }
-                    }
-                }
+                addConstructors(_type, constructors);
             }
         }
 
-        POJODefinition def = new POJODefinition(_type,
-                _pruneProperties(_forSerialization && !_isRecord), constructors);
+        final boolean sortProperties = _forSerialization && !_isRecord;
+        POJODefinition def = new POJODefinition(_type, _pruneProperties(sortProperties), constructors);
         if (_ignorableNames != null) {
             def = def.withIgnorals(_ignorableNames);
         }
         return def;
-    }
-
-    private Constructor<?> _getCanonicalRecordConstructor(Class<?> beanType) {
-        Constructor<?> canonical = RecordsHelpers.findCanonicalConstructor(beanType);
-        if (canonical == null) { // should never happen
-            throw new IllegalArgumentException(
-                    "Unable to find canonical constructor of Record type `"+beanType.getName()+"`");
-        }
-        return canonical;
     }
 
     /*
@@ -166,7 +141,6 @@ public class AnnotationBasedIntrospector
     /* Internal methods, main introspection
     /**********************************************************************
      */
-
     protected POJODefinition.Prop[] _pruneProperties(boolean sortProperties)
     {
         // First round: entry removal, collections of things to rename
@@ -211,8 +185,7 @@ public class AnnotationBasedIntrospector
                     if (orig != null) {
                         newProp = APropBuilder.merge(orig, newProp);
                     }
-                    ((IndexedMap<String, APropBuilder>) _props)
-                            .replaceAtIndexOf(prop.name, explicitName, newProp);
+                    _propsAsIndexed.replaceAtIndexOf(prop.name, explicitName, newProp);
                 } else {
                     it.remove();
                     if (renamed == null) {
