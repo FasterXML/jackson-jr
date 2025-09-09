@@ -96,25 +96,31 @@ public class BeanPropertyIntrospector
         return new POJODefinition(beanType, props, constructors);
     }
 
+    /**
+     * Gets canonical constructor of given types and adds properties to the map, derived from constructor parameters.
+     */
     public static <P> Constructor<?> derivePropertiesFromConstructor(Class<?> beanType, Map<String, P> propsByName,
                                                                      Function<String, P> propBuilder) {
         Constructor<?> canonical = _getCanonicalRecordConstructor(beanType);
         // And then let's "seed" properties to ensure correct ordering
         // of Properties wrt Canonical constructor parameters:
         for (Parameter ctorParam : canonical.getParameters()) {
-            addProperty(propsByName, ctorParam.getName(), propBuilder);
+            addPropertiesFromMap(propsByName, ctorParam.getName(), propBuilder);
         }
         return canonical;
     }
 
-    public static <P>  P addProperty(Map<String, P> props, String name, Function<String, P> propBuilder) {
+    private static <P>  P addPropertiesFromMap(Map<String, P> props, String name, Function<String, P> propBuilder) {
         return props.computeIfAbsent(name, propBuilder);
     }
 
     private static PropBuilder _propFrom(Map<String,PropBuilder> props, String name) {
-        return addProperty(props, name, Prop::builder);
+        return addPropertiesFromMap(props, name, Prop::builder);
     }
 
+    /**
+     * Adds all {@code beanType}'s 0 and 1 argument declared constructors to {@code constructors}.
+     */
     public static void addConstructors(Class<?> beanType, BeanConstructors constructors) {
         for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
             Class<?>[] argTypes = ctor.getParameterTypes();
