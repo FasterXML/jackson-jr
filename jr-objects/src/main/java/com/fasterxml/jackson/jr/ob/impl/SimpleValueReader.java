@@ -6,9 +6,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
@@ -382,7 +380,7 @@ public class SimpleValueReader extends ValueReader
             p.nextToken();
         }
 
-        java.util.List<Boolean> values = new java.util.ArrayList<>();
+        List<Boolean> values = new ArrayList<>();
         int t = p.currentTokenId();
 
         if (t == JsonTokenId.ID_END_ARRAY) {
@@ -404,7 +402,7 @@ public class SimpleValueReader extends ValueReader
             case JsonTokenId.ID_END_ARRAY:
                 break main_loop;
             default:
-                throw new JSONObjectException("Failed to bind `boolean` element if `boolean[]` from value: "+
+                throw new JSONObjectException("Failed to bind `boolean` element of `boolean[]` from value: "+
                         _tokenDesc(p));
             }
             p.nextToken();
@@ -422,7 +420,7 @@ public class SimpleValueReader extends ValueReader
             p.nextToken();
         }
 
-        java.util.List<Short> values = new java.util.ArrayList<>();
+        List<Short> values = new ArrayList<>();
         int t = p.currentTokenId();
 
         if (t == JsonTokenId.ID_END_ARRAY) {
@@ -440,7 +438,7 @@ public class SimpleValueReader extends ValueReader
             case JsonTokenId.ID_END_ARRAY:
                 break main_loop;
             default:
-                throw new JSONObjectException("Failed to bind `short` element if `short[]` from value: "+
+                throw new JSONObjectException("Failed to bind `short` element of `short[]` from value: "+
                         _tokenDesc(p));
             }
             p.nextToken();
@@ -458,7 +456,7 @@ public class SimpleValueReader extends ValueReader
             p.nextToken();
         }
 
-        java.util.List<Float> values = new java.util.ArrayList<>();
+        List<Float> values = new ArrayList<>();
         int t = p.currentTokenId();
 
         if (t == JsonTokenId.ID_END_ARRAY) {
@@ -476,7 +474,7 @@ public class SimpleValueReader extends ValueReader
             case JsonTokenId.ID_END_ARRAY:
                 break main_loop;
             default:
-                throw new JSONObjectException("Failed to bind `float` element if `float[]` from value: "+
+                throw new JSONObjectException("Failed to bind `float` element of `float[]` from value: "+
                         _tokenDesc(p));
             }
             p.nextToken();
@@ -494,7 +492,7 @@ public class SimpleValueReader extends ValueReader
             p.nextToken();
         }
 
-        java.util.List<Double> values = new java.util.ArrayList<>();
+        List<Double> values = new ArrayList<>();
         int t = p.currentTokenId();
 
         if (t == JsonTokenId.ID_END_ARRAY) {
@@ -512,7 +510,7 @@ public class SimpleValueReader extends ValueReader
             case JsonTokenId.ID_END_ARRAY:
                 break main_loop;
             default:
-                throw new JSONObjectException("Failed to bind `double` element if `double[]` from value: "+
+                throw new JSONObjectException("Failed to bind `double` element of `double[]` from value: "+
                         _tokenDesc(p));
             }
             p.nextToken();
