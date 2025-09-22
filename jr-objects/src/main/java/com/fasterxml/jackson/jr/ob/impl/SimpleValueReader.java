@@ -295,7 +295,16 @@ public class SimpleValueReader extends ValueReader
         if (p.hasToken(JsonToken.VALUE_NULL)) {
             return null;
         }
-        return p.getBinaryValue();
+        // For now (2.20) expect binary value (base64-encoded text or
+        // native binary):
+        if (p.hasToken(JsonToken.VALUE_STRING)
+                || p.hasToken(JsonToken.VALUE_STRING)) {
+            // [jackson-jr#107]: should allow base64-encoded binary
+            return p.getBinaryValue();
+        }
+        throw new JSONObjectException(
+                "Can only bind `byte[]` from Binary value (base64-encoded String or native Binary); not from "+
+                _tokenDesc(p));
     }
 
     // @since 2.17

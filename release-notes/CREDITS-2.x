@@ -78,5 +78,13 @@ Giovanni van der Schelde (@Giovds)
 
 Luke Hutchison (@lukehutch)
 
-* Reported #196: `float[]` and `double[]` are serialized to JSON as `{ }`
+* Reported #196: `float[]` and `double[]` are serialized to JSON as `{ 
  (2.20.0)
+
+Stan Brone (@StanB-EKZ)
+
+* Contributed #201: Support for OffsetDateTime and ZonedDateTime
+  in jackson-jr-extension-javatime
+ (2.20.0)
+
+
