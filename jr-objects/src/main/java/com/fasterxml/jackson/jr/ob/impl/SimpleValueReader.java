@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -27,6 +28,7 @@ import static com.fasterxml.jackson.jr.ob.impl.ValueWriterLocator.*;
 public class SimpleValueReader extends ValueReader
 {
     private final static int[] NO_INTS = new int[0];
+    private final static long[] NO_LONGS = new long[0];
 
     protected final int _typeId;
 
@@ -110,6 +112,10 @@ public class SimpleValueReader extends ValueReader
 
         case SER_INT_ARRAY:
             return _readIntArray(p);
+        case SER_LONG_ARRAY:
+            return _readLongArray(p);
+        //case SER_BOOLEAN_ARRAY:
+            // TODO:
 
         case SER_TREE_NODE:
             return reader.readTree();
@@ -319,7 +325,40 @@ public class SimpleValueReader extends ValueReader
             case JsonTokenId.ID_END_ARRAY:
                 break main_loop;
             default:
-                throw new JSONObjectException("Failed to bind `int` element if `int[]` from value: "+
+                throw new JSONObjectException("Failed to bind `int` element of `int[]` from value: "+
+                        _tokenDesc(p));
+            }
+            p.nextToken();
+            t = p.currentTokenId();
+        }
+        return builder.build().toArray();
+    }
+
+    protected long[] _readLongArray(JsonParser p) throws IOException {
+        if (JsonToken.START_ARRAY.equals(p.currentToken())) {
+            p.nextToken();
+        }
+
+        final LongStream.Builder builder = LongStream.builder();
+        int t = p.currentTokenId();
+
+        // Tiny optimization
+        if (t == JsonTokenId.ID_END_ARRAY) {
+            return NO_LONGS;
+        }
+        
+        main_loop:
+        while (true) {
+            switch (t) {
+            case JsonTokenId.ID_NUMBER_FLOAT:
+            case JsonTokenId.ID_NUMBER_INT:
+            case JsonTokenId.ID_NULL:
+                builder.add(p.getValueAsLong());
+                break;
+            case JsonTokenId.ID_END_ARRAY:
+                break main_loop;
+            default:
+                throw new JSONObjectException("Failed to bind `long` element of `long[]` from value: "+
                         _tokenDesc(p));
             }
             p.nextToken();

@@ -11,7 +11,15 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
-2.19.0 (not yet released)
+2.19.2 (18-Jul-2025)
+
+#198: No deserializer for `long[]` type
+
+2.19.1 (13-Jun-2025)
+
+No changes since 2.19.0
+
+2.19.0 (24-Apr-2025)
 
 #171: Add a `JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER` for
   retaining Serialization order of Java Records (instead of alphabetic)
@@ -19,6 +27,7 @@ Modules:
 - Update Retrofit2 dep from 2.9 to 2.11
 - Fix `retrofit2` module deps to Retrofit/OkHttp libraries
 
+2.18.4 (06-May-2025)
 2.18.3 (28-Feb-2025)
 
 No changes since 2.18.2

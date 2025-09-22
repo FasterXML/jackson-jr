@@ -3,12 +3,12 @@
   <parent>
     <groupId>com.fasterxml.jackson</groupId>
     <artifactId>jackson-base</artifactId>
-    <version>2.19.0-SNAPSHOT</version>
+    <version>2.19.3-SNAPSHOT</version>
   </parent>
   <groupId>com.fasterxml.jackson.jr</groupId>
   <artifactId>jackson-jr-parent</artifactId>
   <name>Parent pom for Jackson jr components</name>
-  <version>2.19.0-SNAPSHOT</version>
+  <version>2.19.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>Parent pom for Jackson jr components
   </description>
@@ -36,7 +36,7 @@
     <connection>scm:git:git@github.com:FasterXML/jackson-jr.git</connection>
     <developerConnection>scm:git:git@github.com:FasterXML/jackson-jr.git</developerConnection>
     <url>https://github.com/FasterXML/jackson-jr</url>
-    <tag>HEAD</tag>
+    <tag>jackson-jr-parent-2.19.1</tag>
   </scm>
 
   <properties>
@@ -50,16 +50,16 @@
     <javac.debuglevel>source</javac.debuglevel>
 
     <!-- for Reproducible Builds -->
-    <project.build.outputTimestamp>2024-09-27T02:01:09Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-07-18T17:50:07Z</project.build.outputTimestamp>
   </properties>
 
-  <!-- Alas, need to include snapshot reference since otherwise can not find
-       snapshot of parent... -->
+  <!-- Need to include snapshot reference to find snapshot of parent -->
   <repositories>
+    <!-- 13-May-2025, tatu: now access snapshots via Central Portal -->
     <repository>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Sonatype Nexus Snapshots</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <id>central-snapshots</id>
+      <name>Sonatype Central Portal (snapshots)</name>
+      <url>https://central.sonatype.com/repository/maven-snapshots</url>
       <releases><enabled>false</enabled></releases>
       <snapshots><enabled>true</enabled></snapshots>
     </repository>

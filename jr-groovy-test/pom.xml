@@ -3,9 +3,10 @@
     <parent>
         <groupId>com.fasterxml.jackson.jr</groupId>
         <artifactId>jackson-jr-parent</artifactId>
-        <version>2.19.0-SNAPSHOT</version>
+        <version>2.19.3-SNAPSHOT</version>
     </parent>
     <artifactId>jackson-jr-groovy-test</artifactId>
+    <name>Jackson-jr: Groovy test(s)</name>
     <packaging>pom</packaging>
     <description>Test Module with Groovy support to test Jackson-Jr</description>
     <url>https://github.com/FasterXML/jackson-jr</url>
@@ -81,8 +82,7 @@
                 </configuration>
             </plugin>
 
-            <!-- 13-Jun-2024, tatu: Should NOT publish jar
-              -->
+            <!-- 13-Jun-2024, tatu: Should NOT publish jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
@@ -96,6 +96,15 @@
                 <configuration>
                     <skip>true</skip>
                 </configuration>
+            </plugin>
+            <!-- 13-Jun-2025, tatu: try one more thing wrt new Central publishing -->
+            <plugin>
+                 <groupId>org.sonatype.central</groupId>
+                 <artifactId>central-publishing-maven-plugin</artifactId>
+                 <configuration> 
+                     <enabled>false</enabled>
+                     <skipPublishing>true</skipPublishing>
+                 </configuration>
             </plugin>
         </plugins>
     </build>
