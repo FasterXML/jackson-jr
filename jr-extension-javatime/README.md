@@ -4,7 +4,7 @@ This module extends the functionality of jackson-jr by adding support for (a sub
 
 ### Status
 
-Added in Jackson 2.17.
+Added in Jackson 2.17; extended in 2.20.
 
 ### Usage
 To be able to use supported annotations, you need to register extension like so:
@@ -48,7 +48,10 @@ public class MyClass {
 ### Date Classes currently supported by `JacksonJrJavaTimeExtension`
 
 - `java.time.LocalDateTime`
+- `java.time.OffsetDateTime` (2.20+)
+- `java.time.ZonedDateTime` (2.20+)
 
 ### Plans for Future
 
-- Add support for other Java 8 Date/Time types
+- Add support for more Java 8 Date/Time types
+

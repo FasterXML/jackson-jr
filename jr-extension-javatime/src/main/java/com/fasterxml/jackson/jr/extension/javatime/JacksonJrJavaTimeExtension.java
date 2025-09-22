@@ -6,15 +6,15 @@ import com.fasterxml.jackson.jr.ob.api.ExtensionContext;
 public class JacksonJrJavaTimeExtension extends JacksonJrExtension {
     final static JavaTimeReaderWriterProvider DEFAULT_RW_PROVIDER = new JavaTimeReaderWriterProvider();
 
-    private JavaTimeReaderWriterProvider readerWriterProvider = DEFAULT_RW_PROVIDER;
+    private JavaTimeReaderWriterProvider _readerWriterProvider = DEFAULT_RW_PROVIDER;
 
     @Override
     protected void register(ExtensionContext ctxt) {
-        ctxt.insertProvider(readerWriterProvider);
+        ctxt.insertProvider(_readerWriterProvider);
     }
 
     public JacksonJrJavaTimeExtension with(JavaTimeReaderWriterProvider p) {
-        readerWriterProvider = p;
+        _readerWriterProvider = p;
         return this;
     }
 }
