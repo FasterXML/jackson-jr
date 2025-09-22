@@ -7,6 +7,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
@@ -501,7 +502,7 @@ public class SimpleValueReader extends ValueReader
             p.nextToken();
         }
 
-        List<Double> values = new ArrayList<>();
+        final DoubleStream.Builder builder = DoubleStream.builder();
         int t = p.currentTokenId();
 
         if (t == JsonTokenId.ID_END_ARRAY) {
@@ -514,7 +515,7 @@ public class SimpleValueReader extends ValueReader
             case JsonTokenId.ID_NUMBER_FLOAT:
             case JsonTokenId.ID_NUMBER_INT:
             case JsonTokenId.ID_NULL:
-                values.add(p.getValueAsDouble());
+                builder.add(p.getValueAsDouble());
                 break;
             case JsonTokenId.ID_END_ARRAY:
                 break main_loop;
@@ -525,11 +526,7 @@ public class SimpleValueReader extends ValueReader
             p.nextToken();
             t = p.currentTokenId();
         }
-        double[] result = new double[values.size()];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = values.get(i);
-        }
-        return result;
+        return builder.build().toArray();
     }
 
     protected long _fetchLong(JsonParser p) throws IOException
