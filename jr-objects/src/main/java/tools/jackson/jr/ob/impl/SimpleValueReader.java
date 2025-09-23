@@ -398,7 +398,7 @@ public class SimpleValueReader extends ValueReader
                 +_valueTypeDesc()+") from "+_tokenDesc(p, t));
     }
 
-    protected double[] _readDoubleArray(JsonParser p) throws IOException {
+    protected double[] _readDoubleArray(JsonParser p) throws JacksonException {
         if (JsonToken.START_ARRAY.equals(p.currentToken())) {
             p.nextToken();
         }
