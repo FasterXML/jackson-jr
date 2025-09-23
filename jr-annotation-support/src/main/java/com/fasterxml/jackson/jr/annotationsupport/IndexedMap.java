@@ -13,6 +13,14 @@ import static java.util.stream.Collectors.toSet;
 
 /**
  * Map used when we need to maintain insertion index.
+ *
+ * <p>
+ * This implementation is needed to address the lack of function needed by us: {@linkplain #replaceAtIndexOf}.
+ * The {@link java.util.LinkedHashMap} keeps the order of insertion, but has no possibility to replace an item at given index,
+ * so if you want to keep the insertion order with a possibility to swap at some particular index, you need such implementation.
+ * <p>
+ * The implementation is based on a simple {@link ArrayList}. Each {@link #get}, {@link #containsKey} etc. call
+ * traverses the array map, therefore it is not an optimal data structure if random lookups are performed often.
  */
 @SuppressWarnings("NullableProblems")
 class IndexedMap<K, V> extends AbstractMap<K, V> {
@@ -23,11 +31,6 @@ class IndexedMap<K, V> extends AbstractMap<K, V> {
     @Override
     public int size() {
         return entries.size();
-    }
-
-    @Override
-    public boolean containsKey(Object key) {
-        return entries.stream().anyMatch(e -> e.getKey().equals(key));
     }
 
     @Override
