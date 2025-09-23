@@ -23,12 +23,12 @@ public abstract class ValueLocatorBase
      */
 
     /* FAQ: Why ints? Why not Enums?!? Glad you asked: one reasons is class
-     * size reduction: javac creates annonymous inner class for each switch
+     * size reduction: javac creates anonymous inner class for each switch
      * on enum (per referring type and enum: can combine multiple). So by
      * not using enunms we try to minimize code foot print.
      * But this is ONLY done because Value Type constants are NOT part of
      * public API: if they were, size savings wouldn't make sense.
-     * 
+     *
      * One more note: negative values are used for dynamically introspected
      * Beans.
      */
