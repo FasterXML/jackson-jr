@@ -31,6 +31,7 @@ public class SimpleValueReader extends ValueReader
     private final static boolean[] NO_BOOLEANS = new boolean[0];
     private final static short[] NO_SHORTS = new short[0];
     private final static float[] NO_FLOATS = new float[0];
+    // @since 2.21
     private final static double[] NO_DOUBLES = new double[0];
 
     protected final int _typeId;
@@ -385,6 +386,16 @@ public class SimpleValueReader extends ValueReader
         return builder.build().toArray();
     }
 
+    protected long _fetchLong(JsonParser p) throws IOException
+    {
+        JsonToken t = p.currentToken();
+        if (t == JsonToken.VALUE_NUMBER_INT) {
+            return p.getLongValue();
+        }
+        throw JSONObjectException.from(p, "Can not get long numeric value from JSON (to construct "
+                +_valueTypeDesc()+") from "+_tokenDesc(p, t));
+    }
+    
     protected boolean[] _readBooleanArray(JsonParser p) throws IOException {
         if (JsonToken.START_ARRAY.equals(p.currentToken())) {
             p.nextToken();
@@ -508,7 +519,7 @@ public class SimpleValueReader extends ValueReader
         if (t == JsonTokenId.ID_END_ARRAY) {
             return NO_DOUBLES;
         }
-        
+
         main_loop:
         while (true) {
             switch (t) {
@@ -527,15 +538,5 @@ public class SimpleValueReader extends ValueReader
             t = p.currentTokenId();
         }
         return builder.build().toArray();
-    }
-
-    protected long _fetchLong(JsonParser p) throws IOException
-    {
-        JsonToken t = p.currentToken();
-        if (t == JsonToken.VALUE_NUMBER_INT) {
-            return p.getLongValue();
-        }
-        throw JSONObjectException.from(p, "Can not get long numeric value from JSON (to construct "
-                +_valueTypeDesc()+") from "+_tokenDesc(p, t));
     }
 }

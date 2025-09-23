@@ -136,27 +136,24 @@ public class PrimitiveArrayTest extends TestBase
         assertEquals(DOUBLE_ARRAY_JSON, JSON.std.asString(DOUBLE_ARRAY));
     }
 
-    // Test empty arrays
-    // Not yet implemented in Jackson-jr
+    // Test empty arrays, success cases
     @Test
     public void testEmptyArrays() throws Exception {
         assertArrayEquals(new char[0], JSON.std.beanFrom(char[].class, "\"\""));
         assertArrayEquals(new int[0], JSON.std.beanFrom(int[].class, "[]"));
         assertArrayEquals(new long[0], JSON.std.beanFrom(long[].class, "[]"));
-    }
-
-    // Not yet implemented in Jackson-jr
-    @JacksonTestFailureExpected
-    @Test
-    public void testEmptyArraysFailing() throws Exception {
         assertArrayEquals(new boolean[0], JSON.std.beanFrom(boolean[].class, "[]"));
-        assertArrayEquals(new byte[0], JSON.std.beanFrom(byte[].class, "[]"));
         assertArrayEquals(new short[0], JSON.std.beanFrom(short[].class, "[]"));
         assertArrayEquals(new float[0], JSON.std.beanFrom(float[].class, "[]"), 0.0f);
         assertArrayEquals(new double[0], JSON.std.beanFrom(double[].class, "[]"), 0.0);
     }
 
-    // Not yet fully implemented in Jackson-jr
+    @JacksonTestFailureExpected
+    @Test
+    public void testEmptyArraysFailingByteArray() throws Exception {
+        assertArrayEquals(new byte[0], JSON.std.beanFrom(byte[].class, "[]"));
+    }
+
     @Test
     public void testArraysAsObjectFields() throws Exception {
         AllArraysBean input = new AllArraysBean();
