@@ -6,9 +6,8 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
@@ -29,6 +28,9 @@ public class SimpleValueReader extends ValueReader
 {
     private final static int[] NO_INTS = new int[0];
     private final static long[] NO_LONGS = new long[0];
+
+    // @since 2.21
+    private final static double[] NO_DOUBLES = new double[0];    
 
     protected final int _typeId;
 
@@ -119,9 +121,11 @@ public class SimpleValueReader extends ValueReader
         case SER_BOOLEAN_ARRAY:
         case SER_SHORT_ARRAY:
         case SER_FLOAT_ARRAY:
-        case SER_DOUBLE_ARRAY:
             throw JSONObjectException.from(p,
                 "Deserialization of `"+_valueTypeDesc()+"` not yet supported");
+        case SER_DOUBLE_ARRAY:
+            return _readDoubleArray(p);
+
         case SER_TREE_NODE:
             return reader.readTree();
 
@@ -389,5 +393,37 @@ public class SimpleValueReader extends ValueReader
         }
         throw JSONObjectException.from(p, "Can not get long numeric value from JSON (to construct "
                 +_valueTypeDesc()+") from "+_tokenDesc(p, t));
+    }
+
+    protected double[] _readDoubleArray(JsonParser p) throws IOException {
+        if (JsonToken.START_ARRAY.equals(p.currentToken())) {
+            p.nextToken();
+        }
+
+        final DoubleStream.Builder builder = DoubleStream.builder();
+        int t = p.currentTokenId();
+
+        if (t == JsonTokenId.ID_END_ARRAY) {
+            return NO_DOUBLES;
+        }
+
+        main_loop:
+        while (true) {
+            switch (t) {
+            case JsonTokenId.ID_NUMBER_FLOAT:
+            case JsonTokenId.ID_NUMBER_INT:
+            case JsonTokenId.ID_NULL:
+                builder.add(p.getValueAsDouble());
+                break;
+            case JsonTokenId.ID_END_ARRAY:
+                break main_loop;
+            default:
+                throw new JSONObjectException("Failed to bind `double` element of `double[]` from value: "+
+                        _tokenDesc(p));
+            }
+            p.nextToken();
+            t = p.currentTokenId();
+        }
+        return builder.build().toArray();
     }
 }
