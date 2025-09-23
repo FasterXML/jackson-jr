@@ -69,7 +69,7 @@ public abstract class ValueLocatorBase
     public final static int SER_FLOAT_ARRAY = 9;
     public final static int SER_DOUBLE_ARRAY = 10;
     public final static int SER_BOOLEAN_ARRAY = 11;
-    
+
     /**
      * An implementation of {@link tools.jackson.core.TreeNode}
      */
