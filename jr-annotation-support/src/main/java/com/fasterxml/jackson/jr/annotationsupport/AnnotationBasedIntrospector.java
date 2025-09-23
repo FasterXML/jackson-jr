@@ -54,7 +54,7 @@ public class AnnotationBasedIntrospector
             JsonAutoDetect.Value visibility, int features) {
         _type = type;
         _forSerialization = serialization;
-        _ignorableNames = serialization ? null : new HashSet<String>();
+        _ignorableNames = serialization ? null : new HashSet<>();
         _features = features;
 
         // First things first: find possible `@JsonAutoDetect` to override
