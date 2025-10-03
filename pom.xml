@@ -13,6 +13,17 @@
   <description>Parent pom for Jackson jr components
   </description>
 
+  <!-- 03-Oct-2025, tatu: Should NOT be needed (available via parent):
+      but seems to be
+    -->
+  <developers>
+    <developer>
+      <id>cowtowncoder</id>
+      <name>Tatu Saloranta</name>
+      <email>tatu@fasterxml.com</email>
+    </developer>
+  </developers>
+
   <modules>
     <module>jr-objects</module>
     <module>jr-retrofit2</module>
