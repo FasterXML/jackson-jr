@@ -8,7 +8,7 @@
   <parent>
     <groupId>tools.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
-    <version>3.0.0-rc11-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-annotation-support</artifactId>
   <name>Jackson-jr: Jackson annotation support</name>
@@ -27,7 +27,7 @@
     <packageVersion.package>${project.groupId}.annotationsupport</packageVersion.package>
 
     <!-- for Reproducible Builds -->
-    <project.build.outputTimestamp>2025-09-20T00:11:04Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2025-10-03T19:15:45Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
