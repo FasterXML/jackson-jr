@@ -68,16 +68,18 @@ public class BeanPropertyIntrospector
         final BeanConstructors constructors;
         if (forSerialization) {
             if (recordSerInDeclOrder) {
-                derivePropertiesFromConstructor(beanType, propsByName, PropBuilder::new);
+                derivePropertiesFromRecordConstructor(beanType,
+                        propsByName, PropBuilder::new);
             }
             constructors = null;
         } else {
             constructors = new BeanConstructors(beanType);
             if (isRecord) {
-                Constructor<?> canonical = derivePropertiesFromConstructor(beanType, propsByName, PropBuilder::new);
+                Constructor<?> canonical = derivePropertiesFromRecordConstructor(beanType,
+                        propsByName, PropBuilder::new);
                 constructors.addRecordConstructor(canonical);
             } else {
-                addConstructors(beanType, constructors);
+                addNonRecordConstructors(beanType, constructors);
             }
         }
         _introspect(beanType, propsByName, features, isRecord);
@@ -97,31 +99,32 @@ public class BeanPropertyIntrospector
     }
 
     /**
-     * Gets canonical constructor of given types and adds properties to the map, derived from constructor parameters.
+     * Gets canonical constructor of given types and adds properties to the map,
+     * derived from constructor parameters.
      */
-    public static <P> Constructor<?> derivePropertiesFromConstructor(Class<?> beanType, Map<String, P> propsByName,
-                                                                     Function<String, P> propBuilder) {
+    public static <P> Constructor<?> derivePropertiesFromRecordConstructor(Class<?> beanType,
+            Map<String, P> propsByName, Function<String, P> propBuilder) {
         Constructor<?> canonical = _getCanonicalRecordConstructor(beanType);
         // And then let's "seed" properties to ensure correct ordering
         // of Properties wrt Canonical constructor parameters:
         for (Parameter ctorParam : canonical.getParameters()) {
-            addPropertiesFromMap(propsByName, ctorParam.getName(), propBuilder);
+            _addPropertiesFromMap(propsByName, ctorParam.getName(), propBuilder);
         }
         return canonical;
     }
 
-    private static <P>  P addPropertiesFromMap(Map<String, P> props, String name, Function<String, P> propBuilder) {
-        return props.computeIfAbsent(name, propBuilder);
+    private static PropBuilder _propFrom(Map<String,PropBuilder> props, String name) {
+        return _addPropertiesFromMap(props, name, Prop::builder);
     }
 
-    private static PropBuilder _propFrom(Map<String,PropBuilder> props, String name) {
-        return addPropertiesFromMap(props, name, Prop::builder);
+    private static <P> P _addPropertiesFromMap(Map<String, P> props, String name, Function<String, P> propBuilder) {
+        return props.computeIfAbsent(name, propBuilder);
     }
 
     /**
      * Adds all {@code beanType}'s 0 and 1 argument declared constructors to {@code constructors}.
      */
-    public static void addConstructors(Class<?> beanType, BeanConstructors constructors) {
+    public static void addNonRecordConstructors(Class<?> beanType, BeanConstructors constructors) {
         for (Constructor<?> ctor : beanType.getDeclaredConstructors()) {
             Class<?>[] argTypes = ctor.getParameterTypes();
             if (argTypes.length == 0) {

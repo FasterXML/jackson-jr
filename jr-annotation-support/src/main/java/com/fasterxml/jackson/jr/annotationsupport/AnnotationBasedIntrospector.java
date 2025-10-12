@@ -4,24 +4,17 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.*;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.impl.BeanConstructors;
-import com.fasterxml.jackson.jr.ob.impl.BeanPropertyIntrospector;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
 import com.fasterxml.jackson.jr.ob.impl.RecordsHelpers;
 
-import static com.fasterxml.jackson.jr.ob.impl.BeanPropertyIntrospector.addConstructors;
-import static com.fasterxml.jackson.jr.ob.impl.BeanPropertyIntrospector.derivePropertiesFromConstructor;
-
+import static com.fasterxml.jackson.jr.ob.impl.BeanPropertyIntrospector.addNonRecordConstructors;
+import static com.fasterxml.jackson.jr.ob.impl.BeanPropertyIntrospector.derivePropertiesFromRecordConstructor;
 /**
  *
  * @since 2.11
@@ -116,15 +109,15 @@ public class AnnotationBasedIntrospector
         if (_forSerialization) {
             constructors = null;
             if (_isRecord) {
-                derivePropertiesFromConstructor(_type, _props, APropBuilder::new);
+                derivePropertiesFromRecordConstructor(_type, _props, APropBuilder::new);
             }
         } else {
             constructors = new BeanConstructors(_type);
             if (_isRecord) {
-                Constructor<?> canonical = derivePropertiesFromConstructor(_type, _props, APropBuilder::new);
+                Constructor<?> canonical = derivePropertiesFromRecordConstructor(_type, _props, APropBuilder::new);
                 constructors.addRecordConstructor(canonical);
             } else {
-                addConstructors(_type, constructors);
+                addNonRecordConstructors(_type, constructors);
             }
         }
 
