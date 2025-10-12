@@ -1,6 +1,6 @@
 package jr;
 
-import jr.Java17RecordTest.Cow;
+import jr.TestClasses.Cow;
 
 import java.util.Objects;
 
