@@ -171,6 +171,12 @@ public class BeanReader
         if (aClass.equals(long.class)) {
             return (long) 0;
         }
+        if (aClass.equals(float.class)) {
+            return (float) 0;
+        }
+        if (aClass.equals(double.class)) {
+            return (double) 0;
+        }
         if (aClass.equals(boolean.class)) {
             return Boolean.FALSE;
         }
@@ -179,6 +185,9 @@ public class BeanReader
         }
         if (aClass.equals(char.class)) {
             return (char) 0;
+        }
+        if (aClass.equals(byte.class)) {
+            return (byte) 0;
         }
         throw new IllegalArgumentException("Cannot determine null value for " + aClass);
     }
