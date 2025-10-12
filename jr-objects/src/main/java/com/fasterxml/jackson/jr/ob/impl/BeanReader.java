@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.jr.ob.JSON;
 import com.fasterxml.jackson.jr.ob.JSONObjectException;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
-import com.fasterxml.jackson.jr.ob.impl.POJODefinition.Prop;
 
 /**
  * Class that contains information about dynamically introspected
