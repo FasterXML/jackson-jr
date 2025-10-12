@@ -7,6 +7,7 @@ module tools.jackson.jr.ob
 
     // Additional test lib/framework dependencies
     requires org.junit.jupiter.api; // JUnit 5
+    requires com.fasterxml.jackson.annotation;
 
     // Further, need to open up test packages for JUnit et al
     opens tools.jackson.jr.ob;

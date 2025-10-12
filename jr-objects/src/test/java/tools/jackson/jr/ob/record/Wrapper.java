@@ -3,14 +3,14 @@ package tools.jackson.jr.ob.record;
 import java.util.Objects;
 
 public final class Wrapper {
-    Java17RecordTest.Cow cow;
+    TestClasses.Cow cow;
     String farmerName;
 
-    public Java17RecordTest.Cow getCow() {
+    public TestClasses.Cow getCow() {
         return cow;
     }
 
-    public void setCow(Java17RecordTest.Cow cow) {
+    public void setCow(TestClasses.Cow cow) {
         this.cow = cow;
     }
 

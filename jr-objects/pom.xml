@@ -33,6 +33,11 @@ has no other dependencies, and provides additional builder-style content generat
       <groupId>tools.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
