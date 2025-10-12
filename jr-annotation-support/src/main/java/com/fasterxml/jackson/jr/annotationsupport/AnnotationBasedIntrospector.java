@@ -15,6 +15,7 @@ import com.fasterxml.jackson.jr.ob.impl.RecordsHelpers;
 
 import static com.fasterxml.jackson.jr.ob.impl.BeanPropertyIntrospector.addNonRecordConstructors;
 import static com.fasterxml.jackson.jr.ob.impl.BeanPropertyIntrospector.derivePropertiesFromRecordConstructor;
+
 /**
  *
  * @since 2.11
@@ -34,14 +35,14 @@ public class AnnotationBasedIntrospector
 
     // // // State (collected properties, related)
 
-    protected Map<String, APropBuilder> _props;
-    protected IndexedMap<String, APropBuilder> _propsAsIndexed;
+    protected final Map<String, APropBuilder> _props;
+    protected final IndexedMap<String, APropBuilder> _propsAsIndexed;
 
     // // // State only for deserialization:
 
-    protected Set<String> _ignorableNames;
-    protected int _features;
-    protected boolean _isRecord;
+    protected final Set<String> _ignorableNames;
+    protected final int _features;
+    protected final boolean _isRecord;
 
     protected AnnotationBasedIntrospector(Class<?> type, boolean serialization,
             JsonAutoDetect.Value visibility, int features) {
