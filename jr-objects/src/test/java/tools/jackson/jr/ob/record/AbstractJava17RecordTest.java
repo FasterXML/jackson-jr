@@ -11,7 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * This test is in test module since the JDK version to be tested is higher than other, and hence supports Records.
+ * In Jackson 3 Java 17 is the minimum supported version, so we can
+ * include Record tests here.
  */
 public abstract class AbstractJava17RecordTest
 {
