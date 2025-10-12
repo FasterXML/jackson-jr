@@ -135,6 +135,7 @@ public class AnnotationBasedIntrospector
     /* Internal methods, main introspection
     /**********************************************************************
      */
+
     protected POJODefinition.Prop[] _pruneProperties(boolean sortProperties)
     {
         // First round: entry removal, collections of things to rename

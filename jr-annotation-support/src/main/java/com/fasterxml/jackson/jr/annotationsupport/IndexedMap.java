@@ -23,9 +23,9 @@ import static java.util.stream.Collectors.toSet;
  * traverses the array map, therefore it is not an optimal data structure if random lookups are performed often.
  */
 @SuppressWarnings("NullableProblems")
-class IndexedMap<K, V> extends AbstractMap<K, V> {
-
-    private final ArrayList<Map.Entry<K, V>> entries = new ArrayList<>();
+class IndexedMap<K, V> extends AbstractMap<K, V>
+{
+    final ArrayList<Map.Entry<K, V>> entries = new ArrayList<>();
     private final Map.Entry<K, V> nullValue = new SimpleEntry<>(null, null);
 
     @Override
@@ -93,17 +93,16 @@ class IndexedMap<K, V> extends AbstractMap<K, V> {
      * Replaces entry at the index of {@code oldKey} with a new entry: {@code newKey, value}.
      */
     public void replaceAtIndexOf(K oldKey, K newKey, V value) {
-        boolean stop = false;
-        for (int index = 0; index < entries.size() && !stop; index++) {
+        for (int index = 0; index < entries.size(); index++) {
             Entry<K, V> kvEntry = entries.get(index);
             if (kvEntry.getKey().equals(oldKey)) {
                 entries.set(index, new SimpleEntry<>(newKey, value));
-                stop = true;
+                break;
             }
         }
     }
 
-    class Values extends AbstractList<V> {
+    final class Values extends AbstractList<V> {
         @Override
         public int size() {
             return entries.size();
