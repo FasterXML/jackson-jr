@@ -147,8 +147,8 @@ public class BeanReader
     }
 
     private Object readRecord(JSONReader r, JsonParser p) throws Exception {
-        // `null` values won't get converted automatically to 0/false or other primitive default values
-        // so we need to do it manually
+        // `null` values are not allowed for primitive components and they won't get converted automatically to default
+        // values, so we need to do it manually
         final Object[] values = Arrays.copyOf(_nullValues, _nullValues.length);
 
         String propName;
