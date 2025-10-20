@@ -38,6 +38,8 @@ public class BeanReader
 
     protected final boolean _isRecordType;
 
+    protected Object[] _nullValues;
+
     /**
      * Constructors used for deserialization use case
      *
@@ -51,7 +53,7 @@ public class BeanReader
         _propsByName = props;
         _constructors = constructors;
         if (ignorableNames == null) {
-            ignorableNames = Collections.<String>emptySet();
+            ignorableNames = Collections.emptySet();
         }
         _ignorableNames = ignorableNames;
         if (aliasMapping == null) {
@@ -59,6 +61,14 @@ public class BeanReader
         }
         _aliasMapping = aliasMapping;
         _isRecordType = RecordsHelpers.isRecordType(type);
+        _nullValues = new Object[props.size()];
+        for (int i = 0; i < _nullValues.length; i++) {
+            for (BeanPropertyReader prop : _propsByName.values()) {
+                if (prop.getIndex() == i) {
+                    _nullValues[i] = nullValue(prop.rawSetterType());
+                }
+            }
+        }
     }
 
     @Deprecated // since 2.17
@@ -137,7 +147,9 @@ public class BeanReader
     }
 
     private Object readRecord(JSONReader r, JsonParser p) throws Exception {
-        final Object[] values = new Object[_propsByName.size()];
+        // `null` values won't get converted automatically to 0/false or other primitive default values
+        // so we need to do it manually
+        final Object[] values = Arrays.copyOf(_nullValues, _nullValues.length);
 
         String propName;
         for (; (propName = p.nextFieldName()) != null;) {
@@ -148,15 +160,6 @@ public class BeanReader
             }
             Object value = prop.getReader().readNext(r, p);
             values[prop.getIndex()] = value;
-        }
-        for (int i = 0; i < values.length; i++) {
-            if (values[i] == null) {
-                for (BeanPropertyReader prop : _propsByName.values()) {
-                    if (prop.getIndex() == i) {
-                        values[i] = nullValue(prop.getReader().valueType());
-                    }
-                }
-            }
         }
         return _constructors.createRecord(values);
     }
