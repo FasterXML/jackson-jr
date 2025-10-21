@@ -33,6 +33,12 @@ public class BeanReader
 
     protected final boolean _isRecordType;
 
+    /**
+     * Array that contains default null values for POJO/Record properties;
+     * needed for primitive types for which {@code null} is not a valid value.
+     */
+    protected final Object[] _recordNullValues;
+
     // // 13-Dec-2017, tatu: NOTE! These will be constructed right after construction, but
     // //    not during it (due to need to resolve possible cyclic deps). So they are
     // //    non-final due to this but never `null` before use.
@@ -55,6 +61,19 @@ public class BeanReader
         _ignorableNames = ignorableNames;
         _aliasMapping = aliasMapping;
         _caseInsensitive = caseInsensitive;
+
+        if (_isRecordType) {
+            _recordNullValues = new Object[_propsByName.size()];
+            for (int i = 0; i < _recordNullValues.length; i++) {
+                for (BeanPropertyReader prop : _propsByName.values()) {
+                    if (prop.getIndex() == i) {
+                        _recordNullValues[i] = nullValue(prop.rawSetterType());
+                    }
+                }
+            }
+        } else {
+            _recordNullValues = null;
+        }
     }
 
     /**
@@ -324,8 +343,11 @@ public class BeanReader
     private Object readRecord(JSONReader r, JsonParser p)
         throws JacksonException
     {
-        final Object[] values = new Object[propertiesByName().size()];
-
+        // `null` values are not allowed for primitive components so we will
+        // start with an array pre-filled with appropriate values which get
+        // replaced as we read properties
+        final Object[] values = Arrays.copyOf(_recordNullValues, _recordNullValues.length);
+        
         String propName;
         for (; (propName = p.nextName()) != null;) {
             BeanPropertyReader prop = findProperty(propName);
@@ -398,6 +420,37 @@ public class BeanReader
         }
         parser.nextToken();
         parser.skipChildren();
+    }
+
+    private Object nullValue(Class<?> aClass) {
+        if (!aClass.isPrimitive()) {
+            return null;
+        }
+        if (aClass.equals(int.class)) {
+            return 0;
+        }
+        if (aClass.equals(long.class)) {
+            return (long) 0;
+        }
+        if (aClass.equals(float.class)) {
+            return (float) 0;
+        }
+        if (aClass.equals(double.class)) {
+            return (double) 0;
+        }
+        if (aClass.equals(boolean.class)) {
+            return Boolean.FALSE;
+        }
+        if (aClass.equals(short.class)) {
+            return (short) 0;
+        }
+        if (aClass.equals(char.class)) {
+            return (char) 0;
+        }
+        if (aClass.equals(byte.class)) {
+            return (byte) 0;
+        }
+        throw new IllegalArgumentException("Internal error: Unrecognized primitive value " + aClass.getCanonicalName());
     }
 
     protected Object _reportFailureToCreate(JsonParser p, Exception e)

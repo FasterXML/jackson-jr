@@ -100,17 +100,19 @@ public class POJODefinition
     public static final class Prop
     {
         public final String name;
+        private final String originalName;
 
         public final Field field;
         public final Method setter, getter, isGetter;
 
         private final Collection<String> aliases;
 
-        public Prop(String n, Field f,
+        public Prop(String n, String origName, Field f,
                 Method setter0, Method getter0, Method isGetter0,
                 Collection<String> aliases0)
         {
             name = n;
+            originalName = origName;
             field = f;
             setter = setter0;
             getter = getter0;
@@ -133,23 +135,33 @@ public class POJODefinition
             return !aliases.isEmpty();
         }
 
-        public Iterable<String> aliases() {
+        public Collection<String> aliases() {
             return aliases;
+        }
+        public String originalName() {
+            return originalName;
         }
     }
 
     static final class PropBuilder {
         private final String _name;
 
+        private String _origName;
         private Field _field;
         private Method _setter, _getter, _isGetter;
 
         public PropBuilder(String name) {
             _name = name;
+            _origName = name;
         }
 
         public Prop build() {
-            return new Prop(_name, _field, _setter, _getter, _isGetter, null);
+            return new Prop(_name, _origName, _field, _setter, _getter, _isGetter, null);
+        }
+
+        public PropBuilder withOriginalName(String origName) {
+            _origName = origName;
+            return this;
         }
 
         public PropBuilder withField(Field f) {

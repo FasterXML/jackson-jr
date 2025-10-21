@@ -13,6 +13,9 @@ Modules:
 
 2.21.0 (not yet released)
 
+#176: Cannot Deserialize JSON with `@JsonProperty` annotated Record fields
+ (reported by Juul H)
+ (fix contributed by Tomasz G)
 #208: Support reading of `double[]`
 
 2.20.0 (28-Aug-2025)

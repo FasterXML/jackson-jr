@@ -11,6 +11,10 @@ import tools.jackson.jr.ob.impl.BeanConstructors;
 import tools.jackson.jr.ob.impl.JSONReader;
 import tools.jackson.jr.ob.impl.JSONWriter;
 import tools.jackson.jr.ob.impl.POJODefinition;
+import tools.jackson.jr.ob.impl.RecordsHelpers;
+
+import static tools.jackson.jr.ob.impl.BeanPropertyIntrospector.addNonRecordConstructors;
+import static tools.jackson.jr.ob.impl.BeanPropertyIntrospector.derivePropertiesFromRecordConstructor;
 
 public class AnnotationBasedIntrospector
 {
@@ -27,18 +31,20 @@ public class AnnotationBasedIntrospector
 
     // // // State (collected properties, related)
 
-    protected final Map<String, APropBuilder> _props = new HashMap<String, APropBuilder>();
+    protected final Map<String, APropBuilder> _props;
+    protected final IndexedMap<String, APropBuilder> _propsAsIndexed;
 
     // // // State only for deserialization:
 
-    protected Set<String> _ignorableNames;
-    protected int _features;
+    protected final Set<String> _ignorableNames;
+    protected final int _features;
+    protected final boolean _isRecord;
 
     protected AnnotationBasedIntrospector(Class<?> type, boolean serialization,
             JsonAutoDetect.Value visibility, int features) {
         _type = type;
         _forSerialization = serialization;
-        _ignorableNames = serialization ? null : new HashSet<String>();
+        _ignorableNames = serialization ? null : new HashSet<>();
         _features = features;
 
         // First things first: find possible `@JsonAutoDetect` to override
@@ -49,6 +55,25 @@ public class AnnotationBasedIntrospector
         } else {
             _visibility = visibility.withOverrides(JsonAutoDetect.Value.from(ann));
         }
+        _isRecord = RecordsHelpers.isRecordType(type);
+
+        // May need to retain order for Record serialization too
+        if (keepPropertyOrderForRecord()) {
+            _propsAsIndexed = new IndexedMap<>();
+            _props = _propsAsIndexed;
+        } else {
+            _props = new HashMap<>();
+            _propsAsIndexed  = null;
+        }
+    }
+
+    /**
+     * Property order must be kept for records when:
+     * - record is deserialized
+     * - record is serialized and feature {@link JSON.Feature#WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER} is enabled.
+     */
+    private boolean keepPropertyOrderForRecord() {
+        return _isRecord && (!_forSerialization || JSON.Feature.WRITE_RECORD_FIELDS_IN_DECLARATION_ORDER.isEnabled(_features));
     }
 
     public static POJODefinition pojoDefinitionForDeserialization(JSONReader r,
@@ -80,27 +105,21 @@ public class AnnotationBasedIntrospector
         // secondary ignoral information:
         if (_forSerialization) {
             constructors = null;
+            if (_isRecord) {
+                derivePropertiesFromRecordConstructor(_type, _props, APropBuilder::new);
+            }
         } else {
             constructors = new BeanConstructors(_type);
-            for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
-                Class<?>[] argTypes = ctor.getParameterTypes();
-                if (argTypes.length == 0) {
-                    constructors.addNoArgsConstructor(ctor);
-                } else if (argTypes.length == 1) {
-                    Class<?> argType = argTypes[0];
-                    if (argType == String.class) {
-                        constructors.addStringConstructor(ctor);
-                    } else if (argType == Integer.class || argType == Integer.TYPE) {
-                        constructors.addIntConstructor(ctor);
-                    } else if (argType == Long.class || argType == Long.TYPE) {
-                        constructors.addLongConstructor(ctor);
-                    }
-                }
+            if (_isRecord) {
+                Constructor<?> canonical = derivePropertiesFromRecordConstructor(_type, _props, APropBuilder::new);
+                constructors.addRecordConstructor(canonical);
+            } else {
+                addNonRecordConstructors(_type, constructors);
             }
         }
 
-        POJODefinition def = new POJODefinition(_type,
-                _pruneProperties(_forSerialization), constructors);
+        final boolean sortProperties = _forSerialization && !_isRecord;
+        POJODefinition def = new POJODefinition(_type, _pruneProperties(sortProperties), constructors);
         if (_ignorableNames != null) {
             def = def.withIgnorals(_ignorableNames);
         }
@@ -118,12 +137,15 @@ public class AnnotationBasedIntrospector
         // First round: entry removal, collections of things to rename
         List<APropBuilder> renamed = null;
         Iterator<APropBuilder> it = _props.values().iterator();
+        final boolean keepIgnored = _isRecord && !_forSerialization;
+        final boolean keepPropertyOrderForRecord = keepPropertyOrderForRecord();
+
         while (it.hasNext()) {
             final APropBuilder prop = it.next();
 
             // Start with ignorals, since those can be used as marker for otherwise
             // unknown properties
-            if (prop.anyIgnorals()) {
+            if (!keepIgnored && prop.anyIgnorals()) {
                 // if one or more ignorals, and no explicit markers, remove the whole thing
                 if (!prop.anyExplicit()) {
                     it.remove();
@@ -138,21 +160,30 @@ public class AnnotationBasedIntrospector
                 continue;
             }
             // but even without ignorals, something has to be visible; if not, remove prop
-            if (!prop.anyVisible()) { // if nothing visible, just remove altogether
+            if (!_isRecord && !prop.anyVisible()) { // if nothing visible, just remove altogether
                 it.remove();
                 continue;
             }
             // plus then remove non-visible accessors
-            prop.removeNonVisible();
+            prop.removeNonVisible(_isRecord);
 
             // and finally, see if renaming (due to explicit name override) needed:
-            String explName = prop.findPrimaryExplicitName(_forSerialization);
-            if (explName != null) {
-                it.remove();
-                if (renamed == null) {
-                    renamed = new LinkedList<APropBuilder>();
+            String explicitName = prop.findPrimaryExplicitName(_forSerialization);
+            if (explicitName != null) {
+                APropBuilder newProp = prop.withName(explicitName);
+                if (keepPropertyOrderForRecord) {
+                    APropBuilder orig = _props.get(explicitName);
+                    if (orig != null) {
+                        newProp = APropBuilder.merge(orig, newProp);
+                    }
+                    _propsAsIndexed.replaceAtIndexOf(prop.name, explicitName, newProp);
+                } else {
+                    it.remove();
+                    if (renamed == null) {
+                        renamed = new LinkedList<>();
+                    }
+                    renamed.add(newProp);
                 }
-                renamed.add(prop.withName(explName));
             }
         }
 
@@ -199,7 +230,7 @@ public class AnnotationBasedIntrospector
             }
 
             // and anything remaining, add alphabetically
-            TreeMap<String, APropBuilder> sorted = new TreeMap<String, APropBuilder>(_props);
+            TreeMap<String, APropBuilder> sorted = new TreeMap<>(_props);
 
             // For now, order alphabetically (natural order by name)
             for (APropBuilder prop : sorted.values()) {
@@ -522,7 +553,7 @@ public class AnnotationBasedIntrospector
             // First: do NOT lower case if more than one leading upper case letters:
             if ((name.length() == 1)
                     || !Character.isUpperCase(name.charAt(1))) {
-                char chars[] = name.toCharArray();
+                char[] chars = name.toCharArray();
                 chars[0] = lowerC;
                 return new String(chars);
             }
@@ -564,6 +595,7 @@ public class AnnotationBasedIntrospector
         public POJODefinition.Prop asProperty(boolean collectAliases) {
             Set<String> aliases = collectAliases ? collectAliases() : null;
             return new POJODefinition.Prop(name,
+                    origName,
                     (field == null) ? null : field.accessor,
                     (setter == null) ? null : setter.accessor,
                     (getter == null) ? null : getter.accessor,
@@ -625,8 +657,8 @@ public class AnnotationBasedIntrospector
             }
         }
 
-        public void removeNonVisible() {
-            if ((field != null) && !field.isVisible) {
+        public void removeNonVisible(boolean isRecord) {
+            if ((field != null) && (!field.isVisible && !isRecord)) {
                 field = null;
             }
             if ((getter != null) && !getter.isVisible) {
