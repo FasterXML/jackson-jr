@@ -38,7 +38,13 @@ public class BeanReader
 
     protected final boolean _isRecordType;
 
-    protected Object[] _nullValues;
+    /**
+     * Array that contains default null values for POJO/Record properties;
+     * needed for primitive types for which {@code null} is not a valid value.
+     *
+     * @since 2.21
+     */
+    protected final Object[] _recordNullValues;
 
     /**
      * Constructors used for deserialization use case
@@ -61,13 +67,17 @@ public class BeanReader
         }
         _aliasMapping = aliasMapping;
         _isRecordType = RecordsHelpers.isRecordType(type);
-        _nullValues = new Object[props.size()];
-        for (int i = 0; i < _nullValues.length; i++) {
-            for (BeanPropertyReader prop : _propsByName.values()) {
-                if (prop.getIndex() == i) {
-                    _nullValues[i] = nullValue(prop.rawSetterType());
+        if (_isRecordType) {
+            _recordNullValues = new Object[props.size()];
+            for (int i = 0; i < _recordNullValues.length; i++) {
+                for (BeanPropertyReader prop : _propsByName.values()) {
+                    if (prop.getIndex() == i) {
+                        _recordNullValues[i] = nullValue(prop.rawSetterType());
+                    }
                 }
             }
+        } else {
+            _recordNullValues = null;
         }
     }
 
@@ -147,9 +157,10 @@ public class BeanReader
     }
 
     private Object readRecord(JSONReader r, JsonParser p) throws Exception {
-        // `null` values are not allowed for primitive components and they won't get converted automatically to default
-        // values, so we need to do it manually
-        final Object[] values = Arrays.copyOf(_nullValues, _nullValues.length);
+        // `null` values are not allowed for primitive components so we will
+        // start with an array pre-filled with appropriate values which get
+        // replaced as we read properties
+        final Object[] values = Arrays.copyOf(_recordNullValues, _recordNullValues.length);
 
         String propName;
         for (; (propName = p.nextFieldName()) != null;) {
@@ -192,7 +203,7 @@ public class BeanReader
         if (aClass.equals(byte.class)) {
             return (byte) 0;
         }
-        throw new IllegalArgumentException("Cannot determine null value for " + aClass);
+        throw new IllegalArgumentException("Internal error: Unrecognized primitive value " + aClass.getCanonicalName());
     }
 
     /**

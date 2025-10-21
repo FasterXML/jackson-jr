@@ -69,7 +69,10 @@ Tomasz Gawęda (@TomaszGaweda)
 
 * Contributed #162: Add support for deserializing Java Records
  (2.18.0)
-
+* Contributed fix for #176: Cannot Deserialize JSON with `@JsonProperty`
+  annotated Record fields
+ (2.21.0)
+ 
 Giovanni van der Schelde (@Giovds)
 
 * Reported, suggested a fix for #167: Deserialization of record fails
@@ -87,4 +90,8 @@ Stan Brone (@StanB-EKZ)
   in jackson-jr-extension-javatime
  (2.20.0)
 
+Juul Hobert (@juulhobert)
+
+* Reported #176: Cannot Deserialize JSON with `@JsonProperty` annotated Record fields
+ (2.21.0)
 
