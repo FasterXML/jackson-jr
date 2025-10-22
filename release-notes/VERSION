@@ -11,6 +11,11 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
+3.0.1 (21-Oct-2025)
+
+#176: Cannot Deserialize JSON with `@JsonProperty` annotated Record fields
+ (reported by Juul H)
+
 3.0.0 (03-Oct-2025)
 
 #96: Rename "com.fasterxml.jackson" -> "tools.jackson"
