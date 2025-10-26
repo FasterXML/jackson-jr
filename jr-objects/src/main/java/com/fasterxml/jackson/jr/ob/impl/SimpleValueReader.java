@@ -557,9 +557,7 @@ public class SimpleValueReader extends ValueReader
 
         void add(boolean value) {
             if (_size >= _buffer.length) {
-                boolean[] newBuffer = new boolean[_buffer.length * 2];
-                System.arraycopy(_buffer, 0, newBuffer, 0, _size);
-                _buffer = newBuffer;
+                _buffer = Arrays.copyOf(_buffer, _buffer.length * 2);
             }
             _buffer[_size++] = value;
         }
@@ -591,9 +589,7 @@ public class SimpleValueReader extends ValueReader
 
         void add(short value) {
             if (_size >= _buffer.length) {
-                short[] newBuffer = new short[_buffer.length * 2];
-                System.arraycopy(_buffer, 0, newBuffer, 0, _size);
-                _buffer = newBuffer;
+                _buffer = Arrays.copyOf(_buffer, _buffer.length * 2);
             }
             _buffer[_size++] = value;
         }
@@ -625,9 +621,7 @@ public class SimpleValueReader extends ValueReader
 
         void add(float value) {
             if (_size >= _buffer.length) {
-                float[] newBuffer = new float[_buffer.length * 2];
-                System.arraycopy(_buffer, 0, newBuffer, 0, _size);
-                _buffer = newBuffer;
+                _buffer = Arrays.copyOf(_buffer, _buffer.length * 2);
             }
             _buffer[_size++] = value;
         }
