@@ -30,7 +30,10 @@ public class SimpleValueReader extends ValueReader
     private final static long[] NO_LONGS = new long[0];
 
     // @since 2.21
-    private final static double[] NO_DOUBLES = new double[0];    
+    private final static double[] NO_DOUBLES = new double[0];
+    private final static boolean[] NO_BOOLEANS = new boolean[0];
+    private final static short[] NO_SHORTS = new short[0];
+    private final static float[] NO_FLOATS = new float[0];    
 
     protected final int _typeId;
 
@@ -116,13 +119,12 @@ public class SimpleValueReader extends ValueReader
             return _readIntArray(p);
         case SER_LONG_ARRAY:
             return _readLongArray(p);
- 
-        // Not yet supported:
         case SER_BOOLEAN_ARRAY:
+            return _readBooleanArray(p);
         case SER_SHORT_ARRAY:
+            return _readShortArray(p);
         case SER_FLOAT_ARRAY:
-            throw JSONObjectException.from(p,
-                "Deserialization of `"+_valueTypeDesc()+"` not yet supported");
+            return _readFloatArray(p);
         case SER_DOUBLE_ARRAY:
             return _readDoubleArray(p);
 
@@ -425,5 +427,215 @@ public class SimpleValueReader extends ValueReader
             t = p.currentTokenId();
         }
         return builder.build().toArray();
+    }
+
+    // @since 2.21
+    protected boolean[] _readBooleanArray(JsonParser p) throws IOException {
+        if (JsonToken.START_ARRAY.equals(p.currentToken())) {
+            p.nextToken();
+        }
+
+        int t = p.currentTokenId();
+
+        if (t == JsonTokenId.ID_END_ARRAY) {
+            return NO_BOOLEANS;
+        }
+
+        final BooleanArrayBuilder builder = new BooleanArrayBuilder();
+
+        main_loop:
+        while (true) {
+            switch (t) {
+            case JsonTokenId.ID_TRUE:
+            case JsonTokenId.ID_FALSE:
+            case JsonTokenId.ID_NULL:
+                builder.add(p.getValueAsBoolean());
+                break;
+            case JsonTokenId.ID_END_ARRAY:
+                break main_loop;
+            default:
+                throw new JSONObjectException("Failed to bind `boolean` element of `boolean[]` from value: "+
+                        _tokenDesc(p));
+            }
+            p.nextToken();
+            t = p.currentTokenId();
+        }
+        return builder.toArray();
+    }
+
+    // @since 2.21
+    protected short[] _readShortArray(JsonParser p) throws IOException {
+        if (JsonToken.START_ARRAY.equals(p.currentToken())) {
+            p.nextToken();
+        }
+
+        int t = p.currentTokenId();
+
+        if (t == JsonTokenId.ID_END_ARRAY) {
+            return NO_SHORTS;
+        }
+
+        final ShortArrayBuilder builder = new ShortArrayBuilder();
+
+        main_loop:
+        while (true) {
+            switch (t) {
+            case JsonTokenId.ID_NUMBER_FLOAT:
+            case JsonTokenId.ID_NUMBER_INT:
+            case JsonTokenId.ID_NULL:
+                builder.add((short) p.getValueAsInt());
+                break;
+            case JsonTokenId.ID_END_ARRAY:
+                break main_loop;
+            default:
+                throw new JSONObjectException("Failed to bind `short` element of `short[]` from value: "+
+                        _tokenDesc(p));
+            }
+            p.nextToken();
+            t = p.currentTokenId();
+        }
+        return builder.toArray();
+    }
+
+    // @since 2.21
+    protected float[] _readFloatArray(JsonParser p) throws IOException {
+        if (JsonToken.START_ARRAY.equals(p.currentToken())) {
+            p.nextToken();
+        }
+
+        int t = p.currentTokenId();
+
+        if (t == JsonTokenId.ID_END_ARRAY) {
+            return NO_FLOATS;
+        }
+
+        final FloatArrayBuilder builder = new FloatArrayBuilder();
+
+        main_loop:
+        while (true) {
+            switch (t) {
+            case JsonTokenId.ID_NUMBER_FLOAT:
+            case JsonTokenId.ID_NUMBER_INT:
+            case JsonTokenId.ID_NULL:
+                builder.add((float) p.getValueAsDouble());
+                break;
+            case JsonTokenId.ID_END_ARRAY:
+                break main_loop;
+            default:
+                throw new JSONObjectException("Failed to bind `float` element of `float[]` from value: "+
+                        _tokenDesc(p));
+            }
+            p.nextToken();
+            t = p.currentTokenId();
+        }
+        return builder.toArray();
+    }
+
+    /*
+    /**********************************************************************
+    /* Helper classes for primitive array building
+    /**********************************************************************
+     */
+
+    /**
+     * Simple builder for boolean arrays, similar to IntStream.Builder
+     * but optimized for our specific use case.
+     *
+     * @since 2.21
+     */
+    private static class BooleanArrayBuilder {
+        private boolean[] buffer;
+        private int size;
+
+        BooleanArrayBuilder() {
+            buffer = new boolean[16];
+            size = 0;
+        }
+
+        void add(boolean value) {
+            if (size >= buffer.length) {
+                boolean[] newBuffer = new boolean[buffer.length * 2];
+                System.arraycopy(buffer, 0, newBuffer, 0, size);
+                buffer = newBuffer;
+            }
+            buffer[size++] = value;
+        }
+
+        boolean[] toArray() {
+            if (size == buffer.length) {
+                return buffer;
+            }
+            boolean[] result = new boolean[size];
+            System.arraycopy(buffer, 0, result, 0, size);
+            return result;
+        }
+    }
+
+    /**
+     * Simple builder for short arrays, similar to IntStream.Builder
+     * but optimized for our specific use case.
+     *
+     * @since 2.21
+     */
+    private static class ShortArrayBuilder {
+        private short[] buffer;
+        private int size;
+
+        ShortArrayBuilder() {
+            buffer = new short[16];
+            size = 0;
+        }
+
+        void add(short value) {
+            if (size >= buffer.length) {
+                short[] newBuffer = new short[buffer.length * 2];
+                System.arraycopy(buffer, 0, newBuffer, 0, size);
+                buffer = newBuffer;
+            }
+            buffer[size++] = value;
+        }
+
+        short[] toArray() {
+            if (size == buffer.length) {
+                return buffer;
+            }
+            short[] result = new short[size];
+            System.arraycopy(buffer, 0, result, 0, size);
+            return result;
+        }
+    }
+
+    /**
+     * Simple builder for float arrays, similar to DoubleStream.Builder
+     * but optimized for our specific use case.
+     *
+     * @since 2.21
+     */
+    private static class FloatArrayBuilder {
+        private float[] buffer;
+        private int size;
+
+        FloatArrayBuilder() {
+            buffer = new float[16];
+            size = 0;
+        }
+
+        void add(float value) {
+            if (size >= buffer.length) {
+                float[] newBuffer = new float[buffer.length * 2];
+                System.arraycopy(buffer, 0, newBuffer, 0, size);
+                buffer = newBuffer;
+            }
+            buffer[size++] = value;
+        }
+
+        float[] toArray() {
+            if (size == buffer.length) {
+                return buffer;
+            }
+            float[] result = new float[size];
+            System.arraycopy(buffer, 0, result, 0, size);
+            return result;
+        }
     }
 }

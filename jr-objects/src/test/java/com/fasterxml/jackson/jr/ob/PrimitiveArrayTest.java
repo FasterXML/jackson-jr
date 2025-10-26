@@ -28,8 +28,6 @@ public class PrimitiveArrayTest extends TestBase
     private final static String BOOLEAN_ARRAY_JSON = "[true,false,true,false,true]";
     private final static boolean[] BOOLEAN_ARRAY = new boolean[] { true, false, true, false, true };
 
-    // Not yet implemented in Jackson-jr
-    @JacksonTestFailureExpected
     @Test
     public void testBooleanArrayRead() throws Exception {
         assertArrayEquals(BOOLEAN_ARRAY, JSON.std.beanFrom(boolean[].class, BOOLEAN_ARRAY_JSON));
@@ -71,16 +69,9 @@ public class PrimitiveArrayTest extends TestBase
     private final static String SHORT_ARRAY_JSON = "[1,2,3,32767,-32768]";
     private final static short[] SHORT_ARRAY = new short[] { 1, 2, 3, 32767, -32768 };
 
-    // Not yet implemented in Jackson-jr
     @Test
     public void testShortArrayRead() throws Exception {
-//        assertArrayEquals(SHORT_ARRAY, JSON.std.beanFrom(short[].class, SHORT_ARRAY_JSON));
-        try {
-            JSON.std.beanFrom(short[].class, SHORT_ARRAY_JSON);
-            fail("Should not pass");
-        } catch (JSONObjectException e) {
-            verifyException(e, "Deserialization of `short[]` not yet supported");
-        }
+        assertArrayEquals(SHORT_ARRAY, JSON.std.beanFrom(short[].class, SHORT_ARRAY_JSON));
     }
 
     @Test
@@ -117,18 +108,10 @@ public class PrimitiveArrayTest extends TestBase
     private final static String FLOAT_ARRAY_JSON = "[1.0,2.5,3.125,-5.5,0.0]";
     private final static float[] FLOAT_ARRAY = new float[] {1.0f, 2.5f, 3.125f, -5.5f, 0.0f};
 
-    // Not yet implemented in Jackson-jr
     @Test
     public void testFloatArrayRead() throws Exception {
-        //assertArrayEquals(FLOAT_ARRAY, JSON.std.beanFrom(float[].class, FLOAT_ARRAY_JSON),
-        //        0.00001f);
-
-        try {
-            JSON.std.beanFrom(float[].class, FLOAT_ARRAY_JSON);
-            fail("Should not pass");
-        } catch (JSONObjectException e) {
-            verifyException(e, "Deserialization of `float[]` not yet supported");
-        }
+        assertArrayEquals(FLOAT_ARRAY, JSON.std.beanFrom(float[].class, FLOAT_ARRAY_JSON),
+                0.00001f);
     }
 
     @Test
@@ -159,33 +142,33 @@ public class PrimitiveArrayTest extends TestBase
         assertArrayEquals(new double[0], JSON.std.beanFrom(double[].class, "[]"), 0.0);
     }
 
-    // Empty arrays: Not yet implemented in Jackson-jr
-    @JacksonTestFailureExpected
     @Test
-    public void testEmptyArraysFailingBooleanArray() throws Exception {
+    public void testEmptyBooleanArray() throws Exception {
         assertArrayEquals(new boolean[0], JSON.std.beanFrom(boolean[].class, "[]"));
     }
 
-    @JacksonTestFailureExpected
+    // byte[] still uses Base64 encoding, not JSON array
     @Test
-    public void testEmptyArraysFailingByteArray() throws Exception {
-        assertArrayEquals(new byte[0], JSON.std.beanFrom(byte[].class, "[]"));
+    public void testEmptyByteArrayStillUsesBase64() throws Exception {
+        // byte[] is special - it doesn't read from JSON arrays
+        try {
+            JSON.std.beanFrom(byte[].class, "[]");
+            fail("Should not pass");
+        } catch (JSONObjectException e) {
+            verifyException(e, "Can only bind `byte[]` from Binary value");
+        }
     }
 
-    @JacksonTestFailureExpected
     @Test
-    public void testEmptyArraysFailingShortArray() throws Exception {
+    public void testEmptyShortArray() throws Exception {
         assertArrayEquals(new short[0], JSON.std.beanFrom(short[].class, "[]"));
     }
 
-    @JacksonTestFailureExpected
     @Test
-    public void testEmptyArraysFailingFloatArray() throws Exception {
+    public void testEmptyFloatArray() throws Exception {
         assertArrayEquals(new float[0], JSON.std.beanFrom(float[].class, "[]"), 0.0f);
     }
 
-    // Not yet fully implemented in Jackson-jr
-    @JacksonTestFailureExpected
     @Test
     public void testArraysAsObjectFields() throws Exception {
         AllArraysBean input = new AllArraysBean();
