@@ -17,6 +17,8 @@ Modules:
  (reported by Juul H)
  (fix contributed by Tomasz G)
 #208: Support reading of `double[]`
+#210: Support reading `boolean[]`/`short[]`/`float[]` values
+ (fix by @cowtowncoder, w/ Claude code)
 
 2.20.0 (28-Aug-2025)
 
