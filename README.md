@@ -34,13 +34,13 @@ Good old [Apache License](https://www.apache.org/licenses/LICENSE-2.0).
 
 Project is composed of multiple Maven sub-modules, each corresponding to a jar:
 
-* [jr-objects](../../tree/2.x/jr-objects) contains the "core" databinding implementation, and is commonly the only dependency to use
+* [jr-objects](../../tree/3.x/jr-objects) contains the "core" databinding implementation, and is commonly the only dependency to use
     * Depends on `jackson-core` for low-level reading/writing
-* [jr-stree](../../tree/2.x/jr-stree) contains a simple `TreeCodec` implementation, with which it is possible to read JSON as `TreeNode`s (see more below)
-* [jr-retrofit2](../../tree/2.x/jr-retrofit2) contains `jackson-jr` - based handlers for [Retrofit 2](https://square.github.io/retrofit/) library
+* [jr-stree](../../tree/3.x/jr-stree) contains a simple `TreeCodec` implementation, with which it is possible to read JSON as `TreeNode`s (see more below)
+* [jr-retrofit2](../../tree/3.x/jr-retrofit2) contains `jackson-jr` - based handlers for [Retrofit 2](https://square.github.io/retrofit/) library
     * Depends on `jackson-jr` and `Retrofit` API jars, and indirectly on `jackson-core`
-* [jr-annotation-support](../../tree/2.x/jr-annotation-support) contains extension with support for a subset of core [Jackson annotations](../../../jackson-annotations)
-* [jr-extension-javatime](../../tree/2.x/jr-extension-javatime) contains extension with support for a subset of Java 8 Date/Time types (e.g. `java.time.LocalDateTime`, `java.time.OffsetDateTime` (2.20), `java.time.ZonedDateTime` (2.20))
+* [jr-annotation-support](../../tree/3.x/jr-annotation-support) contains extension with support for a subset of core [Jackson annotations](../../../jackson-annotations)
+* [jr-extension-javatime](../../tree/3.x/jr-extension-javatime) contains extension with support for a subset of Java 8 Date/Time types (e.g. `java.time.LocalDateTime`, `java.time.OffsetDateTime` (2.20), `java.time.ZonedDateTime` (2.20))
 * jr-all creates an "uber-jar" that contains individual modules along with all their dependencies:
     * `jr-objects` classes as-is, without relocating
     * `jr-stree` classes as-is, without relocating
@@ -221,7 +221,7 @@ case ones for Java 8 date/time types, but the concept is general.
 ### Using (some of) Jackson annotations
 
 Jackson 2.11 added a new extension (a `JacksonJrExtension`) -- `jr-annotation-support` -- that adds support for a subset of Jackson annotations.
-See [jr-annotation-support/README.md](../../tree/2.x/jr-annotation-support) for details of this extension, but basic usage is by registering extension:
+See [jr-annotation-support/README.md](../../tree/3.x/jr-annotation-support) for details of this extension, but basic usage is by registering extension:
 
 ```
 import com.fasterxml.jackson.jr.annotationsupport.JacksonAnnotationExtension;
