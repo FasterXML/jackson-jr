@@ -30,10 +30,13 @@ public class SimpleValueReader extends ValueReader
     private final static long[] NO_LONGS = new long[0];
 
     // @since 2.21
-    private final static double[] NO_DOUBLES = new double[0];
     private final static boolean[] NO_BOOLEANS = new boolean[0];
-    private final static short[] NO_SHORTS = new short[0];
+    // @since 2.21
+    private final static double[] NO_DOUBLES = new double[0];
+    // @since 2.21
     private final static float[] NO_FLOATS = new float[0];    
+    // @since 2.21
+    private final static short[] NO_SHORTS = new short[0];
 
     protected final int _typeId;
 
@@ -544,29 +547,29 @@ public class SimpleValueReader extends ValueReader
      * @since 2.21
      */
     private static class BooleanArrayBuilder {
-        private boolean[] buffer;
-        private int size;
+        private boolean[] _buffer;
+        private int _size;
 
         BooleanArrayBuilder() {
-            buffer = new boolean[16];
-            size = 0;
+            _buffer = new boolean[16];
+            _size = 0;
         }
 
         void add(boolean value) {
-            if (size >= buffer.length) {
-                boolean[] newBuffer = new boolean[buffer.length * 2];
-                System.arraycopy(buffer, 0, newBuffer, 0, size);
-                buffer = newBuffer;
+            if (_size >= _buffer.length) {
+                boolean[] newBuffer = new boolean[_buffer.length * 2];
+                System.arraycopy(_buffer, 0, newBuffer, 0, _size);
+                _buffer = newBuffer;
             }
-            buffer[size++] = value;
+            _buffer[_size++] = value;
         }
 
         boolean[] toArray() {
-            if (size == buffer.length) {
-                return buffer;
+            if (_size == _buffer.length) {
+                return _buffer;
             }
-            boolean[] result = new boolean[size];
-            System.arraycopy(buffer, 0, result, 0, size);
+            boolean[] result = new boolean[_size];
+            System.arraycopy(_buffer, 0, result, 0, _size);
             return result;
         }
     }
@@ -578,29 +581,29 @@ public class SimpleValueReader extends ValueReader
      * @since 2.21
      */
     private static class ShortArrayBuilder {
-        private short[] buffer;
-        private int size;
+        private short[] _buffer;
+        private int _size;
 
         ShortArrayBuilder() {
-            buffer = new short[16];
-            size = 0;
+            _buffer = new short[16];
+            _size = 0;
         }
 
         void add(short value) {
-            if (size >= buffer.length) {
-                short[] newBuffer = new short[buffer.length * 2];
-                System.arraycopy(buffer, 0, newBuffer, 0, size);
-                buffer = newBuffer;
+            if (_size >= _buffer.length) {
+                short[] newBuffer = new short[_buffer.length * 2];
+                System.arraycopy(_buffer, 0, newBuffer, 0, _size);
+                _buffer = newBuffer;
             }
-            buffer[size++] = value;
+            _buffer[_size++] = value;
         }
 
         short[] toArray() {
-            if (size == buffer.length) {
-                return buffer;
+            if (_size == _buffer.length) {
+                return _buffer;
             }
-            short[] result = new short[size];
-            System.arraycopy(buffer, 0, result, 0, size);
+            short[] result = new short[_size];
+            System.arraycopy(_buffer, 0, result, 0, _size);
             return result;
         }
     }
@@ -612,29 +615,29 @@ public class SimpleValueReader extends ValueReader
      * @since 2.21
      */
     private static class FloatArrayBuilder {
-        private float[] buffer;
-        private int size;
+        private float[] _buffer;
+        private int _size;
 
         FloatArrayBuilder() {
-            buffer = new float[16];
-            size = 0;
+            _buffer = new float[16];
+            _size = 0;
         }
 
         void add(float value) {
-            if (size >= buffer.length) {
-                float[] newBuffer = new float[buffer.length * 2];
-                System.arraycopy(buffer, 0, newBuffer, 0, size);
-                buffer = newBuffer;
+            if (_size >= _buffer.length) {
+                float[] newBuffer = new float[_buffer.length * 2];
+                System.arraycopy(_buffer, 0, newBuffer, 0, _size);
+                _buffer = newBuffer;
             }
-            buffer[size++] = value;
+            _buffer[_size++] = value;
         }
 
         float[] toArray() {
-            if (size == buffer.length) {
-                return buffer;
+            if (_size == _buffer.length) {
+                return _buffer;
             }
-            float[] result = new float[size];
-            System.arraycopy(buffer, 0, result, 0, size);
+            float[] result = new float[_size];
+            System.arraycopy(_buffer, 0, result, 0, _size);
             return result;
         }
     }
