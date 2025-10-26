@@ -31,11 +31,8 @@ public class SimpleValueReader extends ValueReader
 
     // @since 2.21
     private final static boolean[] NO_BOOLEANS = new boolean[0];
-    // @since 2.21
     private final static double[] NO_DOUBLES = new double[0];
-    // @since 2.21
-    private final static float[] NO_FLOATS = new float[0];    
-    // @since 2.21
+    private final static float[] NO_FLOATS = new float[0];
     private final static short[] NO_SHORTS = new short[0];
 
     protected final int _typeId;
@@ -566,9 +563,7 @@ public class SimpleValueReader extends ValueReader
             if (_size == _buffer.length) {
                 return _buffer;
             }
-            boolean[] result = new boolean[_size];
-            System.arraycopy(_buffer, 0, result, 0, _size);
-            return result;
+            return Arrays.copyOf(_buffer, _size);
         }
     }
 
@@ -598,9 +593,7 @@ public class SimpleValueReader extends ValueReader
             if (_size == _buffer.length) {
                 return _buffer;
             }
-            short[] result = new short[_size];
-            System.arraycopy(_buffer, 0, result, 0, _size);
-            return result;
+            return Arrays.copyOf(_buffer, _size);
         }
     }
 
@@ -630,9 +623,7 @@ public class SimpleValueReader extends ValueReader
             if (_size == _buffer.length) {
                 return _buffer;
             }
-            float[] result = new float[_size];
-            System.arraycopy(_buffer, 0, result, 0, _size);
-            return result;
+            return Arrays.copyOf(_buffer, _size);
         }
     }
 }
