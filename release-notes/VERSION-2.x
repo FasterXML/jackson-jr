@@ -19,6 +19,7 @@ Modules:
 #201: Support for OffsetDateTime and ZonedDateTime in jackson-jr-extension-javatime
  (contributed by Stan B)
 
+2.19.3 (29-Oct-2025)
 2.19.2 (18-Jul-2025)
 
 #198: No deserializer for `long[]` type
@@ -35,6 +36,7 @@ No changes since 2.19.0
 - Update Retrofit2 dep from 2.9 to 2.11
 - Fix `retrofit2` module deps to Retrofit/OkHttp libraries
 
+2.18.5 (27-Oct-2025)
 2.18.4 (06-May-2025)
 2.18.3 (28-Feb-2025)
 
