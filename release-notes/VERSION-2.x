@@ -19,6 +19,7 @@ Modules:
 #201: Support for OffsetDateTime and ZonedDateTime in jackson-jr-extension-javatime
  (contributed by Stan B)
 
+2.19.4 (29-Oct-2025)
 2.19.3 (29-Oct-2025)
 2.19.2 (18-Jul-2025)
 
