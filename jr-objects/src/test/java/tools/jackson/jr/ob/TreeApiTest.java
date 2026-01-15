@@ -138,7 +138,7 @@ public class TreeApiTest extends TestBase
         }
     }
 
-    static class TestTreeCodec implements TreeCodec
+    static class TestTreeCodec implements TreeCodec<TreeNode>
     {
         @Override
         public ArrayTreeNode createArrayNode() {
@@ -150,14 +150,13 @@ public class TreeApiTest extends TestBase
             return new TestObjectNode();
         }
 
-        @SuppressWarnings("unchecked")
         @Override
-        public <T extends TreeNode> T readTree(JsonParser p) {
+        public TreeNode readTree(JsonParser p) {
             if (p.isExpectedStartArrayToken()) {
-                return (T) createArrayNode();
+                return createArrayNode();
             }
             if (p.isExpectedStartArrayToken()) {
-                return (T) createObjectNode();
+                return createObjectNode();
             }
             throw new IllegalStateException("Can't do: "+p.currentToken());
         }
