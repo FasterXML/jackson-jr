@@ -424,7 +424,7 @@ public class JSON
      * Optional handler for {@link TreeNode} values: if defined, we can
      * read and write {@link TreeNode} instances that codec supports.
      */
-    protected final TreeCodec _treeCodec;
+    protected final TreeCodec<TreeNode> _treeCodec;
 
     // @since 2.11
     protected final ValueReaderLocator _valueReaderLocator;
@@ -475,7 +475,7 @@ public class JSON
         
         protected final TokenStreamFactory _streamFactory;
 
-        protected TreeCodec _treeCodec;
+        protected TreeCodec<TreeNode> _treeCodec;
 
         protected JSONReader _reader;
         protected JSONWriter _writer;
@@ -609,7 +609,7 @@ public class JSON
         public PrettyPrinter prettyPrinter() { return _prettyPrinter; }
 
         public TokenStreamFactory streamFactory() { return _streamFactory; }
-        public TreeCodec treeCodec() { return _treeCodec; }
+        public TreeCodec<? extends TreeNode> treeCodec() { return _treeCodec; }
 
         public ReaderWriterModifier readerWriterModifier() {
             return (_extContext == null) ? null : _extContext._rwModifier;
@@ -655,8 +655,9 @@ public class JSON
          * Internal method used by to assign {@link TreeCodec} for {@link JSON}
          * instance built to use -- not to be called by end user.
          */
-        protected Builder treeCodec(TreeCodec tc) {
-            _treeCodec = tc;
+        @SuppressWarnings("unchecked")
+        protected Builder treeCodec(TreeCodec<? extends TreeNode> tc) {
+            _treeCodec = (TreeCodec<TreeNode>) tc;
             return this;
         }
     }
@@ -688,10 +689,11 @@ public class JSON
      *
      * @param b Builder that has configured settings to use.
      */
+    @SuppressWarnings("unchecked")
     public JSON(Builder b) {
         _features = b.featureMask();
         _streamFactory = b.streamFactory();
-        _treeCodec = b.treeCodec();
+        _treeCodec = (TreeCodec<TreeNode>) b.treeCodec();
 
         final ReaderWriterProvider rwProvider = b.readerWriterProvider();
         final ReaderWriterModifier rwModifier = b.readerWriterModifier();
@@ -721,14 +723,15 @@ public class JSON
         return new Builder(streamFactory);
     }
 
+    @SuppressWarnings("unchecked")
     protected JSON(JSON base,
-            int features, TokenStreamFactory streamF, TreeCodec trees,
+            int features, TokenStreamFactory streamF, TreeCodec<? extends TreeNode> trees,
             JSONReader r, JSONWriter w,
             PrettyPrinter pp)
     {
         _features = features;
         _streamFactory = streamF;
-        _treeCodec = trees;
+        _treeCodec = (TreeCodec<TreeNode>) trees;
         _valueReaderLocator = base._valueReaderLocator;
         _valueWriterLocator = base._valueWriterLocator;
         _reader = r;
@@ -901,7 +904,7 @@ public class JSON
      */
 
     protected JSON _with(int features,
-            TokenStreamFactory jsonF, TreeCodec trees,
+            TokenStreamFactory jsonF, TreeCodec<? extends TreeNode> trees,
             JSONReader reader, JSONWriter writer,
             PrettyPrinter pp)
     {
@@ -914,7 +917,7 @@ public class JSON
     /**********************************************************************
      */
 
-    public TreeCodec treeCodec() {
+    public TreeCodec<? extends TreeNode> treeCodec() {
         return _treeCodec;
     }
 
@@ -1327,13 +1330,14 @@ public class JSON
     /**********************************************************************
      */
     
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends TreeNode> T readTree(JsonParser p) throws JacksonException
     {
         if (_treeCodec == null) {
             _noTreeCodec("write TreeNode");
         }
-        return _treeCodec.readTree(p);
+        return (T) _treeCodec.readTree(p);
     }
 
     @Override
@@ -1432,6 +1436,7 @@ public class JSON
         if (_treeCodec == null) {
             _noTreeCodec("write TreeNode");
         }
+        // 15-Jan-2026, tatu: Ugly, but has to do
         _treeCodec.writeTree(g, tree);
     }
 
@@ -1599,6 +1604,7 @@ public class JSON
             return _builder.isEnabled(feature);
         }
         
+        @SuppressWarnings({ "rawtypes", "unchecked" })
         @Override
         public ExtensionContext setTreeCodec(TreeCodec tc) {
             _builder.treeCodec(tc);
@@ -1606,7 +1612,7 @@ public class JSON
         }
 
         @Override
-        public TreeCodec treeCodec() {
+        public TreeCodec<? extends TreeNode> treeCodec() {
             return _builder.treeCodec();
         }
 
