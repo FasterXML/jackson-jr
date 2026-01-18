@@ -11,7 +11,7 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
-2.21.0 (not yet released)
+2.21.0 (18-Jan-2026)
 
 #176: Cannot Deserialize JSON with `@JsonProperty` annotated Record fields
  (reported by Juul H)
