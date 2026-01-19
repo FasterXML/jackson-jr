@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.fasterxml.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
-    <version>2.20.2</version>
+    <version>2.20.3-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-stree</artifactId>
   <name>Jackson-jr: (simple) Tree extension</name>
@@ -35,7 +35,7 @@ has no other dependencies.
     <packageVersion.package>${project.groupId}.stree</packageVersion.package>
 
     <!-- for Reproducible Builds -->
-    <project.build.outputTimestamp>2026-01-19T21:15:43Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-01-19T21:16:33Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
