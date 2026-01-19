@@ -20,6 +20,7 @@ Modules:
 #210: Support reading `boolean[]`/`short[]`/`float[]` values
  (fix by @cowtowncoder, w/ Claude code)
 
+2.20.2 (19-Jan-2026)
 2.20.1 (30-Oct-2025)
 
 No changes since 2.20.0
