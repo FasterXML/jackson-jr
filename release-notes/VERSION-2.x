@@ -11,6 +11,10 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
+2.21.1 (22-Feb-2026)
+
+No changes since 2.21.0
+
 2.21.0 (18-Jan-2026)
 
 #176: Cannot Deserialize JSON with `@JsonProperty` annotated Record fields
@@ -20,6 +24,7 @@ Modules:
 #210: Support reading `boolean[]`/`short[]`/`float[]` values
  (fix by @cowtowncoder, w/ Claude code)
 
+2.20.2 (19-Jan-2026)
 2.20.1 (30-Oct-2025)
 
 No changes since 2.20.0
