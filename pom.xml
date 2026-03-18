@@ -12,7 +12,6 @@
   <packaging>pom</packaging>
   <description>Parent pom for Jackson jr components
   </description>
-
   <modules>
     <module>jr-objects</module>
     <module>jr-retrofit2</module>
