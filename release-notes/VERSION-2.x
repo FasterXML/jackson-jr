@@ -11,6 +11,10 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
+2.23.0 (not yet released)
+
+No changes since 2.22
+
 2.22.0 (31-May-2026)
 
 No changes since 2.21
