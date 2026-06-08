@@ -8,7 +8,7 @@
   <parent>
     <groupId>tools.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
-    <version>3.2.0</version>
+    <version>3.2.1-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-stree</artifactId>
   <name>Jackson-jr: (simple) Tree extension</name>
@@ -27,7 +27,7 @@ has no other dependencies.
     <packageVersion.package>${project.groupId}.stree</packageVersion.package>
 
     <!-- for Reproducible Builds -->
-    <project.build.outputTimestamp>2026-06-08T23:37:29Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-06-08T23:40:05Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
