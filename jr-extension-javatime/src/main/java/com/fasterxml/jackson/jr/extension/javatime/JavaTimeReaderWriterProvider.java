@@ -9,6 +9,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -27,18 +28,23 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
 {
     /**
      * ISO-8601 pattern used as the default for parsing textual
-     * {@link java.util.Date} values (and for writing them when textual
-     * serialization is enabled via {@link #withDateFormat}).
+     * {@link java.util.Date} / {@link java.util.Calendar} values (and for
+     * writing them when textual serialization is enabled via
+     * {@link #withDateFormat}).
+     *
+     * @since 2.23
      */
     private static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
     private ZoneId _localZoneId;
 
     /**
-     * Optional format for {@link java.util.Date} serialization. When left
-     * {@code null}, dates are written as numeric timestamps (milliseconds since
-     * the Unix epoch); reading always accepts both numeric timestamps and
-     * textual values.
+     * Optional format for {@link java.util.Date} and {@link java.util.Calendar}
+     * serialization. When left {@code null}, values are written as numeric
+     * timestamps (milliseconds since the Unix epoch); reading always accepts
+     * both numeric timestamps and textual values.
+     *
+     * @since 2.23
      */
     private DateFormat _dateFormat = null;
 
@@ -65,6 +71,9 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
             // serialization defaults to numeric timestamps.
             return new DateValueReader(_dateFormatForReading());
         }
+        if (Calendar.class.isAssignableFrom(type)) {
+            return new CalendarValueReader(_dateFormatForReading());
+        }
         return null;
     }
 
@@ -81,8 +90,10 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
         }
         if (Date.class.isAssignableFrom(type)) {
             // null format => numeric timestamp (default)
-            DateFormat f = (_dateFormat == null) ? null : (DateFormat) _dateFormat.clone();
-            return new DateValueWriter(f);
+            return new DateValueWriter(_dateFormatForWriting());
+        }
+        if (Calendar.class.isAssignableFrom(type)) {
+            return new CalendarValueWriter(_dateFormatForWriting());
         }
         return null;
     }
@@ -112,12 +123,13 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
 
     /**
      * Method for configuring the {@link DateFormat} used for textual
-     * serialization and deserialization of {@link java.util.Date} values.
+     * serialization and deserialization of {@link java.util.Date} and
+     * {@link java.util.Calendar} values.
      *<p>
-     * When set, {@code java.util.Date} values are <i>written</i> as JSON Strings
-     * using this format (instead of the default numeric timestamp), and textual
-     * values are <i>read</i> using this same format. Numeric timestamps are
-     * always accepted on read regardless of this setting.
+     * When set, those values are <i>written</i> as JSON Strings using this
+     * format (instead of the default numeric timestamp), and textual values are
+     * <i>read</i> using this same format. Numeric timestamps are always accepted
+     * on read regardless of this setting.
      *
      * @param df {@link DateFormat} instance, or {@code null} to restore the
      *   default (numeric timestamp serialization)
@@ -129,6 +141,19 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
         return this;
     }
 
+    /**
+     * @return Private clone of the configured format, or {@code null} when none
+     *   is configured (meaning: write numeric timestamps).
+     */
+    private DateFormat _dateFormatForWriting() {
+        return (_dateFormat == null) ? null : (DateFormat) _dateFormat.clone();
+    }
+
+    /**
+     * @return A format usable for reading textual values; falls back to a
+     *   default ISO-8601 (UTC) format when none is configured, so textual input
+     *   is always accepted.
+     */
     private DateFormat _dateFormatForReading() {
         if (_dateFormat != null) {
             return (DateFormat) _dateFormat.clone();
