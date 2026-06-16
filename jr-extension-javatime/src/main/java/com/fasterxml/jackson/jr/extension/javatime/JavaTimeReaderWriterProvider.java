@@ -1,5 +1,7 @@
 package com.fasterxml.jackson.jr.extension.javatime;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -7,6 +9,9 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import com.fasterxml.jackson.jr.ob.api.ReaderWriterProvider;
 import com.fasterxml.jackson.jr.ob.api.ValueReader;
@@ -20,11 +25,26 @@ import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
  */
 public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
 {
+    /**
+     * ISO-8601 pattern used as the default for parsing textual
+     * {@link java.util.Date} values (and for writing them when textual
+     * serialization is enabled via {@link #withDateFormat}).
+     */
+    private static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+
     private ZoneId _localZoneId;
-    
+
+    /**
+     * Optional format for {@link java.util.Date} serialization. When left
+     * {@code null}, dates are written as numeric timestamps (milliseconds since
+     * the Unix epoch); reading always accepts both numeric timestamps and
+     * textual values.
+     */
+    private DateFormat _dateFormat = null;
+
     protected static final DateTimeFormatter OFFSET_FORMATTER = _createFormatter(true);
     protected static final DateTimeFormatter LOCAL_FORMATTER = _createFormatter(false);
-    
+
     public JavaTimeReaderWriterProvider() {
         withLocalTimeZone(null);
     }
@@ -40,6 +60,11 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
         if (ZonedDateTime.class.isAssignableFrom(type)) {
         	return new ZonedDateTimeValueReader(_localZoneId);
         }
+        if (Date.class.isAssignableFrom(type)) {
+            // Always supply a format so textual values can be read, even when
+            // serialization defaults to numeric timestamps.
+            return new DateValueReader(_dateFormatForReading());
+        }
         return null;
     }
 
@@ -53,6 +78,11 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
         }
         if (ZonedDateTime.class.isAssignableFrom(type)) {
             return new ZonedDateTimeValueWriter();
+        }
+        if (Date.class.isAssignableFrom(type)) {
+            // null format => numeric timestamp (default)
+            DateFormat f = (_dateFormat == null) ? null : (DateFormat) _dateFormat.clone();
+            return new DateValueWriter(f);
         }
         return null;
     }
@@ -79,7 +109,35 @@ public class JavaTimeReaderWriterProvider extends ReaderWriterProvider
     public JavaTimeReaderWriterProvider withSystemDefaultTimeZone() {
     	return withLocalTimeZone(ZoneId.systemDefault());
     }
-    
+
+    /**
+     * Method for configuring the {@link DateFormat} used for textual
+     * serialization and deserialization of {@link java.util.Date} values.
+     *<p>
+     * When set, {@code java.util.Date} values are <i>written</i> as JSON Strings
+     * using this format (instead of the default numeric timestamp), and textual
+     * values are <i>read</i> using this same format. Numeric timestamps are
+     * always accepted on read regardless of this setting.
+     *
+     * @param df {@link DateFormat} instance, or {@code null} to restore the
+     *   default (numeric timestamp serialization)
+     * @since 2.23
+     * @return This provider instance for call chaining
+     */
+    public JavaTimeReaderWriterProvider withDateFormat(DateFormat df) {
+        _dateFormat = df;
+        return this;
+    }
+
+    private DateFormat _dateFormatForReading() {
+        if (_dateFormat != null) {
+            return (DateFormat) _dateFormat.clone();
+        }
+        SimpleDateFormat f = new SimpleDateFormat(DEFAULT_DATE_PATTERN, Locale.ROOT);
+        f.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return f;
+    }
+
     /**
      * Create a forgiving date time formatter that allows different interpretations of ISO 8601
      * strings to be parsed.
