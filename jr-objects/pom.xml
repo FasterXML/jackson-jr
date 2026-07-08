@@ -8,7 +8,7 @@
   <parent>
     <groupId>tools.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
-    <version>3.1.5-SNAPSHOT</version>
+    <version>3.1.5</version>
   </parent>
   <artifactId>jackson-jr-objects</artifactId>
   <name>Jackson-jr: Objects (main)</name>
@@ -25,7 +25,7 @@ has no other dependencies, and provides additional builder-style content generat
     <packageVersion.template.output>${generatedSourcesDir}/${packageVersion.dir}/PackageVersion.java</packageVersion.template.output>
 
     <!-- for Reproducible Builds -->
-    <project.build.outputTimestamp>2026-05-29T20:42:41Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-07-08T01:29:23Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
