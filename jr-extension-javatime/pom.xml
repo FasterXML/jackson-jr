@@ -8,7 +8,7 @@
     <parent>
         <groupId>tools.jackson.jr</groupId>
         <artifactId>jackson-jr-parent</artifactId>
-        <version>3.1.5</version>
+        <version>3.1.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>jackson-jr-extension-javatime</artifactId>
@@ -32,7 +32,7 @@
         <osgi.export>${project.groupId}.extension.javatime;version=${project.version}</osgi.export>
 
         <!-- for Reproducible Builds -->
-        <project.build.outputTimestamp>2026-07-08T01:29:23Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2026-07-08T01:30:08Z</project.build.outputTimestamp>
     </properties>
 
     <dependencies>
