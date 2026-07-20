@@ -318,11 +318,21 @@ public class ValueWriterLocator extends ValueLocatorBase
             if (I != null) {
                 typeId = I.intValue();
             } else {
-                typeId = _findSimpleType(type, true);
-                if ((_writerModifier != null) && typeId != 0) {
-                    ValueWriter w = _writerModifier.overrideStandardValueWriter(_writeContext, type, typeId);
-                    if (w != null) {
-                        typeId = _registerWriter(type, w);
+                // [jackson-jr#48]: consult custom provider before simple-type
+                // lookup so a `ReaderWriterProvider` can override handling of
+                // built-in types (such as `java.util.Date`) for bean properties,
+                // consistent with the reader side and top-level writer resolution.
+                ValueWriter w = (_writerProvider == null) ? null
+                        : _writerProvider.findValueWriter(_writeContext, type);
+                if (w != null) {
+                    typeId = _modifyAndRegisterWriter(type, w);
+                } else {
+                    typeId = _findSimpleType(type, true);
+                    if ((_writerModifier != null) && typeId != 0) {
+                        w = _writerModifier.overrideStandardValueWriter(_writeContext, type, typeId);
+                        if (w != null) {
+                            typeId = _registerWriter(type, w);
+                        }
                     }
                 }
                 // But what if none found? Discovered dynamically later on?
