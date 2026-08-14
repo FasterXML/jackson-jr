@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.fasterxml.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
-    <version>2.21.6-SNAPSHOT</version>
+    <version>2.21.6</version>
   </parent>
   <artifactId>jackson-jr-objects</artifactId>
   <name>Jackson-jr: Objects (main)</name>
@@ -32,7 +32,7 @@ has no other dependencies, and provides additional builder-style content generat
     <packageVersion.template.output>${generatedSourcesDir}/${packageVersion.dir}/PackageVersion.java</packageVersion.template.output>
 
     <!-- for Reproducible Builds -->
-    <project.build.outputTimestamp>2026-07-07T02:10:17Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-08-14T22:32:20Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
