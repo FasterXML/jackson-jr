@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.fasterxml.jackson.jr</groupId>
     <artifactId>jackson-jr-parent</artifactId>
-    <version>2.21.6</version>
+    <version>2.21.7-SNAPSHOT</version>
   </parent>
   <artifactId>jackson-jr-annotation-support</artifactId>
   <name>Jackson-jr: Jackson annotation support</name>
@@ -34,7 +34,7 @@
     <packageVersion.package>${project.groupId}.annotationsupport</packageVersion.package>
 
     <!-- for Reproducible Builds -->
-    <project.build.outputTimestamp>2026-08-14T22:32:20Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-08-14T22:33:00Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
