@@ -1,6 +1,7 @@
 package tools.jackson.jr.stree;
 
 import java.util.*;
+import java.util.IdentityHashMap;
 
 import tools.jackson.core.*;
 import tools.jackson.jr.ob.JSONObjectException;
@@ -87,10 +88,30 @@ public class JacksonJrsTreeCodec implements TreeCodec
     @Override
     public void writeTree(JsonGenerator g, TreeNode treeNode) throws JacksonException
     {
+        writeTree(g, treeNode, new IdentityHashMap<>());
+    }
+
+    void writeTree(JsonGenerator g, TreeNode treeNode, IdentityHashMap<JrsValue, Boolean> seen)
+        throws JacksonException
+    {
         if (treeNode == null) {
             g.writeNull();
+            return;
+        }
+        JrsValue v = (JrsValue) treeNode;
+        if (v.isContainer()) {
+            if (seen.containsKey(v)) {
+                throw new JSONObjectException("Direct self-reference leading to cycle (through `"
+                        + v.getClass().getName() + "` node)");
+            }
+            seen.put(v, Boolean.TRUE);
+            try {
+                v.write(g, this, seen);
+            } finally {
+                seen.remove(v);
+            }
         } else {
-            ((JrsValue) treeNode).write(g, this);
+            v.write(g, this);
         }
     }
 
