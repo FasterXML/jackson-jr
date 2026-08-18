@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.jr.ob.JSON;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,6 +47,11 @@ public class BasicIgnoralTest extends ASTestBase
             this.z = z;
         }
     }
+
+    record SnakeCaseRecord(
+        @JsonIgnore int x,
+        @JsonProperty("y_value") int y
+    ) {}
 
     private final JSON JSON_WITH_ANNO = jsonWithAnnotationSupport();
     private final JSON JSON_WITH_ANNO_WITH_STATIC =
@@ -117,6 +123,23 @@ public class BasicIgnoralTest extends ASTestBase
         assertEquals(2, result.y);
         assertEquals(new XY().x, result.x);
     }
+
+//    Probably another bug that needs to be fixed. First I'm focusing on the deserialization of records.
+//
+//    public void testSnakeCaseRecordDeserialization() throws Exception
+//    {
+//        final String input = a2q("{ 'x':1, 'y_value':2 }");
+//        SnakeCaseRecord result;
+//
+//        // First: without setting, nothing matches
+//        result = JSON.std.beanFrom(SnakeCaseRecord.class, input);
+//        assertNull(result);
+//
+//        // but with annotations it's all good...
+//        result = JSON_WITH_ANNO.beanFrom(SnakeCaseRecord.class, input);
+//        assertEquals(0, result.x());
+//        assertEquals(2, result.y());
+//    }
 
     /*
     /**********************************************************************

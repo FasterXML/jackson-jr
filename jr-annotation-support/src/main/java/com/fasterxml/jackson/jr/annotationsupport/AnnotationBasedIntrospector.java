@@ -16,6 +16,7 @@ import com.fasterxml.jackson.jr.ob.impl.BeanConstructors;
 import com.fasterxml.jackson.jr.ob.impl.JSONReader;
 import com.fasterxml.jackson.jr.ob.impl.JSONWriter;
 import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
+import com.fasterxml.jackson.jr.ob.impl.RecordsHelpers;
 
 /**
  *
@@ -91,18 +92,30 @@ public class AnnotationBasedIntrospector
             constructors = null;
         } else {
             constructors = new BeanConstructors(_type);
-            for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
-                Class<?>[] argTypes = ctor.getParameterTypes();
-                if (argTypes.length == 0) {
-                    constructors.addNoArgsConstructor(ctor);
-                } else if (argTypes.length == 1) {
-                    Class<?> argType = argTypes[0];
-                    if (argType == String.class) {
-                        constructors.addStringConstructor(ctor);
-                    } else if (argType == Integer.class || argType == Integer.TYPE) {
-                        constructors.addIntConstructor(ctor);
-                    } else if (argType == Long.class || argType == Long.TYPE) {
-                        constructors.addLongConstructor(ctor);
+            if (RecordsHelpers.isRecordType(_type)) {
+                Constructor<?> canonical = RecordsHelpers.findCanonicalConstructor(_type);
+                constructors.addRecordConstructor(canonical);
+                for (int i = 0; i < canonical.getParameterCount(); i++) {
+                    Parameter ctorParam = canonical.getParameters()[i];
+                    final String explName = _findExplicitName(ctorParam);
+                    if (explName != null) {
+                        constructors.addRecordConstructorAlias(explName, ctorParam.getType(), i);
+                    }
+                }
+            } else {
+                for (Constructor<?> ctor : _type.getDeclaredConstructors()) {
+                    Class<?>[] argTypes = ctor.getParameterTypes();
+                    if (argTypes.length == 0) {
+                        constructors.addNoArgsConstructor(ctor);
+                    } else if (argTypes.length == 1) {
+                        Class<?> argType = argTypes[0];
+                        if (argType == String.class) {
+                            constructors.addStringConstructor(ctor);
+                        } else if (argType == Integer.class || argType == Integer.TYPE) {
+                            constructors.addIntConstructor(ctor);
+                        } else if (argType == Long.class || argType == Long.TYPE) {
+                            constructors.addLongConstructor(ctor);
+                        }
                     }
                 }
             }

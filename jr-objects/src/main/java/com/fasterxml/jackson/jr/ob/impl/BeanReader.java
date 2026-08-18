@@ -137,10 +137,17 @@ public class BeanReader
     }
 
     private Object readRecord(JSONReader r, JsonParser p) throws Exception {
-        final Object[] values = new Object[_propsByName.size()];
+        final Object[] values = new Object[_propsByName.size() + _constructors.getRecordCtorAliasesCount()];
 
         String propName;
         for (; (propName = p.nextFieldName()) != null;) {
+            BeanConstructors.RecordAlias recAlias;
+            if ((recAlias = _constructors.getRecordCtorAliasValueReader(propName)) != null) {
+                values[recAlias.pos()] = recAlias.reader().readNext(r, p);
+
+                continue;
+            }
+
             BeanPropertyReader prop = findProperty(propName);
             if (prop == null) {
                 handleUnknown(r, p, propName);
