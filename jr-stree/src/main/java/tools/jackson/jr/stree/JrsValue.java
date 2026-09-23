@@ -2,6 +2,7 @@ package tools.jackson.jr.stree;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 
 import tools.jackson.core.*;
 import tools.jackson.jr.stree.util.JrsTreeTraversingParser;
@@ -123,6 +124,16 @@ public abstract class JrsValue implements TreeNode
 
     protected abstract void write(JsonGenerator g, JacksonJrsTreeCodec codec)
         throws JacksonException;
+
+    /**
+     * Variant used for container nodes during serialization, to allow cycle detection.
+     */
+    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec,
+            IdentityHashMap<JrsValue, Boolean> seen)
+        throws JacksonException
+    {
+        write(g, codec);
+    }
 
     /*
     /**********************************************************************

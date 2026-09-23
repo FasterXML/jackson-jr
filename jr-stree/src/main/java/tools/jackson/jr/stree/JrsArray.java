@@ -94,14 +94,22 @@ public class JrsArray
      */
 
     @Override
-    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec)
+    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec,
+            IdentityHashMap<JrsValue, Boolean> seen)
         throws JacksonException
     {
         g.writeStartArray();
         for (int i = 0, end = _values.size(); i < end; ++i) {
-            codec.writeTree(g, _values.get(i));
+            codec.writeTree(g, _values.get(i), seen);
         }
         g.writeEndArray();
+    }
+
+    @Override
+    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec)
+        throws JacksonException
+    {
+        write(g, codec, new IdentityHashMap<>());
     }
 
     @Override
