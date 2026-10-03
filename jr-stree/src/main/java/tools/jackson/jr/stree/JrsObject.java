@@ -2,6 +2,7 @@ package tools.jackson.jr.stree;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -100,16 +101,24 @@ public class JrsObject
      */
 
     @Override
-    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws JacksonException
+    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec,
+            IdentityHashMap<JrsValue, Boolean> seen)
+        throws JacksonException
     {
         g.writeStartObject();
         if (!_values.isEmpty()) {
             for (Map.Entry<String,JrsValue> entry : _values.entrySet()) {
                 g.writeName(entry.getKey());
-                codec.writeTree(g, entry.getValue());
+                codec.writeTree(g, entry.getValue(), seen);
             }
         }
         g.writeEndObject();
+    }
+
+    @Override
+    protected void write(JsonGenerator g, JacksonJrsTreeCodec codec) throws JacksonException
+    {
+        write(g, codec, new IdentityHashMap<>());
     }
 
     @Override
