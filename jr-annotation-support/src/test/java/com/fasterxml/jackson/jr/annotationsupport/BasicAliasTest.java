@@ -3,6 +3,7 @@ package com.fasterxml.jackson.jr.annotationsupport;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.jr.ob.JSON;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,6 +35,11 @@ public class BasicAliasTest extends ASTestBase
         public void setLast(String str) { last = str; }
     }
 
+    record SnakeCaseRecord(
+        @JsonProperty("first_name") String firstName,
+        @JsonProperty("last_name") String lastName
+    ) {}
+
     /*
     /**********************************************************************
     /* Test methods
@@ -61,5 +67,21 @@ public class BasicAliasTest extends ASTestBase
         assertEquals("Billy", result.first);
         assertEquals("Bob", result.middle);
         assertEquals("Burger", result.last);
+    }
+
+    public void testSnakeCaseRecordDeserialization() throws Exception
+    {
+        final String input = a2q("{ 'first_name':'John', 'last_name':'Doe' }");
+        SnakeCaseRecord result;
+
+        // First: without setting, nothing matches
+        result = JSON.std.beanFrom(SnakeCaseRecord.class, input);
+        assertNull(result.firstName());
+        assertNull(result.lastName());
+
+        // but with annotations it's all good...
+        result = JSON_WITH_ANNO.beanFrom(SnakeCaseRecord.class, input);
+        assertEquals("John", result.firstName());
+        assertEquals("Doe", result.lastName());
     }
 }

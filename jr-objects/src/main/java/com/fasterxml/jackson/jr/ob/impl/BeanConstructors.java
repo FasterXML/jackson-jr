@@ -1,6 +1,10 @@
 package com.fasterxml.jackson.jr.ob.impl;
 
+import com.fasterxml.jackson.jr.ob.api.ValueReader;
+
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Container class added to encapsulate details of collection and use of
@@ -10,6 +14,9 @@ import java.lang.reflect.Constructor;
  */
 public class BeanConstructors
 {
+    public record RecordAlias(ValueReader reader, Integer pos) {
+
+    }
     protected final Class<?> _valueType;
 
     protected Constructor<?> _noArgsCtor;
@@ -21,10 +28,17 @@ public class BeanConstructors
      */
     protected Constructor<?> _recordCtor;
 
+    /**
+     * Aliases for Record constructor parameters.
+     *
+     * @since 2.20
+     */
+    protected Map<String, RecordAlias> _recordCtorAliases = new HashMap<>();
+
     protected Constructor<?> _intCtor;
+
     protected Constructor<?> _longCtor;
     protected Constructor<?> _stringCtor;
-
     public BeanConstructors(Class<?> valueType) {
         _valueType = valueType;
     }
@@ -42,6 +56,14 @@ public class BeanConstructors
         return this;
     }
 
+    /**
+     * @since 2.20
+     */
+    public BeanConstructors addRecordConstructorAlias(String alias, Class<?> valueType, int pos) {
+        _recordCtorAliases.put(alias, new RecordAlias(new SimpleValueReader(valueType, 9), pos)); // TODO: Should not always be a simplevaluereader
+        return this;
+    }
+
     public BeanConstructors addIntConstructor(Constructor<?> ctor) {
         _intCtor = ctor;
         return this;
@@ -55,6 +77,14 @@ public class BeanConstructors
     public BeanConstructors addStringConstructor(Constructor<?> ctor) {
         _stringCtor = ctor;
         return this;
+    }
+
+    public RecordAlias getRecordCtorAliasValueReader(String name) {
+        return _recordCtorAliases.get(name);
+    }
+
+    public int getRecordCtorAliasesCount() {
+        return _recordCtorAliases.size();
     }
 
     public void forceAccess() {
