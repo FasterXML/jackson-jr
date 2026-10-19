@@ -58,6 +58,13 @@ public class JSONWriter
 
     protected final boolean _writeNullValues;
 
+    /**
+     * Identity set used to detect cyclic references during bean serialization.
+     * Lazily instantiated; scoped to active container via add/remove in
+     * {@link #writeBeanValue}.
+     */
+    protected IdentityHashMap<Object, Object> _seenBeans;
+
     /*
     /**********************************************************************
     /* Blueprint construction
@@ -791,7 +798,18 @@ public class JSONWriter
 
     public void writeBeanValue(BeanPropertyWriter[] props, Object bean) throws JacksonException
     {
+        _checkBeanCycle(bean);
         _generator.writeStartObject(bean);
+        try {
+            writeBeanValueContents(props, bean);
+        } finally {
+            _releaseBeanCycle(bean);
+        }
+    }
+
+    protected void writeBeanValueContents(BeanPropertyWriter[] props, Object bean)
+        throws JacksonException
+    {
         int i = 0;
         int left = props.length;
 
@@ -912,6 +930,28 @@ public class JSONWriter
             }
         }
         _generator.writeEndObject();
+    }
+
+    protected void _checkBeanCycle(Object bean) throws JacksonException
+    {
+        if (bean == null) {
+            return;
+        }
+        if (_seenBeans == null) {
+            _seenBeans = new IdentityHashMap<>();
+        }
+        if (_seenBeans.containsKey(bean)) {
+            throw new JSONObjectException("Direct self-reference leading to cycle (through reference chain involving "
+                    + bean.getClass().getName() + ")");
+        }
+        _seenBeans.put(bean, bean);
+    }
+
+    protected void _releaseBeanCycle(Object bean)
+    {
+        if (_seenBeans != null && bean != null) {
+            _seenBeans.remove(bean);
+        }
     }
 
     protected void writeUnknownValue(Object data) throws JacksonException {
