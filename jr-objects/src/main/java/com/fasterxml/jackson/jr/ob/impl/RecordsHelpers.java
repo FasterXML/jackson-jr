@@ -37,7 +37,7 @@ public final class RecordsHelpers {
     }
     private RecordsHelpers() {}
 
-    static Constructor<?> findCanonicalConstructor(Class<?> beanClass) {
+    public static Constructor<?> findCanonicalConstructor(Class<?> beanClass) {
         // sanity check: caller shouldn't rely on it
         if (!supportsRecords || !isRecordType(beanClass)) {
             return null;
@@ -78,7 +78,7 @@ public final class RecordsHelpers {
         }
     }
 
-    static boolean isRecordType(Class<?> cls) {
+    public static boolean isRecordType(Class<?> cls) {
         Class<?> parent = cls.getSuperclass();
         return (parent != null) && "java.lang.Record".equals(parent.getName());
     }
