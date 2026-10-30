@@ -48,6 +48,13 @@ public class ArrayReader extends ValueReader
     
     @Override
     public Object read(JSONReader r, JsonParser p) throws IOException {
+        if (!p.hasToken(JsonToken.START_ARRAY)) {
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
+            throw JSONObjectException.from(p, "Unexpected token %s; should get START_ARRAY",
+                    p.currentToken());
+        }
         CollectionBuilder b = r._collectionBuilder(null);
         if (p.nextToken() == JsonToken.END_ARRAY) {
             return b.emptyArray(_elementType);
