@@ -69,6 +69,13 @@ public class MapReader extends ValueReader
 
     @Override
     public Object read(JSONReader r, JsonParser p) throws JacksonException {
+        if (!p.hasToken(JsonToken.START_OBJECT)) {
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
+            throw JSONObjectException.from(p, "Unexpected token %s; should get START_OBJECT",
+                    p.currentToken());
+        }
         MapBuilder b = r._mapBuilder(_mapType);
         String propName0 = p.nextName();
         if (propName0 == null) {
