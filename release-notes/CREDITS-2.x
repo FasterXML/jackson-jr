@@ -95,3 +95,9 @@ Juul Hobert (@juulhobert)
 * Reported #176: Cannot Deserialize JSON with `@JsonProperty` annotated Record fields
  (2.21.0)
 
+Oleg Tsvetkov (@Hekzory)
+
+* Reported, contributed fix for #223: Reading `List<List<X>>` or `List<String[]>`
+  never returns when an element isn't an array
+ (2.23.0)
+
