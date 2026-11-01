@@ -44,7 +44,7 @@ public class CollectionReader extends ValueReader
             return b.emptyCollection();
         }
         Object value = _valueReader.read(r, p);
-        if (p.nextToken() == JsonToken.END_ARRAY) {
+        if (!_hasMoreElements(p)) {
             return b.singletonCollection(value);
         }
         b = b.start().add(value);
@@ -68,7 +68,7 @@ public class CollectionReader extends ValueReader
             return b.emptyCollection();
         }
         Object value = _valueReader.read(r, p);
-        if (p.nextToken() == JsonToken.END_ARRAY) {
+        if (!_hasMoreElements(p)) {
             return b.singletonCollection(value);
         }
         b = b.start().add(value);
@@ -83,6 +83,8 @@ public class CollectionReader extends ValueReader
      * end-of-input: parser reports it as {@code null} (not as an exception) once past
      * root-level content, which an element reader that consumes too many tokens
      * can cause; reading more elements would then never reach {@code END_ARRAY}.
+     *
+     * @since 2.23
      */
     static boolean _hasMoreElements(JsonParser p) throws IOException {
         final JsonToken t = p.nextToken();

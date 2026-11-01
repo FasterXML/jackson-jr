@@ -140,6 +140,20 @@ public class ReadNestedContainers223Test extends TestBase
                 "Unexpected end-of-input");
         _verifyFails(() -> GREEDY_JSON.arrayOfFrom(Greedy.class, "[1]"),
                 "Unexpected end-of-input");
+        // Above fail right after the first element; these after later ones
+        _verifyFails(() -> GREEDY_JSON.listOfFrom(Greedy.class, "[1,2,3]"),
+                "Unexpected end-of-input");
+        _verifyFails(() -> GREEDY_JSON.arrayOfFrom(Greedy.class, "[1,2,3]"),
+                "Unexpected end-of-input");
+    }
+
+    // Not hanging, but used to call element reader with no current token
+    @Test
+    public void testEndOfInputAfterFirstElement() throws Exception {
+        _verifyFails(() -> JSON.std.listOfFrom(int[].class, "[5]"),
+                "Unexpected end-of-input");
+        _verifyFails(() -> JSON.std.arrayOfFrom(int[].class, "[5]"),
+                "Unexpected end-of-input");
     }
 
     @Test

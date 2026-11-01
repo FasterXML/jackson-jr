@@ -36,7 +36,7 @@ public class ArrayReader extends ValueReader
             return b.emptyArray(_elementType);
         }
         Object value = _valueReader.read(r, p);
-        if (p.nextToken() == JsonToken.END_ARRAY) {
+        if (!CollectionReader._hasMoreElements(p)) {
             return b.singletonArray(_elementType, value);
         }
         b = b.start().add(value);
@@ -60,7 +60,7 @@ public class ArrayReader extends ValueReader
             return b.emptyArray(_elementType);
         }
         Object value = _valueReader.read(r, p);
-        if (p.nextToken() == JsonToken.END_ARRAY) {
+        if (!CollectionReader._hasMoreElements(p)) {
             return b.singletonArray(_elementType, value);
         }
         b = b.start().add(value);
