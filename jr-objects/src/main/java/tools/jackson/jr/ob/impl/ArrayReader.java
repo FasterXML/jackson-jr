@@ -33,30 +33,37 @@ public class ArrayReader extends ValueReader
             return b.emptyArray(_elementType);
         }
         Object value = _valueReader.read(r, p);
-        if (p.nextToken() == JsonToken.END_ARRAY) {
+        if (!CollectionReader._hasMoreElements(p)) {
             return b.singletonArray(_elementType, value);
         }
         b = b.start().add(value);
         do {
             b = b.add(_valueReader.read(r, p));
-        } while (p.nextToken() != JsonToken.END_ARRAY);
+        } while (CollectionReader._hasMoreElements(p));
         return b.buildArray(_elementType);
     }
     
     @Override
     public Object read(JSONReader r, JsonParser p) throws JacksonException {
+        if (!p.hasToken(JsonToken.START_ARRAY)) {
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
+            throw JSONObjectException.from(p, "Unexpected token %s; should get START_ARRAY",
+                    p.currentToken());
+        }
         CollectionBuilder b = r._collectionBuilder(null);
         if (p.nextToken() == JsonToken.END_ARRAY) {
             return b.emptyArray(_elementType);
         }
         Object value = _valueReader.read(r, p);
-        if (p.nextToken() == JsonToken.END_ARRAY) {
+        if (!CollectionReader._hasMoreElements(p)) {
             return b.singletonArray(_elementType, value);
         }
         b = b.start().add(value);
         do {
             b = b.add(_valueReader.read(r, p));
-        } while (p.nextToken() != JsonToken.END_ARRAY);
+        } while (CollectionReader._hasMoreElements(p));
         return b.buildArray(_elementType);
     }
 }
