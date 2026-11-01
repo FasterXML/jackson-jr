@@ -44,30 +44,53 @@ public class CollectionReader extends ValueReader
             return b.emptyCollection();
         }
         Object value = _valueReader.read(r, p);
-        if (p.nextToken() == JsonToken.END_ARRAY) {
+        if (!_hasMoreElements(p)) {
             return b.singletonCollection(value);
         }
         b = b.start().add(value);
         do {
             b = b.add(_valueReader.read(r, p));
-        } while (p.nextToken() != JsonToken.END_ARRAY);
+        } while (_hasMoreElements(p));
         return b.buildCollection();
     }
         
     @Override
     public Object read(JSONReader r, JsonParser p) throws IOException {
+        if (!p.hasToken(JsonToken.START_ARRAY)) {
+            if (p.hasToken(JsonToken.VALUE_NULL)) {
+                return null;
+            }
+            throw JSONObjectException.from(p, "Unexpected token %s; should get START_ARRAY",
+                    p.currentToken());
+        }
         CollectionBuilder b = r._collectionBuilder(_collectionType);
         if (p.nextToken() == JsonToken.END_ARRAY) {
             return b.emptyCollection();
         }
         Object value = _valueReader.read(r, p);
-        if (p.nextToken() == JsonToken.END_ARRAY) {
+        if (!_hasMoreElements(p)) {
             return b.singletonCollection(value);
         }
         b = b.start().add(value);
         do {
             b = b.add(_valueReader.read(r, p));
-        } while (p.nextToken() != JsonToken.END_ARRAY);
+        } while (_hasMoreElements(p));
         return b.buildCollection();
+    }
+
+    /**
+     * Helper method for advancing to the token after an array element. Fails on
+     * end-of-input: parser reports it as {@code null} (not as an exception) once past
+     * root-level content, which an element reader that consumes too many tokens
+     * can cause; reading more elements would then never reach {@code END_ARRAY}.
+     *
+     * @since 2.23
+     */
+    static boolean _hasMoreElements(JsonParser p) throws IOException {
+        final JsonToken t = p.nextToken();
+        if (t == null) {
+            throw JSONObjectException.from(p, "Unexpected end-of-input; should get array element or END_ARRAY");
+        }
+        return t != JsonToken.END_ARRAY;
     }
 }
