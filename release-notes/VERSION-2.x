@@ -13,7 +13,9 @@ Modules:
 
 2.23.0 (not yet released)
 
-No changes since 2.22
+#223: Reading `List<List<X>>` or `List<String[]>` never returns when an element
+  isn't an array
+ (reported, fix contributed by Oleg T)
 
 2.22.4 (17-Oct-2026)
 2.22.3 (21-Sep-2026)

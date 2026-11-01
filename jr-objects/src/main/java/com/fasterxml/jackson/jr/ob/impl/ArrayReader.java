@@ -42,7 +42,7 @@ public class ArrayReader extends ValueReader
         b = b.start().add(value);
         do {
             b = b.add(_valueReader.read(r, p));
-        } while (p.nextToken() != JsonToken.END_ARRAY);
+        } while (CollectionReader._hasMoreElements(p));
         return b.buildArray(_elementType);
     }
     
@@ -66,7 +66,7 @@ public class ArrayReader extends ValueReader
         b = b.start().add(value);
         do {
             b = b.add(_valueReader.read(r, p));
-        } while (p.nextToken() != JsonToken.END_ARRAY);
+        } while (CollectionReader._hasMoreElements(p));
         return b.buildArray(_elementType);
     }
 }
