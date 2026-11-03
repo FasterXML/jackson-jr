@@ -201,7 +201,7 @@ public class ReadSimpleTest extends TestBase
     public void testMiscUriTypes() throws Exception
     {
         final String URL_STR = "http://fasterxml.com";
-        final URL url = new URL(URL_STR);
+        final URL url = URI.create(URL_STR).toURL();
         assertEquals(url, JSON.std.beanFrom(URL.class, q(URL_STR)));
 
         Path p = Paths.get(new URI("file:///foo/bar.txt"));
