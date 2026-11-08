@@ -11,7 +11,7 @@ Modules:
 === Releases ===
 ------------------------------------------------------------------------
 
-2.23.0 (not yet released)
+2.23.0 (07-Nov-2026)
 
 #223: Reading `List<List<X>>` or `List<String[]>` never returns when an element
   isn't an array
